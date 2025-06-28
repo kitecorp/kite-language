@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Operators")
-public class OperatorsTest extends BaseTest {
+public class OperatorsTest extends ParserTest {
 
 
     @Test

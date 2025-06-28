@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Block")
-public class BlockTest extends BaseTest {
+public class BlockTest extends ParserTest {
 
     @Test
     void testInteger() {

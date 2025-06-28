@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Val")
-public class ValTest extends BaseChecker {
+public class ValTest extends CheckerTest {
 
     @Test
     void testGlobalVarEmptyString() {

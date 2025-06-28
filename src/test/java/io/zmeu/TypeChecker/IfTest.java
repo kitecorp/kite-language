@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TypeChecker If")
-public class IfTest extends BaseChecker {
+public class IfTest extends CheckerTest {
 
     @Test
     void testBlock() {

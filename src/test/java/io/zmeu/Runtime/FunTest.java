@@ -1,5 +1,6 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import io.zmeu.Frontend.Parser.Expressions.VarDeclaration;
 import io.zmeu.Frontend.Parser.Literals.Identifier;
 import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
@@ -17,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-public class FunTest extends BaseRuntimeTest {
+public class FunTest extends RuntimeTest {
 
     @Test
     void funDeclaration() {

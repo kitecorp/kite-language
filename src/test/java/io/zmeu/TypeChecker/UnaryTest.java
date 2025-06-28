@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-public class UnaryTest extends BaseChecker {
+public class UnaryTest extends CheckerTest {
 
     @Test
     void incrementInt() {

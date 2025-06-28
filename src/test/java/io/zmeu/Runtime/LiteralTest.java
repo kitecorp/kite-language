@@ -1,12 +1,13 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
 import io.zmeu.Frontend.Parser.Literals.SymbolIdentifier;
 import io.zmeu.Runtime.Values.NullValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class LiteralTest extends BaseRuntimeTest {
+public class LiteralTest extends RuntimeTest {
     @Test
     void literal() {
         var res = interpreter.visit(10.0);

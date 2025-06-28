@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Var")
-public class VarDeclarationTest extends BaseTest {
+public class VarDeclarationTest extends ParserTest {
 
     @Test
     void testDeclaration() {

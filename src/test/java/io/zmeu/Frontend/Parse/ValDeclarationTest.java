@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j2
 @DisplayName("Parser val")
-public class ValDeclarationTest extends BaseTest {
+public class ValDeclarationTest extends ParserTest {
 
     @Test
     void testDeclaration() {

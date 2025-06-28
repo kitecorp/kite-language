@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Assignment")
-public class AssignmentTest extends BaseTest {
+public class AssignmentTest extends ParserTest {
 
     @Test
     void testAssignment() {

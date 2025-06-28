@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -8,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 @Log4j2
 @DisplayName("TypeChecker String")
-class StringTest extends BaseChecker {
+class StringTest extends CheckerTest {
 
     @Test
     void testStringLiteral() {

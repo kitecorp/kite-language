@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("TypeChecker Lambdas")
-public class LambdaTest extends BaseChecker {
+public class LambdaTest extends CheckerTest {
 
     @Test
     void lambdaWithReturn() {

@@ -1,9 +1,9 @@
 package io.zmeu.Runtime.Functions;
 
-import io.zmeu.Runtime.BaseRuntimeTest;
+import io.zmeu.Base.RuntimeTest;
 import org.junit.jupiter.api.Test;
 
-class PrintFunctionTest extends BaseRuntimeTest {
+class PrintFunctionTest extends RuntimeTest {
 
     private final PrintFunction function = new PrintFunction();
 

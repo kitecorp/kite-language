@@ -1,11 +1,11 @@
 package io.zmeu.Frontend.Lexical;
 
 import io.zmeu.Frontend.Parser.errors.ParseError;
-import io.zmeu.Runtime.BaseRuntimeTest;
+import io.zmeu.Base.RuntimeTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class ResolverTest extends BaseRuntimeTest {
+class ResolverTest extends RuntimeTest {
 
     @Test
     void varNameCollision() {

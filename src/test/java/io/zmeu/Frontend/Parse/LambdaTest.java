@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Lambda")
-public class LambdaTest extends BaseTest {
+public class LambdaTest extends ParserTest {
 
     @Test
     void lambdaSimple() {

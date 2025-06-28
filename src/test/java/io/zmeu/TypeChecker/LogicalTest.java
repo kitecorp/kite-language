@@ -1,10 +1,11 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class LogicalTest extends BaseChecker {
+public class LogicalTest extends CheckerTest {
 
     @Test
     void trueOrTrue() {

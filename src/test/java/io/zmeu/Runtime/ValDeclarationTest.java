@@ -1,5 +1,6 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import io.zmeu.ErrorSystem;
 import io.zmeu.Frontend.Parser.Parser;
 import lombok.extern.log4j.Log4j2;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j2
-public class ValDeclarationTest extends BaseRuntimeTest {
+public class ValDeclarationTest extends RuntimeTest {
 
 
     @Test

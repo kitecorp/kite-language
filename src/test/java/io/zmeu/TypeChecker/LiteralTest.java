@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.Frontend.Parser.Literals.NullLiteral;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +15,7 @@ import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
 
 @Log4j2
 @DisplayName("TypeChecker Literal")
-class LiteralTest extends BaseChecker {
+class LiteralTest extends CheckerTest {
 
     @Test
     void testInteger() {

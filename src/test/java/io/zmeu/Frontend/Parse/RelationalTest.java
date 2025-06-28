@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Relational")
-public class RelationalTest extends BaseTest {
+public class RelationalTest extends ParserTest {
 
     @Test
     void testGreaterThan() {

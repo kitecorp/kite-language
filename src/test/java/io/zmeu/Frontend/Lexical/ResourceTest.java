@@ -1,9 +1,9 @@
 package io.zmeu.Frontend.Lexical;
 
-import io.zmeu.Runtime.BaseRuntimeTest;
+import io.zmeu.Base.RuntimeTest;
 import org.junit.jupiter.api.Test;
 
-class ResourceTest extends BaseRuntimeTest {
+class ResourceTest extends RuntimeTest {
 
     @Test
     void varNameCollision() {

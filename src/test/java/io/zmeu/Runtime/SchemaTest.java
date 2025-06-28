@@ -1,5 +1,6 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import io.zmeu.Runtime.Values.FunValue;
 import io.zmeu.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +13,7 @@ import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
-public class SchemaTest extends BaseRuntimeTest {
+public class SchemaTest extends RuntimeTest {
 
     @Test
     void declare() {

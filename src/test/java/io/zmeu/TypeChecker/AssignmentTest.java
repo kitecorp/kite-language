@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
 @DisplayName("TypeChecker Assignment")
-public class AssignmentTest extends BaseChecker {
+public class AssignmentTest extends CheckerTest {
 
     @Test
     void testSimpleAssignment() {

@@ -1,7 +1,7 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.ErrorSystem;
-import io.zmeu.Frontend.Parse.BaseTest;
+import io.zmeu.Frontend.Parse.ParserTest;
 import io.zmeu.Frontend.Parser.Factory;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("TypeChecker Type")
-public class ValueTypesTest extends BaseTest {
+public class ValueTypesTest extends ParserTest {
 
     @Test
     void testString() {

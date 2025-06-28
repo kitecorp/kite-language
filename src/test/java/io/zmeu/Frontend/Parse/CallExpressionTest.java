@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Function Call")
-public class CallExpressionTest extends BaseTest {
+public class CallExpressionTest extends ParserTest {
 
     @Test
     void testFunctionCall() {

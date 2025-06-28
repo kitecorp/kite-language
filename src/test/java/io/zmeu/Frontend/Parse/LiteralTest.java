@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Literal")
-public class LiteralTest extends BaseTest {
+public class LiteralTest extends ParserTest {
 
     @Test
     void testInteger() {
