@@ -1,6 +1,5 @@
 package io.zmeu.Runtime.Values;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.zmeu.Frontend.Parser.Expressions.Expression;
 import io.zmeu.Frontend.Parser.Literals.Identifier;
 import io.zmeu.Frontend.Parser.Literals.ParameterIdentifier;
@@ -21,7 +20,6 @@ import java.util.List;
 
 @Data
 public class FunValue implements Callable {
-    @JsonBackReference
     @EqualsAndHashCode.Exclude
     private Environment clojure;
     private Identifier name;

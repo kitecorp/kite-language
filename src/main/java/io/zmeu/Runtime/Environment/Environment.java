@@ -1,7 +1,5 @@
 package io.zmeu.Runtime.Environment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.zmeu.Runtime.Values.ResourceValue;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.Runtime.exceptions.VarExistsException;
@@ -21,13 +19,11 @@ import java.util.Map;
 public class Environment<T> implements IEnvironment<T> {
     @Nullable
     @Getter
-    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final Environment<T> parent;
 
     @Getter
-    @JsonIgnoreProperties("variables")
     private final Map<String, T> variables;
 
     public Environment(@Nullable Environment<T> parent) {
