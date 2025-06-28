@@ -21,7 +21,7 @@ public class SchemaTest extends BaseRuntimeTest {
                     
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         assertEquals("Vm", actual.getType());
@@ -36,7 +36,7 @@ public class SchemaTest extends BaseRuntimeTest {
                     }
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         Assertions.assertEquals(FunValue.of("test", actual.getEnvironment()), actual.getEnvironment().lookup("test"));
@@ -50,7 +50,7 @@ public class SchemaTest extends BaseRuntimeTest {
                     val int y // init not mandatory in schema
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         assertNull(actual.getEnvironment().get("x"));
@@ -65,7 +65,7 @@ public class SchemaTest extends BaseRuntimeTest {
                     val int y = 20.2 // init can be a default value schema
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         Assertions.assertEquals(20.2, actual.getEnvironment().get("x"));
@@ -80,7 +80,7 @@ public class SchemaTest extends BaseRuntimeTest {
                     val String y = "hello"
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         Assertions.assertEquals("hello", actual.getEnvironment().get("x"));
@@ -97,7 +97,7 @@ public class SchemaTest extends BaseRuntimeTest {
                 }
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         Assertions.assertEquals(FunValue.of("init", actual.getEnvironment()), actual.getEnvironment().lookup("init"));
@@ -112,7 +112,7 @@ public class SchemaTest extends BaseRuntimeTest {
                 }
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         Assertions.assertEquals(FunValue.of("init", List.of(param("x")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
@@ -127,7 +127,7 @@ public class SchemaTest extends BaseRuntimeTest {
                 }
                 """);
 
-        log.warn(toJson(res));
+        log.warn(res);
         var actual = (SchemaValue) global.get("Vm");
 
         assertEquals(res, actual);
@@ -144,7 +144,7 @@ public class SchemaTest extends BaseRuntimeTest {
                 }
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         assertNotNull(res);
@@ -162,7 +162,7 @@ public class SchemaTest extends BaseRuntimeTest {
                 }
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
         assertNotNull(res);

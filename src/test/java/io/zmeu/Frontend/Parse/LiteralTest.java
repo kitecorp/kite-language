@@ -18,7 +18,7 @@ public class LiteralTest extends BaseTest {
         var res = parse("1");
         var expected = Program.of(ExpressionStatement.expressionStatement(NumberLiteral.of(1)));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement("Hello")
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement(1)
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 
@@ -64,7 +64,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement("42")
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -76,7 +76,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement("42")
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement("  42  ")
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement(42)
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class LiteralTest extends BaseTest {
                 ExpressionStatement.expressionStatement("  42  ")
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 }

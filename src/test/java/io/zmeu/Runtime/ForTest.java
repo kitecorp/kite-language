@@ -18,7 +18,7 @@ public class ForTest extends BaseRuntimeTest {
                    a = b;
                  }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(233, res);
     }
 
@@ -29,7 +29,7 @@ public class ForTest extends BaseRuntimeTest {
                    a;
                  }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(10, res);
     }
 
@@ -41,7 +41,7 @@ public class ForTest extends BaseRuntimeTest {
                    a
                  }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(10, res);
     }
 

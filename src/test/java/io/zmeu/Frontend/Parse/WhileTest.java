@@ -36,7 +36,7 @@ public class WhileTest extends BaseTest {
                         )).build()
 
         );
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 
@@ -64,7 +64,7 @@ public class WhileTest extends BaseTest {
 
         );
 
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 
@@ -86,7 +86,7 @@ public class WhileTest extends BaseTest {
                 .build()
         );
 
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 

@@ -15,7 +15,7 @@ public class BlockTest extends BaseRuntimeTest {
                 x*y+30
                 """);
         assertEquals(230, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
     @Test
     void nestedBlock() {
@@ -29,7 +29,7 @@ public class BlockTest extends BaseRuntimeTest {
                 }
                 """);
         assertEquals(10, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class BlockTest extends BaseRuntimeTest {
                 }
                 """);
         assertEquals(20, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -60,6 +60,6 @@ public class BlockTest extends BaseRuntimeTest {
                 }
                 """);
         assertEquals(20, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 }

@@ -142,7 +142,7 @@ public class ResourceTest extends BaseChecker {
                 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn(res);
         var schema = (SchemaType) checker.getEnv().get("vm");
 
         var resource = (ResourceType) schema.getInstances().get("main");

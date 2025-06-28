@@ -32,7 +32,7 @@ public class LambdaTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class LambdaTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class LambdaTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class LambdaTest extends BaseTest {
                 expressionStatement(lambda("x", "y", binary("*", "x", "y")))
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class LambdaTest extends BaseTest {
                         lambda("x", "y", block(expressionStatement(binary("*", "x", "y"))))
                 ));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class LambdaTest extends BaseTest {
                 )
         )));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class LambdaTest extends BaseTest {
                 )
         )));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class LambdaTest extends BaseTest {
                 """);
         var expected = program(expressionStatement(lambda(List.of(), block())));
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class LambdaTest extends BaseTest {
                 """);
         var expected = program(
                 expressionStatement(call(lambda("x", binary("*", "x", "x")), 2)));
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -150,7 +150,7 @@ public class LambdaTest extends BaseTest {
                 expressionStatement(
                         call(call(lambda("x", binary("*", "x", "x")), 2), Collections.emptyList())
                 ));
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -163,7 +163,7 @@ public class LambdaTest extends BaseTest {
                 expressionStatement(
                         call(call(lambda("x", binary("*", "x", "x")), 2), string("hi"))
                 ));
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
     }
 

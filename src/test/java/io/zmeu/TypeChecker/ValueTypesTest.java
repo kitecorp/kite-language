@@ -25,7 +25,7 @@ public class ValueTypesTest extends BaseTest {
         var res = parse("var string x\n");
         var expected = program(Factory.var(id("x"), type("string")));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -33,7 +33,7 @@ public class ValueTypesTest extends BaseTest {
         var res = parse("var string x ");
         var expected = program(Factory.var(id("x"), type("string")));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ValueTypesTest extends BaseTest {
         var res = parse("var string x ;");
         var expected = program(Factory.var(id("x"), type("string")));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ValueTypesTest extends BaseTest {
                 """);
         var expected = program(var(id("x"), type("string"), string("test")));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class ValueTypesTest extends BaseTest {
                 """);
         var expected = program(Factory.var(id("x"), type("std.Number")));
         assertEquals(expected, actual);
-        log.info(toJson(actual));
+        log.info((actual));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ValueTypesTest extends BaseTest {
                 """);
         var expected = program(var(id("x"), type("std.Number"), number(2)));
         assertEquals(expected, actual);
-        log.info(toJson(actual));
+        log.info((actual));
     }
     @Test
     void testSpace() {
@@ -92,7 +92,7 @@ public class ValueTypesTest extends BaseTest {
                 """);
         var expected = program(var(id("x"), type("std.Number"), number(2)));
         assertEquals(expected, actual);
-        log.info(toJson(actual));
+        log.info((actual));
     }
 
 

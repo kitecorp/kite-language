@@ -20,7 +20,7 @@ public class LambdaTest extends BaseRuntimeTest {
                     onClick((data)->data*10)
                 }""");
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(300, res);
     }
 
@@ -31,7 +31,7 @@ public class LambdaTest extends BaseRuntimeTest {
                 f(2)
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(4, res);
     }
 
@@ -41,7 +41,7 @@ public class LambdaTest extends BaseRuntimeTest {
                 ((x) -> x*x) (2)
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(4, res);
     }
 
@@ -56,7 +56,7 @@ public class LambdaTest extends BaseRuntimeTest {
                     }) (2)
                 }""");
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(9, res);
     }
 
@@ -72,7 +72,7 @@ public class LambdaTest extends BaseRuntimeTest {
                     }) (2)
                 }""");
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(11, res);
     }
 
@@ -93,7 +93,7 @@ public class LambdaTest extends BaseRuntimeTest {
                                 
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(9, res);
     }
 
@@ -111,7 +111,7 @@ public class LambdaTest extends BaseRuntimeTest {
                 bar()
                 """);
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(30, res);
     }
 

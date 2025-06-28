@@ -10,8 +10,6 @@ repositories {
     mavenCentral()
 }
 
-def pf4jVersion = '3.12.1'
-def jackson = '2.18.3'
 def lombok = '1.18.36'
 
 dependencies {
@@ -23,13 +21,6 @@ dependencies {
 
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.jetbrains:annotations:26.0.1'
-    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson"
-    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson"
-    testImplementation "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson"
-
-    testImplementation "com.fasterxml.jackson.core:jackson-databind:$jackson"
-    testImplementation "com.fasterxml.jackson.core:jackson-core:$jackson"
-    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jackson"
 
     compileOnly "org.projectlombok:lombok:${lombok}"
     annotationProcessor "org.projectlombok:lombok:${lombok}"

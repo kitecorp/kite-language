@@ -23,7 +23,7 @@ public class AssignmentTest extends BaseTest {
         var res = parse("x=2");
         var expected = program(expressionStatement(assign("=", id("x"), of(2))));
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -31,7 +31,7 @@ public class AssignmentTest extends BaseTest {
         var res = parse("x={2}");
         var expected = program(expressionStatement(assign("=", id("x"), block(expressionStatement(of(2))))));
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AssignmentTest extends BaseTest {
                 assign("=", id("x"),
                         block(expressionStatement(assign("=", id("y"), number(2))),
                                 expressionStatement(number(2))))));
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -58,7 +58,7 @@ public class AssignmentTest extends BaseTest {
                         assign("=", id("y"), number(2))
                 )));
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class AssignmentTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class AssignmentTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test

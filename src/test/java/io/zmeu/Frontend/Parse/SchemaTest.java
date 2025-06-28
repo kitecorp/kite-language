@@ -34,8 +34,8 @@ public class SchemaTest extends BaseTest {
                         var(id("x"), type("Number"), number(1)),
                         valStatement(val(id("y"), type("Number"), number(1))))
                 ));
-        log.warn(toJson(actual));
-        assertEquals(toJson(expected), toJson(actual));
+        log.warn((actual));
+        assertEquals((expected), (actual));
     }
 
 }
