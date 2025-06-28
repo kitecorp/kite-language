@@ -17,7 +17,7 @@ public class ModuleTest extends BaseTest {
         var res = parse("module Backend api {}");
         var expected = program(module("Backend", "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -25,7 +25,7 @@ public class ModuleTest extends BaseTest {
         var res = parse("module 'Backend' api {}");
         var expected = program(module("'Backend'", "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ModuleTest extends BaseTest {
                 "Backend"
                 """, "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class ModuleTest extends BaseTest {
         var res = parse("module 'Aws.Storage' api {}");
         var expected = program(module("'Aws.Storage'", "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ModuleTest extends BaseTest {
         var res = parse("module Aws.Storage api {}");
         var expected = program(module("Aws.Storage", "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     /*
@@ -69,7 +69,7 @@ public class ModuleTest extends BaseTest {
         var res = parse("module 'Aws.Storage/S3.Bucket' api {}");
         var expected = program(module("'Aws.Storage/S3.Bucket'", "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ModuleTest extends BaseTest {
         var res = parse("module 'Aws.Storage/S3.Bucket@2022-01-20' api {}");
         var expected = program(module("'Aws.Storage/S3.Bucket@2022-01-20'", "api", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class ModuleTest extends BaseTest {
         var expected = program(module("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
                 block(assign("name", "bucket-prod"))));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 

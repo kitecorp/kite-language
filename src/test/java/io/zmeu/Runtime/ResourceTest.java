@@ -41,7 +41,7 @@ public class ResourceTest extends BaseRuntimeTest {
                 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -70,7 +70,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     maxCount = vm.main.maxCount
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -108,7 +108,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     maxCount = vm.main.maxCount
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -139,7 +139,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     maxCount = 3
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -171,7 +171,7 @@ public class ResourceTest extends BaseRuntimeTest {
                 }
                 
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var main = schema.getInstances().get("main");
@@ -204,7 +204,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     minCount = 1
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -245,7 +245,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     maxCount = 2
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -290,7 +290,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     minCount = 3
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -342,7 +342,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     maxCount = 3
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -393,7 +393,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     minCount = 2
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
@@ -509,7 +509,7 @@ public class ResourceTest extends BaseRuntimeTest {
                 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn(res);
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -528,7 +528,7 @@ public class ResourceTest extends BaseRuntimeTest {
                 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -548,7 +548,7 @@ public class ResourceTest extends BaseRuntimeTest {
                 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -571,7 +571,7 @@ public class ResourceTest extends BaseRuntimeTest {
                 var z = vm.main.x
                 z
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -619,7 +619,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     x = 3
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");
@@ -644,7 +644,7 @@ public class ResourceTest extends BaseRuntimeTest {
                     x = 3
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
         var resource = schema.getInstances().get("main");

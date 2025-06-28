@@ -37,7 +37,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class IfBaseTest extends BaseTest {
                         expressionStatement(
                                 assign("=", id("x"), number(1)))));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class IfBaseTest extends BaseTest {
                         block(expressionStatement(number(1))),
                         block(expressionStatement(number(2)))));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -143,7 +143,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -204,7 +204,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -223,7 +223,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -244,7 +244,7 @@ public class IfBaseTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -265,7 +265,7 @@ public class IfBaseTest extends BaseTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 
@@ -287,7 +287,7 @@ public class IfBaseTest extends BaseTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 
@@ -309,7 +309,7 @@ public class IfBaseTest extends BaseTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 
@@ -331,7 +331,7 @@ public class IfBaseTest extends BaseTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info(toJson(res));
+        log.info((res));
         assertEquals(expected, res);
     }
 

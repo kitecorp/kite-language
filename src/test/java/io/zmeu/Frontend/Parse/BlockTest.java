@@ -20,7 +20,7 @@ public class BlockTest extends BaseTest {
         var res = parse("{ 42 }");
         var expected = program(expressionStatement(block(expressionStatement(42))));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -28,14 +28,14 @@ public class BlockTest extends BaseTest {
         var res = parse("{ \"hello\" }");
         var expected = program(expressionStatement(block(expressionStatement("hello"))));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
     @Test
     void testEmptyBlock() {
         var res = parse("{ }    ");
         var expected = program(expressionStatement(block(Collections.emptyList())));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 
@@ -44,7 +44,7 @@ public class BlockTest extends BaseTest {
         var res = parse("{ { \"hello\" } }");
         var expected = program(expressionStatement(block(block(expressionStatement("hello")))));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 
@@ -53,7 +53,7 @@ public class BlockTest extends BaseTest {
         var res = parse("\n");
         var expected = program();
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class BlockTest extends BaseTest {
         var res = parse("{ \n }");
         var expected = program(expressionStatement(block(Collections.emptyList())));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 

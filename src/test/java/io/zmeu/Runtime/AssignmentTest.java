@@ -19,7 +19,7 @@ public class AssignmentTest extends BaseRuntimeTest {
 
         var res = eval("VERSION");
         assertEquals(2, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -28,7 +28,7 @@ public class AssignmentTest extends BaseRuntimeTest {
 
         var res = (Boolean) eval("VERSION");
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class AssignmentTest extends BaseRuntimeTest {
 
         var res = (Boolean) eval("VERSION");
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AssignmentTest extends BaseRuntimeTest {
 
         var res = eval("VERSION");
         assertEquals(1.1, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
 
@@ -57,7 +57,7 @@ public class AssignmentTest extends BaseRuntimeTest {
         var res = eval("VERSION");
         var expected = new NullValue();
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class AssignmentTest extends BaseRuntimeTest {
         var res = eval("VERSION=2");
         var expected = 2;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class AssignmentTest extends BaseRuntimeTest {
         var res = eval("VERSION=1");
         var expected = 1;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class AssignmentTest extends BaseRuntimeTest {
 
         var res = (Boolean) eval("VERSION=true");
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class AssignmentTest extends BaseRuntimeTest {
 
         var res = (Boolean) eval("VERSION=false");
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class AssignmentTest extends BaseRuntimeTest {
         var res = eval("VERSION=1.1");
         var expected = 1.1;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class AssignmentTest extends BaseRuntimeTest {
         var res = eval("VERSION=1.2");
         var expected = 1.2;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 """);
         var expected = 1.1 + 2.2;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 """);
         var expected = 1.1 * 2.2;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 """);
         var expected = 2.1 / 2.2;
         assertEquals(expected, res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -158,7 +158,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 1==2
                 """);
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -168,7 +168,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 1==1
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 3 < 2
                 """);
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 3 < 3.1
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -198,7 +198,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 3.2 < 3.1
                 """);
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -208,7 +208,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 3 > 2
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 3 >= 2
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -228,7 +228,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 2 >= 2
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -238,7 +238,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 1 >= 2
                 """);
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -248,7 +248,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 3 <= 2
                 """);
         assertFalse(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -258,7 +258,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 2 <= 2
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn((res));
     }
 
     @Test
@@ -268,7 +268,7 @@ public class AssignmentTest extends BaseRuntimeTest {
                 x = 1 <= 2
                 """);
         assertTrue(res);
-        log.warn(toJson(res));
+        log.warn(res);
     }
 
 

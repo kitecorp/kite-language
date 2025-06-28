@@ -33,7 +33,7 @@ public class FunTest extends BaseRuntimeTest {
                         VarDeclaration.of(Identifier.id("x"), NumberLiteral.of(1))))),
                 global
         );
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
         Assertions.assertEquals(global.get("myFun"), res);
     }
@@ -56,7 +56,7 @@ public class FunTest extends BaseRuntimeTest {
                 global
         );
 
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
         Assertions.assertEquals(global.get("myFun"), res);
     }
@@ -69,7 +69,7 @@ public class FunTest extends BaseRuntimeTest {
                 }
                 myFun(2)
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(2, res);
     }
     @Test
@@ -87,7 +87,7 @@ public class FunTest extends BaseRuntimeTest {
                     
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals("global", res);
     }
 
@@ -99,7 +99,7 @@ public class FunTest extends BaseRuntimeTest {
                 }
                 sqrt(2)
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(4, res);
     }
 
@@ -123,7 +123,7 @@ public class FunTest extends BaseRuntimeTest {
                 }
                 sqrt(2,3)
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(7, res);
     }
 
@@ -143,7 +143,7 @@ public class FunTest extends BaseRuntimeTest {
                     fn(30)
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(160, res);
     }
 
@@ -160,7 +160,7 @@ public class FunTest extends BaseRuntimeTest {
                 println("fib result is: ", x)
                 x
                     """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(8, res);
     }
 

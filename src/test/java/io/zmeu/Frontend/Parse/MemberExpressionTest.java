@@ -20,7 +20,7 @@ public class MemberExpressionTest extends BaseTest {
         var res = parse("x.y");
         var expected = program(expressionStatement(member("x", "y")));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -30,7 +30,7 @@ public class MemberExpressionTest extends BaseTest {
                 assign(member("x", "y"), 1, "="))
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -40,7 +40,7 @@ public class MemberExpressionTest extends BaseTest {
                 member(true, "x", 0), 1, "="))
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class MemberExpressionTest extends BaseTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class MemberExpressionTest extends BaseTest {
                         1)
         ));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 }

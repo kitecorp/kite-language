@@ -19,7 +19,7 @@ public class WhileTest extends BaseRuntimeTest {
                     x 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(5, res);
     }
 
@@ -34,7 +34,7 @@ public class WhileTest extends BaseRuntimeTest {
                     x 
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(6, res);
     }
 

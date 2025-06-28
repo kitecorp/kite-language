@@ -20,7 +20,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -36,7 +36,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -52,7 +52,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -68,7 +68,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(3, res);
     }
 
@@ -86,7 +86,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(3, res);
     }
 
@@ -104,7 +104,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(3, res);
     }
 
@@ -122,7 +122,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(3  , res);
     }
 
@@ -140,7 +140,7 @@ public class IfStatementTest extends BaseRuntimeTest {
                     x       
                 }
                 """);
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(3, res);
     }
 

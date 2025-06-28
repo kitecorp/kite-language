@@ -22,7 +22,7 @@ public class VarDeclarationTest extends BaseTest {
         var res = parse("var x");
         var expected = program(statement(var("x")));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class VarDeclarationTest extends BaseTest {
                         var("y")
                 ));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class VarDeclarationTest extends BaseTest {
                         var("x", number(2))
                 ));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class VarDeclarationTest extends BaseTest {
                         var("y", number(2))
                 ));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class VarDeclarationTest extends BaseTest {
                         var("y", number(2))
                 ));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 
@@ -83,7 +83,7 @@ public class VarDeclarationTest extends BaseTest {
         var expected = program(statement(
                 var("x", block(expressionStatement(number(2)))))
         );
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -101,7 +101,7 @@ public class VarDeclarationTest extends BaseTest {
                                 statement(var("y", number(2))),
                                 ExpressionStatement.expressionStatement(number(3)))))
         );
-        log.warn(toJson(res));
+        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -116,7 +116,7 @@ public class VarDeclarationTest extends BaseTest {
                 statement(var("y", number(2)))
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class VarDeclarationTest extends BaseTest {
                 statement(var("y", number(2)))
         );
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 

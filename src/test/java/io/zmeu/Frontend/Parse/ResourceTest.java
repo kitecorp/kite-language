@@ -17,7 +17,7 @@ public class ResourceTest extends BaseTest {
         var res = parse("resource vm main {  }");
         var expected = program(resource("vm", "main", block()));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ResourceTest extends BaseTest {
                 assign("name", "main")
         )));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ResourceTest extends BaseTest {
                 assign("name", "main")
         )));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ResourceTest extends BaseTest {
                 assign("name", 1)
         )));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ResourceTest extends BaseTest {
                 assign("name", member("a", "b"))
         )));
         assertEquals(expected, res);
-        log.info(toJson(res));
+        log.info((res));
     }
 
 
