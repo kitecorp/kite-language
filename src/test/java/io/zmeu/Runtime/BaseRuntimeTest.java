@@ -15,6 +15,7 @@ public class BaseRuntimeTest {
     protected Tokenizer tokenizer;
     protected Environment global;
     protected Resolver resolver;
+    protected Program program;
 
     @BeforeEach
     void reset() {
@@ -29,10 +30,11 @@ public class BaseRuntimeTest {
     @AfterEach
     void cleanup() {
         ErrorSystem.clear();
+        program = null;
     }
 
     protected Object eval(String source) {
-        Program program = parser.produceAST(tokenizer.tokenize(source));
+        program = src(source);
         resolver.resolve(program);
         return interpreter.visit(program);
     }
