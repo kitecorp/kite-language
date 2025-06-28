@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id('org.gradlex.extra-java-module-info') version "1.12"
+}
+
+group 'io.zmeu'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+def pf4jVersion = '3.12.1'
+def jackson = '2.18.3'
+def lombok = '1.18.36'
+
+dependencies {
+    implementation project(':api')
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.24.2'
+    testImplementation 'org.slf4j:slf4j-jdk14:2.0.16'
+
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'org.jetbrains:annotations:26.0.1'
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson"
+    implementation "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jackson"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson"
+
+    compileOnly "org.projectlombok:lombok:${lombok}"
+    annotationProcessor "org.projectlombok:lombok:${lombok}"
+
+    testCompileOnly "org.projectlombok:lombok:${lombok}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombok}"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.3'
+    testImplementation 'org.junit.platform:junit-platform-suite-engine:1.11.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.3'
+    testImplementation 'com.h2database:h2:2.3.232'
+    testImplementation "org.mockito:mockito-core:3.+"
+}
+
+test {
+    useJUnitPlatform()
+}
+extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
+}
+compileJava {
+    options.compilerArgs += [
+            "-Aproject=${project.group}/${project.name}",
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+            '-Amapstruct.verbose=true'
+    ]
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+configurations {
+    testClasses {
+        canBeResolved = true  // ✅ this is key
+        canBeConsumed = true
+        extendsFrom(testImplementation)
+        // ✅ Assign a distinct capability
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+        }
+    }
+}
+
+tasks.register('testJar', Jar) {
+    archiveClassifier.set('test')
+    from sourceSets.test.output
+}
+
+artifacts {
+    testClasses testJar
+}

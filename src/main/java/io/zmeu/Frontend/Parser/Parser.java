@@ -1,0 +1,1018 @@
+package io.zmeu.Frontend.Parser;
+
+import io.zmeu.ErrorSystem;
+import io.zmeu.ExecutionContext;
+import io.zmeu.Frontend.Lexer.Token;
+import io.zmeu.Frontend.Lexer.TokenType;
+import io.zmeu.Frontend.Parser.Expressions.*;
+import io.zmeu.Frontend.Parser.Literals.*;
+import io.zmeu.Frontend.Parser.Statements.*;
+import io.zmeu.Runtime.exceptions.InvalidInitException;
+import io.zmeu.TypeChecker.Types.TypeParser;
+import io.zmeu.TypeChecker.Types.ValueType;
+import io.zmeu.Visitors.SyntaxPrinter;
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static io.zmeu.Frontend.Lexer.TokenType.*;
+import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+
+
+/**
+ * Name         Operators       Associates
+ * Equality     == !=           Left
+ * Comparison   < >= < <=       Left
+ * Term         - +             Left
+ * Factor       * /             Left
+ * Unary        ! -             Right
+ * Each rule here only matches expressions at its precedence level or higher.
+ * For example, unary matches a unary expression like !negated or a primary expression like 1234
+ * And term can match 1 + 2 but also 3 * 4 / 5. The final primary rule covers the highest-precedence
+ * forms—literals and parenthesized expressions.
+ * <p>
+ * Expression -> Equality
+ * Equality -> Comparison ( ("==" | "!=") Comparison)* ;
+ * Comparison -> Term ( ( "!=" | "==" ) Term )* ;
+ * Term -> Factor ( ( "-" | "+" ) Factor )* ;
+ * Factor -> Unary ( ( "/" | "*" ) Unary )* ;
+ * Unary -> ( "!" | "-" ) Unary
+ * | Primary ;
+ * Primary -> NUMBER
+ * | STRING
+ * | "true"
+ * | "false"
+ * | "null"
+ * | "(" Expression ")"
+ * <p>
+ * ----------------------------------------------------------
+ * Grammar notation         Code representation
+ * -----------------------------------------------------------
+ * Terminal                 Code to match and consume a token
+ * Nonterminal              Call to that rule’s function
+ * |                        if or switch statement
+ * + or *                   while or for loop
+ * ?                        if statement
+ * ------------------------------------------------------------
+ */
+@Data
+@Log4j2
+public class Parser {
+    public static final String VAL_NOT_INITIALISED = "val \"%s\" must be initialized";
+    private ParserIterator iterator;
+    private Program program = new Program();
+    private SyntaxPrinter printer = new SyntaxPrinter();
+    public TypeParser typeParser = new TypeParser(this);
+    /**
+     * Used to detect when a val/var is declared in a schema or in a resource.
+     * When in a schema, a val can be left uninitialised:
+     * val String x
+     * this is ok because it's just a declaration but when in a resource, it must be initialised
+     */
+    private ExecutionContext context;
+
+    public Parser(List<Token> tokens) {
+        setTokens(tokens);
+    }
+
+    public Parser() {
+    }
+
+    private void setTokens(List<Token> tokens) {
+        iterator = new ParserIterator(tokens);
+    }
+
+    public Program produceAST(List<Token> tokens) {
+        setTokens(tokens);
+        return Program();
+    }
+
+    private Program Program() {
+        var statements = StatementList(EOF);
+        program.setBody(statements);
+        return program;
+    }
+
+    /**
+     * StatementList
+     * : Statement
+     * | StatementList Statement
+     * ;
+     */
+    private List<Statement> StatementList(TokenType endTokenType) {
+        var statementList = new ArrayList<Statement>();
+        for (; iterator.hasNext(); eat()) {
+            if (IsLookAhead(endTokenType)) { // need to check for EOF before doing any work
+                break;
+            }
+            Statement statement = Declaration();
+            if (statement == null || statement instanceof EmptyStatement) {
+                if (iterator.hasNext()) {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+//            if (iterator.getCurrent().isLineTerminator()) { // if we eat too much - going beyond lineTerminator -> go back 1 token
+//                iterator.prev();
+//            }
+            statementList.add(statement);
+            if (IsLookAhead(endTokenType) || iterator.getCurrent().type() == EOF) {
+                // after some work is done, before calling iterator.next(),
+                // we must check for EOF again or else we risk going outside the iterators bounds
+                break;
+            }
+
+        }
+
+        return statementList;
+    }
+
+    private Statement Declaration() {
+        try {
+            return switch (lookAhead().type()) {
+                case Fun -> FunctionDeclaration();
+                case Schema -> SchemaDeclaration();
+                case Resource, Existing -> ResourceDeclaration();
+                case Module -> ModuleDeclaration();
+                case Var -> VarDeclarations();
+                case Val -> ValDeclarations();
+                default -> Statement();
+            };
+        } catch (RuntimeException error) {
+            ErrorSystem.error(error.getMessage());
+            log.error(error.getMessage());
+            iterator.synchronize();
+            return null;
+        }
+    }
+
+    /**
+     * {@snippet
+             *: Statement
+     * | EmptyStatement
+     * | VarStatement
+     * | IfStatement
+     * | IterationStatement
+     * | ForStatement
+     * | FunctionDeclarationStatement
+     * | SchemaDeclarationStatement
+     * | ReturnStatement
+     * | ExpressionStatement
+     * ;
+     *}
+     */
+    @Nullable
+    private Statement Statement() {
+        return switch (lookAhead().type()) {
+            case NewLine -> new EmptyStatement();
+//            case OpenBraces -> BlockStatement();
+            case If -> IfStatement();
+            case Init -> InitStatement();
+            case Return -> ReturnStatement();
+            case While, For -> IterationStatement();
+            case EOF -> null;
+            default -> ExpressionStatement();
+        };
+    }
+
+    private Statement IterationStatement() {
+        return switch (lookAhead().type()) {
+            case While -> WhileStatement();
+            case For -> ForStatement();
+            default -> throw new SyntaxError();
+        };
+    }
+
+    /**
+     * WhileStatement
+     * : while ( Expression ) {? StatementList }?
+     * ;
+     */
+    private Statement WhileStatement() {
+        eat(While);
+        eat(OpenParenthesis);
+        var test = Expression();
+        eat(CloseParenthesis);
+        if (IsLookAhead(NewLine)) {
+            /* while(x)
+             *   x=2
+             */
+            eat(NewLine);
+        }
+
+        var statement = Statement();
+        return WhileStatement.of(test, statement);
+    }
+
+    /**
+     * ForStatement
+     * : for ( OptStatementInit ; OptExpression ; OptExpression ) Statement
+     * ;
+     */
+    private Statement ForStatement() {
+        eat(For);
+        eat(OpenParenthesis);
+
+        Statement init = ForStatementInit();
+        eat(SemiColon);
+
+        var test = ForStatementTest();
+        eat(SemiColon);
+
+        var update = ForStatementIncrement();
+        eat(CloseParenthesis);
+        if (IsLookAhead(NewLine)) {
+            /* while(x)
+             *   x=2
+             */
+            eat(NewLine);
+        }
+
+        var body = Statement();
+        return ForStatement.builder()
+                .test(test)
+                .body(body)
+                .init(init)
+                .update(update)
+                .build();
+    }
+
+    @Nullable
+    private Expression ForStatementIncrement() {
+        return IsLookAhead(CloseParenthesis) ? null : Expression();
+    }
+
+    @Nullable
+    private Expression ForStatementTest() {
+        return IsLookAhead(SemiColon) ? null : Expression();
+    }
+
+    private Statement ForStatementInit() {
+        return switch (lookAhead().type()) {
+            case Var -> {
+                eat(Var);
+                yield VarStatementInit();
+            }
+            case SemiColon -> null;
+            default -> ExpressionStatement();
+        };
+    }
+
+    /**
+     * VarStatement
+     * : var VarDeclarations LineTerminator
+     * ;
+     */
+    private Statement VarDeclarations() {
+        eat(Var);
+        var statement = VarStatementInit();
+        return statement;
+    }
+
+    /**
+     * ValStatement
+     * : val ValDeclarations = InitStatement LineTerminator
+     * ;
+     */
+    private Statement ValDeclarations() {
+        eat(Val);
+        var statement = ValStatementInit();
+        return statement;
+    }
+
+    /**
+     * ValStatementInit
+     * : val ValStatements ";"
+     */
+    private Statement ValStatementInit() {
+        var declarations = ValDeclarationList();
+        return ValStatement.valStatement(declarations);
+    }
+
+    /**
+     * VarStatementInit
+     * : var VarStatements ";"
+     */
+    private Statement VarStatementInit() {
+        var declarations = VarDeclarationList();
+        return VarStatement.varStatement(declarations);
+    }
+
+    /**
+     * ExpressionStatement
+     * : Expression \n
+     * ;
+     */
+    private Statement ExpressionStatement() {
+        return expressionStatement(Expression());
+    }
+
+    /**
+     * BlockStatement
+     * : { Statements? }
+     * ;
+     * Statements
+     * : Statement* Expression
+     */
+    private Expression BlockExpression() {
+        return BlockExpression(null, "Error");
+    }
+
+    private Expression BlockExpression(String errorOpen, String errorClose) {
+        eat(OpenBraces, errorOpen);
+        var res = IsLookAhead(CloseBraces)
+                ? BlockExpression.block(Collections.emptyList())
+                : BlockExpression.block(StatementList(CloseBraces));
+        if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
+            eat(CloseBraces, errorClose);
+        }
+        return res;
+    }
+
+    /**
+     * VarDeclarationList
+     * : VarDeclaration
+     * | VarDeclarationList , VarDeclaration
+     * ;
+     */
+    private List<VarDeclaration> VarDeclarationList() {
+        var declarations = new ArrayList<VarDeclaration>();
+        do {
+            declarations.add(VarDeclaration());
+        } while (IsLookAhead(Comma) && eat(Comma) != null);
+        return declarations;
+    }
+
+    /**
+     * ValDeclarationList
+     * : ValDeclaration
+     * | ValDeclarationList , ValDeclaration
+     * ;
+     */
+    private List<ValDeclaration> ValDeclarationList() {
+        var declarations = new ArrayList<ValDeclaration>();
+        do {
+            declarations.add(ValDeclaration());
+        } while (IsLookAhead(Comma) && eat(Comma) != null);
+        return declarations;
+    }
+
+    /**
+     * VarDeclaration
+     * : TypeDeclaration? Identifier VarInitialization?
+     * ;
+     */
+    private VarDeclaration VarDeclaration() {
+        TypeIdentifier type = null;
+        if (context == ExecutionContext.SCHEMA) {
+            if (HasType()) { // type mandatory inside a schema. Init/default value is optional
+                type = typeParser.Declaration();
+            } else {
+                throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
+            }
+        } else {
+            if (HasType()) { // type not mandatory outside a schema
+                type = typeParser.Declaration();
+            }
+        }
+        var id = Identifier();
+        var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : VarInitializer();
+        return VarDeclaration.of(id, type, init);
+    }
+
+    /**
+     * ValDeclaration
+     * : TypeDeclaration? Identifier = ValInitialization?
+     * ;
+     */
+    private ValDeclaration ValDeclaration() {
+        TypeIdentifier type = null;
+        if (context == ExecutionContext.SCHEMA) {
+            if (IsLookAheadAfter(Identifier, Identifier)) { // type mandatory inside a schema. Init/default value is optional
+                type = typeParser.Declaration();
+            } else {
+                throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
+            }
+        }
+        var id = Identifier();
+        if (context != ExecutionContext.SCHEMA) {
+            if (!IsLookAhead(Equal)) {
+                throw new InvalidInitException(VAL_NOT_INITIALISED.formatted(id.string()));
+            }
+        }
+        var init = ValInitializer();
+        return ValDeclaration.val(id, type, init);
+    }
+
+
+    /**
+     * VarInitializer
+     * : SIMPLE_ASSIGN Expression
+     */
+    private Expression VarInitializer() {
+        if (IsLookAhead(Equal, Equal_Complex)) {
+            eat(Equal, Equal_Complex);
+        }
+        return Expression();
+    }
+
+    /**
+     * ValInitializer
+     * : SIMPLE_ASSIGN Expression
+     */
+    private Expression ValInitializer() {
+        if (IsLookAhead(Equal, Equal_Complex)) {
+            eat(Equal, Equal_Complex);
+        } else { // when no init
+            return null;
+        }
+        return Expression();
+    }
+
+    private Expression Expression() {
+        return switch (lookAhead().type()) {
+            case OpenBraces -> BlockExpression();
+            default -> AssignmentExpression();
+        };
+    }
+
+    /**
+     * IfStatement
+     * : if ( Expression ) Statement? (else Statement)?
+     * ;
+     */
+    private Statement IfStatement() {
+        eat(If);
+        eat(OpenParenthesis);
+        var test = Expression();
+        eat(CloseParenthesis);
+        if (IsLookAhead(NewLine)) {
+            // if(x) x=2
+            eat(NewLine);
+        }
+
+        Statement ifBlock = Statement();
+        Statement elseBlock = ElseStatement();
+        return IfStatement.If(test, ifBlock, elseBlock);
+    }
+
+    private Statement ElseStatement() {
+        if (IsLookAhead(Else)) {
+            eat(Else);
+            Statement alternate = Statement();
+            iterator.eatIf(CloseBraces);
+            return alternate;
+        }
+        return null;
+    }
+
+    /**
+     * FunctionDeclarationStatement
+     * : fun Identifier ( OptParameterList ) BlockStatement?
+     * ;
+     */
+    private Statement FunctionDeclaration() {
+        eat(Fun, "Fun token expected: " + lookAhead());
+        var name = Identifier();
+        eat(OpenParenthesis, "Expected '(' but got: " + lookAhead());
+        var params = OptParameterList();
+        eat(CloseParenthesis, "Expected ')' but got: " + lookAhead());
+        var type = typeParser.Declaration();
+
+        Statement body = ExpressionStatement.expressionStatement(BlockExpression());
+        return FunctionDeclaration.fun(name, params, type, body);
+    }
+
+    /**
+     * SchemaDeclaration
+     * schema Name '{'
+     * VarDeclaration
+     * ValDeclaration
+     * '}'
+     * ;
+     */
+    private Statement SchemaDeclaration() {
+        eat(Schema);
+        var packageIdentifier = Identifier();
+
+        context = ExecutionContext.SCHEMA;
+        Expression body = BlockExpression();
+        context = null;
+        return SchemaDeclaration.of(packageIdentifier, body);
+    }
+
+    /**
+     * InitStatement
+     * : init  ( OptParameterList ) BlockStatement?
+     * ;
+     */
+    private Statement InitStatement() {
+        eat(Init);
+        eat(OpenParenthesis);
+        var params = OptParameterList();
+        eat(CloseParenthesis);
+
+        Statement body = ExpressionStatement.expressionStatement(BlockExpression());
+        return InitStatement.of(params, body);
+    }
+
+    private List<ParameterIdentifier> OptParameterList() {
+        return IsLookAhead(CloseParenthesis) ? Collections.emptyList() : ParameterList();
+    }
+
+    /**
+     * ParameterList
+     * : Identifier
+     * | ParameterList, Identifier
+     * ;
+     */
+    private List<ParameterIdentifier> ParameterList() {
+        var params = new ArrayList<ParameterIdentifier>();
+        do {
+            params.add(FunParameter());
+        } while (IsLookAhead(Comma) && eat(Comma) != null);
+
+        return params;
+    }
+
+    private ParameterIdentifier FunParameter() {
+        if (IsLookAhead(Identifier, OpenParenthesis)) { // OpenParenthesis because fun onClick(callback (Number)->Number) callback's type is a function
+            TypeIdentifier type = null;
+            if (IsLookAheadAfter(Identifier, Identifier)) { // param has type, parse it. If it doesn't the TypeChecker will throw an exception
+                type = typeParser.Declaration();
+            }
+            var symbol = SymbolIdentifier();
+            return param(symbol, type);
+        } else {
+            var symbol = SymbolIdentifier();
+            return param(symbol);
+        }
+    }
+
+    private Statement ReturnStatement() {
+        eat(Return);
+        var arg = OptExpression();
+        return ReturnStatement.funReturn(arg);
+    }
+
+    private Expression OptExpression() {
+        return IsLookAhead(lineTerminator) ? TypeIdentifier.type(ValueType.Void) : Expression();
+    }
+
+    /**
+     * LambdaExpression
+     * : ( OptParameterList ) -> LambdaBody
+     * | (( OptParameterList ) -> LambdaBody)()()
+     * ;
+     */
+    private Expression LambdaExpression() {
+        eat(OpenParenthesis);
+        if (IsLookAhead(OpenParenthesis)) {
+            var expression = LambdaExpression();
+            eat(CloseParenthesis); // eat CloseParenthesis after lambda body
+            return CallExpression.call(expression, Arguments());
+        }
+
+        var params = OptParameterList();
+        eat(CloseParenthesis);
+        var returnType = typeParser.Declaration(); // eat returnType
+        eat(Lambda, "Expected -> but got: " + lookAhead().value());
+
+        return LambdaExpression.lambda(params, LambdaBody(), returnType);
+    }
+
+    private Statement LambdaBody() {
+        return IsLookAhead(OpenBraces) ? Statement() : ExpressionStatement();
+    }
+
+    /**
+     * A single token lookahead recursive descent parser can’t see far enough to tell that it’s parsing an assignment
+     * until after it has gone through the left-hand side and stumbled onto the =.
+     * You might wonder why it even needs to. After all, we don’t know we’re parsing a + expression until
+     * after we’ve finished parsing the left operand.
+     * <p>
+     * The difference is that the left-hand side of an assignment isn’t an expression that evaluates to a value.
+     * It’s a sort of pseudo-expression that evaluates to a “thing” you can assign to. Consider:
+     * {@snippet :
+     * var a = "before";
+     * a = "value";
+     *}
+     * On the second line, we don’t evaluate a (which would return the string “before”).
+     * We figure out what variable a refers to so we know where to store the right-hand side expression’s value.
+     * All of the expressions that we’ve seen so far that produce values are r-values.
+     * An l-value “evaluates” to a storage location that you can assign into.
+     * We want the syntax tree to reflect that an l-value isn’t evaluated like a normal expression.
+     * That’s why the Expr.Assign node has a Token for the left-hand side, not an Expr.
+     * The problem is that the parser doesn’t know it’s parsing an l-value until it hits the =.
+     * In a complex l-value, that may occur many tokens later.
+     * {@snippet :
+     *  makeList().head.next = node;
+     *}
+     */
+    private Expression AssignmentExpression() {
+        Expression left = OrExpression();
+        if (IsLookAhead(Equal, Equal_Complex)) {
+            var operator = AssignmentOperator().value();
+            Expression rhs = Expression();
+
+            left = AssignmentExpression.assign(isValidAssignmentTarget(left, operator), rhs, operator);
+        }
+        return left;
+    }
+
+    // x || y
+    private Expression OrExpression() {
+        var expression = AndExpression();
+        while (!IsLookAhead(EOF) && IsLookAhead(Logical_Or)) {
+            var operator = eat();
+            Expression right = AndExpression();
+            expression = LogicalExpression.of(operator.value().toString(), expression, right);
+        }
+        return expression;
+    }
+
+    // x && y
+    private Expression AndExpression() {
+        var expression = EqualityExpression();
+        while (!IsLookAhead(EOF) && IsLookAhead(Logical_And)) {
+            var operator = eat();
+            Expression right = EqualityExpression();
+            expression = LogicalExpression.of(operator.value(), expression, right);
+        }
+        return expression;
+    }
+
+    /**
+     * x == y
+     * x != y
+     */
+    private Expression EqualityExpression() {
+        var expression = RelationalExpression();
+        while (!IsLookAhead(EOF) && IsLookAhead(Equality_Operator)) {
+            var operator = eat();
+            Expression right = EqualityExpression();
+            expression = BinaryExpression.binary(expression, right, operator.value().toString());
+        }
+        return expression;
+    }
+
+    /**
+     * x > y
+     * x >= y
+     * x < y
+     * x <= y
+     */
+    private Expression RelationalExpression() {
+        var expression = AdditiveExpression();
+        while (!IsLookAhead(EOF) && IsLookAhead(RelationalOperator)) {
+            var operator = eat();
+            Expression right = RelationalExpression();
+            expression = BinaryExpression.binary(expression, right, operator.value().toString());
+        }
+        return expression;
+    }
+
+    /**
+     * AssignmentOperator: +, -=, +=, /=, *=
+     */
+    private Token AssignmentOperator() {
+        Token token = lookAhead();
+        if (token.isAssignment()) {
+            return eat(token.type());
+        }
+        throw Error(token, "Unrecognized token");
+    }
+
+    private Expression isValidAssignmentTarget(Expression target, Object operator) {
+        if (target instanceof Identifier || target instanceof MemberExpression) {
+            return target;
+        }
+        Object value = iterator.getCurrent().value();
+        if (target instanceof Literal n) {
+            throw Error("Invalid left-hand side in assignment expression: %s %s %s".formatted(n.getVal(), operator, value));
+        } else {
+            throw Error("Invalid left-hand side in assignment expression: %s %s %s".formatted(printer.visit(target), operator, value));
+        }
+    }
+
+    private RuntimeException Error(String message) {
+        return Error(iterator.lookAhead(), message);
+    }
+
+    private RuntimeException Error(Token token, String message) {
+        return ErrorSystem.error(message, token);
+    }
+
+
+    /**
+     * AdditiveExpression
+     * : MultiplicativeExpression
+     * | AdditiveExpression ADDITIVE_OPERATOR MultiplicativeExpression -> MultiplicativeExpression ADDITIVE_OPERATOR MultiplicativeExpression
+     * ;
+     */
+    @Nullable
+    private Expression AdditiveExpression() {
+        var left = MultiplicativeExpression();
+
+        // (10+5)-5
+        while (match("+", "-")) {
+            var operator = eat();
+            Expression right = this.MultiplicativeExpression();
+            left = BinaryExpression.binary(left, right, operator.value().toString());
+        }
+
+        return left;
+    }
+
+    private Expression MultiplicativeExpression() {
+        var left = UnaryExpression();
+
+        // (10*5)-5
+        while (match("*", "/", "%")) {
+            var operator = eat();
+            Expression right = UnaryExpression();
+            left = new BinaryExpression(left, right, operator.value().toString());
+        }
+
+        return left;
+    }
+
+    private Expression UnaryExpression() {
+        var operator = switch (lookAhead().type()) {
+            case Minus -> eat(Minus);
+            case Increment -> eat(Increment);
+            case Decrement -> eat(Decrement);
+            case Logical_Not -> eat(Logical_Not);
+            default -> null;
+        };
+        if (operator != null) {
+            return UnaryExpression.of(operator.value(), UnaryExpression());
+        }
+
+        return LeftHandSideExpression();
+    }
+
+    @Nullable
+    private Expression PrimaryExpression() {
+        if (lookAhead() == null) {
+            return null;
+        }
+        return switch (lookAhead().type()) {
+            case OpenParenthesis, OpenBrackets -> ParenthesizedExpression();
+            case Equal -> {
+                eat();
+                yield AssignmentExpression();
+            }
+            case Equality_Operator -> Literal();
+            case Number, String, True, False, Null -> /* literals */{
+                eat();
+                yield Literal();
+            }
+            case Identifier -> Identifier();
+            case This -> ThisExpression();
+            case EOF -> null;
+            default -> LeftHandSideExpression();
+        };
+    }
+
+    /**
+     * ThisExpression
+     * : this
+     * ;
+     */
+    private Expression ThisExpression() {
+        eat(This);
+        return ThisExpression.of();
+    }
+
+    /**
+     * ResourceDeclaration
+     * : resource TypeIdentifier name '{'
+     * :    VarDeclaration
+     * : '}'
+     * ;
+     */
+    private Statement ResourceDeclaration() {
+        boolean existing = false;
+        if (IsLookAhead(Existing)) {
+            eat(Existing);
+            existing = true;
+        }
+        eat(Resource);
+        var type = typeParser.TypeIdentifier();
+        Identifier name = null;
+        if (IsLookAhead(TokenType.Identifier)) {
+            name = Identifier();
+        } else {
+            throw ErrorSystem.error("Missing identifier when declaring: resource " + type.string());
+        }
+        context = ExecutionContext.RESOURCE;
+        var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
+        context = null;
+        return ResourceExpression.resource(existing, type, name, (BlockExpression) body);
+    }
+
+
+    /**
+     * ModuleDeclaration
+     * : module TypeIdentifier name '{'
+     * :    Inputs
+     * : '}'
+     * ;
+     */
+    private Statement ModuleDeclaration() {
+        eat(Module);
+        var moduleType = PluginIdentifier();
+        var name = Identifier();
+        var body = BlockExpression("Expect '{' after module name.", "Expect '}' after module body.");
+
+        return ModuleExpression.of(moduleType, name, (BlockExpression) body);
+    }
+
+    private Expression LeftHandSideExpression() {
+        return CallMemberExpression();
+    }
+
+    // bird.fly()
+    private Expression CallMemberExpression() {
+        var primaryIdentifier = MemberExpression(); // .fly
+        while (true) {
+            if (IsLookAhead(OpenParenthesis)) { // fly(
+                primaryIdentifier = CallExpression.call(primaryIdentifier, Arguments());
+            } else {
+                break;
+            }
+        }
+        return primaryIdentifier;
+    }
+
+    private List<Expression> Arguments() {
+        eat(OpenParenthesis, "Expect '(' before arguments.");
+        var list = ArgumentList();
+        eat(CloseParenthesis, "Expect ')' after arguments.");
+        return list;
+    }
+
+    private List<Expression> ArgumentList() {
+        if (IsLookAhead(CloseParenthesis)) return Collections.emptyList();
+
+        var arguments = new ArrayList<Expression>();
+        do {
+            if (arguments.size() >= 128) {
+                throw Error(lookAhead(), "Can't have more than 128 arguments");
+            }
+            arguments.add(Expression());
+        } while (match(Comma) && eat(Comma, "Expect ',' after argument: " + iterator.getCurrent().raw()) != null);
+
+        return arguments;
+    }
+
+    /**
+     * a.Expression
+     * a[ Expression ]
+     */
+    private Expression MemberExpression() {
+        var object = PrimaryExpression();
+        for (var next = lookAhead(); IsLookAhead(Dot, OpenBrackets); next = lookAhead()) {
+            object = switch (next.type()) {
+                case Dot -> {
+                    var property = MemberProperty();
+                    yield MemberExpression.member(false, object, property);
+                }
+                case OpenBrackets -> {
+                    var property = MemberPropertyIndex();
+                    yield MemberExpression.member(true, object, property);
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + next.type());
+            };
+        }
+        return object;
+    }
+
+    private Expression MemberPropertyIndex() {
+        eat(OpenBrackets);
+        var property = Expression();
+        eat(CloseBrackets);
+        return property;
+    }
+
+    private Expression MemberProperty() {
+        eat(Dot);
+        return Identifier();
+    }
+
+    private PluginIdentifier PluginIdentifier() {
+        switch (lookAhead().type()) {
+            case String -> {
+                var token = eat(String);
+                return PluginIdentifier.fromString(token.value().toString());
+            }
+            case Identifier -> {
+                TypeIdentifier type = typeParser.TypeIdentifier();
+                return PluginIdentifier.from(type);
+            }
+            case null, default -> throw new RuntimeException("Unexpected token type: " + lookAhead().type());
+        }
+    }
+
+    private Identifier Identifier() {
+        return switch (lookAhead().type()) {
+            case String -> typeParser.TypeIdentifier();
+            default -> SymbolIdentifier();
+        };
+    }
+
+    private @NotNull SymbolIdentifier SymbolIdentifier() {
+        var id = eat(TokenType.Identifier);
+        return new SymbolIdentifier(id.value());
+    }
+
+    private Expression ParenthesizedExpression() {
+        if (IsLookAheadAfter(CloseParenthesis, Lambda) || IsLookAheadAfter(Identifier, Lambda)) {
+            // lookahead after () -> or () type ->
+            return LambdaExpression();
+        }
+        eat(OpenParenthesis);
+        var res = Expression();
+        if (IsLookAhead(CloseParenthesis)) {
+            eat(CloseParenthesis, "Unexpected token found inside parenthesized expression. Expected closed parenthesis.");
+        } else if (IsLookAhead(CloseBraces)) {
+            eat(CloseBraces, "Unexpected token found inside parenthesized expression. Expected closed parenthesis.");
+        }
+        return res;
+    }
+
+    private Expression Literal() {
+        Token current = iterator.getCurrent();
+        return switch (current.type()) {
+            case True, False -> BooleanLiteral();
+            case Null -> NullLiteral.of();
+            case Number -> NumberLiteral.of(current.value());
+            case String -> new StringLiteral(current.value());
+            default -> new ErrorExpression(current.value());
+        };
+    }
+
+    private Expression BooleanLiteral() {
+//        var literal = eat();
+        return BooleanLiteral.bool(iterator.getCurrent().value());
+    }
+
+    boolean IsLookAheadAfter(TokenType after, TokenType... type) {
+        return iterator.IsLookAheadAfter(after, type);
+    }
+
+    boolean HasType() {
+        return iterator.hasType();
+    }
+
+    public Token lookAhead() {
+        return iterator.lookAhead();
+    }
+
+    public Token eat() {
+        return iterator.eat();
+    }
+
+    public Token eat(TokenType... type) {
+        return iterator.eat("Expected token: %s but it was %s".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+    }
+
+    public Token eat(TokenType type, String error) {
+        return iterator.eat(error, type);
+    }
+
+    public boolean IsLookAhead(List<TokenType> list, TokenType... types) {
+        return IsLookAhead(list) || IsLookAhead(types);
+    }
+
+    public boolean IsLookAhead(TokenType... type) {
+        return iterator.IsLookAhead(type);
+    }
+
+    public boolean IsLookAhead(List<TokenType> type) {
+        for (TokenType p : type) {
+            if (iterator.IsLookAhead(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean match(String... strings) {
+        return iterator.hasNext() && lookAhead().is(strings);
+    }
+
+    public boolean match(TokenType... strings) {
+        return iterator.hasNext() && IsLookAhead(strings);
+    }
+
+}
