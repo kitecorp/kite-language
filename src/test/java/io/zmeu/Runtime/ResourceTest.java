@@ -1,5 +1,6 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import io.zmeu.ErrorSystem;
 import io.zmeu.Runtime.Values.ResourceValue;
 import io.zmeu.Runtime.Values.SchemaValue;
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
-public class ResourceTest extends BaseRuntimeTest {
+public class ResourceTest extends RuntimeTest {
     @Test
     void newResourceThrowsIfNoNameIsSpecified() {
         eval("""

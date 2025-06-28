@@ -1,6 +1,6 @@
 package io.zmeu.Runtime.Functions.Numeric;
 
-import io.zmeu.Runtime.BaseRuntimeTest;
+import io.zmeu.Base.RuntimeTest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-class PowFunctionTest extends BaseRuntimeTest {
+class PowFunctionTest extends RuntimeTest {
     private final PowFunction function = new PowFunction();
 
     @Test

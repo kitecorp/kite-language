@@ -1,11 +1,12 @@
-package io.zmeu.TypeChecker;
+package io.zmeu.Base;
 
-import io.zmeu.Frontend.Parse.BaseTest;
+import io.zmeu.Frontend.Parse.ParserTest;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Runtime.Environment.Environment;
+import io.zmeu.TypeChecker.TypeChecker;
 import org.junit.jupiter.api.BeforeEach;
 
-public class BaseChecker extends BaseTest {
+public class CheckerTest extends ParserTest {
     protected TypeChecker checker;
     protected Program program;
 

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Function")
-public class FunTest extends BaseTest {
+public class FunTest extends ParserTest {
 
     @Test
     void testWithArgs() {

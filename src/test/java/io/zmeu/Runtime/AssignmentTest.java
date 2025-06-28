@@ -1,5 +1,6 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import io.zmeu.Runtime.Values.NullValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
-public class AssignmentTest extends BaseRuntimeTest {
+public class AssignmentTest extends RuntimeTest {
 
     private void setGlobalVar(Object of) {
         global.init("VERSION", of);

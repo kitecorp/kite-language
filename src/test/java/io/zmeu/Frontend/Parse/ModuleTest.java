@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Module")
-public class ModuleTest extends BaseTest {
+public class ModuleTest extends ParserTest {
 
     @Test
     void moduleUnquoted() {

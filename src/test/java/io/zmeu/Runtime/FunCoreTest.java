@@ -1,5 +1,6 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +9,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-public class FunCoreTest extends BaseRuntimeTest {
+public class FunCoreTest extends RuntimeTest {
 
     @Test
     void funDeclaration() {

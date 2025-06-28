@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Member Expression")
-public class MemberExpressionTest extends BaseTest {
+public class MemberExpressionTest extends ParserTest {
 
     @Test
     void testMember() {

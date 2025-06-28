@@ -1,9 +1,10 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class LogicalTest extends BaseRuntimeTest {
+public class LogicalTest extends RuntimeTest {
 
     @Test
     void trueOrTrue() {

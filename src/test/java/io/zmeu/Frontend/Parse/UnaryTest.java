@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Unary")
-public class UnaryTest extends BaseTest {
+public class UnaryTest extends ParserTest {
 
     @Test
     void testLogicalUnary() {

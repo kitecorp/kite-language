@@ -1,4 +1,4 @@
-package io.zmeu.Runtime;
+package io.zmeu.Base;
 
 import io.zmeu.ErrorSystem;
 import io.zmeu.Frontend.Lexer.Tokenizer;
@@ -6,10 +6,11 @@ import io.zmeu.Frontend.Lexical.Resolver;
 import io.zmeu.Frontend.Parser.Parser;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Runtime.Environment.Environment;
+import io.zmeu.Runtime.Interpreter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-public class BaseRuntimeTest {
+public class RuntimeTest {
     protected Interpreter interpreter;
     protected Parser parser;
     protected Tokenizer tokenizer;

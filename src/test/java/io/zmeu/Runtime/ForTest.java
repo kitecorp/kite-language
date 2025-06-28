@@ -1,12 +1,13 @@
 package io.zmeu.Runtime;
 
+import io.zmeu.Base.RuntimeTest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-public class ForTest extends BaseRuntimeTest {
+public class ForTest extends RuntimeTest {
 
     @Test
     void increment() {

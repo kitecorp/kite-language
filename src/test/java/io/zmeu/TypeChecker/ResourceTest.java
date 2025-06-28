@@ -1,5 +1,6 @@
 package io.zmeu.TypeChecker;
 
+import io.zmeu.Base.CheckerTest;
 import io.zmeu.ErrorSystem;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.TypeChecker.Types.ResourceType;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
-public class ResourceTest extends BaseChecker {
+public class ResourceTest extends CheckerTest {
     @Test
     void newResourceThrowsIfNoNameIsSpecified() {
         eval("""

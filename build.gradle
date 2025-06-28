@@ -57,10 +57,10 @@ configurations {
 
 tasks.register('testJar', Jar) {
     archiveClassifier.set('test')
-    from sourceSets.test.output
-//    from(sourceSets.test.output) {
-//        include 'com/zmeu/test/**'
-//    }
+//    from sourceSets.test.output
+    from(sourceSets.test.output) {
+        include 'io/zmeu/Base/**'
+    }
 }
 
 artifacts {

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Resource")
-public class ResourceTest extends BaseTest {
+public class ResourceTest extends ParserTest {
 
     @Test
     void resourceDeclaration() {

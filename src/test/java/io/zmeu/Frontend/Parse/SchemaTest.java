@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Schema")
-public class SchemaTest extends BaseTest {
+public class SchemaTest extends ParserTest {
 
     @Test
     void schemaDeclaration() {

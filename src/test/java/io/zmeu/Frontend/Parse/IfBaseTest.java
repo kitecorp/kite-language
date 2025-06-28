@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser if case")
-public class IfBaseTest extends BaseTest {
+public class IfBaseTest extends ParserTest {
 
     @Test
     void test() {

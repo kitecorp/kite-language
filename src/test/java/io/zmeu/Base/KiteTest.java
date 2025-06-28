@@ -1,10 +1,9 @@
-package io.zmeu;
+package io.zmeu.Base;
 
-import io.zmeu.Runtime.BaseRuntimeTest;
 import io.zmeu.TypeChecker.TypeChecker;
 import org.junit.jupiter.api.BeforeEach;
 
-public class KiteTest extends BaseRuntimeTest {
+public class KiteTest extends RuntimeTest {
     protected TypeChecker checker;
 
     @BeforeEach
