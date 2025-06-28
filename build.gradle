@@ -49,14 +49,6 @@ test {
 extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
 }
-compileJava {
-    options.compilerArgs += [
-            "-Aproject=${project.group}/${project.name}",
-            '-Amapstruct.suppressGeneratorTimestamp=true',
-            '-Amapstruct.suppressGeneratorVersionInfoComment=true',
-            '-Amapstruct.verbose=true'
-    ]
-}
 
 java {
     toolchain {
@@ -69,10 +61,6 @@ configurations {
         canBeResolved = true  // ✅ this is key
         canBeConsumed = true
         extendsFrom(testImplementation)
-        // ✅ Assign a distinct capability
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
-        }
     }
 }
 
