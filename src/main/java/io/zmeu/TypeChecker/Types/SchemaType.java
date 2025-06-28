@@ -1,6 +1,5 @@
 package io.zmeu.TypeChecker.Types;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.zmeu.TypeChecker.TypeEnvironment;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,11 +13,9 @@ import org.jetbrains.annotations.Nullable;
 public final class SchemaType extends ReferenceType {
 
     @Getter
-    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final TypeEnvironment environment;
-    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Getter
