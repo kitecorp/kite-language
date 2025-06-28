@@ -24,7 +24,7 @@ public class BaseRuntimeTest {
     protected Parser parser;
     protected Tokenizer tokenizer;
     protected Environment global;
-    protected ObjectMapper gson;
+    protected ObjectMapper json;
     protected Resolver resolver;
 
     @BeforeEach
@@ -34,16 +34,16 @@ public class BaseRuntimeTest {
         this.parser = new Parser();
         this.tokenizer = new Tokenizer();
         this.resolver = new Resolver(interpreter);
-        gson = JsonMapper.builder() // or different mapper for other format
+        json = JsonMapper.builder() // or different mapper for other format
                 .addModule(new ParameterNamesModule())
                 .addModule(new Jdk8Module())
                 .addModule(new JavaTimeModule())
                 .build();
-        gson.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        gson.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        json.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        json.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 
-        gson.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        gson.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        json.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        json.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         ErrorSystem.clear();
     }
@@ -55,7 +55,7 @@ public class BaseRuntimeTest {
 
     protected String toJson(Object o) {
         try {
-            return gson.writeValueAsString(o);
+            return json.writeValueAsString(o);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
