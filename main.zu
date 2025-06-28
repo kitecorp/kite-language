@@ -1,0 +1,6 @@
+resource File users {
+   name = "student"
+   content = "poop"
+}
+
+
