@@ -1,6 +1,5 @@
 package io.zmeu.Runtime.Values;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.zmeu.Frontend.Parser.Literals.Identifier;
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.Environment.IEnvironment;
@@ -13,11 +12,9 @@ import org.jetbrains.annotations.Nullable;
 @Data
 public class SchemaValue {
     public static final String INSTANCES = "instances";
-    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final Environment environment;
-    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final Environment<ResourceValue> instances;
