@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public sealed abstract class Expression permits AssignmentExpression, BinaryExpression, CallExpression, ErrorExpression, GroupExpression, LogicalExpression, MemberExpression, ThisExpression, UnaryExpression, ValDeclaration, VarDeclaration, Identifier, Literal, BlockExpression, LambdaExpression, Type {
+public sealed abstract class Expression permits AssignmentExpression, BinaryExpression, CallExpression, ErrorExpression, GroupExpression, LogicalExpression, MemberExpression, ObjectExpression, ThisExpression, UnaryExpression, ValDeclaration, VarDeclaration, Identifier, Literal, BlockExpression, LambdaExpression, Type {
 
 
 }

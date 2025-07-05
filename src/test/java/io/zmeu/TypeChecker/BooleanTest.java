@@ -41,7 +41,7 @@ class BooleanTest extends CheckerTest {
 
     @Test
     void testNull() {
-        var t1 = checker.visit(NullLiteral.of());
+        var t1 = checker.visit(NullLiteral.nullLiteral());
         assertEquals(t1, ValueType.Null);
     }
 

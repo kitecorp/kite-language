@@ -1,5 +1,5 @@
 package io.zmeu;
 
-public enum ExecutionContext {
+public enum SchemaContext {
     SCHEMA, RESOURCE
 }

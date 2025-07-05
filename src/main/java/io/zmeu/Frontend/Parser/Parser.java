@@ -1,7 +1,8 @@
 package io.zmeu.Frontend.Parser;
 
+import io.zmeu.BlockContext;
 import io.zmeu.ErrorSystem;
-import io.zmeu.ExecutionContext;
+import io.zmeu.SchemaContext;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.Expressions.*;
@@ -22,8 +23,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.zmeu.Frontend.Lexer.TokenType.*;
+import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.*;
 import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parser.Statements.BlockExpression.*;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.zmeu.Frontend.Parser.Statements.ObjectStatement.*;
+import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 
 
 /**
@@ -76,7 +81,8 @@ public class Parser {
      * val String x
      * this is ok because it's just a declaration but when in a resource, it must be initialised
      */
-    private ExecutionContext context;
+    private SchemaContext context;
+    private BlockContext blockContext;
 
     public Parser(List<Token> tokens) {
         setTokens(tokens);
@@ -139,6 +145,7 @@ public class Parser {
         try {
             return switch (lookAhead().type()) {
                 case Fun -> FunctionDeclaration();
+                case Type -> TypeDeclaration();
                 case Schema -> SchemaDeclaration();
                 case Resource, Existing -> ResourceDeclaration();
                 case Module -> ModuleDeclaration();
@@ -303,7 +310,7 @@ public class Parser {
      */
     private Statement VarStatementInit() {
         var declarations = VarDeclarationList();
-        return VarStatement.varStatement(declarations);
+        return varStatement(declarations);
     }
 
     /**
@@ -328,13 +335,54 @@ public class Parser {
 
     private Expression BlockExpression(String errorOpen, String errorClose) {
         eat(OpenBraces, errorOpen);
-        var res = IsLookAhead(CloseBraces)
-                ? BlockExpression.block(Collections.emptyList())
-                : BlockExpression.block(StatementList(CloseBraces));
+        Expression res;
+        if (IsLookAhead(CloseBraces)) {
+            res = blockContext == BlockContext.OBJECT ? block(ObjectStatement()) : block(Collections.emptyList());
+        } else {
+            res = blockContext == BlockContext.OBJECT ? block(ObjectStatement()) : block(StatementList(CloseBraces));
+        }
         if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
             eat(CloseBraces, errorClose);
         }
         return res;
+    }
+
+    /**
+     * ObjectStatement
+     * : ObjectPropertyList
+     */
+    private Statement ObjectStatement() {
+        if (IsLookAhead(CloseBraces)) {
+            return objectStatement(object());
+        }
+
+        List<ObjectExpression> properties = ObjectPropertyList();
+        return objectStatement(properties);
+    }
+
+    /**
+     * ObjectPropertyList
+     * : ObjectExpression
+     * | ObjectPropertyList , ObjectExpression
+     * ;
+     */
+    private List<ObjectExpression> ObjectPropertyList() {
+        var declarations = new ArrayList<ObjectExpression>();
+        do {
+            declarations.add(ObjectExpression());
+        } while (IsLookAhead(Comma) && eat(Comma) != null);
+        return declarations;
+    }
+
+    /**
+     * ObjectExpression
+     * : Identifier ':' ObjectInitialization?
+     * ;
+     */
+    private ObjectExpression ObjectExpression() {
+        var id = Identifier();
+        var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : ObjectInitializer();
+        return ObjectExpression.object(id, init);
     }
 
     /**
@@ -372,15 +420,15 @@ public class Parser {
      */
     private VarDeclaration VarDeclaration() {
         TypeIdentifier type = null;
-        if (context == ExecutionContext.SCHEMA) {
+        if (context == SchemaContext.SCHEMA) {
             if (HasType()) { // type mandatory inside a schema. Init/default value is optional
-                type = typeParser.Declaration();
+                type = typeParser.identifier();
             } else {
                 throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
             }
         } else {
             if (HasType()) { // type not mandatory outside a schema
-                type = typeParser.Declaration();
+                type = typeParser.identifier();
             }
         }
         var id = Identifier();
@@ -395,15 +443,15 @@ public class Parser {
      */
     private ValDeclaration ValDeclaration() {
         TypeIdentifier type = null;
-        if (context == ExecutionContext.SCHEMA) {
+        if (context == SchemaContext.SCHEMA) {
             if (IsLookAheadAfter(Identifier, Identifier)) { // type mandatory inside a schema. Init/default value is optional
-                type = typeParser.Declaration();
+                type = typeParser.identifier();
             } else {
                 throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
             }
         }
         var id = Identifier();
-        if (context != ExecutionContext.SCHEMA) {
+        if (context != SchemaContext.SCHEMA) {
             if (!IsLookAhead(Equal)) {
                 throw new InvalidInitException(VAL_NOT_INITIALISED.formatted(id.string()));
             }
@@ -415,11 +463,25 @@ public class Parser {
 
     /**
      * VarInitializer
-     * : SIMPLE_ASSIGN Expression
+     * : SIMPLE_ASSIGN ObjectExpression
      */
     private Expression VarInitializer() {
         if (IsLookAhead(Equal, Equal_Complex)) {
             eat(Equal, Equal_Complex);
+//            blockContext = BlockContext.OBJECT;
+        }
+        var expression = Expression();
+//        blockContext = null;
+        return expression;
+    }
+
+    /**
+     * ObjectInitializer
+     * : ':' ObjectExpression
+     */
+    private Expression ObjectInitializer() {
+        if (IsLookAhead(Equal, Equal_Complex, Colon)) {
+            eat(Equal, Equal_Complex, Colon);
         }
         return Expression();
     }
@@ -434,7 +496,8 @@ public class Parser {
         } else { // when no init
             return null;
         }
-        return Expression();
+        var expression = Expression();
+        return expression;
     }
 
     private Expression Expression() {
@@ -485,7 +548,7 @@ public class Parser {
         eat(OpenParenthesis, "Expected '(' but got: " + lookAhead());
         var params = OptParameterList();
         eat(CloseParenthesis, "Expected ')' but got: " + lookAhead());
-        var type = typeParser.Declaration();
+        var type = typeParser.identifier();
 
         Statement body = ExpressionStatement.expressionStatement(BlockExpression());
         return FunctionDeclaration.fun(name, params, type, body);
@@ -503,7 +566,7 @@ public class Parser {
         eat(Schema);
         var packageIdentifier = Identifier();
 
-        context = ExecutionContext.SCHEMA;
+        context = SchemaContext.SCHEMA;
         Expression body = BlockExpression();
         context = null;
         return SchemaDeclaration.of(packageIdentifier, body);
@@ -547,7 +610,7 @@ public class Parser {
         if (IsLookAhead(Identifier, OpenParenthesis)) { // OpenParenthesis because fun onClick(callback (Number)->Number) callback's type is a function
             TypeIdentifier type = null;
             if (IsLookAheadAfter(Identifier, Identifier)) { // param has type, parse it. If it doesn't the TypeChecker will throw an exception
-                type = typeParser.Declaration();
+                type = typeParser.identifier();
             }
             var symbol = SymbolIdentifier();
             return param(symbol, type);
@@ -583,7 +646,7 @@ public class Parser {
 
         var params = OptParameterList();
         eat(CloseParenthesis);
-        var returnType = typeParser.Declaration(); // eat returnType
+        var returnType = typeParser.identifier(); // eat returnType
         eat(Lambda, "Expected -> but got: " + lookAhead().value());
 
         return LambdaExpression.lambda(params, LambdaBody(), returnType);
@@ -772,7 +835,7 @@ public class Parser {
                 yield AssignmentExpression();
             }
             case Equality_Operator -> Literal();
-            case Number, String, True, False, Null -> /* literals */{
+            case Number, Object, String, True, False, Null -> /* literals */{
                 eat();
                 yield Literal();
             }
@@ -814,10 +877,32 @@ public class Parser {
         } else {
             throw ErrorSystem.error("Missing identifier when declaring: resource " + type.string());
         }
-        context = ExecutionContext.RESOURCE;
+        context = SchemaContext.RESOURCE;
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
         context = null;
         return ResourceExpression.resource(existing, type, name, (BlockExpression) body);
+    }
+
+    /**
+     * TypeDeclaration
+     * type Name = TypeParams
+     * ;
+     */
+    private Statement TypeDeclaration() {
+        eat(Type);
+        var name = Identifier();
+
+        Expression body = TypeParams();
+        return TypeExpression.type(name, body);
+    }
+
+    /**
+     * : TypeParams
+     * | '(' Literal | TypeIdentifier ')'[]?
+     */
+    private Expression TypeParams() {
+
+        return null;
     }
 
 
@@ -950,20 +1035,17 @@ public class Parser {
         return res;
     }
 
-    private Expression Literal() {
+    private Literal Literal() {
         Token current = iterator.getCurrent();
         return switch (current.type()) {
-            case True, False -> BooleanLiteral();
-            case Null -> NullLiteral.of();
-            case Number -> NumberLiteral.of(current.value());
+            case True, False -> BooleanLiteral.bool(current.value());
+            case Null -> NullLiteral.nullLiteral();
+            case Number -> NumberLiteral.number(current.value());
             case String -> new StringLiteral(current.value());
-            default -> new ErrorExpression(current.value());
+            case Object -> new ObjectLiteral(new StringLiteral(current.value().toString()), Literal());
+//            default -> new ErrorExpression(current.value());
+            default -> NullLiteral.nullLiteral();
         };
-    }
-
-    private Expression BooleanLiteral() {
-//        var literal = eat();
-        return BooleanLiteral.bool(iterator.getCurrent().value());
     }
 
     boolean IsLookAheadAfter(TokenType after, TokenType... type) {

@@ -1,7 +1,7 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.ErrorSystem;
-import io.zmeu.ExecutionContext;
+import io.zmeu.SchemaContext;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.Expressions.*;
@@ -41,7 +41,7 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private final LanguageAstPrinter printer = new LanguageAstPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
-    private ExecutionContext context;
+    private SchemaContext context;
 
     public Interpreter() {
         this(new Environment());
@@ -378,7 +378,7 @@ public final class Interpreter implements Visitor<Object> {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + resource.name());
         }
-        context = ExecutionContext.RESOURCE;
+        context = SchemaContext.RESOURCE;
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
@@ -482,7 +482,7 @@ public final class Interpreter implements Visitor<Object> {
         switch (expression.getBody()) {
             case ExpressionStatement statement when statement.getStatement() instanceof BlockExpression blockExpression -> {
                 var typeEnv = new Environment<>(env);
-                context = ExecutionContext.SCHEMA;
+                context = SchemaContext.SCHEMA;
                 executeBlock(blockExpression.getExpression(), typeEnv); // install properties/methods of a type into the environment
                 context = null;
                 var name = expression.getName();
@@ -565,7 +565,7 @@ public final class Interpreter implements Visitor<Object> {
     public Object visit(ValDeclaration expression) {
         String symbol = expression.getId().string();
         Object value = null;
-        if (context == ExecutionContext.RESOURCE) {
+        if (context == SchemaContext.RESOURCE) {
             if (!expression.hasInit()) {
                 throw new InvalidInitException("Val declaration must be initialised: " + expression.getId().string() + " is null");
             }

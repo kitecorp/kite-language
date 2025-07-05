@@ -16,14 +16,14 @@ class AstPrinterTest {
 
     @Test
     void numeric() {
-        var res = printer.print(NumberLiteral.of("2"));
+        var res = printer.print(NumberLiteral.number("2"));
         log.warn(res);
         Assertions.assertEquals("2", res);
     }
 
     @Test
     void logical() {
-        var res = printer.print(LogicalExpression.of(">", NumberLiteral.of("2"), NumberLiteral.of("3")));
+        var res = printer.print(LogicalExpression.of(">", NumberLiteral.number("2"), NumberLiteral.number("3")));
         log.warn(res);
         Assertions.assertEquals("(> 2 3)", res);
     }
