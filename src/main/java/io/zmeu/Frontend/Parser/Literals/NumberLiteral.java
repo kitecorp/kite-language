@@ -60,7 +60,7 @@ public class NumberLiteral extends Literal {
         }
     }
 
-    public static Expression of(Object value) {
+    public static Literal number(Object value) {
         return new NumberLiteral(value);
     }
 

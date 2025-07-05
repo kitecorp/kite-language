@@ -10,6 +10,7 @@ public enum TokenType {
     /*****   Literal types   *****/
     Number("number"),
     Identifier("symbol"),
+    Object("object"),
     String("string"),
 //    Type("type"),
     WhiteSpace("whitespace"),
@@ -44,6 +45,7 @@ public enum TokenType {
     False("false"),
     True("true"),
     Fun("fun"),
+    Type("type"),
     Val("val"),
     Var("var"),
     Param("param"),

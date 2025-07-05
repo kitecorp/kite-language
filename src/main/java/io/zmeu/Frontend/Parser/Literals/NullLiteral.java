@@ -16,7 +16,7 @@ public class NullLiteral extends Literal {
     private NullLiteral() {
     }
 
-    public static Literal of() {
+    public static Literal nullLiteral() {
         return new NullLiteral();
     }
 

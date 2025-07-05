@@ -4,8 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Optional;
-
 /**
  * A string literal has the form of: "hello" or empty string ""
  * StringLiteral
@@ -36,9 +34,7 @@ public class StringLiteral extends Literal {
         if (StringUtils.isBlank(value)) {
             this.value = value;
         } else {
-            this.value = Optional.ofNullable(StringUtils.substringBetween(value, "\"", "\""))
-                    .or(() -> Optional.ofNullable(StringUtils.substringBetween(value, "'", "'")))
-                    .orElse(value);
+            this.value = LiteralUtils.quote(value);
         }
     }
 

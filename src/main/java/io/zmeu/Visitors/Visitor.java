@@ -30,6 +30,7 @@ public sealed interface Visitor<R>
             case BlockExpression expression -> visit(expression);
             case LambdaExpression expression -> visit(expression);
             case Type type -> visit(type);
+            case ObjectExpression expression -> visit(expression);
         };
     }
 

@@ -72,6 +72,9 @@ public final class VarDeclaration extends Expression {
     }
 
     public static VarDeclaration var(Expression id) {
+        if (!(id instanceof Identifier)) {
+            throw new IllegalArgumentException("Identifier expected but got: " + id.getClass().getSimpleName());
+        }
         return new VarDeclaration(id);
     }
 

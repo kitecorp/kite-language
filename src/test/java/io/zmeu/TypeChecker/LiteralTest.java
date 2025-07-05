@@ -61,7 +61,7 @@ class LiteralTest extends CheckerTest {
 
     @Test
     void testNull() {
-        var t1 = checker.visit(NullLiteral.of());
+        var t1 = checker.visit(NullLiteral.nullLiteral());
         Assertions.assertEquals(t1, ValueType.Null);
     }
 

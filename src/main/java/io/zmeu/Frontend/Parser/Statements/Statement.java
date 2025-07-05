@@ -2,6 +2,7 @@ package io.zmeu.Frontend.Parser.Statements;
 
 import io.zmeu.Frontend.Parser.Expressions.ModuleExpression;
 import io.zmeu.Frontend.Parser.Expressions.ResourceExpression;
+import io.zmeu.Frontend.Parser.Expressions.TypeExpression;
 import io.zmeu.Frontend.Parser.Program;
 import lombok.Data;
 
@@ -24,9 +25,6 @@ import lombok.Data;
  */
 @Data
 public abstract sealed class Statement
-        permits ModuleExpression, ResourceExpression, Program,
-        EmptyStatement, ExpressionStatement, ForStatement,
-        FunctionDeclaration, IfStatement, InitStatement,
-        ReturnStatement, SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
+        permits ModuleExpression, ResourceExpression, TypeExpression, Program, EmptyStatement, ExpressionStatement, ForStatement, FunctionDeclaration, IfStatement, InitStatement, ObjectStatement, ReturnStatement, SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
 
 }
