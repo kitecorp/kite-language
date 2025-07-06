@@ -30,6 +30,10 @@ public class ObjectLiteral extends Literal {
         return new ObjectLiteral(key, value);
     }
 
+    public static ObjectLiteral object(String key, Expression value) {
+        return new ObjectLiteral(Identifier.id(key), value);
+    }
+
     public static ObjectLiteral object() {
         return new ObjectLiteral();
     }

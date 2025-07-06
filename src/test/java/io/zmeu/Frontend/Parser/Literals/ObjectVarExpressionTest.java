@@ -17,7 +17,7 @@ import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-@DisplayName("Parser object")
+@DisplayName("Parse object var")
 public class ObjectVarExpressionTest extends ParserTest {
 
     @Test
@@ -185,6 +185,183 @@ public class ObjectVarExpressionTest extends ParserTest {
                                 "b"
                                 """.trim()), string("hello b"))
                 ))));
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void multiplePropertiesRealExample() {
+        var res = parse("""
+                var environmentSettings = {
+                   dev: {
+                     name: "Development"
+                   },
+                   prod: {
+                     name: "Production"
+                   }
+                 }
+                
+                """);
+        var expected = program(
+                varStatement(var("environmentSettings",
+                        objectExpression(
+                                object("dev",
+                                        objectExpression(
+                                                object("""
+                                                        name
+                                                        """.trim(), string("Development"))
+                                        )),
+                                object("prod",
+                                        objectExpression(object("""
+                                                name
+                                                """.trim(), string("Production"))
+                                        )))))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void multiplePropertiesRealExampleNoComma() {
+        var res = parse("""
+                var environmentSettings = {
+                   dev: {
+                     name: "Development"
+                     team: "backend"
+                   }
+                   prod: {
+                     name: "Production"
+                   }
+                 }
+                
+                """);
+        var expected = program(
+                varStatement(var("environmentSettings",
+                        objectExpression(
+                                object("dev",
+                                        objectExpression(
+                                                object("""
+                                                        name
+                                                        """.trim(), string("Development")),
+                                                object("""
+                                                        team
+                                                        """.trim(), string("backend"))
+                                        )),
+                                object("prod",
+                                        objectExpression(object("""
+                                                name
+                                                """.trim(), string("Production"))
+                                        )))))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void multiplePropertiesRealExampleComma() {
+        var res = parse("""
+                var environmentSettings = {
+                   dev: {
+                     name: "Development",
+                     team: "backend"
+                   }
+                   prod: {
+                     name: "Production"
+                   }
+                 }
+                
+                """);
+        var expected = program(
+                varStatement(var("environmentSettings",
+                        objectExpression(
+                                object("dev",
+                                        objectExpression(
+                                                object("""
+                                                        name
+                                                        """.trim(), string("Development")),
+                                                object("""
+                                                        team
+                                                        """.trim(), string("backend"))
+                                        )),
+                                object("prod",
+                                        objectExpression(object("""
+                                                name
+                                                """.trim(), string("Production"))
+                                        )))))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void multiplePropertiesRealExampleCommaObject() {
+        var res = parse("""
+                var environmentSettings = {
+                   dev: {
+                     name: "Development",
+                     team: "backend"
+                   },
+                   prod: {
+                     name: "Production"
+                   }
+                 }
+                
+                """);
+        var expected = program(
+                varStatement(var("environmentSettings",
+                        objectExpression(
+                                object("dev",
+                                        objectExpression(
+                                                object("""
+                                                        name
+                                                        """.trim(), string("Development")),
+                                                object("""
+                                                        team
+                                                        """.trim(), string("backend"))
+                                        )),
+                                object("prod",
+                                        objectExpression(object("""
+                                                name
+                                                """.trim(), string("Production"))
+                                        )))))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+
+    @Test
+    void multiplePropertiesRealExampleNoCommaProperty() {
+        var res = parse("""
+                var environmentSettings = {
+                   dev: {
+                     name: "Development"
+                     team: "backend"
+                   },
+                   prod: {
+                     name: "Production"
+                   }
+                 }
+                
+                """);
+        var expected = program(
+                varStatement(var("environmentSettings",
+                        objectExpression(
+                                object("dev",
+                                        objectExpression(
+                                                object("""
+                                                        name
+                                                        """.trim(), string("Development")),
+                                                object("""
+                                                        team
+                                                        """.trim(), string("backend"))
+                                        )),
+                                object("prod",
+                                        objectExpression(object("""
+                                                name
+                                                """.trim(), string("Production"))
+                                        )))))
+        );
         assertEquals(expected, res);
         log.info((res));
     }
