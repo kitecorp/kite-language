@@ -1,5 +1,6 @@
 package io.zmeu.Frontend.Parser.Literals;
 
+import io.zmeu.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,19 +13,20 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ObjectLiteral extends Literal {
-    private StringLiteral key;
-    private Literal value;
+    private TypeIdentifier type;
+    private Identifier key;
+    private Expression value;
 
     public ObjectLiteral() {
     }
 
-    public ObjectLiteral(StringLiteral key, Literal value) {
+    public ObjectLiteral(Identifier key, Expression value) {
         this();
         this.key = key;
         this.value = value;
     }
 
-    public static ObjectLiteral object(StringLiteral key, Literal value) {
+    public static ObjectLiteral object(Identifier key, Expression value) {
         return new ObjectLiteral(key, value);
     }
 

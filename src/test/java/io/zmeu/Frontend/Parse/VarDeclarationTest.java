@@ -1,6 +1,5 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -70,39 +67,6 @@ public class VarDeclarationTest extends ParserTest {
                 ));
         assertEquals(expected, res);
         log.info((res));
-    }
-
-
-    @Test
-    void initVarWithBlockStatement() {
-        var res = parse("""
-                var x={
-                    2
-                }
-                """);
-        var expected = program(statement(
-                var("x", block(expressionStatement(number(2)))))
-        );
-        log.warn((res));
-        assertEquals(expected, res);
-    }
-
-    @Test
-    void testAssignmentBlockWithStatements() {
-        var res = parse("""
-                var x={
-                    var y=2
-                    3
-                }
-                """);
-        var expected = program(
-                statement(
-                        var("x", block(
-                                statement(var("y", number(2))),
-                                ExpressionStatement.expressionStatement(number(3)))))
-        );
-        log.warn((res));
-        assertEquals(expected, res);
     }
 
     @Test

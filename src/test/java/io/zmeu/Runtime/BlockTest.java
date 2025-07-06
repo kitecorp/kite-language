@@ -34,22 +34,6 @@ public class BlockTest extends RuntimeTest {
     }
 
     @Test
-    void nestedBlockAccess() {
-        var res = eval("""
-                {
-                    var outer=10
-                    var res = {
-                        var x = 2*outer
-                        x
-                    }
-                    res
-                }
-                """);
-        assertEquals(20, res);
-        log.warn((res));
-    }
-
-    @Test
     void nestedBlockSet() {
         var res = eval("""
                 {

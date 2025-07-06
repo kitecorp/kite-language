@@ -2,13 +2,13 @@ package io.zmeu.Frontend.Parser;
 
 import io.zmeu.BlockContext;
 import io.zmeu.ErrorSystem;
-import io.zmeu.SchemaContext;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Literals.*;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.Runtime.exceptions.InvalidInitException;
+import io.zmeu.SchemaContext;
 import io.zmeu.TypeChecker.Types.TypeParser;
 import io.zmeu.TypeChecker.Types.ValueType;
 import io.zmeu.Visitors.SyntaxPrinter;
@@ -23,11 +23,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.zmeu.Frontend.Lexer.TokenType.*;
-import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.*;
+import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.*;
+import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.ObjectStatement.*;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 
 
@@ -337,9 +336,9 @@ public class Parser {
         eat(OpenBraces, errorOpen);
         Expression res;
         if (IsLookAhead(CloseBraces)) {
-            res = blockContext == BlockContext.OBJECT ? block(ObjectStatement()) : block(Collections.emptyList());
+            res = block(Collections.emptyList());
         } else {
-            res = blockContext == BlockContext.OBJECT ? block(ObjectStatement()) : block(StatementList(CloseBraces));
+            res = block(StatementList(CloseBraces));
         }
         if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
             eat(CloseBraces, errorClose);
@@ -351,13 +350,20 @@ public class Parser {
      * ObjectStatement
      * : ObjectPropertyList
      */
-    private Statement ObjectStatement() {
+    private Expression ObjectDeclaration() {
+        eat(OpenBraces, "Object must start with { but it is: " + getIterator().getCurrent());
+        Expression res;
         if (IsLookAhead(CloseBraces)) {
-            return objectStatement(object());
+            res = ObjectExpression.objectExpression();
+        } else {
+            res = ObjectExpression.objectExpression(ObjectPropertyList());
+        }
+        eatWhitespace();
+        if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
+            eat(CloseBraces, "Object must end with } but it is: " + getIterator().getCurrent());
         }
 
-        List<ObjectExpression> properties = ObjectPropertyList();
-        return objectStatement(properties);
+        return res;
     }
 
     /**
@@ -366,10 +372,10 @@ public class Parser {
      * | ObjectPropertyList , ObjectExpression
      * ;
      */
-    private List<ObjectExpression> ObjectPropertyList() {
-        var declarations = new ArrayList<ObjectExpression>();
+    private List<ObjectLiteral> ObjectPropertyList() {
+        var declarations = new ArrayList<ObjectLiteral>();
         do {
-            declarations.add(ObjectExpression());
+            declarations.add(ObjectLiteral());
         } while (IsLookAhead(Comma) && eat(Comma) != null);
         return declarations;
     }
@@ -379,10 +385,28 @@ public class Parser {
      * : Identifier ':' ObjectInitialization?
      * ;
      */
-    private ObjectExpression ObjectExpression() {
+    private ObjectLiteral ObjectLiteral() {
+        eatWhitespace();
         var id = Identifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : ObjectInitializer();
-        return ObjectExpression.object(id, init);
+        return ObjectLiteral.object(id, init);
+    }
+
+    private void eatWhitespace() {
+        while (IsLookAhead(lineTerminator)) {
+            eat();
+        }
+    }
+
+    /**
+     * ObjectInitializer
+     * : ':' ObjectExpression
+     */
+    private Expression ObjectInitializer() {
+        if (IsLookAhead(Equal, Equal_Complex, Colon)) {
+            eat(Equal, Equal_Complex, Colon);
+        }
+        return Expression();
     }
 
     /**
@@ -468,22 +492,13 @@ public class Parser {
     private Expression VarInitializer() {
         if (IsLookAhead(Equal, Equal_Complex)) {
             eat(Equal, Equal_Complex);
-//            blockContext = BlockContext.OBJECT;
         }
-        var expression = Expression();
-//        blockContext = null;
-        return expression;
-    }
-
-    /**
-     * ObjectInitializer
-     * : ':' ObjectExpression
-     */
-    private Expression ObjectInitializer() {
-        if (IsLookAhead(Equal, Equal_Complex, Colon)) {
-            eat(Equal, Equal_Complex, Colon);
+        if (IsLookAhead(OpenBraces)) {
+            blockContext = BlockContext.OBJECT;
         }
-        return Expression();
+        var res = Expression();
+        blockContext = null;
+        return res;
     }
 
     /**
@@ -496,13 +511,23 @@ public class Parser {
         } else { // when no init
             return null;
         }
-        var expression = Expression();
-        return expression;
+        if (IsLookAhead(OpenBraces)) {
+            blockContext = BlockContext.OBJECT;
+        }
+        var res = Expression();
+        blockContext = null;
+        return res;
     }
 
     private Expression Expression() {
         return switch (lookAhead().type()) {
-            case OpenBraces -> BlockExpression();
+            case OpenBraces -> {
+                if (blockContext == BlockContext.OBJECT) {
+                    yield ObjectDeclaration();
+                } else {
+                    yield BlockExpression();
+                }
+            }
             default -> AssignmentExpression();
         };
     }
@@ -1042,7 +1067,7 @@ public class Parser {
             case Null -> NullLiteral.nullLiteral();
             case Number -> NumberLiteral.number(current.value());
             case String -> new StringLiteral(current.value());
-            case Object -> new ObjectLiteral(new StringLiteral(current.value().toString()), Literal());
+            case Object -> new ObjectLiteral(id(current.value().toString()), Literal());
 //            default -> new ErrorExpression(current.value());
             default -> NullLiteral.nullLiteral();
         };
