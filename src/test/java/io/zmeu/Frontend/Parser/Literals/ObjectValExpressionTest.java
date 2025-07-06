@@ -5,8 +5,11 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.zmeu.Frontend.Parser.Expressions.MemberExpression.member;
 import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
+import static io.zmeu.Frontend.Parser.Factory.expressionStatement;
 import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
 import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
@@ -366,5 +369,52 @@ public class ObjectValExpressionTest extends ParserTest {
         log.info((res));
     }
 
+    @Test
+    void testMember() {
+        var res = parse("""
+                val x = {
+                    name: "backend"
+                }
+                x.name
+                """);
+        var expected = program(
+                valStatement(val("x", objectExpression(object("name", string("backend"))))),
+                expressionStatement(member("x", "name"))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void testMemberAssignmentComputed() {
+        var res = parse("""
+                val x = {
+                    name: "backend"
+                }
+                x["name"] = 1""");
+        var member = member(true, "x", string("name"));
+        var expected = program(
+                valStatement(val("x", objectExpression(object("name", string("backend"))))),
+                expressionStatement(assign(member, 1, "="))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void testMemberAssignmentComputedSingleQuote() {
+        var res = parse("""
+                val x = {
+                    name: "backend"
+                }
+                x['name'] = 1""");
+        var member = member(true, "x", string("name"));
+        var expected = program(
+                valStatement(val("x", objectExpression(object("name", string("backend"))))),
+                expressionStatement(assign(member, 1, "="))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
 
 }
