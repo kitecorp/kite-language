@@ -12,7 +12,7 @@ public enum TokenType {
     Identifier("symbol"),
     Object("object"),
     String("string"),
-//    Type("type"),
+    //    Type("type"),
     WhiteSpace("whitespace"),
     Comment("//"),
     NewLine(System.lineSeparator()),
@@ -143,8 +143,8 @@ public enum TokenType {
             case ']' -> CloseBrackets;
             case '?' -> OptionalOperator;
             case '@' -> AT;
-            case '<'-> LessThanOperator;
-            case '>'-> GreaterThanOperator;
+            case '<' -> LessThanOperator;
+            case '>' -> GreaterThanOperator;
             case '+' -> Plus;
             case '-' -> Minus;
             case '*' -> Multiply;

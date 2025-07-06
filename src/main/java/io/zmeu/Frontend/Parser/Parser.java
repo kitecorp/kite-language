@@ -377,7 +377,7 @@ public class Parser {
         do {
             eatWhitespace();
             declarations.add(ObjectLiteral());
-        } while (IsLookAhead(Comma) && eat(Comma) != null);
+        } while (IsLookAhead(Comma, NewLine) && eat(Comma, NewLine) != null && !IsLookAhead(CloseBraces));
         return declarations;
     }
 
@@ -1101,6 +1101,10 @@ public class Parser {
 
     public Token eat(TokenType... type) {
         return iterator.eat("Expected token: %s but it was %s".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+    }
+
+    public Token eat(List<TokenType> list) {
+        return list.stream().map(this::eat).findFirst().orElse(null);
     }
 
     public Token eat(TokenType type, String error) {
