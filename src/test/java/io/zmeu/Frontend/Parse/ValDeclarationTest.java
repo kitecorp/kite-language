@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
 import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,39 +55,6 @@ public class ValDeclarationTest extends ParserTest {
                 ));
         assertEquals(expected, res);
         log.info((res));
-    }
-
-
-    @Test
-    void initVarWithBlockStatement() {
-        var res = parse("""
-                val x={
-                    2
-                }
-                """);
-        var expected = program(valStatement(
-                val("x", block(expressionStatement(number(2)))))
-        );
-        log.warn((res));
-        assertEquals(expected, res);
-    }
-
-    @Test
-    void testAssignmentBlockWithStatements() {
-        var res = parse("""
-                val x={
-                    val y=2
-                    3
-                }
-                """);
-        var expected = program(
-                valStatement(
-                        val("x", block(
-                                valStatement(val("y", number(2))),
-                                expressionStatement(number(3)))))
-        );
-        log.warn((res));
-        assertEquals(expected, res);
     }
 
     @Test

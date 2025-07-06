@@ -1,95 +1,44 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parser.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Literals.TypeIdentifier;
+import io.zmeu.Frontend.Parser.Literals.ObjectLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class ObjectExpression extends Expression {
-    private Identifier id;
-    private Expression init;
-    private TypeIdentifier type;
+    private List<ObjectLiteral> properties;
 
     public ObjectExpression() {
+        this.properties = new ArrayList<>();
     }
 
-    private ObjectExpression(Expression id, Expression init) {
+    private ObjectExpression(ObjectLiteral property) {
         this();
-        this.id = (Identifier) id;
-        this.init = init;
+        this.properties.add(property);
     }
 
-    private ObjectExpression(Expression id, TypeIdentifier type) {
-        this();
-        this.id = (Identifier) id;
-        this.type = type;
+    public static ObjectExpression objectExpression(ObjectLiteral literal) {
+        return new ObjectExpression(literal);
     }
 
-    private ObjectExpression(Expression id, TypeIdentifier type, Expression init) {
-        this();
-        this.id = (Identifier) id;
-        this.init = init;
-        this.type = type;
+    public static ObjectExpression objectExpression(ObjectLiteral... id) {
+        var expression = new ObjectExpression();
+        expression.properties = List.of(id);
+        return expression;
     }
 
-    private ObjectExpression(Expression id) {
-        this(id, null);
+    public static ObjectExpression objectExpression(List<ObjectLiteral> list) {
+        var expression = new ObjectExpression();
+        expression.properties = list;
+        return expression;
     }
 
-    public static ObjectExpression object(Expression id, Expression init) {
-        return new ObjectExpression(id, init);
-    }
-
-    public static ObjectExpression object() {
+    public static ObjectExpression objectExpression() {
         return new ObjectExpression();
     }
 
-    public static ObjectExpression object(String id, Expression init) {
-        return new ObjectExpression(Identifier.id(id), init);
-    }
-
-    public static ObjectExpression object(String id, TypeIdentifier type) {
-        return new ObjectExpression(Identifier.id(id), type);
-    }
-
-    public static ObjectExpression object(String id) {
-        return new ObjectExpression(Identifier.id(id));
-    }
-
-    public static ObjectExpression of(Expression id, TypeIdentifier type, Expression init) {
-        return new ObjectExpression(id, type, init);
-    }
-
-    public static ObjectExpression of(Expression id, TypeIdentifier type) {
-        return new ObjectExpression(id, type);
-    }
-
-    public static ObjectExpression of(Expression id) {
-        return new ObjectExpression(id);
-    }
-
-    public static ObjectExpression object(Expression id) {
-        if (!(id instanceof Identifier)) {
-            throw new IllegalArgumentException("Identifier expected but got: " + id.getClass().getSimpleName());
-        }
-        return new ObjectExpression(id);
-    }
-
-    public static ObjectExpression of(String id) {
-        return new ObjectExpression(Identifier.id(id));
-    }
-
-    public static ObjectExpression object(String id, TypeIdentifier type, Expression init) {
-        return ObjectExpression.of(Identifier.id(id), type, init);
-    }
-
-    public boolean hasInit() {
-        return init != null;
-    }
-
-    public boolean hasType() {
-        return type != null;
-    }
 }
