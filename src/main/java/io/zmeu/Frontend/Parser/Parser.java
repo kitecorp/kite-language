@@ -375,6 +375,7 @@ public class Parser {
     private List<ObjectLiteral> ObjectPropertyList() {
         var declarations = new ArrayList<ObjectLiteral>();
         do {
+            eatWhitespace();
             declarations.add(ObjectLiteral());
         } while (IsLookAhead(Comma) && eat(Comma) != null);
         return declarations;
@@ -386,8 +387,7 @@ public class Parser {
      * ;
      */
     private ObjectLiteral ObjectLiteral() {
-        eatWhitespace();
-        var id = Identifier();
+        var id = ObjectKeyIdentifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : ObjectInitializer();
         return ObjectLiteral.object(id, init);
     }
@@ -1036,6 +1036,16 @@ public class Parser {
     private Identifier Identifier() {
         return switch (lookAhead().type()) {
             case String -> typeParser.TypeIdentifier();
+            default -> SymbolIdentifier();
+        };
+    }
+
+    private Identifier ObjectKeyIdentifier() {
+        return switch (lookAhead().type()) {
+            case String -> {
+                var id = eat(String);
+                yield new SymbolIdentifier(id.value().toString());
+            }
             default -> SymbolIdentifier();
         };
     }

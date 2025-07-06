@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser object")
-public class ObjectExpressionTest extends ParserTest {
+public class ObjectValExpressionTest extends ParserTest {
 
     @Test
     void varEmptyObject() {
@@ -109,6 +109,19 @@ public class ObjectExpressionTest extends ParserTest {
                 """);
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object(id("a"), string("hello"))))));
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void varStringInitToString() {
+        var res = parse("""
+                var x = { "a": "hello"}
+                """);
+        var expected = program(varStatement(var(id("x"),
+                objectExpression(object(id("""
+                        "a"
+                        """.trim()), string("hello"))))));
         assertEquals(expected, res);
         log.info((res));
     }
