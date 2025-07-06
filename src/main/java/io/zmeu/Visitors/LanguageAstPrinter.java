@@ -7,6 +7,7 @@ import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.TypeChecker.Types.Type;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 
@@ -79,6 +80,20 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
             val.append(" = ").append(visit(expression.getInit()));
         }
         return val.toString();
+    }
+
+    @Override
+    public String visit(ObjectExpression expression) {
+        var builder = new StringBuilder("{\n");
+        for (Iterator<ObjectLiteral> iterator = expression.getProperties().iterator(); iterator.hasNext(); ) {
+            var objectLiteral = iterator.next();
+            builder.append(visit(objectLiteral));
+            if (iterator.hasNext()) {
+                builder.append("\n");
+            }
+        }
+        builder.append("}");
+        return builder.toString();
     }
 
     @Override
@@ -235,6 +250,14 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
     @Override
     public String visit(NullLiteral expression) {
         return "null";
+    }
+
+    @Override
+    public String visit(ObjectLiteral expression) {
+        if (expression.hasType()) {
+            return "%s %s: %s".formatted(visit(expression.getType()), visit(expression.getKey()), visit(expression.getValue()));
+        }
+        return "%s: %s".formatted(visit(expression.getKey()), visit(expression.getValue()));
     }
 
     @Override

@@ -81,6 +81,11 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     @Override
+    public Type visit(ObjectLiteral expression) {
+        throw new OperationNotImplementedException("Object literals not implemented yet");
+    }
+
+    @Override
     public Type visit(StringLiteral expression) {
         return ValueType.String;
     }
@@ -513,6 +518,11 @@ public final class TypeChecker implements Visitor<Type> {
         } else {
             throw new IllegalArgumentException("Missing explicit and implicit type for variable " + var);
         }
+    }
+
+    @Override
+    public Type visit(ObjectExpression expression) {
+        throw new OperationNotImplementedException("Object expression not implemented");
     }
 
     /**

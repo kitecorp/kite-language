@@ -354,6 +354,11 @@ public final class Resolver implements Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visit(ObjectExpression expression) {
+        return null;
+    }
+
     /**
      * Declaration adds the variable to the innermost scope so that it shadows any outer one and so that we know the variable exists. We mark it as “not ready yet” by binding its name to false in the scope map.
      * The value associated with a key in the scope map represents whether or not we have finished resolving that variable’s initializer.
@@ -414,6 +419,11 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(NullLiteral expression) {
+        return null;
+    }
+
+    @Override
+    public Void visit(ObjectLiteral expression) {
         return null;
     }
 

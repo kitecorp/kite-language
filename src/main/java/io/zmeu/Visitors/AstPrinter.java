@@ -63,6 +63,11 @@ public final class AstPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(ObjectExpression expression) {
+        return "";
+    }
+
+    @Override
     public String visit(AssignmentExpression expression) {
         return parenthesize(expression.getOperator().toString(), expression.getLeft(), expression.getRight());
     }
@@ -183,6 +188,11 @@ public final class AstPrinter implements Visitor<String> {
     @Override
     public String visit(NullLiteral expression) {
         return "null";
+    }
+
+    @Override
+    public String visit(ObjectLiteral expression) {
+        return "";
     }
 
     @Override

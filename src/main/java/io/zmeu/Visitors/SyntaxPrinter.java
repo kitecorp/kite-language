@@ -63,6 +63,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(ObjectExpression expression) {
+        return "";
+    }
+
+    @Override
     public String visit(AssignmentExpression expression) {
         return visit(expression.getLeft()) + expression.getOperator() + visit(expression.getRight());
     }
@@ -183,6 +188,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(NullLiteral expression) {
         return "null";
+    }
+
+    @Override
+    public String visit(ObjectLiteral expression) {
+        return "";
     }
 
     @Override

@@ -5,9 +5,9 @@ import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Literals.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.TypeChecker.TypeChecker;
 import io.zmeu.Runtime.Interpreter;
+import io.zmeu.TypeChecker.TypeChecker;
+import io.zmeu.TypeChecker.Types.Type;
 
 public sealed interface Visitor<R>
         permits Resolver, TypeChecker, Interpreter, AstPrinter, LanguageAstPrinter, SyntaxPrinter {
@@ -40,12 +40,13 @@ public sealed interface Visitor<R>
             case StringLiteral string -> visit(string);
             case BooleanLiteral bool -> visit(bool);
             case NullLiteral nullliteral -> visit(nullliteral);
+            case ObjectLiteral object -> visit(object);
             default -> throw new IllegalStateException("Unexpected value: " + expression);
         };
     }
 
-    default R visit(Statement statement){
-        return switch (statement){
+    default R visit(Statement statement) {
+        return switch (statement) {
             case ResourceExpression resourceExpression -> visit(resourceExpression);
             case Program program -> visit(program);
             case ExpressionStatement expressionStatement -> visit(expressionStatement);
@@ -70,6 +71,8 @@ public sealed interface Visitor<R>
     R visit(Identifier expression);
 
     R visit(NullLiteral expression);
+
+    R visit(ObjectLiteral expression);
 
     R visit(StringLiteral expression);
 
@@ -96,6 +99,8 @@ public sealed interface Visitor<R>
     R visit(VarDeclaration expression);
 
     R visit(ValDeclaration expression);
+
+    R visit(ObjectExpression expression);
 
     R visit(AssignmentExpression expression);
 
