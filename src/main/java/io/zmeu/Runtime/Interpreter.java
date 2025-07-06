@@ -131,6 +131,11 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     @Override
+    public Object visit(ObjectLiteral expression) {
+        throw new OperationNotImplementedException("Object literals not implemented yet");
+    }
+
+    @Override
     public Object visit(StringLiteral expression) {
         return expression.getValue();
     }
@@ -577,6 +582,11 @@ public final class Interpreter implements Visitor<Object> {
             return env.init(symbol, dependency.value());
         }
         return env.init(symbol, value);
+    }
+
+    @Override
+    public Object visit(ObjectExpression expression) {
+        throw new OperationNotImplementedException("Object literals not implemented yet");
     }
 
 

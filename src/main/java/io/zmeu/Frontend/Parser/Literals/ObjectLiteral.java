@@ -38,6 +38,11 @@ public class ObjectLiteral extends Literal {
         return new ObjectLiteral();
     }
 
+
+    public boolean hasType() {
+        return type != null;
+    }
+
     @Override
     public Object getVal() {
         return value;
