@@ -1,7 +1,6 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.ErrorSystem;
-import io.zmeu.SchemaContext;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.Expressions.*;
@@ -20,11 +19,13 @@ import io.zmeu.Runtime.Functions.PrintFunction;
 import io.zmeu.Runtime.Functions.PrintlnFunction;
 import io.zmeu.Runtime.Values.*;
 import io.zmeu.Runtime.exceptions.*;
+import io.zmeu.SchemaContext;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.Visitors.LanguageAstPrinter;
 import io.zmeu.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -132,7 +133,12 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ObjectLiteral expression) {
-        throw new OperationNotImplementedException("Object literals not implemented yet");
+        if (expression.getKey() == null || expression.getValue() == null) {
+            return ImmutablePair.nullPair();
+        }
+        var key = expression.getKey().string();
+        var value = visit(expression.getValue());
+        return ImmutablePair.of(key, value);
     }
 
     @Override
