@@ -151,11 +151,7 @@ public class ParserIterator {
                 if (token.is(TokenType.Dot)) {
                     continue;
                 }
-                if (token.is(TokenType.Identifier)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return token.is(TokenType.Identifier);
             }
         }
 

@@ -26,6 +26,7 @@ public class StringLiteral extends Literal {
     public static StringLiteral of(String value) {
         return new StringLiteral(value);
     }
+
     public static StringLiteral string(String value) {
         return new StringLiteral(value);
     }

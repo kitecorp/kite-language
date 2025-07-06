@@ -2,6 +2,7 @@ package io.zmeu.Frontend.Parser.Expressions;
 
 import io.zmeu.Frontend.Parser.Literals.Identifier;
 import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parser.Literals.StringLiteral;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,15 +28,23 @@ public final class MemberExpression extends Expression {
     public static Expression member(boolean computed, Expression object, Expression property) {
         return new MemberExpression(computed, object, property);
     }
+
     public static Expression member(boolean computed, Expression object, int property) {
         return new MemberExpression(computed, object, NumberLiteral.of(property));
     }
+
     public static Expression member(boolean computed, Expression object, String property) {
         return new MemberExpression(computed, object, Identifier.id(property));
     }
+
+    public static Expression member(boolean computed, Expression object, StringLiteral property) {
+        return new MemberExpression(computed, object, property);
+    }
+
     public static Expression member(Expression object, String property) {
         return new MemberExpression(false, object, Identifier.id(property));
     }
+
     public static Expression member(boolean computed, String object, int property) {
         return new MemberExpression(computed, Identifier.id(object), NumberLiteral.of(property));
     }
@@ -46,6 +55,10 @@ public final class MemberExpression extends Expression {
 
     public static Expression member(boolean computed, String object, String property) {
         return new MemberExpression(computed, Identifier.id(object), Identifier.id(property));
+    }
+
+    public static Expression member(boolean computed, String object, StringLiteral property) {
+        return new MemberExpression(computed, Identifier.id(object), property);
     }
 
     public static Expression member(String object, String property) {
