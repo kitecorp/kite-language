@@ -11,9 +11,10 @@ import org.junit.jupiter.api.Test;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Factory.number;
 import static io.zmeu.Frontend.Parser.Factory.program;
+import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.id;
 import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.type;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -23,7 +24,7 @@ public class ValueTypesTest extends ParserTest {
     @Test
     void testString() {
         var res = parse("var string x\n");
-        var expected = program(var(id("x"), type("string")));
+        var expected = program(varStatement(var("x", type("string"))));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -31,7 +32,7 @@ public class ValueTypesTest extends ParserTest {
     @Test
     void testStringEOF() {
         var res = parse("var string x ");
-        var expected = program(var(id("x"), type("string")));
+        var expected = program(varStatement(var("x", type("string"))));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -39,7 +40,7 @@ public class ValueTypesTest extends ParserTest {
     @Test
     void testStringLineTerminator() {
         var res = parse("var string x ;");
-        var expected = program(var(id("x"), type("string")));
+        var expected = program(varStatement(var("x", type("string"))));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -85,6 +86,7 @@ public class ValueTypesTest extends ParserTest {
         assertEquals(expected, actual);
         log.info((actual));
     }
+
     @Test
     void testSpace() {
         var actual = parse("""

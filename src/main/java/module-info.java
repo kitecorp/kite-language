@@ -8,4 +8,5 @@ module zmeu.io {
     requires java.sql;
     requires jdk.jdi;
     requires java.desktop;
+    requires jdk.compiler;
 }

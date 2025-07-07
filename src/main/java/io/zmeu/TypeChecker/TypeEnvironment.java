@@ -3,6 +3,8 @@ package io.zmeu.TypeChecker;
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.Values.ResourceValue;
 import io.zmeu.TypeChecker.Types.Type;
+import io.zmeu.TypeChecker.Types.TypeFactory;
+import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +35,10 @@ public class TypeEnvironment extends Environment<Type> {
 
     public TypeEnvironment() {
         super();
+        for (ValueType value : ValueType.values()) {
+            init(value.getValue(), value);
+        }
+        init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));
+        init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
     }
 }

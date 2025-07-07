@@ -13,7 +13,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ObjectLiteral extends Literal {
-    private TypeIdentifier type;
     private Identifier key;
     private Expression value;
 
@@ -36,11 +35,6 @@ public class ObjectLiteral extends Literal {
 
     public static ObjectLiteral object() {
         return new ObjectLiteral();
-    }
-
-
-    public boolean hasType() {
-        return type != null;
     }
 
     @Override
