@@ -254,9 +254,6 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
 
     @Override
     public String visit(ObjectLiteral expression) {
-        if (expression.hasType()) {
-            return "%s %s: %s".formatted(visit(expression.getType()), visit(expression.getKey()), visit(expression.getValue()));
-        }
         return "%s: %s".formatted(visit(expression.getKey()), visit(expression.getValue()));
     }
 

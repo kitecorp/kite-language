@@ -25,13 +25,6 @@ public final class TypeChecker implements Visitor<Type> {
 
     public TypeChecker() {
         env = new TypeEnvironment();
-        env.init(ValueType.String.getValue(), ValueType.String);
-        env.init(ValueType.Number.getValue(), ValueType.Number);
-        env.init(ValueType.Boolean.getValue(), ValueType.Boolean);
-        env.init(ValueType.Void.getValue(), ValueType.Void);
-        env.init(ValueType.Null.getValue(), ValueType.Null);
-        env.init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));
-        env.init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
     }
 
     public TypeChecker(TypeEnvironment environment) {
@@ -82,7 +75,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ObjectLiteral expression) {
-        throw new OperationNotImplementedException("Object literals not implemented yet");
+        return visit(expression.getValue());
     }
 
     @Override
@@ -522,7 +515,21 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ObjectExpression expression) {
-        throw new OperationNotImplementedException("Object expression not implemented");
+        TypeEnvironment previous = this.env;
+        try {
+            var objectType = new ObjectType(this.env);
+            this.env = objectType.getEnvironment();
+            for (ObjectLiteral property : expression.getProperties()) {
+                var t = visit(property); // check each property
+                objectType.setProperty(property.getKey().string(), t);
+
+                var keyType = visit(property.getKey());         // also check the key but it's only available after bein set in the env
+                expect(keyType, ValueType.String, property.getKey()); // make sure the key is alwasy string
+            }
+            return objectType;
+        } finally {
+            this.env = previous;
+        }
     }
 
     /**
