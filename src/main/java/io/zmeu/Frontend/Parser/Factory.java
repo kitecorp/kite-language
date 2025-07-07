@@ -1,10 +1,10 @@
 package io.zmeu.Frontend.Parser;
 
 import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parser.Literals.StringLiteral;
-import io.zmeu.Frontend.Parser.Literals.TypeIdentifier;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.StringLiteral;
+import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import io.zmeu.Frontend.Parser.Statements.*;
 
 import java.util.Arrays;

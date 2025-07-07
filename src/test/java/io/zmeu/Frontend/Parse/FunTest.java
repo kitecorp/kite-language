@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Literals.TypeIdentifier;
+import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;

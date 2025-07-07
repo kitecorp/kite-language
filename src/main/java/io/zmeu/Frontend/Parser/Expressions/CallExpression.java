@@ -1,8 +1,8 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parser.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parser.Literals.StringLiteral;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.StringLiteral;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

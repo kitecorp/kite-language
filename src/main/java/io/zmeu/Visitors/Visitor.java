@@ -1,8 +1,8 @@
 package io.zmeu.Visitors;
 
 import io.zmeu.Frontend.Lexical.Resolver;
+import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Literals.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.Runtime.Interpreter;

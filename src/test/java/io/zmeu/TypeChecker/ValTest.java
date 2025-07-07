@@ -7,11 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
-import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
-import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

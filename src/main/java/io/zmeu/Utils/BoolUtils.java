@@ -1,6 +1,6 @@
 package io.zmeu.Utils;
 
-import io.zmeu.Frontend.Parser.Literals.BooleanLiteral;
+import io.zmeu.Frontend.Parse.Literals.BooleanLiteral;
 
 public class BoolUtils {
     public static boolean isTruthy(Object object) {

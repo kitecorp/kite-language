@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Factory.number;
 import static io.zmeu.Frontend.Parser.Factory.program;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.id;
-import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.id;
+import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

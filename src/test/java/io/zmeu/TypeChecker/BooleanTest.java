@@ -1,14 +1,14 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
-import io.zmeu.Frontend.Parser.Literals.NullLiteral;
+import io.zmeu.Frontend.Parse.Literals.NullLiteral;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
+import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

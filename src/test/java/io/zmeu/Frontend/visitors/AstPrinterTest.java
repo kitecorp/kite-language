@@ -4,7 +4,7 @@ import io.zmeu.Frontend.Parser.Expressions.BinaryExpression;
 import io.zmeu.Frontend.Parser.Expressions.GroupExpression;
 import io.zmeu.Frontend.Parser.Expressions.LogicalExpression;
 import io.zmeu.Frontend.Parser.Expressions.UnaryExpression;
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import io.zmeu.Visitors.AstPrinter;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;

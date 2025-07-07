@@ -6,8 +6,8 @@ import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parser.Literals.ObjectLiteral.object;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TypeChecker Object")

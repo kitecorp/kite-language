@@ -2,7 +2,7 @@ package io.zmeu.Frontend.Parse;
 
 import io.zmeu.Frontend.Parser.Expressions.CallExpression;
 import io.zmeu.Frontend.Parser.Expressions.MemberExpression;
-import io.zmeu.Frontend.Parser.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
 import lombok.extern.log4j.Log4j2;

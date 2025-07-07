@@ -1,16 +1,16 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
-import io.zmeu.Frontend.Parser.Literals.SymbolIdentifier;
+import io.zmeu.Frontend.Parse.Literals.SymbolIdentifier;
 import io.zmeu.Runtime.Values.NullValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parser.Literals.ObjectLiteral.ObjectLiteralPair;
-import static io.zmeu.Frontend.Parser.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 
 public class LiteralTest extends RuntimeTest {
     @Test

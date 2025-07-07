@@ -1,6 +1,6 @@
 package io.zmeu.Runtime.Environment;
 
-import io.zmeu.Frontend.Parser.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public interface IEnvironment<T> {

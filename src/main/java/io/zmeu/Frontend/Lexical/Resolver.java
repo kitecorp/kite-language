@@ -1,10 +1,10 @@
 package io.zmeu.Frontend.Lexical;
 
 import io.zmeu.ErrorSystem;
+import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.Visitors.Visitor;
 import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Literals.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.Runtime.Interpreter;

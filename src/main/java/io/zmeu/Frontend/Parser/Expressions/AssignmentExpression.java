@@ -1,11 +1,11 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parser.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

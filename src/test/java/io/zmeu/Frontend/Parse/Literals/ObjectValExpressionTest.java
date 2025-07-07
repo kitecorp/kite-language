@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser.Literals;
+package io.zmeu.Frontend.Parse.Literals;
 
 import io.zmeu.Frontend.Parse.ParserTest;
 import lombok.extern.log4j.Log4j2;
@@ -8,33 +8,33 @@ import org.junit.jupiter.api.Test;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.zmeu.Frontend.Parser.Expressions.MemberExpression.member;
 import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
 import static io.zmeu.Frontend.Parser.Factory.expressionStatement;
-import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
-import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parser.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
+import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-@DisplayName("Parse object var")
-public class ObjectVarExpressionTest extends ParserTest {
+@DisplayName("Parse object val")
+public class ObjectValExpressionTest extends ParserTest {
 
     @Test
     void varEmptyObject() {
-        var res = parse("var x = {}");
-        var expected = program(varStatement(var(id("x"), objectExpression())));
+        var res = parse("val x = {}");
+        var expected = program(valStatement(val(id("x"), objectExpression())));
         assertEquals(expected, res);
         log.info((res));
     }
 
     @Test
     void varInitToNumber() {
-        var res = parse("var x = { a: 2}");
-        var expected = program(varStatement(var(id("x"),
+        var res = parse("val x = { a: 2}");
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), number(2))))));
         assertEquals(expected, res);
         log.info((res));
@@ -42,8 +42,8 @@ public class ObjectVarExpressionTest extends ParserTest {
 
     @Test
     void varInitToDecimal() {
-        var res = parse("var x = { a: 2.2}");
-        var expected = program(varStatement(var(id("x"),
+        var res = parse("val x = { a: 2.2}");
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), number(2.2))))));
         assertEquals(expected, res);
         log.info((res));
@@ -51,8 +51,8 @@ public class ObjectVarExpressionTest extends ParserTest {
 
     @Test
     void varInitToTrue() {
-        var res = parse("var x = { a:true}");
-        var expected = program(varStatement(var(id("x"),
+        var res = parse("val x = { a:true}");
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), bool(true))))));
         assertEquals(expected, res);
         log.info((res));
@@ -60,8 +60,8 @@ public class ObjectVarExpressionTest extends ParserTest {
 
     @Test
     void varInitToFalse() {
-        var res = parse("var x = { a:false}");
-        var expected = program(varStatement(var(id("x"),
+        var res = parse("val x = { a:false}");
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), bool(false))))));
         assertEquals(expected, res);
         log.info((res));
@@ -69,8 +69,8 @@ public class ObjectVarExpressionTest extends ParserTest {
 
     @Test
     void varInitToNull() {
-        var res = parse("var x = { a:null}");
-        var expected = program(varStatement(var(id("x"),
+        var res = parse("val x = { a:null}");
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), NullLiteral.nullLiteral())))));
         assertEquals(expected, res);
         log.info((res));
@@ -79,14 +79,14 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void varInitToNesteObject() {
         var res = parse("""
-                var x = { 
+                val x = { 
                     a: { 
                         b: 2
                     }
                 }
                 
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"),
                         objectExpression(object(id("b"), number(2)))
                 )))));
@@ -97,9 +97,9 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void varInitToString() {
         var res = parse("""
-                var x = { a: "2"}
+                val x = { a: "2"}
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), string("2"))))));
         assertEquals(expected, res);
         log.info((res));
@@ -108,9 +108,9 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void varInitToString2() {
         var res = parse("""
-                var x = { a: "hello"}
+                val x = { a: "hello"}
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("a"), string("hello"))))));
         assertEquals(expected, res);
         log.info((res));
@@ -119,9 +119,9 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void varStringInitToString() {
         var res = parse("""
-                var x = { "a": "hello"}
+                val x = { "a": "hello"}
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(object(id("""
                         "a"
                         """.trim()), string("hello"))))));
@@ -132,12 +132,12 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multipleProperties() {
         var res = parse("""
-                var x = { 
+                val x = { 
                 "a": "hello",
                 "b": "hello b"
                 }
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(
                         object(id("""
                                 "a"
@@ -153,12 +153,12 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesMixedKeys() {
         var res = parse("""
-                var x = { 
+                val x = { 
                 a: "hello",
                 "b": "hello b"
                 }
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(
                         object(id("""
                                 a
@@ -174,12 +174,12 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesMixedValues() {
         var res = parse("""
-                var x = { 
+                val x = { 
                 a: 2,
                 "b": "hello b"
                 }
                 """);
-        var expected = program(varStatement(var(id("x"),
+        var expected = program(valStatement(val(id("x"),
                 objectExpression(
                         object(id("""
                                 a
@@ -195,7 +195,7 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesRealExample() {
         var res = parse("""
-                var environmentSettings = {
+                val environmentSettings = {
                    dev: {
                      name: "Development"
                    },
@@ -206,7 +206,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 
                 """);
         var expected = program(
-                varStatement(var("environmentSettings",
+                valStatement(val("environmentSettings",
                         objectExpression(
                                 object("dev",
                                         objectExpression(
@@ -227,7 +227,7 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesRealExampleNoComma() {
         var res = parse("""
-                var environmentSettings = {
+                val environmentSettings = {
                    dev: {
                      name: "Development"
                      team: "backend"
@@ -239,7 +239,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 
                 """);
         var expected = program(
-                varStatement(var("environmentSettings",
+                valStatement(val("environmentSettings",
                         objectExpression(
                                 object("dev",
                                         objectExpression(
@@ -263,7 +263,7 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesRealExampleComma() {
         var res = parse("""
-                var environmentSettings = {
+                val environmentSettings = {
                    dev: {
                      name: "Development",
                      team: "backend"
@@ -275,7 +275,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 
                 """);
         var expected = program(
-                varStatement(var("environmentSettings",
+                valStatement(val("environmentSettings",
                         objectExpression(
                                 object("dev",
                                         objectExpression(
@@ -299,7 +299,7 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesRealExampleCommaObject() {
         var res = parse("""
-                var environmentSettings = {
+                val environmentSettings = {
                    dev: {
                      name: "Development",
                      team: "backend"
@@ -311,7 +311,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 
                 """);
         var expected = program(
-                varStatement(var("environmentSettings",
+                valStatement(val("environmentSettings",
                         objectExpression(
                                 object("dev",
                                         objectExpression(
@@ -336,7 +336,7 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void multiplePropertiesRealExampleNoCommaProperty() {
         var res = parse("""
-                var environmentSettings = {
+                val environmentSettings = {
                    dev: {
                      name: "Development"
                      team: "backend"
@@ -348,7 +348,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 
                 """);
         var expected = program(
-                varStatement(var("environmentSettings",
+                valStatement(val("environmentSettings",
                         objectExpression(
                                 object("dev",
                                         objectExpression(
@@ -372,13 +372,13 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void testMember() {
         var res = parse("""
-                var x = {
+                val x = {
                     name: "backend"
                 }
                 x.name
                 """);
         var expected = program(
-                varStatement(var("x", objectExpression(object("name", string("backend"))))),
+                valStatement(val("x", objectExpression(object("name", string("backend"))))),
                 expressionStatement(member("x", "name"))
         );
         assertEquals(expected, res);
@@ -388,13 +388,13 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void testMemberAssignmentComputed() {
         var res = parse("""
-                var x = {
+                val x = {
                     name: "backend"
                 }
                 x["name"] = 1""");
         var member = member(true, "x", string("name"));
         var expected = program(
-                varStatement(var("x", objectExpression(object("name", string("backend"))))),
+                valStatement(val("x", objectExpression(object("name", string("backend"))))),
                 expressionStatement(assign(member, 1, "="))
         );
         assertEquals(expected, res);
@@ -404,13 +404,13 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void testMemberAssignmentComputedSingleQuote() {
         var res = parse("""
-                var x = {
+                val x = {
                     name: "backend"
                 }
                 x['name'] = 1""");
         var member = member(true, "x", string("name"));
         var expected = program(
-                varStatement(var("x", objectExpression(object("name", string("backend"))))),
+                valStatement(val("x", objectExpression(object("name", string("backend"))))),
                 expressionStatement(assign(member, 1, "="))
         );
         assertEquals(expected, res);
