@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import io.zmeu.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;

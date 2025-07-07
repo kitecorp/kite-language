@@ -1,6 +1,6 @@
 package io.zmeu.Runtime;
 
-import io.zmeu.Frontend.Parser.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.exceptions.NotFoundException;

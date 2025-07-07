@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;

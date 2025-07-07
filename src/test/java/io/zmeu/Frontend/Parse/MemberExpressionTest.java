@@ -8,7 +8,7 @@ import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.zmeu.Frontend.Parser.Expressions.MemberExpression.member;
 import static io.zmeu.Frontend.Parser.Factory.expressionStatement;
 import static io.zmeu.Frontend.Parser.Factory.program;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

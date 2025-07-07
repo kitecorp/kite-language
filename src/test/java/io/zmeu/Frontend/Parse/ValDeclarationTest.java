@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;

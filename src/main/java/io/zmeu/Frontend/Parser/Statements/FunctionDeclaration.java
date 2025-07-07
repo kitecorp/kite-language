@@ -1,7 +1,7 @@
 package io.zmeu.Frontend.Parser.Statements;
 
+import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.Frontend.Parser.Expressions.Expression;
-import io.zmeu.Frontend.Parser.Literals.*;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

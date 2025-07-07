@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser.Literals;
+package io.zmeu.Frontend.Parse.Literals;
 
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.TypeChecker.Types.TypeFactory;

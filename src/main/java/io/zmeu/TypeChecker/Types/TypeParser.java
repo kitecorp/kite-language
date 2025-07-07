@@ -2,7 +2,7 @@ package io.zmeu.TypeChecker.Types;
 
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Parser.Literals.TypeIdentifier;
+import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import io.zmeu.Frontend.Parser.Parser;
 import org.jetbrains.annotations.NotNull;
 

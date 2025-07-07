@@ -1,6 +1,6 @@
 package io.zmeu.Runtime.Environment;
 
-import io.zmeu.Frontend.Parser.Literals.ParameterIdentifier;
+import io.zmeu.Frontend.Parse.Literals.ParameterIdentifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

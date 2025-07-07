@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser.Literals;
+package io.zmeu.Frontend.Parse.Literals;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

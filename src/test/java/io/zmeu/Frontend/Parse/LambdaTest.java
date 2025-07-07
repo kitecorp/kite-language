@@ -10,9 +10,9 @@ import java.util.List;
 
 import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Expressions.CallExpression.call;
-import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
-import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;

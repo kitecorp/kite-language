@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.zmeu.Frontend.Parser.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2

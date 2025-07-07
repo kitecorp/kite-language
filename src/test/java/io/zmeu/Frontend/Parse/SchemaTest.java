@@ -10,9 +10,9 @@ import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Factory.program;
 import static io.zmeu.Frontend.Parser.Factory.schema;
-import static io.zmeu.Frontend.Parser.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parser.Literals.ObjectLiteral;
+import io.zmeu.Frontend.Parse.Literals.ObjectLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

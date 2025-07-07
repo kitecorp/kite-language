@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assignment;
 import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Expressions.Expressions.logical;
-import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
+import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;

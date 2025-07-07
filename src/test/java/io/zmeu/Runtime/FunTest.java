@@ -2,8 +2,8 @@ package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
 import io.zmeu.Frontend.Parser.Expressions.VarDeclaration;
-import io.zmeu.Frontend.Parser.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import io.zmeu.Frontend.Parser.Statements.BlockExpression;
 import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
 import io.zmeu.Frontend.Parser.Statements.VarStatement;

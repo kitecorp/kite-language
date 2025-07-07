@@ -1,10 +1,10 @@
 package io.zmeu.Frontend.Parser.Statements;
 
 import io.zmeu.Frontend.Parser.Expressions.Expression;
-import io.zmeu.Frontend.Parser.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parser.Literals.ParameterIdentifier;
-import io.zmeu.Frontend.Parser.Literals.StringLiteral;
-import io.zmeu.Frontend.Parser.Literals.TypeIdentifier;
+import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.ParameterIdentifier;
+import io.zmeu.Frontend.Parse.Literals.StringLiteral;
+import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
