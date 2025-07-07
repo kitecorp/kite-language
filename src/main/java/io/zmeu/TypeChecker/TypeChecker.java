@@ -523,13 +523,21 @@ public final class TypeChecker implements Visitor<Type> {
                 var t = visit(property); // check each property
                 objectType.setProperty(property.getKey().string(), t);
 
-                var keyType = visit(property.getKey());         // also check the key but it's only available after bein set in the env
+                var keyType = validatePropertyIsString(property.getKey()); // also check the key but it's only available after bein set in the env
                 expect(keyType, ValueType.String, property.getKey()); // make sure the key is alwasy string
             }
             return objectType;
         } finally {
             this.env = previous;
         }
+    }
+
+    private Type validatePropertyIsString(Identifier key) {
+        return switch (key) {
+            case SymbolIdentifier symbolIdentifier -> visit(symbolIdentifier.getSymbol());
+            case Identifier symbolIdentifier -> visit(symbolIdentifier.string());
+            case null -> null;
+        };
     }
 
     /**
