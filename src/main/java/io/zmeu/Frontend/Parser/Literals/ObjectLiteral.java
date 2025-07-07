@@ -47,4 +47,16 @@ public class ObjectLiteral extends Literal {
     public Object getVal() {
         return value;
     }
+
+    public record ObjectLiteralPair(String key, Object value) {
+        public ObjectLiteralPair(String key, Object value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public ObjectLiteralPair() {
+            this(null, null);
+        }
+
+    }
 }

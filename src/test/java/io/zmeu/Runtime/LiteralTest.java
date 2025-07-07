@@ -1,15 +1,15 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
-import io.zmeu.Frontend.Parser.Literals.ObjectLiteral;
 import io.zmeu.Frontend.Parser.Literals.SymbolIdentifier;
 import io.zmeu.Runtime.Values.NullValue;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parser.Literals.BooleanLiteral.bool;
 import static io.zmeu.Frontend.Parser.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parser.Literals.ObjectLiteral.ObjectLiteralPair;
+import static io.zmeu.Frontend.Parser.Literals.ObjectLiteral.object;
 import static io.zmeu.Frontend.Parser.Literals.StringLiteral.string;
 
 public class LiteralTest extends RuntimeTest {
@@ -59,32 +59,32 @@ public class LiteralTest extends RuntimeTest {
 
     @Test
     void objectEmpty() {
-        var res = interpreter.visit(ObjectLiteral.object());
+        var res = interpreter.visit(object());
         Assertions.assertNotNull(res);
     }
 
     @Test
     void objectSingleEntryString() {
-        var res = (Pair) interpreter.visit(ObjectLiteral.object("env", string("production")));
+        var res = (ObjectLiteralPair) interpreter.visit(object("env", string("production")));
         Assertions.assertNotNull(res);
-        Assertions.assertEquals("env", res.getLeft());
-        Assertions.assertEquals("production", res.getRight());
+        Assertions.assertEquals("env", res.key());
+        Assertions.assertEquals("production", res.value());
     }
 
     @Test
     void objectSingleEntryNumber() {
-        var res = (Pair) interpreter.visit(ObjectLiteral.object("env", number(2)));
+        var res = (ObjectLiteralPair) interpreter.visit(object("env", number(2)));
         Assertions.assertNotNull(res);
-        Assertions.assertEquals("env", res.getLeft());
-        Assertions.assertEquals(2, res.getRight());
+        Assertions.assertEquals("env", res.key());
+        Assertions.assertEquals(2, res.value());
     }
 
     @Test
     void objectSingleEntryBoolean() {
-        var res = (Pair) interpreter.visit(ObjectLiteral.object("env", bool(true)));
+        var res = (ObjectLiteralPair) interpreter.visit(object("env", bool(true)));
         Assertions.assertNotNull(res);
-        Assertions.assertEquals("env", res.getLeft());
-        Assertions.assertEquals(true, res.getRight());
+        Assertions.assertEquals("env", res.key());
+        Assertions.assertEquals(true, res.value());
     }
 
     @Test
