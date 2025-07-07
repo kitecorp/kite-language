@@ -29,6 +29,50 @@ public class ObjectTest extends CheckerTest {
                 "env"
                 """.trim()), ValueType.String);
     }
+
+    @Test
+    void testVarNumber() {
+        eval("""
+                var x = { "env": 2 }
+                """);
+        var varType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(varType.getProperty("""
+                "env"
+                """.trim()), ValueType.Number);
+    }
+
+    @Test
+    void testVarDecimal() {
+        eval("""
+                var x = { "env": 2.1 }
+                """);
+        var varType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(varType.getProperty("""
+                "env"
+                """.trim()), ValueType.Number);
+    }
+
+    @Test
+    void testVarBoolean() {
+        eval("""
+                var x = { "env": false }
+                """);
+        var varType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(varType.getProperty("""
+                "env"
+                """.trim()), ValueType.Boolean);
+    }
+
+    @Test
+    void testVarNull() {
+        eval("""
+                var x = { "env": null }
+                """);
+        var varType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(varType.getProperty("""
+                "env"
+                """.trim()), ValueType.Null);
+    }
 //
 //    @Test
 //    void testVarExplicitType() {
