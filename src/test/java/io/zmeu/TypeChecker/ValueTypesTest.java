@@ -23,7 +23,7 @@ public class ValueTypesTest extends ParserTest {
     @Test
     void testString() {
         var res = parse("var string x\n");
-        var expected = program(Factory.var(id("x"), type("string")));
+        var expected = program(var(id("x"), type("string")));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -31,7 +31,7 @@ public class ValueTypesTest extends ParserTest {
     @Test
     void testStringEOF() {
         var res = parse("var string x ");
-        var expected = program(Factory.var(id("x"), type("string")));
+        var expected = program(var(id("x"), type("string")));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -39,7 +39,7 @@ public class ValueTypesTest extends ParserTest {
     @Test
     void testStringLineTerminator() {
         var res = parse("var string x ;");
-        var expected = program(Factory.var(id("x"), type("string")));
+        var expected = program(var(id("x"), type("string")));
         assertEquals(expected, res);
         log.info((res));
     }

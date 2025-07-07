@@ -5,6 +5,7 @@ import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Literals.*;
+import io.zmeu.Frontend.Parser.Literals.ObjectLiteral.ObjectLiteralPair;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.Runtime.Environment.ActivationEnvironment;
@@ -25,10 +26,10 @@ import io.zmeu.Visitors.LanguageAstPrinter;
 import io.zmeu.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;
@@ -38,10 +39,10 @@ import static io.zmeu.Utils.BoolUtils.isTruthy;
 public final class Interpreter implements Visitor<Object> {
     private static boolean hadRuntimeError;
     @Getter
-    private Environment<Object> env;
-    @Getter
     private final LanguageAstPrinter printer = new LanguageAstPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
+    @Getter
+    private Environment<Object> env;
     private SchemaContext context;
 
     public Interpreter() {
@@ -73,6 +74,11 @@ public final class Interpreter implements Visitor<Object> {
         this.env.init("date", new DateFunction());
 
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
+    }
+
+    static void runtimeError(RuntimeError error) {
+        System.err.printf("%s\n[line %d]%n", error.getMessage(), error.getToken().line());
+        hadRuntimeError = true;
     }
 
     @Override
@@ -134,11 +140,11 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(ObjectLiteral expression) {
         if (expression.getKey() == null || expression.getValue() == null) {
-            return ImmutablePair.nullPair();
+            return new ObjectLiteralPair();
         }
         var key = expression.getKey().string();
         var value = visit(expression.getValue());
-        return ImmutablePair.of(key, value);
+        return new ObjectLiteralPair(key, value);
     }
 
     @Override
@@ -592,9 +598,13 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ObjectExpression expression) {
-        throw new OperationNotImplementedException("Object literals not implemented yet");
+        var map = new HashMap<String, Object>(expression.getProperties().size());
+        for (ObjectLiteral property : expression.getProperties()) {
+            var object = (ObjectLiteralPair)visit(property);
+            map.put(object.key(), object.value());
+        }
+        return map;
     }
-
 
     @Override
     public Object visit(Program program) {
@@ -686,11 +696,6 @@ public final class Interpreter implements Visitor<Object> {
 
     private Object execute(Expression stmt) {
         return visit(stmt);
-    }
-
-    static void runtimeError(RuntimeError error) {
-        System.err.printf("%s\n[line %d]%n", error.getMessage(), error.getToken().line());
-        hadRuntimeError = true;
     }
 
 }

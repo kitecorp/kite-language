@@ -15,8 +15,8 @@ import static io.zmeu.Frontend.Parser.Literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("TypeChecker Variable")
-public class VariableTest extends CheckerTest {
+@DisplayName("TypeChecker Var")
+public class VarTest extends CheckerTest {
 
     @Test
     void testGlobalVarEmptyString() {
