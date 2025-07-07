@@ -24,15 +24,15 @@ public class SchemaTest extends ParserTest {
     void schemaDeclaration() {
         var actual = (Program) parse("""
                 schema square { 
-                    var Number x =1
-                    val Number y =1
+                    var Vm x =1
+                    val Vm y =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
                         BlockExpression.block(
-                        var(id("x"), type("Number"), number(1)),
-                        valStatement(val(id("y"), type("Number"), number(1))))
+                        var(id("x"), type("Vm"), number(1)),
+                        valStatement(val(id("y"), type("Vm"), number(1))))
                 ));
         log.warn((actual));
         assertEquals((expected), (actual));
