@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.zmeu.Frontend.Parser.Factory.number;
-import static io.zmeu.Frontend.Parser.Factory.program;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.id;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.zmeu.Frontend.Parser.Factory.number;
+import static io.zmeu.Frontend.Parser.Factory.program;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,6 +33,22 @@ public class ValueTypesTest extends ParserTest {
     void testStringEOF() {
         var res = parse("var string x ");
         var expected = program(varStatement(var("x", type("string"))));
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void testNumber() {
+        var res = parse("var number x ");
+        var expected = program(varStatement(var("x", type("number"))));
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void testObjectEOF() {
+        var res = parse("var object x ");
+        var expected = program(varStatement(var("x", type("object"))));
         assertEquals(expected, res);
         log.info((res));
     }
