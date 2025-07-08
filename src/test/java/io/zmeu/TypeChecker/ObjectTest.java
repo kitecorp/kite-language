@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TypeChecker Object")
 public class ObjectTest extends CheckerTest {
@@ -26,9 +26,7 @@ public class ObjectTest extends CheckerTest {
                 var x = { "env": "hello" }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("""
-                "env"
-                """.trim()), ValueType.String);
+        assertEquals(varType.getProperty("env"), ValueType.String);
     }
 
     @Test
@@ -37,9 +35,7 @@ public class ObjectTest extends CheckerTest {
                 var x = { "env": 2 }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("""
-                "env"
-                """.trim()), ValueType.Number);
+        assertEquals(varType.getProperty("env"), ValueType.Number);
     }
 
     @Test
@@ -48,9 +44,7 @@ public class ObjectTest extends CheckerTest {
                 var x = { "env": 2.1 }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("""
-                "env"
-                """.trim()), ValueType.Number);
+        assertEquals(varType.getProperty("env"), ValueType.Number);
     }
 
     @Test
@@ -59,9 +53,7 @@ public class ObjectTest extends CheckerTest {
                 var x = { "env": false }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("""
-                "env"
-                """.trim()), ValueType.Boolean);
+        assertEquals(varType.getProperty("env"), ValueType.Boolean);
     }
 
     @Test
@@ -70,9 +62,7 @@ public class ObjectTest extends CheckerTest {
                 var x = { "env": null }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("""
-                "env"
-                """.trim()), ValueType.Null);
+        assertEquals(varType.getProperty("env"), ValueType.Null);
     }
     @Test
     void testVarDeclareType() {
@@ -80,9 +70,30 @@ public class ObjectTest extends CheckerTest {
                 var object x = { "env": "prod" }
                 """);
         var varType = (ReferenceType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("""
-                "env"
-                """.trim()), ValueType.String);
+        assertEquals(varType.getProperty("env"), ValueType.String);
+    }
+    @Test
+    void testNestedObject() {
+        eval("""
+          var x = {
+            "env": {
+              "name": "prod",
+              "settings": {
+                "verbose": false,
+                "retries": 3
+              }
+            }
+          }
+          """);
+        ObjectType xt = (ObjectType) checker.getEnv().lookup("x");
+        // top-level “env” is an object
+        var envType = xt.getProperty("env");
+        assertInstanceOf(ObjectType.class, envType);
+        ObjectType envObj = (ObjectType) envType;
+        assertEquals(envObj.getProperty("name"), ValueType.String);
+        ObjectType settings = (ObjectType) envObj.getProperty("settings");
+        assertEquals(settings.getProperty("verbose"), ValueType.Boolean);
+        assertEquals(settings.getProperty("retries"), ValueType.Number);
     }
 //
 //    @Test

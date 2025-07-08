@@ -69,6 +69,9 @@ public class Tokenizer {
             if (TokenType.isAny(type, TokenType.WhiteSpace, TokenType.Comment)) {
                 return null;
             }
+            if (TokenType.isAny(type, TokenType.String)) {
+                value = value.substring(1, value.length() - 1);
+            }
             return new Token(value, type, value, line);
         }
         log.error("{} {} | Unknown symbol: {}", line, line, ch);
