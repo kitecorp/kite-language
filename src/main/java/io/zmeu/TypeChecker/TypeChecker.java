@@ -273,28 +273,33 @@ public final class TypeChecker implements Visitor<Type> {
 
     private @NotNull Type accessMemberType(MemberExpression expression, SymbolIdentifier resourceName, ObjectType objectType) {
         Type lookup = objectType.getProperty(resourceName.string());
-        if (lookup != null) { // found the property in the object
+        if (lookup != null) {
+            // found the property in the object:
+            // var a = "a"
+            // var b = "b"
+            // var c = 0
+            // var x = { a: 1 } ; x.a is found
             return lookup;
         }
         try {
             // if property was not found check if is a variable declared in a higher scope
             var storedType = objectType.lookup(resourceName.string());
-            var type = switch (storedType) {
+            // if we found the var declaration, we know it's value so we try to access the member of the object using the variable value
+            // x[a] -> x["a"] works only with strings
+            return switch (storedType) {
                 // if we found the var declaration, we know it's value so we try to access the member of the object using the variable value
-                case StringType stringType -> objectType.getProperty(stringType.getString());
+                // x[a] -> x["a"] works only with strings
+                case StringType stringType -> objectType.lookup(stringType.getString());
                 case null, default -> throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
             };
-            if (type == null) {
-                throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
-            }
-            return type;
         } catch (RuntimeException e) {
             throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
         }
     }
 
     private @NotNull String propertyNotFoundOnObject(MemberExpression expression, SymbolIdentifier resourceName) {
-        return "Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression);
+        return "Property '%s' not found on object: %s in expression: %s"
+                .formatted(resourceName.string(), printer.visit(expression.getObject()), printer.visit(expression));
     }
 
     @Override
