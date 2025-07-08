@@ -12,7 +12,7 @@ import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TypeChecker Object")
-public class ObjectTest extends CheckerTest {
+public class ValObjectTest extends CheckerTest {
 
     @Test
     void testVarInt() {
@@ -23,7 +23,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testVarString() {
         eval("""
-                var x = { "env": "hello" }
+                val x = { "env": "hello" }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.String);
@@ -32,7 +32,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testVarNumber() {
         eval("""
-                var x = { "env": 2 }
+                val x = { "env": 2 }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.Number);
@@ -41,7 +41,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testVarDecimal() {
         eval("""
-                var x = { "env": 2.1 }
+                val x = { "env": 2.1 }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.Number);
@@ -50,7 +50,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testVarBoolean() {
         eval("""
-                var x = { "env": false }
+                val x = { "env": false }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.Boolean);
@@ -59,7 +59,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testVarNull() {
         eval("""
-                var x = { "env": null }
+                val x = { "env": null }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.Null);
@@ -77,7 +77,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testNestedObject() {
         eval("""
-                var x = {
+                val x = {
                   "env": {
                     "name": "prod",
                     "settings": {
@@ -101,7 +101,7 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testReferenceAlias() {
         eval("""
-                        var x = { "count": 1 };
+                        val x = { "count": 1 };
                         var y = x;
                         x.count = 2;
                 """);
@@ -114,7 +114,7 @@ public class ObjectTest extends CheckerTest {
     void testMissingProperty() {
         assertThrows(TypeError.class, () ->
                 eval("""
-                        var x = { "foo": 42 };
+                        val x = { "foo": 42 };
                         x.bar;                  // bar doesn’t exist
                         """)
         );
@@ -125,7 +125,7 @@ public class ObjectTest extends CheckerTest {
     void testMissingNestedProperty() {
         assertThrows(TypeError.class, () ->
                 eval("""
-                        var x = { "a": { "b": 1 } };
+                        val x = { "a": { "b": 1 } };
                         x.a.c;          // “c” isn’t on the nested object
                         """
                 )
@@ -137,7 +137,7 @@ public class ObjectTest extends CheckerTest {
     void testMissingDeeplyNestedProperty() {
         assertThrows(TypeError.class, () ->
                 eval("""
-                        var x = { "a": { "b": { "c": true } } };
+                        val x = { "a": { "b": { "c": true } } };
                         x.a.b.d;        // “d” isn’t on the deepest object
                         """
                 )
@@ -149,8 +149,8 @@ public class ObjectTest extends CheckerTest {
     void testMissingComputedKey() {
         assertThrows(TypeError.class, () ->
                 eval("""
-                        var key = "env";
-                        var x = { "foo": 1 };
+                        val key = "env";
+                        val x = { "foo": 1 };
                         x[key];         // “env” isn’t defined on x
                         """
                 )
@@ -161,8 +161,8 @@ public class ObjectTest extends CheckerTest {
     @DisplayName("Computed Property Key Present")
     void testMissingComputedKey2() {
         eval("""
-                var key = "env";
-                var x = { "env": 1 };
+                val key = "env";
+                val x = { "env": 1 };
                 x[key];         // “env” is defined on x
                 """
         );
@@ -174,8 +174,8 @@ public class ObjectTest extends CheckerTest {
     @DisplayName("Computed Property Key Present")
     void testMissingComputedKeyString() {
         eval("""
-                var key = "env";
-                var x = { "env": 1 };
+                val key = "env";
+                val x = { "env": 1 };
                 x["key"];         // “key” is missing
                 """
         );
@@ -188,7 +188,7 @@ public class ObjectTest extends CheckerTest {
     void testPropertyReassignmentTypeError() {
         assertThrows(TypeError.class, () ->
                 eval("""
-                        var x = { "env": 1 };
+                        val x = { "env": 1 };
                         x.env = "oops";        // was Number, now String
                         """
                 )
@@ -200,58 +200,11 @@ public class ObjectTest extends CheckerTest {
     void testAddNewProperty() {
         assertThrows(TypeError.class, () ->
                 eval("""
-                        var object x = { "a": 1 };
+                        val object x = { "a": 1 };
                         x.b = 2;               // adding 'b' not allowed if strict
                         """
                 )
         );
     }
 
-//
-//    @Test
-//    void testVarExplicitType() {
-//        var type = checker.visit(var("x", type("string"), string("hello")));
-//        var accessType = checker.visit(id("x"));
-//        assertEquals(type, ValueType.String);
-//        assertEquals(accessType, ValueType.String);
-//    }
-//
-//    @Test
-//    void testVarExplicitTypeWrongNumberAssignment() {
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("string"), number(10))));
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("string"), number(10.1))));
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("string"), bool(true))));
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("string"), bool(false))));
-//    }
-//
-//    @Test
-//    void testVarExplicitTypeWrongStringAssignment() {
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("number"), string("10"))));
-//    }
-//
-//    @Test
-//    void testExplicitTypeWrongBoolAssignment() {
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("number"), bool(false))));
-//        assertThrows(TypeError.class, () -> checker.visit(var("x", type("number"), bool(true))));
-//    }
-//
-//    @Test
-//    void testGlobalVarNonExisting() {
-//        checker = new TypeChecker(new TypeEnvironment());
-//        assertThrows(NotFoundException.class, () -> checker.visit(id("VERSION")));
-//    }
-//
-//    @Test
-//    void testNull() {
-//        var t = checker.visit(var("x", type("string"), string("")));
-//        assertEquals(t, ValueType.String);
-//    }
-//
-//    @Test
-//    void testInferTypeFromAnotherVar() {
-//        var t1 = checker.visit(var("x", type("string"), string("first")));
-//        var t2 = checker.visit(var("y", type("string"), id("x")));
-//        assertEquals(t1, ValueType.String);
-//        assertEquals(t2, ValueType.String);
-//    }
 }
