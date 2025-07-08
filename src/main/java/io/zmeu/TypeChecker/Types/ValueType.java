@@ -3,18 +3,18 @@ package io.zmeu.TypeChecker.Types;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-public final class ValueType extends Type {
+public non-sealed class ValueType extends Type {
     public static ValueType String = new ValueType("string");
     public static ValueType Number = new ValueType("number");
     public static ValueType Boolean = new ValueType("boolean");
     public static ValueType Void = new ValueType("void");
     public static ValueType Null = new ValueType("null");
 
-    private ValueType() {
+    public ValueType() {
         super();
     }
 
-    private ValueType(String value) {
+    public ValueType(String value) {
         super();
         setValue(value);
     }
