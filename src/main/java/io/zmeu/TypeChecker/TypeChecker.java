@@ -247,12 +247,16 @@ public final class TypeChecker implements Visitor<Type> {
                     return schemaValue.getInstances().lookup(resourceName.string());  // vm.main -> if user references the schema we search for the instances of those schemas
                 }
                 case ResourceType iEnvironment -> {
-                    return iEnvironment.lookup(resourceName.string());
+                    try {
+                        return iEnvironment.lookup(resourceName.string());
+                    } catch (NotFoundException e) {
+                        throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
+                    }
                 }
                 case ObjectType objectType -> {
                     Type lookup = objectType.lookup(resourceName.string());
                     if (lookup == null) {
-                        throw new TypeError("Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
+                        throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
                     }
                     return lookup;
                 }
@@ -269,6 +273,10 @@ public final class TypeChecker implements Visitor<Type> {
             return lookup;
         }
         throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
+    }
+
+    private @NotNull String propertyNotFoundOnObject(MemberExpression expression, SymbolIdentifier resourceName) {
+        return "Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression);
     }
 
     @Override
