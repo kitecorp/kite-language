@@ -12,6 +12,7 @@ import io.zmeu.Visitors.LanguageAstPrinter;
 import io.zmeu.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -483,6 +484,11 @@ public final class TypeChecker implements Visitor<Type> {
             if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
                 expect(implicitType, explicitType, expression);
+                if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
+                    // when it's an object implicit type is the object + all of it's env variable types { name: string }
+                    // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
+                    return env.init(var, implicitType);
+                }
                 return env.init(var, explicitType);
             }
             return env.init(var, implicitType);
@@ -519,6 +525,7 @@ public final class TypeChecker implements Visitor<Type> {
         try {
             var objectType = new ObjectType(this.env);
             this.env = objectType.getEnvironment();
+
             for (ObjectLiteral property : expression.getProperties()) {
                 var t = visit(property); // check each property
                 objectType.setProperty(property.getKey().string(), t);
