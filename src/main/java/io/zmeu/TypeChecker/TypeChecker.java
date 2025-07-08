@@ -246,7 +246,14 @@ public final class TypeChecker implements Visitor<Type> {
                 return schemaValue.getInstances().lookup(resourceName.string());
             } else if (value instanceof ResourceType iEnvironment) {
                 return iEnvironment.lookup(resourceName.string());
-            } // else it could be a resource or any other type like a NumericLiteral or something else
+            } else if (value instanceof ObjectType type) {
+                Type lookup = type.lookup(resourceName.string());
+                if (lookup == null) {
+                    throw new TypeError("Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
+                }
+                return lookup;
+            }
+            // else it could be a resource or any other type like a NumericLiteral or something else
         }
         throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
     }
