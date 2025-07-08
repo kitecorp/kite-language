@@ -242,16 +242,22 @@ public final class TypeChecker implements Visitor<Type> {
             var value = executeBlock(expression.getObject(), env);
             // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
             // Since that environment points to the parent(type env) it will also find the properties
-            if (value instanceof SchemaType schemaValue) { // vm.main -> if user references the schema we search for the instances of those schemas
-                return schemaValue.getInstances().lookup(resourceName.string());
-            } else if (value instanceof ResourceType iEnvironment) {
-                return iEnvironment.lookup(resourceName.string());
-            } else if (value instanceof ObjectType type) {
-                Type lookup = type.lookup(resourceName.string());
-                if (lookup == null) {
-                    throw new TypeError("Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
+            switch (value) {
+                case SchemaType schemaValue -> {
+                    return schemaValue.getInstances().lookup(resourceName.string());  // vm.main -> if user references the schema we search for the instances of those schemas
                 }
-                return lookup;
+                case ResourceType iEnvironment -> {
+                    return iEnvironment.lookup(resourceName.string());
+                }
+                case ObjectType type -> {
+                    Type lookup = type.lookup(resourceName.string());
+                    if (lookup == null) {
+                        throw new TypeError("Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
+                    }
+                    return lookup;
+                }
+                case null, default -> {
+                }
             }
             // else it could be a resource or any other type like a NumericLiteral or something else
         }
