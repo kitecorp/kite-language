@@ -106,8 +106,8 @@ public class ObjectTest extends CheckerTest {
                         x.count = 2;
                 """);
         // Both x and y should reflect the same object reference
-        ObjectType yType = (ObjectType) checker.getEnv().lookup("y");
-        assertEquals(yType.getProperty("count"), ValueType.Number);
+        var yType = (ObjectType) checker.getEnv().lookup("y");
+        assertEquals(ValueType.Number, yType.getProperty("count"));
     }
 
     @Test
@@ -120,6 +120,79 @@ public class ObjectTest extends CheckerTest {
         );
     }
 
+    @Test
+    @DisplayName("Missing Nested Property")
+    void testMissingNestedProperty() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        var x = { "a": { "b": 1 } };
+                        x.a.c;          // “c” isn’t on the nested object
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Missing Deeply Nested Property")
+    void testMissingDeeplyNestedProperty() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        var x = { "a": { "b": { "c": true } } };
+                        x.a.b.d;        // “d” isn’t on the deepest object
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Computed Property Key Missing")
+    void testMissingComputedKey() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        var key = "env";
+                        var x = { "foo": 1 };
+                        x[key];         // “env” isn’t defined on x
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Computed Property Key Present")
+    void testMissingComputedKey2() {
+        eval("""
+                var key = "env";
+                var x = { "env": 1 };
+                x[key];         // “env” is defined on x
+                """
+        );
+        var yType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(ValueType.Number, yType.getProperty("env"));
+    }
+
+    @Test
+    @DisplayName("Reassign Existing Property with Wrong Type")
+    void testPropertyReassignmentTypeError() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        var x = { "env": 1 };
+                        x.env = "oops";        // was Number, now String
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Add New Property After Declaration")
+    void testAddNewProperty() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+        var object x = { "a": 1 };
+        x.b = 2;               // adding 'b' not allowed if strict
+        """
+                )
+        );
+    }
 
 //
 //    @Test
