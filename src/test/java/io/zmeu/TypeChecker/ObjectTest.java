@@ -64,6 +64,7 @@ public class ObjectTest extends CheckerTest {
         var varType = (ObjectType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.Null);
     }
+
     @Test
     void testVarDeclareType() {
         eval("""
@@ -72,19 +73,20 @@ public class ObjectTest extends CheckerTest {
         var varType = (ReferenceType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.String);
     }
+
     @Test
     void testNestedObject() {
         eval("""
-          var x = {
-            "env": {
-              "name": "prod",
-              "settings": {
-                "verbose": false,
-                "retries": 3
-              }
-            }
-          }
-          """);
+                var x = {
+                  "env": {
+                    "name": "prod",
+                    "settings": {
+                      "verbose": false,
+                      "retries": 3
+                    }
+                  }
+                }
+                """);
         ObjectType xt = (ObjectType) checker.getEnv().lookup("x");
         // top-level “env” is an object
         var envType = xt.getProperty("env");
@@ -95,6 +97,30 @@ public class ObjectTest extends CheckerTest {
         assertEquals(settings.getProperty("verbose"), ValueType.Boolean);
         assertEquals(settings.getProperty("retries"), ValueType.Number);
     }
+
+    @Test
+    void testReferenceAlias() {
+        eval("""
+                        var x = { "count": 1 };
+                        var y = x;
+                        x.count = 2;
+                """);
+        // Both x and y should reflect the same object reference
+        ObjectType yType = (ObjectType) checker.getEnv().lookup("y");
+        assertEquals(yType.getProperty("count"), ValueType.Number);
+    }
+
+    @Test
+    void testMissingProperty() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        var x = { "foo": 42 };
+                        x.bar;                  // bar doesn’t exist
+                        """)
+        );
+    }
+
+
 //
 //    @Test
 //    void testVarExplicitType() {
