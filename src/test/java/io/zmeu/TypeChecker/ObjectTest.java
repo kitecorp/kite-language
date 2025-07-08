@@ -171,6 +171,19 @@ public class ObjectTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("Computed Property Key Present")
+    void testMissingComputedKeyString() {
+        eval("""
+                var key = "env";
+                var x = { "env": 1 };
+                x["key"];         // “key” is missing
+                """
+        );
+        var yType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(ValueType.Number, yType.getProperty("env"));
+    }
+
+    @Test
     @DisplayName("Reassign Existing Property with Wrong Type")
     void testPropertyReassignmentTypeError() {
         assertThrows(TypeError.class, () ->
@@ -187,9 +200,9 @@ public class ObjectTest extends CheckerTest {
     void testAddNewProperty() {
         assertThrows(TypeError.class, () ->
                 eval("""
-        var object x = { "a": 1 };
-        x.b = 2;               // adding 'b' not allowed if strict
-        """
+                        var object x = { "a": 1 };
+                        x.b = 2;               // adding 'b' not allowed if strict
+                        """
                 )
         );
     }

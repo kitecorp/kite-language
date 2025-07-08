@@ -249,8 +249,8 @@ public final class TypeChecker implements Visitor<Type> {
                 case ResourceType iEnvironment -> {
                     return iEnvironment.lookup(resourceName.string());
                 }
-                case ObjectType type -> {
-                    Type lookup = type.lookup(resourceName.string());
+                case ObjectType objectType -> {
+                    Type lookup = objectType.lookup(resourceName.string());
                     if (lookup == null) {
                         throw new TypeError("Property '" + resourceName.string() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
                     }
@@ -260,6 +260,13 @@ public final class TypeChecker implements Visitor<Type> {
                 }
             }
             // else it could be a resource or any other type like a NumericLiteral or something else
+        } else if (expression.getProperty() instanceof StringLiteral stringLiteral) {
+            var value = executeBlock(expression.getObject(), env);
+            Type lookup = env.lookup(stringLiteral.getValue());
+            if (lookup == null) {
+                throw new TypeError("Property '" + stringLiteral.getValue() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
+            }
+            return lookup;
         }
         throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
     }
