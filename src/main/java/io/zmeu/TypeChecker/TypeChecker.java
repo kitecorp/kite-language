@@ -564,7 +564,17 @@ public final class TypeChecker implements Visitor<Type> {
             if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
                 expect(implicitType, explicitType, expression);
+                if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
+                    // when it's an object implicit type is the object + all of it's env variable types { name: string }
+                    // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
+                    return env.init(var, implicitType);
+                }
                 return env.init(var, explicitType);
+            }
+            if (implicitType == ValueType.String) {
+                // only needed when var is string because this var could be used to access a member on an object
+                var init = (StringLiteral) expression.getInit();
+                return env.init(var, new StringType(init.getValue()));
             }
             return env.init(var, implicitType);
         } else if (expression.hasType()) {
