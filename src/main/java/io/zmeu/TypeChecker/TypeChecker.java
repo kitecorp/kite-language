@@ -54,19 +54,14 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(Identifier expression) {
-        try {
-            if (expression instanceof TypeIdentifier identifier) {
-                Type type = env.lookup(identifier.getType().getValue());
-                return Objects.requireNonNullElseGet(type, () -> TypeFactory.fromString(identifier.getType().getValue()));
-            } else if (expression instanceof SymbolIdentifier identifier) {
-                Type type = env.lookup(identifier.getSymbol());
-                return Objects.requireNonNullElseGet(type, () -> TypeFactory.fromString(identifier.getSymbol()));
-            }
-            throw new TypeError(expression.string());
-        } catch (NotFoundException exception) {
-            log.error(exception.getMessage());
-            throw exception;
+        if (expression instanceof TypeIdentifier identifier) {
+            Type type = env.lookup(identifier.getType().getValue());
+            return Objects.requireNonNullElseGet(type, () -> TypeFactory.fromString(identifier.getType().getValue()));
+        } else if (expression instanceof SymbolIdentifier identifier) {
+            Type type = env.lookup(identifier.getSymbol());
+            return Objects.requireNonNullElseGet(type, () -> TypeFactory.fromString(identifier.getSymbol()));
         }
+        throw new TypeError(expression.string());
     }
 
     @Override
@@ -418,7 +413,7 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(VarStatement statement) {
         Type type = ValueType.Null;
-        for (VarDeclaration declaration : statement.getDeclarations()) {
+        for (var declaration : statement.getDeclarations()) {
             type = executeBlock(declaration, this.env);
         }
         return type;

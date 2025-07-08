@@ -468,10 +468,14 @@ public class Parser {
     private ValDeclaration ValDeclaration() {
         TypeIdentifier type = null;
         if (context == SchemaContext.SCHEMA) {
-            if (IsLookAheadAfter(Identifier, Identifier)) { // type mandatory inside a schema. Init/default value is optional
+            if (HasType()) { // type mandatory inside a schema. Init/default value is optional
                 type = typeParser.identifier();
             } else {
                 throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
+            }
+        } else {
+            if (HasType()) { // type not mandatory outside a schema
+                type = typeParser.identifier();
             }
         }
         var id = Identifier();
