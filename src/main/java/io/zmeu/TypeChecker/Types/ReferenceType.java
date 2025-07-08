@@ -47,7 +47,7 @@ public sealed class ReferenceType extends Type permits ObjectType, ResourceType,
 
     @Nullable
     public Type lookup(@NotNull String fieldName) {
-        return environment.get(fieldName);
+        return environment.lookup(fieldName);
     }
 
     public Type setProperty(@NotNull String fieldName, Type type) {
