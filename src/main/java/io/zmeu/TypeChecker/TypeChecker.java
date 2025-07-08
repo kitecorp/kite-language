@@ -254,11 +254,7 @@ public final class TypeChecker implements Visitor<Type> {
                     }
                 }
                 case ObjectType objectType -> {
-                    Type lookup = objectType.lookup(resourceName.string());
-                    if (lookup == null) {
-                        throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
-                    }
-                    return lookup;
+                    return accessMemberType(expression, resourceName, objectType);
                 }
                 case null, default -> {
                 }
@@ -273,6 +269,28 @@ public final class TypeChecker implements Visitor<Type> {
             return lookup;
         }
         throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
+    }
+
+    private @NotNull Type accessMemberType(MemberExpression expression, SymbolIdentifier resourceName, ObjectType objectType) {
+        Type lookup = objectType.getProperty(resourceName.string());
+        if (lookup != null) { // found the property in the object
+            return lookup;
+        }
+        try {
+            // if property was not found check if is a variable declared in a higher scope
+            var storedType = objectType.lookup(resourceName.string());
+            var type = switch (storedType) {
+                // if we found the var declaration, we know it's value so we try to access the member of the object using the variable value
+                case StringType stringType -> objectType.getProperty(stringType.getString());
+                case null, default -> throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
+            };
+            if (type == null) {
+                throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
+            }
+            return type;
+        } catch (RuntimeException e) {
+            throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
+        }
     }
 
     private @NotNull String propertyNotFoundOnObject(MemberExpression expression, SymbolIdentifier resourceName) {
@@ -518,6 +536,11 @@ public final class TypeChecker implements Visitor<Type> {
                     return env.init(var, implicitType);
                 }
                 return env.init(var, explicitType);
+            }
+            if (implicitType == ValueType.String) {
+                // only needed when var is string because this var could be used to access a member on an object
+                var init = (StringLiteral) expression.getInit();
+                return env.init(var, new StringType(init.getValue()));
             }
             return env.init(var, implicitType);
         } else if (expression.hasType()) {
