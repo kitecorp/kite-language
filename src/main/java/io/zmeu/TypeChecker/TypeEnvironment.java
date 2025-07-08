@@ -2,6 +2,7 @@ package io.zmeu.TypeChecker;
 
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.Values.ResourceValue;
+import io.zmeu.TypeChecker.Types.ReferenceType;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.TypeChecker.Types.TypeFactory;
 import io.zmeu.TypeChecker.Types.ValueType;
@@ -35,7 +36,10 @@ public class TypeEnvironment extends Environment<Type> {
 
     public TypeEnvironment() {
         super();
-        for (ValueType value : ValueType.values()) {
+        for (var value : ValueType.values()) {
+            init(value.getValue(), value);
+        }
+        for (var value : ReferenceType.values()) {
             init(value.getValue(), value);
         }
         init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));

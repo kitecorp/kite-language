@@ -183,7 +183,7 @@ public final class TypeChecker implements Visitor<Type> {
         if (expectedType == ValueType.Null) {
             return actualType;
         }
-        if (!Objects.equals(actualType, expectedType)) {
+        if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue())) {
             // only evaluate printing if we need to
             String string = "Expected type " + expectedType + " but got " + actualType + " in expression: " + printer.visit(expectedVal);
             throw new TypeError(string);
@@ -478,7 +478,7 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(VarDeclaration expression) {
         String var = expression.getId().string();
-        if (expression.getInit() != null) {
+        if (expression.hasInit()) {
             var implicitType = visit(expression.getInit());
             if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
@@ -497,7 +497,7 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(ValDeclaration expression) {
         String var = expression.getId().string();
-        if (expression.getInit() != null) {
+        if (expression.hasInit()) {
             var implicitType = visit(expression.getInit());
             if (expression.hasType()) {
                 var explicitType = visit(expression.getType());

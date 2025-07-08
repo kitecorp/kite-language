@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 public final class ValueType extends Type {
     public static ValueType String = new ValueType("string");
     public static ValueType Number = new ValueType("number");
-    public static ValueType Object = new ValueType("object");
     public static ValueType Boolean = new ValueType("boolean");
     public static ValueType Void = new ValueType("void");
     public static ValueType Null = new ValueType("null");
@@ -25,7 +24,6 @@ public final class ValueType extends Type {
             case "boolean" -> Boolean;
             case "string" -> String;
             case "number" -> Number;
-            case "object" -> Object;
             case "void" -> Void;
             case "null" -> Null;
             default -> null;
@@ -38,7 +36,7 @@ public final class ValueType extends Type {
     }
 
     public static ValueType[] values() {
-        return new ValueType[]{String, Number, Object, Boolean, Void, Null};
+        return new ValueType[]{String, Number, Boolean, Void, Null};
     }
 
 }

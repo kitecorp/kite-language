@@ -1,5 +1,6 @@
 package io.zmeu.Frontend.Parse.Literals;
 
+import io.zmeu.TypeChecker.Types.ReferenceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,11 +25,6 @@ public final class PathIdentifier extends Identifier {
         super();
     }
 
-    @Override
-    public String string() {
-        return StringUtils.join(paths,".");
-    }
-
     private PathIdentifier(String path) {
         this();
         paths = StringUtils.split(path, ".");
@@ -38,8 +34,17 @@ public final class PathIdentifier extends Identifier {
         return of(type);
     }
 
+    public static PathIdentifier type(ReferenceType type) {
+        return of(type.getValue());
+    }
+
     public static PathIdentifier of(String object) {
         return new PathIdentifier(object);
+    }
+
+    @Override
+    public String string() {
+        return StringUtils.join(paths, ".");
     }
 
 }

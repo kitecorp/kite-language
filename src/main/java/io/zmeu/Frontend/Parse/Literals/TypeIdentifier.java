@@ -1,5 +1,6 @@
 package io.zmeu.Frontend.Parse.Literals;
 
+import io.zmeu.TypeChecker.Types.ReferenceType;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.TypeChecker.Types.TypeFactory;
 import io.zmeu.TypeChecker.Types.ValueType;
@@ -69,6 +70,7 @@ public final class TypeIdentifier extends Identifier {
     public static TypeIdentifier type(Type type) {
         return switch (type) {
             case ValueType valueType -> new TypeIdentifier(valueType, PathIdentifier.type(type.getValue()));
+            case ReferenceType valueType -> new TypeIdentifier(valueType, PathIdentifier.type(type.getValue()));
             default -> new TypeIdentifier(type);
         };
     }
