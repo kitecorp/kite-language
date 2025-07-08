@@ -125,9 +125,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 var x = { "a": "hello"}
                 """);
         var expected = program(varStatement(var(id("x"),
-                objectExpression(object(id("""
-                        "a"
-                        """.trim()), string("hello"))))));
+                objectExpression(object(id("a"), string("hello"))))));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -142,12 +140,8 @@ public class ObjectVarExpressionTest extends ParserTest {
                 """);
         var expected = program(varStatement(var(id("x"),
                 objectExpression(
-                        object(id("""
-                                "a"
-                                """.trim()), string("hello")),
-                        object(id("""
-                                "b"
-                                """.trim()), string("hello b"))
+                        object(id("a"), string("hello")),
+                        object(id("b"), string("hello b"))
                 ))));
         assertEquals(expected, res);
         log.info((res));
@@ -163,12 +157,8 @@ public class ObjectVarExpressionTest extends ParserTest {
                 """);
         var expected = program(varStatement(var(id("x"),
                 objectExpression(
-                        object(id("""
-                                a
-                                """.trim()), string("hello")),
-                        object(id("""
-                                "b"
-                                """.trim()), string("hello b"))
+                        object(id("a"), string("hello")),
+                        object(id("b"), string("hello b"))
                 ))));
         assertEquals(expected, res);
         log.info((res));
@@ -184,12 +174,8 @@ public class ObjectVarExpressionTest extends ParserTest {
                 """);
         var expected = program(varStatement(var(id("x"),
                 objectExpression(
-                        object(id("""
-                                a
-                                """.trim()), number(2)),
-                        object(id("""
-                                "b"
-                                """.trim()), string("hello b"))
+                        object(id("a"), number(2)),
+                        object(id("b"), string("hello b"))
                 ))));
         assertEquals(expected, res);
         log.info((res));
