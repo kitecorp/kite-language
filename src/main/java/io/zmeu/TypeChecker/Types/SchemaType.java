@@ -12,32 +12,14 @@ import org.jetbrains.annotations.Nullable;
 @EqualsAndHashCode(callSuper = true)
 public final class SchemaType extends ReferenceType {
 
-    @Getter
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private final TypeEnvironment environment;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Getter
     private final TypeEnvironment instances;
 
-    public SchemaType(String typeName) {
-        this(typeName, null);
-    }
-
     public SchemaType(String typeName, @Nullable TypeEnvironment env) {
-        super(typeName);
-        this.environment = new TypeEnvironment(env);
+        super(typeName, env);
         this.instances = new TypeEnvironment();
-    }
-
-    @Nullable
-    public Type getProperty(@NotNull String fieldName) {
-        return environment.lookup(fieldName);
-    }
-
-    public Type setProperty(@NotNull String fieldName, Type type) {
-        return environment.init(fieldName, type);
     }
 
     public Type addInstance(@NotNull String fieldName, ResourceType type) {

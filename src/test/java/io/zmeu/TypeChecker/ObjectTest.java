@@ -2,6 +2,7 @@ package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ObjectType;
+import io.zmeu.TypeChecker.Types.ReferenceType;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,16 @@ public class ObjectTest extends CheckerTest {
                 var x = { "env": null }
                 """);
         var varType = (ObjectType) checker.getEnv().lookup("x");
+        assertEquals(varType.getProperty("""
+                "env"
+                """.trim()), ValueType.Null);
+    }
+    @Test
+    void testVarDeclareType() {
+        eval("""
+                var object x = { "env": null }
+                """);
+        var varType = (ReferenceType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("""
                 "env"
                 """.trim()), ValueType.Null);
