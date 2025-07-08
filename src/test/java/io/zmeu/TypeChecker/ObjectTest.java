@@ -77,12 +77,12 @@ public class ObjectTest extends CheckerTest {
     @Test
     void testVarDeclareType() {
         eval("""
-                var object x = { "env": null }
+                var object x = { "env": "prod" }
                 """);
         var varType = (ReferenceType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("""
                 "env"
-                """.trim()), ValueType.Null);
+                """.trim()), ValueType.String);
     }
 //
 //    @Test
