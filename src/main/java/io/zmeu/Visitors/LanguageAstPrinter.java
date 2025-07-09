@@ -59,10 +59,11 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
 
     @Override
     public String visit(VarDeclaration expression) {
-        StringBuilder var = new StringBuilder("var " + expression.getId().string());
+        var var = new StringBuilder("var ");
         if (expression.hasType()) {
-            var.append(" :").append(expression.getType().getType().getValue());
+            var.append(expression.getType().getType().getValue()).append(" ");
         }
+        var.append(expression.getId().string());
         if (expression.hasInit()) {
             var.append(" = ").append(visit(expression.getInit()));
         }
