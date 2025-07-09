@@ -638,12 +638,36 @@ public final class TypeChecker implements Visitor<Type> {
         var valueType = visit(expression.getRight());
         var expected = expect(valueType, varType, expression.getLeft());
         if (expression.getLeft() instanceof SymbolIdentifier symbolIdentifier) {
-            if (immutables.contains(symbolIdentifier.string())) {
-                throw new TypeError("Cannot assign `"+printer.visit(expression.getRight())+"` to immutable variable `" + symbolIdentifier.string() + "` in expression: " + printer.visit(expression));
+            extracted(expression, symbolIdentifier, expression.getRight(), expected);
+        } else if (expression.getLeft() instanceof MemberExpression memberExpression) {
+            SymbolIdentifier symbolIdentifier = getSymbolIdentifier(memberExpression);
+            if (symbolIdentifier != null) {
+                // if trying to override a val object's property, we should forbid it
+                extracted(expression, symbolIdentifier, expression.getRight(), expected);
             }
-            env.assign(symbolIdentifier.string(), expected);
         }
         return expected;
+    }
+
+    /**
+     * Recurse through the member access of an object to reach the root var/val
+     * x.y.z -> returns x
+     * Then we check if x is immutable(val) and throw error if it is
+     */
+    private SymbolIdentifier getSymbolIdentifier(MemberExpression expression) {
+        if (expression.getObject() instanceof MemberExpression symbolIdentifier) {
+            return getSymbolIdentifier(symbolIdentifier);
+        } else if (expression.getObject() instanceof SymbolIdentifier symbolIdentifier) {
+            return symbolIdentifier;
+        }
+        return null;
+    }
+
+    private void extracted(Expression expression, SymbolIdentifier symbolIdentifier, Expression right, Type expected) {
+        if (immutables.contains(symbolIdentifier.string())) {
+            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + symbolIdentifier.string() + "` in expression: " + printer.visit(expression));
+        }
+        env.assign(symbolIdentifier.string(), expected);
     }
 
     @Override
