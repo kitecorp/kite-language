@@ -85,7 +85,7 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
 
     @Override
     public String visit(ObjectExpression expression) {
-        var builder = new StringBuilder("{\n");
+        var builder = new StringBuilder("{ ");
         for (Iterator<ObjectLiteral> iterator = expression.getProperties().iterator(); iterator.hasNext(); ) {
             var objectLiteral = iterator.next();
             builder.append(visit(objectLiteral));
@@ -93,7 +93,7 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
                 builder.append("\n");
             }
         }
-        builder.append("}");
+        builder.append(" }");
         return builder.toString();
     }
 
