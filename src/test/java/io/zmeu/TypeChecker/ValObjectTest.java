@@ -68,7 +68,7 @@ public class ValObjectTest extends CheckerTest {
     @Test
     void testVarDeclareType() {
         eval("""
-                var object x = { "env": "prod" }
+                val object x = { "env": "prod" }
                 """);
         var varType = (ReferenceType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.String);
@@ -101,9 +101,8 @@ public class ValObjectTest extends CheckerTest {
     @Test
     void testReferenceAlias() {
         eval("""
-                        val x = { "count": 1 };
-                        var y = x;
-                        x.count = 2;
+                    val x = { "count": 1 };
+                    var y = x;
                 """);
         // Both x and y should reflect the same object reference
         var yType = (ObjectType) checker.getEnv().lookup("y");
@@ -205,6 +204,70 @@ public class ValObjectTest extends CheckerTest {
                         """
                 )
         );
+    }
+
+    @Test
+    @DisplayName("Cannot Reassign Val Binding")
+    void testValRebindError() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        val x = { "a": 1 };
+                        x = { "a": 2 };       // rebinding x not allowed
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Deep immutability: direct property mutation error")
+    void testValPropertyMutationError() {
+        assertThrows(TypeError.class, () -> eval("""
+                        val x = { "count": 0 };
+                        x.count = 5;           // forbidden on a val object
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Deep immutability: direct nested property mutation error")
+    void testValNestedPropertyMutationError() {
+        assertThrows(TypeError.class, () -> eval("""
+                        val x = { 
+                            count: { 
+                                eggs: 2
+                            }
+                        }
+                        x.count.eggs = 5;           // forbidden on a val object
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Deep immutability: alias property mutation error")
+    void testValAliasPropertyMutationError() {
+        assertThrows(TypeError.class, () ->
+                eval("""
+                        val x = { "foo": 1 };
+                        var y = x;
+                        y.foo = 2;             // still forbidden, object is frozen
+                        """
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Var alias rebind allowed")
+    void testVarAliasRebindOk() {
+        // even though the object is frozen, `y` is a var binding so you may point it elsewhere
+        eval("""
+                val x = { "a": 1 };
+                var y = x;
+                y = { "a": 2 };         // OK, rebind y to a new object
+                """);
+        ObjectType yT = (ObjectType) checker.getEnv().lookup("y");
+        assertEquals(ValueType.Number, yT.getProperty("a"));
     }
 
 }
