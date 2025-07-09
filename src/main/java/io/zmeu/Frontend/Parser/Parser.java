@@ -713,6 +713,9 @@ public class Parser {
         Expression left = OrExpression();
         if (IsLookAhead(Equal, Equal_Complex)) {
             var operator = AssignmentOperator().value();
+            if (IsLookAhead(OpenBraces)) {
+                blockContext = BlockContext.OBJECT;
+            }
             Expression rhs = Expression();
 
             left = AssignmentExpression.assign(isValidAssignmentTarget(left, operator), rhs, operator);

@@ -21,6 +21,7 @@ import java.util.*;
 @Log4j2
 public final class TypeChecker implements Visitor<Type> {
     private final LanguageAstPrinter printer = new LanguageAstPrinter();
+    private final Set<String> immutables = new HashSet<>();
     @Getter
     private TypeEnvironment env;
 
@@ -526,23 +527,7 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(VarDeclaration expression) {
         String var = expression.getId().string();
         if (expression.hasInit()) {
-            var implicitType = visit(expression.getInit());
-            if (expression.hasType()) {
-                var explicitType = visit(expression.getType());
-                expect(implicitType, explicitType, expression);
-                if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
-                    // when it's an object implicit type is the object + all of it's env variable types { name: string }
-                    // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
-                    return env.init(var, implicitType);
-                }
-                return env.init(var, explicitType);
-            }
-            if (implicitType == ValueType.String) {
-                // only needed when var is string because this var could be used to access a member on an object
-                var init = (StringLiteral) expression.getInit();
-                return env.init(var, new StringType(init.getValue()));
-            }
-            return env.init(var, implicitType);
+            return initType(expression, var);
         } else if (expression.hasType()) {
             var explicitType = visit(expression.getType());
             return env.init(var, explicitType);
@@ -551,32 +536,66 @@ public final class TypeChecker implements Visitor<Type> {
         }
     }
 
+    private Type initType(VarDeclaration expression, String var) {
+        var implicitType = visit(expression.getInit());
+        if (expression.hasType()) {
+            var explicitType = visit(expression.getType());
+            expect(implicitType, explicitType, expression);
+            if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
+                // when it's an object implicit type is the object + all of it's env variable types { name: string }
+                // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
+                return env.init(var, implicitType);
+            }
+            return env.init(var, explicitType);
+        }
+        if (implicitType == ValueType.String) {
+            // only needed when var is string because this var could be used to access a member on an object
+            var init = (StringLiteral) expression.getInit();
+            return env.init(var, new StringType(init.getValue()));
+        }
+        return env.init(var, implicitType);
+    }
+
     @Override
     public Type visit(ValDeclaration expression) {
         String var = expression.getId().string();
-        if (expression.hasInit()) {
-            var implicitType = visit(expression.getInit());
-            if (expression.hasType()) {
+        try {
+            immutables.add(var);
+            if (expression.hasInit()) {
+                return initType(expression, var);
+            } else if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
-                expect(implicitType, explicitType, expression);
-                if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
-                    // when it's an object implicit type is the object + all of it's env variable types { name: string }
-                    // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
-                    return env.init(var, implicitType);
-                }
                 return env.init(var, explicitType);
+            } else {
+                throw new TypeError("Missing explicit and implicit type for expression: " + printer.visit(expression));
             }
-            if (implicitType == ValueType.String) {
-                // only needed when var is string because this var could be used to access a member on an object
-                var init = (StringLiteral) expression.getInit();
-                return env.init(var, new StringType(init.getValue()));
-            }
-            return env.init(var, implicitType);
-        } else if (expression.hasType()) {
+        } catch (TypeError error) {
+            immutables.remove(var);
+            throw error;
+        }
+    }
+
+    /**
+     * Check if implicit type (after the =) is the same as explicit type
+     */
+    private Type initType(ValDeclaration expression, String var) {
+        var implicitType = visit(expression.getInit());
+        if (expression.hasType()) { // val type name
             var explicitType = visit(expression.getType());
+            expect(implicitType, explicitType, expression);
+            if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
+                // when it's an object implicit type is the object + all of it's env variable types { name: string }
+                // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
+                return env.init(var, implicitType);
+            }
             return env.init(var, explicitType);
+        }
+        if (implicitType == ValueType.String) {
+            // only needed when val is string because this val could be used to access a member on an object
+            var init = (StringLiteral) expression.getInit();
+            return env.init(var, new StringType(init.getValue()));
         } else {
-            throw new IllegalArgumentException("Missing explicit and implicit type for variable " + var);
+            return env.init(var, implicitType);
         }
     }
 
@@ -619,6 +638,9 @@ public final class TypeChecker implements Visitor<Type> {
         var valueType = visit(expression.getRight());
         var expected = expect(valueType, varType, expression.getLeft());
         if (expression.getLeft() instanceof SymbolIdentifier symbolIdentifier) {
+            if (immutables.contains(symbolIdentifier.string())) {
+                throw new TypeError("Cannot assign `"+printer.visit(expression.getRight())+"` to immutable variable `" + symbolIdentifier.string() + "` in expression: " + printer.visit(expression));
+            }
             env.assign(symbolIdentifier.string(), expected);
         }
         return expected;

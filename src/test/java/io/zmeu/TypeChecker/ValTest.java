@@ -3,15 +3,16 @@ package io.zmeu.TypeChecker;
 import io.zmeu.Base.CheckerTest;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.TypeChecker.Types.ValueType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
 import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -87,5 +88,21 @@ public class ValTest extends CheckerTest {
         var t2 = checker.visit(val("y", type("string"), id("x")));
         assertEquals(t1, ValueType.String);
         assertEquals(t2, ValueType.String);
+    }
+
+    @Test
+    void testInvalidAssignment() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val x = 10
+                x = "hello"
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignment() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val x = 10
+                x = 2
+                """));
     }
 }
