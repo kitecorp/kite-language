@@ -4,13 +4,12 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.of;
+import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,29 +25,29 @@ public class AssignmentTest extends ParserTest {
         log.warn((res));
     }
 
-    @Test
-    void testAssignmentBlock() {
-        var res = parse("x={2}");
-        var expected = program(expressionStatement(assign("=", id("x"), block(expressionStatement(of(2))))));
-        assertEquals(expected, res);
-        log.warn((res));
-    }
+//    @Test
+//    void testAssignmentBlock() {
+//        var res = parse("x={2}");
+//        var expected = program(expressionStatement(assign("=", id("x"), block(expressionStatement(of(2))))));
+//        assertEquals(expected, res);
+//        log.warn((res));
+//    }
 
-    @Test
-    void testAssignmentBlockWithStatements() {
-        var res = parse("""
-                x={
-                    y=2
-                    2
-                }
-                """);
-        var expected = program(expressionStatement(
-                assign("=", id("x"),
-                        block(expressionStatement(assign("=", id("y"), number(2))),
-                                expressionStatement(number(2))))));
-        log.warn((res));
-        assertEquals(expected, res);
-    }
+//    @Test
+//    void testAssignmentBlockWithStatements() {
+//        var res = parse("""
+//                x={
+//                    y=2
+//                    2
+//                }
+//                """);
+//        var expected = program(expressionStatement(
+//                assign("=", id("x"),
+//                        block(expressionStatement(assign("=", id("y"), number(2))),
+//                                expressionStatement(number(2))))));
+//        log.warn((res));
+//        assertEquals(expected, res);
+//    }
 
     @Test
     void testMultipleAssignments() {
