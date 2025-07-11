@@ -1,7 +1,6 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
-import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -376,42 +375,142 @@ class BooleanTest extends RuntimeTest {
 
     @Test
     void testObjectEqual() {
-        var type = eval("""
+        var type = (boolean) eval("""
                 val x = { "env": "prod" }
                 val y = { "env": "prod" }
                 x == y
                 """);
-        assertEquals(type, ValueType.Boolean);
+        assertTrue(type);
     }
 
     @Test
     void testObjectNotEqual() {
-        var type = eval("""
+        var type = (boolean) eval("""
                 val x = { "env": "prod" }
                 val y = { "env": "prod" }
                 x != y
                 """);
-        assertEquals(type, ValueType.Boolean);
+        assertFalse(type);
+    }
+
+    @Test
+    void testObjectNotEqualTrue() {
+        var type = (boolean) eval("""
+                val x = { "env": "dev" }
+                val y = { "env": "prod" }
+                x != y
+                """);
+        assertTrue(type);
     }
 
     @Test
     void testVarObjectNotEqual() {
-        var type = eval("""
+        var type = (boolean) eval("""
                 var x = { "env": "prod" }
                 var y = { "env": "prod" }
                 x != y
                 """);
-        assertEquals(type, ValueType.Boolean);
+        Assertions.assertFalse(type);
     }
 
     @Test
     void testVarObjectEqual() {
-        var type = eval("""
+        var type = (boolean) eval("""
                 var x = { "env": "prod" }
                 var y = { "env": "prod" }
                 x == y
                 """);
-        assertEquals(type, ValueType.Boolean);
+        Assertions.assertTrue(type);
+    }
+
+    @Test
+    void testVarObjectEqualMoreProperties() {
+        var type = (boolean) eval("""
+                var x = { "env": "prod" }
+                var y = { "env": "prod", size: 1 }
+                x == y
+                """);
+        Assertions.assertFalse(type);
+    }
+
+    @Test
+    void testVarObjectEqualOrder() {
+        var type = (boolean) eval("""
+                var x = { size: 1, "env": "prod" }
+                var y = { "env": "prod", size: 1 }
+                x == y
+                """);
+        Assertions.assertTrue(type);
+    }
+
+    @Test
+    void testVarObjectEqualDifferentType() {
+        var type = (boolean) eval("""
+                var x = { size: true, "env": "prod" }
+                var y = { "env": "prod", size: 1 }
+                x == y
+                """);
+        Assertions.assertFalse(type);
+    }
+
+    @Test
+    void testVarObjectEqualNested() {
+        var type = (boolean) eval("""
+                var x = { 
+                    env: "prod", 
+                    size: {
+                        UE: "xl"
+                    } 
+                }
+                var y = { 
+                    env: "prod", 
+                    size: {
+                        UE: "xl"
+                    } 
+                }
+                x == y
+                """);
+        Assertions.assertTrue(type);
+    }
+
+    @Test
+    void testVarObjectEqualNestedDifferentKey() {
+        var type = (boolean) eval("""
+                var x = { 
+                    env: "prod", 
+                    size: {
+                        US: "xl"
+                    } 
+                }
+                var y = { 
+                    env: "prod", 
+                    size: {
+                        UE: "xl"
+                    } 
+                }
+                x == y
+                """);
+        Assertions.assertFalse(type);
+    }
+
+    @Test
+    void testVarObjectEqualNestedDifferentValue() {
+        var type = (boolean) eval("""
+                var x = { 
+                    env: "prod", 
+                    size: {
+                        UE: "m"
+                    } 
+                }
+                var y = { 
+                    env: "prod", 
+                    size: {
+                        UE: "xl"
+                    } 
+                }
+                x == y
+                """);
+        Assertions.assertFalse(type);
     }
 
 

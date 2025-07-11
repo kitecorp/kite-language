@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;
 import static io.zmeu.Utils.BoolUtils.isTruthy;
@@ -250,7 +251,7 @@ public final class Interpreter implements Visitor<Object> {
                     default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
                 };
             } else if (left instanceof Boolean l && right instanceof Boolean r) {
-                return switch (op){
+                return switch (op) {
                     case "==" -> l.equals(r);
                     case "!=" -> !l.equals(r);
                     case "<" -> l.compareTo(r) < 0;
@@ -259,7 +260,15 @@ public final class Interpreter implements Visitor<Object> {
                     case ">=" -> l.compareTo(r) >= 0;
                     default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
                 };
+            } else if (left instanceof HashMap l && right instanceof HashMap r) {
+                return switch (op) {
+                    case "==" -> Objects.equals(l, r);
+                    case "!=" -> !Objects.equals(l, r);
+                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+                };
+
             }
+
             throw new IllegalArgumentException("%s cannot be compared with %s".formatted(left, right));
         }
         throw new RuntimeException("Invalid number: %s %s".formatted(left, right));
@@ -273,10 +282,13 @@ public final class Interpreter implements Visitor<Object> {
 
     private List<Class> allowTypes(String op) {
         return switch (op) {
-            case "+" -> List.of(NumberLiteral.class, StringLiteral.class); // allow addition for numbers and string
+            case "+" -> List.of(NumberLiteral.class, StringLiteral.class, SymbolIdentifier.class);
+            // allow addition for numbers and string
             case "-", "/", "*", "%" -> List.of(NumberLiteral.class);
-            case "==", "!=" -> List.of(StringLiteral.class, NumberLiteral.class, BooleanLiteral.class, ObjectLiteral.class);
-            case "<=", "<", ">", ">=" -> List.of(NumberLiteral.class, BooleanLiteral.class, StringLiteral.class);
+            case "==", "!=" -> List.of(StringLiteral.class, SymbolIdentifier.class, NumberLiteral.class,
+                    BooleanLiteral.class, ObjectLiteral.class);
+            case "<=", "<", ">", ">=" -> List.of(NumberLiteral.class, BooleanLiteral.class, StringLiteral.class,
+                    SymbolIdentifier.class);
             default -> throw new TypeError("Unknown operator " + op);
         };
     }
