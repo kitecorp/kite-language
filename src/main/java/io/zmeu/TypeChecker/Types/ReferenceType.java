@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public sealed class ReferenceType extends Type permits ObjectType, ResourceType, SchemaType {
-    public static final ReferenceType Resource = new ReferenceType("resource");
-    public static final ReferenceType Object = new ReferenceType("object");
-    public static final ReferenceType Schema = new ReferenceType("schema");
+    public static final ReferenceType Resource = new ReferenceType(SystemType.RESOURCE);
+    public static final ReferenceType Object = new ReferenceType(SystemType.OBJECT);
+    public static final ReferenceType Schema = new ReferenceType(SystemType.SCHEMA);
 
     @Getter
     protected TypeEnvironment environment;
@@ -17,7 +17,16 @@ public sealed class ReferenceType extends Type permits ObjectType, ResourceType,
         super(typeName);
     }
 
+    public ReferenceType(SystemType typeName) {
+        super(typeName);
+    }
+
     public ReferenceType(String typeName, TypeEnvironment environment) {
+        super(typeName);
+        this.environment = environment;
+    }
+
+    public ReferenceType(SystemType typeName, TypeEnvironment environment) {
         super(typeName);
         this.environment = environment;
     }
