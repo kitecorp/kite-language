@@ -594,6 +594,8 @@ public final class TypeChecker implements Visitor<Type> {
                 return env.init(var, implicitType);
             }
             return env.init(var, explicitType);
+        } else if (implicitType == ValueType.Null) {
+            throw new TypeError("Explicit type declaration required for: " + printer.visit(expression));
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // only needed when val is string because this val could be used to access a member on an object

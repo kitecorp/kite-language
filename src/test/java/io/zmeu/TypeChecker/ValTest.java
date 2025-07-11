@@ -2,6 +2,7 @@ package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
 import io.zmeu.Runtime.exceptions.NotFoundException;
+import io.zmeu.Runtime.exceptions.VarExistsException;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +28,32 @@ public class ValTest extends CheckerTest {
     }
 
     @Test
-    void testVarInt() {
+    void testValInt() {
         var type = checker.visit(val("x", number(10)));
         var accessType = checker.visit(id("x"));
         assertEquals(type, ValueType.Number);
         assertEquals(accessType, ValueType.Number);
+    }
+
+    @Test
+    void testValDecimalInference() {
+        var type = checker.visit(val("x", number(10.5)));
+        var access = checker.visit(id("x"));
+        assertEquals(ValueType.Number, type);
+        assertEquals(ValueType.Number, access);
+    }
+
+    @Test
+    void testValUseBeforeDeclaration() {
+        assertThrows(NotFoundException.class,
+                () -> checker.visit(val("y", id("x"))));
+    }
+
+    @Test
+    void testDuplicateValDeclaration() {
+        checker.visit(val("x", number(1)));
+        assertThrows(VarExistsException.class,
+                () -> checker.visit(val("x", number(2))));
     }
 
     @Test
@@ -61,6 +83,14 @@ public class ValTest extends CheckerTest {
     @Test
     void testVarExplicitTypeWrongStringAssignment() {
         assertThrows(TypeError.class, () -> checker.visit(val("x", type("number"), string("10"))));
+    }
+
+    @Test
+    void testVarBool() {
+        var type = checker.visit(val("x", bool(true)));
+        var access = checker.visit(id("x"));
+        assertEquals(ValueType.Boolean, type);
+        assertEquals(ValueType.Boolean, access);
     }
 
     @Test
@@ -101,6 +131,30 @@ public class ValTest extends CheckerTest {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 val x = 10
                 x = 2
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignmentString() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val x = "abc"
+                x = "cd"
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignmentBoolean() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val x = true
+                x = false
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignmentObject() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val x = null
+                x = false
                 """));
     }
 }
