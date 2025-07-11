@@ -152,7 +152,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     private void expectOperatorType(Type type, List<Type> allowedTypes, BinaryExpression expression) {
         if (!allowedTypes.contains(type)) {
-            throw new TypeError("Unexpected type: " + type + " in expression " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
+            throw new TypeError("Unexpected type `" + type.getValue() + "` in expression: " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
         }
     }
 
@@ -160,7 +160,7 @@ public final class TypeChecker implements Visitor<Type> {
         return switch (op) {
             case "+" -> List.of(ValueType.Number, ValueType.String); // allow addition for numbers and string
             case "-", "/", "*", "%" -> List.of(ValueType.Number);
-            case "==", "!=" -> List.of(ValueType.String, ValueType.Number, ValueType.Boolean);
+            case "==", "!=" -> List.of(ValueType.String, ValueType.Number, ValueType.Boolean, ObjectType.Object);
             case "<=", "<", ">", ">=" -> List.of(ValueType.Number, ValueType.Boolean);
             default -> throw new TypeError("Unknown operator " + op);
         };
