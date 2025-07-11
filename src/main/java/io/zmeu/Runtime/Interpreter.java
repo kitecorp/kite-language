@@ -282,14 +282,34 @@ public final class Interpreter implements Visitor<Object> {
 
     private List<Class> allowTypes(String op) {
         return switch (op) {
-            case "+" -> List.of(NumberLiteral.class, StringLiteral.class, SymbolIdentifier.class);
+            case "+" ->List.of(
+                    NumberLiteral.class,
+                    StringLiteral.class,
+                    SymbolIdentifier.class,
+                    CallExpression.class,
+                    BinaryExpression.class
+            );
             // allow addition for numbers and string
-            case "-", "/", "*", "%" -> List.of(NumberLiteral.class);
-            case "==", "!=" -> List.of(StringLiteral.class, SymbolIdentifier.class, NumberLiteral.class,
-                    BooleanLiteral.class, ObjectLiteral.class);
-            case "<=", "<", ">", ">=" -> List.of(NumberLiteral.class, BooleanLiteral.class, StringLiteral.class,
+            case "-", "/", "*", "%" -> List.of(
+                    NumberLiteral.class,
+                    CallExpression.class,
+                    SymbolIdentifier.class,
+                    BinaryExpression.class);
+            case "==", "!=" -> List.of(
+                    StringLiteral.class,
+                    CallExpression.class,
+                    SymbolIdentifier.class,
+                    NumberLiteral.class,
+                    BinaryExpression.class,
+                    BooleanLiteral.class,
+                    ObjectLiteral.class);
+            case "<=", "<", ">", ">=" -> List.of(BinaryExpression.class,
+                    NumberLiteral.class,
+                    CallExpression.class,
+                    BooleanLiteral.class,
+                    StringLiteral.class,
                     SymbolIdentifier.class);
-            default -> throw new TypeError("Unknown operator " + op);
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
         };
     }
 
