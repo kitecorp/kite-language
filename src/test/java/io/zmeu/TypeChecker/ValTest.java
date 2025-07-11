@@ -172,7 +172,7 @@ public class ValTest extends CheckerTest {
 
     /**
      * val x = "foo";
-     * val y: number = x;  // should TypeError
+     * val number y = x;  // should TypeError
      */
     @Test
     void testExplicitTypeWrongIdAssignment() {

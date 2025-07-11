@@ -3,15 +3,16 @@ package io.zmeu.TypeChecker;
 import io.zmeu.Base.CheckerTest;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.TypeChecker.Types.ValueType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -85,5 +86,75 @@ public class VarTest extends CheckerTest {
         var t2 = checker.visit(var("y", type("string"), id("x")));
         assertEquals(t1, ValueType.String);
         assertEquals(t2, ValueType.String);
+    }
+
+
+    @Test
+    void testInferTypeFromVal() {
+        eval("""
+                var a = 42;
+                var b = a;
+                """);
+        var ta = checker.getEnv().lookup("a");
+        var tb = checker.getEnv().lookup("b");
+        assertEquals(ValueType.Number, ta);
+        assertEquals(ValueType.Number, tb);
+    }
+
+    @Test
+    void testInferTypeFromValVar() {
+        eval("""
+                val a = 42;
+                var b = a;
+                """);
+        var ta = checker.getEnv().lookup("a");
+        var tb = checker.getEnv().lookup("b");
+        assertEquals(ValueType.Number, ta);
+        assertEquals(ValueType.Number, tb);
+    }
+
+    @Test
+    void testInferTypeFromVarVal() {
+        eval("""
+                var a = 42;
+                val b = a;
+                """);
+        var ta = checker.getEnv().lookup("a");
+        var tb = checker.getEnv().lookup("b");
+        assertEquals(ValueType.Number, ta);
+        assertEquals(ValueType.Number, tb);
+    }
+
+
+    @Test
+    void testInvalidReAssignmentObject() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var x = null
+                x = false
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignmentNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var x = true
+                x = 1
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignmentString() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var x = true
+                x = "sun"
+                """));
+    }
+
+    @Test
+    void testInvalidReAssignment() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var x = true
+                x = null
+                """));
     }
 }
