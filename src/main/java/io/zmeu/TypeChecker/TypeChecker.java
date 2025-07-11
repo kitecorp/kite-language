@@ -563,8 +563,11 @@ public final class TypeChecker implements Visitor<Type> {
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // only needed when var is string because this var could be used to access a member on an object
-            var init = (StringLiteral) expression.getInit();
-            return env.init(var, new StringType(init.getValue()));
+            if (expression.getInit() instanceof StringLiteral stringLiteral) {
+                return env.init(var, new StringType(stringLiteral.getValue()));
+            } else {
+                return env.init(var, visit(expression.getInit()));
+            }
         }
         return env.init(var, implicitType);
     }
@@ -612,12 +615,12 @@ public final class TypeChecker implements Visitor<Type> {
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // member assignment like val x = a.b.c
-            if (expression.getInit() instanceof MemberExpression memberExpression) {
-                return env.init(var, visit(memberExpression));
+            if (expression.getInit() instanceof StringLiteral stringLiteral) {
+                // only needed when val is string because this val could be used to access a member on an object
+                return env.init(var, new StringType(stringLiteral.getValue()));
+            } else {
+                return env.init(var, visit(expression.getInit())); // x[key] we need to find value of variable key so we store it here
             }
-            // only needed when val is string because this val could be used to access a member on an object
-            var init = (StringLiteral) expression.getInit();
-            return env.init(var, new StringType(init.getValue())); // x[key] we need to find value of variable key so we store it here
         } else {
             return env.init(var, implicitType);
         }
