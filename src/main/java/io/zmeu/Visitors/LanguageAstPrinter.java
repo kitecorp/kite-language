@@ -13,6 +13,13 @@ import java.util.stream.Collectors;
 
 public non-sealed class LanguageAstPrinter implements Visitor<String> {
 
+    private static @NotNull String formatParameter(ParameterIdentifier it) {
+        if (it.getType() == null || it.getType().getType() == null) {
+            return it.getName().string();
+        }
+        return it.getName().string() + " :" + it.getType().string();
+    }
+
     public String print(Expression expr) {
         return visit(expr);
     }
@@ -72,9 +79,11 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
 
     @Override
     public String visit(ValDeclaration expression) {
-        StringBuilder val = new StringBuilder("val ");
+        StringBuilder val = new StringBuilder("val");
         if (expression.hasType()) {
-            val.append(" ").append(expression.getType().getType().getValue());
+            val.append(" ")
+                    .append(expression.getType().getType().getValue())
+                    .append(" ");
         }
         val.append(expression.getId().string());
         if (expression.hasInit()) {
@@ -155,13 +164,6 @@ public non-sealed class LanguageAstPrinter implements Visitor<String> {
                + "{ \n"
                + visit(statement.getBody())
                + "\n} \n";
-    }
-
-    private static @NotNull String formatParameter(ParameterIdentifier it) {
-        if (it.getType() == null || it.getType().getType() == null) {
-            return it.getName().string();
-        }
-        return it.getName().string() + " :" + it.getType().string();
     }
 
     @Override
