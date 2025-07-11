@@ -245,6 +245,23 @@ public class ValObjectTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("Deep immutability: direct nested property mutation error")
+    void testNestedPropertyMutationError() {
+        assertThrows(TypeError.class, () -> eval("""
+                        val x = { 
+                            count: { 
+                                eggs: {
+                                    "chicken": 10
+                                }
+                            }
+                        }
+                        x.count.eggs["chicken"] = 5;           // forbidden on a val object
+                        """
+                )
+        );
+    }
+
+    @Test
     @DisplayName("Deep immutability: alias property mutation error")
     void testValAliasPropertyMutationError() {
         assertThrows(TypeError.class, () ->

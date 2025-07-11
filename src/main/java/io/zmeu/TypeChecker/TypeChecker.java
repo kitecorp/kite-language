@@ -250,7 +250,7 @@ public final class TypeChecker implements Visitor<Type> {
                     }
                 }
                 case ObjectType objectType -> {
-                    return accessMemberType(expression, resourceName, objectType);
+                    return accessMemberType(expression, resourceName.string(), objectType);
                 }
                 case null, default -> {
                 }
@@ -258,6 +258,13 @@ public final class TypeChecker implements Visitor<Type> {
             // else it could be a resource or any other type like a NumericLiteral or something else
         } else if (expression.getProperty() instanceof StringLiteral stringLiteral) {
             var value = executeBlock(expression.getObject(), env);
+            switch (value) {
+                case ObjectType objectType -> {
+                    return accessMemberType(expression, stringLiteral.getValue(), objectType);
+                }
+                case null, default -> {
+                }
+            }
             Type lookup = env.lookup(stringLiteral.getValue());
             if (lookup == null) {
                 throw new TypeError("Property '" + stringLiteral.getValue() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
@@ -267,8 +274,8 @@ public final class TypeChecker implements Visitor<Type> {
         throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
     }
 
-    private @NotNull Type accessMemberType(MemberExpression expression, SymbolIdentifier resourceName, ObjectType objectType) {
-        Type lookup = objectType.getProperty(resourceName.string());
+    private @NotNull Type accessMemberType(MemberExpression expression, String resourceName, ObjectType objectType) {
+        Type lookup = objectType.getProperty(resourceName);
         if (lookup != null) {
             // found the property in the object:
             // var a = "a"
@@ -279,7 +286,7 @@ public final class TypeChecker implements Visitor<Type> {
         }
         try {
             // if property was not found check if is a variable declared in a higher scope
-            var storedType = objectType.lookup(resourceName.string());
+            var storedType = objectType.lookup(resourceName);
             // if we found the var declaration, we know it's value so we try to access the member of the object using the variable value
             // x[a] -> x["a"] works only with strings
             return switch (storedType) {
@@ -294,8 +301,12 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     private @NotNull String propertyNotFoundOnObject(MemberExpression expression, SymbolIdentifier resourceName) {
+        return propertyNotFoundOnObject(expression, resourceName.string());
+    }
+
+    private @NotNull String propertyNotFoundOnObject(MemberExpression expression, String resourceName) {
         return "Property '%s' not found on object: %s in expression: %s"
-                .formatted(resourceName.string(), printer.visit(expression.getObject()), printer.visit(expression));
+                .formatted(resourceName, printer.visit(expression.getObject()), printer.visit(expression));
     }
 
     @Override
