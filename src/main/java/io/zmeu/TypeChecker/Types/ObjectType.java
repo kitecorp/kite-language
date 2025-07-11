@@ -16,7 +16,7 @@ public final class ObjectType extends ReferenceType {
     private boolean immutable = false;
 
     public ObjectType(@Nullable TypeEnvironment environment) {
-        super(ReferenceType.Object.getValue(), environment);
+        super(SystemType.OBJECT, environment);
     }
 
 }

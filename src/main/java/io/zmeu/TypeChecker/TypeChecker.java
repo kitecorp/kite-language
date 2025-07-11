@@ -139,7 +139,7 @@ public final class TypeChecker implements Visitor<Type> {
 
         // allow operations only on the same types of values
         // 1+1, "hello "+"world", 1/2, 1<2, "hi" == "hi"
-        List<Type> allowedTypes = allowTypes(op);
+        List<SystemType> allowedTypes = allowTypes(op);
         this.expectOperatorType(t1, allowedTypes, expression);
         this.expectOperatorType(t2, allowedTypes, expression);
 
@@ -150,18 +150,18 @@ public final class TypeChecker implements Visitor<Type> {
         return expect(t1, t2, left);
     }
 
-    private void expectOperatorType(Type type, List<Type> allowedTypes, BinaryExpression expression) {
-        if (!allowedTypes.contains(type)) {
+    private void expectOperatorType(Type type, List<SystemType> allowedTypes, BinaryExpression expression) {
+        if (!allowedTypes.contains(type.getKind())) {
             throw new TypeError("Unexpected type `" + type.getValue() + "` in expression: " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
         }
     }
 
-    private List<Type> allowTypes(String op) {
+    private List<SystemType> allowTypes(String op) {
         return switch (op) {
-            case "+" -> List.of(ValueType.Number, ValueType.String); // allow addition for numbers and string
-            case "-", "/", "*", "%" -> List.of(ValueType.Number);
-            case "==", "!=" -> List.of(ValueType.String, ValueType.Number, ValueType.Boolean, ObjectType.Object);
-            case "<=", "<", ">", ">=" -> List.of(ValueType.Number, ValueType.Boolean);
+            case "+" -> List.of(SystemType.NUMBER, SystemType.STRING); // allow addition for numbers and string
+            case "-", "/", "*", "%" -> List.of(SystemType.NUMBER);
+            case "==", "!=" -> List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
+            case "<=", "<", ">", ">=" -> List.of(SystemType.NUMBER, SystemType.BOOLEAN);
             default -> throw new TypeError("Unknown operator " + op);
         };
     }

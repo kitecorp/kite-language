@@ -4,11 +4,11 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public non-sealed class ValueType extends Type {
-    public static ValueType String = new ValueType("string");
-    public static ValueType Number = new ValueType("number");
-    public static ValueType Boolean = new ValueType("boolean");
-    public static ValueType Void = new ValueType("void");
-    public static ValueType Null = new ValueType("null");
+    public static ValueType String = new ValueType(SystemType.STRING);
+    public static ValueType Number = new ValueType(SystemType.NUMBER);
+    public static ValueType Boolean = new ValueType(SystemType.BOOLEAN);
+    public static ValueType Void = new ValueType(SystemType.VOID);
+    public static ValueType Null = new ValueType(SystemType.NULL);
 
     public ValueType() {
         super();
@@ -17,6 +17,10 @@ public non-sealed class ValueType extends Type {
     public ValueType(String value) {
         super();
         setValue(value);
+    }
+
+    public ValueType(SystemType value) {
+        super(value);
     }
 
     public static ValueType of(String value) {
@@ -30,13 +34,13 @@ public non-sealed class ValueType extends Type {
         };
     }
 
+    public static ValueType[] values() {
+        return new ValueType[]{String, Number, Boolean, Void, Null};
+    }
+
     @Override
     public java.lang.String toString() {
         return getValue();
-    }
-
-    public static ValueType[] values() {
-        return new ValueType[]{String, Number, Boolean, Void, Null};
     }
 
 }

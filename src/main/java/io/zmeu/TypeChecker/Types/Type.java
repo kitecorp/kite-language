@@ -14,16 +14,17 @@ public sealed abstract class Type extends Expression
     @Getter
     @Setter
     private String value;
-//    @Getter
-//    private boolean immutable = false;
-//
-//    public void setImmutable(boolean immutable) {
-//        this.immutable = immutable;
-//    }
+    @Getter
+    private SystemType kind;
 
     public Type(String value) {
         this();
         this.value = value;
+    }
+
+    public Type(SystemType kind) {
+        this.kind = kind;
+        setValue(kind.name().toLowerCase());
     }
 
     public Type() {
