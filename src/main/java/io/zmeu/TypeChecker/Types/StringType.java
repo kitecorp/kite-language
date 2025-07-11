@@ -11,9 +11,4 @@ public class StringType extends ValueType {
         this.string = string;
     }
 
-    public StringType(String string, boolean immutable) {
-        this(string);
-//        setImmutable(immutable);
-    }
-
 }
