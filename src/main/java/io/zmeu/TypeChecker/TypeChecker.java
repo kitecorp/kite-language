@@ -547,6 +547,8 @@ public final class TypeChecker implements Visitor<Type> {
                 return env.init(var, implicitType);
             }
             return env.init(var, explicitType);
+        } else if (implicitType == ValueType.Null) {
+            throw new TypeError("Explicit type declaration required for: " + printer.visit(expression));
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // only needed when var is string because this var could be used to access a member on an object
@@ -643,7 +645,7 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(AssignmentExpression expression) {
         var varType = visit(expression.getLeft());
         var valueType = visit(expression.getRight());
-        var expected = expect(valueType, varType, expression.getLeft());
+        var expected = expect(valueType, varType, expression);
         if (expression.getLeft() instanceof SymbolIdentifier symbolIdentifier) {
             assign(expression, symbolIdentifier, expression.getRight(), expected);
         } else if (expression.getLeft() instanceof MemberExpression memberExpression) {
