@@ -20,7 +20,6 @@ public class VarTest extends CheckerTest {
 
     @Test
     void testGlobalVarEmptyString() {
-        checker = new TypeChecker(new TypeEnvironment());
         checker.getEnv().init("VERSION", ValueType.String);
         var type = checker.visit(id("VERSION"));
         assertEquals(type, ValueType.String);
@@ -71,7 +70,6 @@ public class VarTest extends CheckerTest {
 
     @Test
     void testGlobalVarNonExisting() {
-        checker = new TypeChecker(new TypeEnvironment());
         assertThrows(NotFoundException.class, () -> checker.visit(id("VERSION")));
     }
 

@@ -18,7 +18,7 @@ public final class SchemaType extends ReferenceType {
     private final TypeEnvironment instances;
 
     public SchemaType(String typeName, @Nullable TypeEnvironment env) {
-        super(typeName, env);
+        super(typeName, new TypeEnvironment(env));
         this.instances = new TypeEnvironment();
     }
 
