@@ -448,7 +448,7 @@ public class Parser {
             if (HasType()) { // type mandatory inside a schema. Init/default value is optional
                 type = typeParser.identifier();
             } else {
-                throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
+                throw new RuntimeException("Type declaration expected during schema declaration: var " + printer.visit(Identifier()));
             }
         } else {
             if (HasType()) { // type not mandatory outside a schema
