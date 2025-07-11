@@ -4,6 +4,7 @@ import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.ObjectType;
 import io.zmeu.TypeChecker.Types.ReferenceType;
 import io.zmeu.TypeChecker.Types.ValueType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -309,6 +310,55 @@ public class ValObjectTest extends CheckerTest {
         assertEquals(ValueType.Boolean, missing);
         var name = checker.getEnv().lookup("name");
         assertEquals(ValueType.String, name);
+    }
+
+    @Test
+    @DisplayName("Assign from nested object")
+    void testAssignPropertyFromNestedObject3() {
+        eval("""
+                val x = { 
+                    count: {
+                        eggs: 1
+                        missing: true
+                        name: "chicken"
+                    }
+                }
+                val y = x.count.eggs;
+                var missing = x.count["missing"];
+                missing=false
+                var name = x.count["name"];
+                name = "duck"
+                """
+        );
+        var yT = checker.getEnv().lookup("y");
+        assertEquals(ValueType.Number, yT);
+        var missing = checker.getEnv().lookup("missing");
+        assertEquals(ValueType.Boolean, missing);
+        var name = checker.getEnv().lookup("name");
+        assertEquals(ValueType.String, name);
+    }
+
+    @Test
+    @DisplayName("Deep immutability: indirect nested property mutation error")
+    void testAlias() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val x = { 
+                    count: {
+                        eggs: 1
+                        missing: true
+                        name: "chicken"
+                    }
+                }
+                val y = x.count;
+                var z=y
+                z.eggs = 2;              // still forbidden, object is frozen
+                """
+        ));
+        var yT = checker.getEnv().lookup("y");
+        Assertions.assertInstanceOf(ObjectType.class, yT);
+        var zT = checker.getEnv().lookup("z");
+        Assertions.assertInstanceOf(ObjectType.class, zT);
+
     }
 
     @Test
