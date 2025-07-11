@@ -665,12 +665,12 @@ public final class TypeChecker implements Visitor<Type> {
         var valueType = visit(expression.getRight());
         var expected = expect(valueType, varType, expression);
         if (expression.getLeft() instanceof SymbolIdentifier symbolIdentifier) {
-            assign(expression, symbolIdentifier, expression.getRight(), expected);
+            assign(expression, symbolIdentifier.string(), expression.getRight(), expected);
         } else if (expression.getLeft() instanceof MemberExpression memberExpression) {
             SymbolIdentifier symbolIdentifier = getSymbolIdentifier(memberExpression);
             if (symbolIdentifier != null) {
                 // if trying to override a val object's property, we should forbid it
-                assign(expression, symbolIdentifier, expression.getRight(), expected);
+                assign(expression, symbolIdentifier.string(), expression.getRight(), expected);
             }
         }
         return expected;
@@ -690,28 +690,28 @@ public final class TypeChecker implements Visitor<Type> {
         return null;
     }
 
-    private void assign(Expression expression, SymbolIdentifier identifier, Expression right, Type expected) {
+    private void assign(Expression expression, String identifier, Expression right, Type expected) {
         /**
          * check if right hand side type is immutable. For example a val object once it's assigned we can't change it's properties
          * val x = { env: "test" }; x.env -> error
          */
-        Type lookup = env.lookup(identifier.string());
+        Type lookup = env.lookup(identifier);
         boolean isImmutable = lookup instanceof ObjectType objectType && objectType.isImmutable();
-        if (isImmutable || vals.contains(identifier.string())) {
+        if (isImmutable || vals.contains(identifier)) {
             Type visit = visit(right);
             if (Objects.equals(ObjectType.Object.getValue(), visit.getValue())) {
                 if (visit == lookup) {
-                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier.string() + "` in expression: " + printer.visit(expression));
-                } else if (vals.contains(identifier.string())) {
-                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier.string() + "` in expression: " + printer.visit(expression));
+                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
+                } else if (vals.contains(identifier)) {
+                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
                 } else {
-                    env.assign(identifier.string(), expected);
+                    env.assign(identifier, expected);
                     return;
                 }
             }
-            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier.string() + "` in expression: " + printer.visit(expression));
+            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
         }
-        env.assign(identifier.string(), expected);
+        env.assign(identifier, expected);
     }
 
     @Override
