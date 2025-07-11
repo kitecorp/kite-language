@@ -611,9 +611,13 @@ public final class TypeChecker implements Visitor<Type> {
             throw new TypeError("Explicit type declaration required for: " + printer.visit(expression));
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
+            // member assignment like val x = a.b.c
+            if (expression.getInit() instanceof MemberExpression memberExpression) {
+                return env.init(var, visit(memberExpression));
+            }
             // only needed when val is string because this val could be used to access a member on an object
             var init = (StringLiteral) expression.getInit();
-            return env.init(var, new StringType(init.getValue(), true));
+            return env.init(var, new StringType(init.getValue())); // x[key] we need to find value of variable key so we store it here
         } else {
             return env.init(var, implicitType);
         }
