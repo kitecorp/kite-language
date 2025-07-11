@@ -1,6 +1,7 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
+import io.zmeu.TypeChecker.Types.ObjectType;
 import io.zmeu.TypeChecker.Types.SchemaType;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @Log4j2
 @DisplayName("TypeChecker Schema")
@@ -49,6 +51,34 @@ public class SchemaTest extends CheckerTest {
         SchemaType vm = new SchemaType("Vm", checker.getEnv());
         vm.setProperty("x", ValueType.Number);
         assertEquals(vm, actual);
+    }
+
+    @Test
+    void singlePropertyObject() {
+        var actual = checker.visit(src("""
+                schema Vm {
+                   var object   x  
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        SchemaType vm = new SchemaType("Vm", checker.getEnv());
+        vm.setProperty("x", ObjectType.Object);
+        assertEquals(vm, actual);
+    }
+
+    @Test
+    void singlePropertyObjectFalse() {
+        var actual = checker.visit(src("""
+                schema Vm {
+                   var object   x  
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        SchemaType vm = new SchemaType("Vm", checker.getEnv());
+        vm.setProperty("x", ValueType.Boolean);
+        assertNotEquals(vm, actual);
     }
 
     @Test
