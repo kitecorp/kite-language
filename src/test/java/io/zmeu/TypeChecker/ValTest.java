@@ -157,4 +157,27 @@ public class ValTest extends CheckerTest {
                 x = false
                 """));
     }
+
+    @Test
+    void testInferTypeFromVal() {
+        eval("""
+                val a = 42;
+                val b = a;
+                """);
+        var ta = checker.getEnv().lookup("a");
+        var tb = checker.getEnv().lookup("b");
+        assertEquals(ValueType.Number, ta);
+        assertEquals(ValueType.Number, tb);
+    }
+
+    /**
+     * val x = "foo";
+     * val y: number = x;  // should TypeError
+     */
+    @Test
+    void testExplicitTypeWrongIdAssignment() {
+        checker.visit(val("x", string("foo")));
+        assertThrows(TypeError.class,
+                () -> checker.visit(val("y", type("number"), id("x"))));
+    }
 }
