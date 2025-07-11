@@ -4,8 +4,8 @@ import io.zmeu.ErrorSystem;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
+import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.Runtime.Environment.ActivationEnvironment;
@@ -21,11 +21,13 @@ import io.zmeu.Runtime.Functions.PrintlnFunction;
 import io.zmeu.Runtime.Values.*;
 import io.zmeu.Runtime.exceptions.*;
 import io.zmeu.SchemaContext;
+import io.zmeu.TypeChecker.TypeError;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.Visitors.LanguageAstPrinter;
 import io.zmeu.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -194,44 +196,89 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(BinaryExpression expression) {
-        Object lhs = executeBlock(expression.getLeft(), env);
-        Object rhs = executeBlock(expression.getRight(), env);
-        if (expression.getOperator() instanceof String op
-            && lhs instanceof Number ln
-            && rhs instanceof Number rn) {
-            // if both were ints, do int math → preserve integer result
-            if (ln instanceof Integer a && rn instanceof Integer b) {
+        Object left = executeBlock(expression.getLeft(), env);
+        Object right = executeBlock(expression.getRight(), env);
+
+        var allowedTypes = allowTypes(expression.getOperator());
+        expectOperatorType(expression.getLeft(), allowedTypes, expression);
+        expectOperatorType(expression.getRight(), allowedTypes, expression);
+
+        if (expression.getOperator() instanceof String op) {
+            if (left instanceof Number ln && right instanceof Number rn) {
+                // if both were ints, do int math → preserve integer result
+                if (ln instanceof Integer a && rn instanceof Integer b) {
+                    return switch (op) {
+                        case "+" -> a + b;
+                        case "-" -> a - b;
+                        case "*" -> a * b;
+                        case "/" -> a / b;
+                        case "%" -> a % b;
+                        case "==" -> a.equals(b);
+                        case "!=" -> !a.equals(b);
+                        case "<" -> a < b;
+                        case "<=" -> a <= b;
+                        case ">" -> a > b;
+                        case ">=" -> a >= b;
+                        default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+                    };
+                }
+                // otherwise treat both as doubles
+                double a = ln.doubleValue(), b = rn.doubleValue();
                 return switch (op) {
                     case "+" -> a + b;
                     case "-" -> a - b;
                     case "*" -> a * b;
                     case "/" -> a / b;
                     case "%" -> a % b;
-                    case "==" -> a.equals(b);
+                    case "==" -> a == b;
+                    case "!=" -> a != b;
                     case "<" -> a < b;
                     case "<=" -> a <= b;
                     case ">" -> a > b;
                     case ">=" -> a >= b;
-                    default -> throw new RuntimeException("Operator could not be evaluated: " + op);
+                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+                };
+            } else if (left instanceof String l && right instanceof String r) {
+                return switch (op) {
+                    case "+" -> l + r;
+                    case "==" -> StringUtils.equals(l, r);
+                    case "!=" -> !StringUtils.equals(l, r);
+                    case "<" -> StringUtils.compare(l, r) < 0;
+                    case "<=" -> StringUtils.compare(l, r) <= 0;
+                    case ">" -> StringUtils.compare(l, r) > 0;
+                    case ">=" -> StringUtils.compare(l, r) >= 0;
+                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+                };
+            } else if (left instanceof Boolean l && right instanceof Boolean r) {
+                return switch (op){
+                    case "==" -> l.equals(r);
+                    case "!=" -> !l.equals(r);
+                    case "<" -> l.compareTo(r) < 0;
+                    case "<=" -> l.compareTo(r) <= 0;
+                    case ">" -> l.compareTo(r) > 0;
+                    case ">=" -> l.compareTo(r) >= 0;
+                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
                 };
             }
-            // otherwise treat both as doubles
-            double a = ln.doubleValue(), b = rn.doubleValue();
-            return switch (op) {
-                case "+" -> a + b;
-                case "-" -> a - b;
-                case "*" -> a * b;
-                case "/" -> a / b;
-                case "%" -> a % b;
-                case "==" -> a == b;
-                case "<" -> a < b;
-                case "<=" -> a <= b;
-                case ">" -> a > b;
-                case ">=" -> a >= b;
-                default -> throw new RuntimeException("Operator could not be evaluated: " + op);
-            };
+            throw new IllegalArgumentException("%s cannot be compared with %s".formatted(left, right));
         }
-        throw new RuntimeException("Invalid number: %s %s".formatted(lhs, rhs));
+        throw new RuntimeException("Invalid number: %s %s".formatted(left, right));
+    }
+
+    private void expectOperatorType(Object type, List<Class> allowedTypes, BinaryExpression expression) {
+        if (!allowedTypes.contains(type.getClass())) {
+            throw new TypeError("Unexpected type `" + type.getClass() + "` in expression: " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
+        }
+    }
+
+    private List<Class> allowTypes(String op) {
+        return switch (op) {
+            case "+" -> List.of(NumberLiteral.class, StringLiteral.class); // allow addition for numbers and string
+            case "-", "/", "*", "%" -> List.of(NumberLiteral.class);
+            case "==", "!=" -> List.of(StringLiteral.class, NumberLiteral.class, BooleanLiteral.class, ObjectLiteral.class);
+            case "<=", "<", ">", ">=" -> List.of(NumberLiteral.class, BooleanLiteral.class, StringLiteral.class);
+            default -> throw new TypeError("Unknown operator " + op);
+        };
     }
 
     @Override
@@ -600,7 +647,7 @@ public final class Interpreter implements Visitor<Object> {
     public Object visit(ObjectExpression expression) {
         var map = new HashMap<String, Object>(expression.getProperties().size());
         for (ObjectLiteral property : expression.getProperties()) {
-            var object = (ObjectLiteralPair)visit(property);
+            var object = (ObjectLiteralPair) visit(property);
             map.put(object.key(), object.value());
         }
         return map;
