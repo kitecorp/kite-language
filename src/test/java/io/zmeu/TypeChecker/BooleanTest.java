@@ -320,4 +320,15 @@ class BooleanTest extends CheckerTest {
     }
 
 
+    @Test
+    void testObjectEqual() {
+        var type = eval("""
+                val x = { "env": "prod" }
+                val y = { "env": "prod" }
+                x == y
+                """);
+        assertEquals(type, ValueType.Boolean);
+    }
+
+
 }
