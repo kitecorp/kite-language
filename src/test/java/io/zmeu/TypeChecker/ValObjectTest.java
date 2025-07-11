@@ -286,6 +286,32 @@ public class ValObjectTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("Assign from nested object")
+    void testAssignPropertyFromNestedObject2() {
+        eval("""
+                val x = { 
+                    count: {
+                        eggs: 1
+                        missing: true
+                        name: "chicken"
+                    }
+                }
+                val y = x.count.eggs;
+                var missing = x.count.missing;
+                missing=false
+                var name = x.count.name;
+                name = "duck"
+                """
+        );
+        var yT = checker.getEnv().lookup("y");
+        assertEquals(ValueType.Number, yT);
+        var missing = checker.getEnv().lookup("missing");
+        assertEquals(ValueType.Boolean, missing);
+        var name = checker.getEnv().lookup("name");
+        assertEquals(ValueType.String, name);
+    }
+
+    @Test
     @DisplayName("Deep immutability: direct nested property mutation error")
     void testAssignProperty() {
         eval("""
