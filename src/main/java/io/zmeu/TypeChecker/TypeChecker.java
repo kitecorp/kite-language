@@ -494,8 +494,8 @@ public final class TypeChecker implements Visitor<Type> {
         executeBlock(resource.getArguments(), resourceEnv);
         // validate each property in the resource that matches the type defined in the schema
         for (var argument : resourceEnv.getVariables().entrySet()) {
-            if (installedSchema.getProperty(argument.getKey()) != argument.getValue()) {
-                throw new InvalidInitException("Property type mismatch for: " + argument.getKey() + " in " + printer.visit(resource));
+            if (!Objects.equals(installedSchema.getProperty(argument.getKey()), argument.getValue())) {
+                throw new InvalidInitException("Property type mismatch for " + argument.getKey() + " in:\n " + printer.visit(resource));
             }
         }
 
@@ -548,7 +548,7 @@ public final class TypeChecker implements Visitor<Type> {
             }
             return env.init(var, explicitType);
         }
-        if (implicitType == ValueType.String) {
+        if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // only needed when var is string because this var could be used to access a member on an object
             var init = (StringLiteral) expression.getInit();
             return env.init(var, new StringType(init.getValue()));
@@ -561,14 +561,19 @@ public final class TypeChecker implements Visitor<Type> {
         String var = expression.getId().string();
         try {
             vals.add(var);
+            Type returnType;
             if (expression.hasInit()) {
-                return initType(expression, var);
+                returnType = initType(expression, var);
             } else if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
-                return env.init(var, explicitType);
+                returnType = env.init(var, explicitType);
             } else {
                 throw new TypeError("Missing explicit and implicit type for expression: " + printer.visit(expression));
             }
+            if (returnType instanceof ObjectType objectType) {
+                objectType.setImmutable(true);
+            }
+            return returnType;
         } catch (TypeError error) {
             vals.remove(var);
             throw error;
@@ -580,10 +585,8 @@ public final class TypeChecker implements Visitor<Type> {
      */
     private Type initType(ValDeclaration expression, String var) {
         var implicitType = visit(expression.getInit());
-        implicitType.setImmutable(true);
         if (expression.hasType()) { // val type name
             var explicitType = visit(expression.getType());
-            explicitType.setImmutable(true);
             expect(implicitType, explicitType, expression);
             if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
@@ -592,7 +595,7 @@ public final class TypeChecker implements Visitor<Type> {
             }
             return env.init(var, explicitType);
         }
-        if (implicitType == ValueType.String) {
+        if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // only needed when val is string because this val could be used to access a member on an object
             var init = (StringLiteral) expression.getInit();
             return env.init(var, new StringType(init.getValue(), true));
@@ -671,7 +674,8 @@ public final class TypeChecker implements Visitor<Type> {
          * val x = { env: "test" }; x.env -> error
          */
         Type lookup = env.lookup(identifier.string());
-        if (lookup.isImmutable()) {
+        boolean isImmutable = lookup instanceof ObjectType objectType && objectType.isImmutable();
+        if (isImmutable || vals.contains(identifier.string())) {
             Type visit = visit(right);
             if (Objects.equals(ObjectType.Object.getValue(), visit.getValue())) {
                 if (visit == lookup) {

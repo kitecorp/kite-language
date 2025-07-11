@@ -14,12 +14,12 @@ public sealed abstract class Type extends Expression
     @Getter
     @Setter
     private String value;
-    @Getter
-    private boolean immutable = false;
-
-    public void setImmutable(boolean immutable) {
-        this.immutable = immutable;
-    }
+//    @Getter
+//    private boolean immutable = false;
+//
+//    public void setImmutable(boolean immutable) {
+//        this.immutable = immutable;
+//    }
 
     public Type(String value) {
         this();
