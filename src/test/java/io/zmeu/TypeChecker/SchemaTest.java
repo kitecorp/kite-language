@@ -1,9 +1,7 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
-import io.zmeu.TypeChecker.Types.ObjectType;
-import io.zmeu.TypeChecker.Types.SchemaType;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.zmeu.TypeChecker.Types.*;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -92,6 +90,23 @@ public class SchemaTest extends CheckerTest {
 
         var vm = new SchemaType("Vm", checker.getEnv());
         vm.setProperty("x", ValueType.Number);
+        assertEquals(vm, actual);
+    }
+
+    @Test
+    void objectInit() {
+        var actual = checker.visit(src("""
+                schema Vm {
+                   var object x = {
+                     size: 1
+                   }
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        var vm = new SchemaType("Vm", checker.getEnv());
+        var typeEnv = new TypeEnvironment(Map.of("size", ValueType.Number));
+        vm.setProperty("x", new ObjectType(typeEnv));
         assertEquals(vm, actual);
     }
 
