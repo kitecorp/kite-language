@@ -45,6 +45,48 @@ public class AssignmentTest extends CheckerTest {
     }
 
     @Test
+    void testObjectInitWrongTypeString() {
+        assertThrows(TypeError.class, () -> eval("""
+                var object x = "test"
+                """));
+    }
+
+    @Test
+    void testObjectInitWrongTypeNumber() {
+        assertThrows(TypeError.class, () -> eval("""
+                var object x = 1.2
+                """));
+    }
+
+    @Test
+    void testObjectInitWrongTypeBoolean() {
+        assertThrows(TypeError.class, () -> eval("""
+                var object x = true
+                """));
+    }
+
+    @Test
+    void testObjectInitWrongTypeNull() {
+        assertThrows(TypeError.class, () -> eval("""
+                var object x = null
+                """));
+    }
+
+    @Test
+    void testObjectInitWrongTypeVoid() {
+        assertThrows(TypeError.class, () -> eval("""
+                var object x = void
+                """));
+    }
+
+    @Test
+    void testObjectInitWrongTypeFalse() {
+        assertThrows(TypeError.class, () -> eval("""
+                var object x = false
+                """));
+    }
+
+    @Test
     void testStringInitWrongTypeBoolean() {
         assertThrows(TypeError.class, () -> eval("""
                 var string x = true
