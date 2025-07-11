@@ -595,7 +595,7 @@ public final class TypeChecker implements Visitor<Type> {
         if (implicitType == ValueType.String) {
             // only needed when val is string because this val could be used to access a member on an object
             var init = (StringLiteral) expression.getInit();
-            return env.init(var, new StringType(init.getValue()));
+            return env.init(var, new StringType(init.getValue(), true));
         } else {
             return env.init(var, implicitType);
         }
@@ -675,15 +675,15 @@ public final class TypeChecker implements Visitor<Type> {
             Type visit = visit(right);
             if (Objects.equals(ObjectType.Object.getValue(), visit.getValue())) {
                 if (visit == lookup) {
-                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + identifier.string() + "` in expression: " + printer.visit(expression));
+                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier.string() + "` in expression: " + printer.visit(expression));
                 } else if (vals.contains(identifier.string())) {
-                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + identifier.string() + "` in expression: " + printer.visit(expression));
+                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier.string() + "` in expression: " + printer.visit(expression));
                 } else {
                     env.assign(identifier.string(), expected);
                     return;
                 }
             }
-            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + identifier.string() + "` in expression: " + printer.visit(expression));
+            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier.string() + "` in expression: " + printer.visit(expression));
         }
         env.assign(identifier.string(), expected);
     }
