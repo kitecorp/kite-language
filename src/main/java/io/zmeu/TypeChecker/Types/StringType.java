@@ -13,7 +13,7 @@ public class StringType extends ValueType {
 
     public StringType(String string, boolean immutable) {
         this(string);
-        setImmutable(immutable);
+//        setImmutable(immutable);
     }
 
 }
