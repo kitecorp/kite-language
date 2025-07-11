@@ -1,7 +1,9 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
-import io.zmeu.TypeChecker.Types.*;
+import io.zmeu.TypeChecker.Types.ObjectType;
+import io.zmeu.TypeChecker.Types.SchemaType;
+import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -66,6 +68,7 @@ public class SchemaTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("single property object with properties checks if type was correctly parsed")
     void singlePropertyObjectFalse() {
         var actual = checker.visit(src("""
                 schema Vm {
@@ -77,6 +80,18 @@ public class SchemaTest extends CheckerTest {
         SchemaType vm = new SchemaType("Vm", checker.getEnv());
         vm.setProperty("x", ValueType.Boolean);
         assertNotEquals(vm, actual);
+    }
+
+    @Test
+    @DisplayName("single property object with properties checks if type was correctly parsed")
+    void singlePropertyObjectWrontAssignment() {
+        Assertions.assertThrows(TypeError.class, () -> {
+            checker.visit(src("""
+                    schema Vm {
+                       var object   x  = false
+                    }
+                    """));
+        });
     }
 
     @Test

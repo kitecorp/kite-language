@@ -182,7 +182,7 @@ public final class TypeChecker implements Visitor<Type> {
         }
         if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue())) {
             // only evaluate printing if we need to
-            String string = "Expected type " + expectedType + " but got " + actualType + " in expression: " + printer.visit(expectedVal);
+            String string = "Expected type `" + expectedType + "` but got `" + actualType + "` in expression: " + printer.visit(expectedVal);
             throw new TypeError(string);
         }
         return actualType;
