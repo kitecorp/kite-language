@@ -17,9 +17,9 @@ public sealed class ReferenceType extends Type permits ObjectType, ResourceType,
         super(typeName);
     }
 
-    public ReferenceType(String typeName, TypeEnvironment parent) {
+    public ReferenceType(String typeName, TypeEnvironment environment) {
         super(typeName);
-        this.environment = new TypeEnvironment(parent);
+        this.environment = environment;
     }
 
     public static ReferenceType of(String typeName) {

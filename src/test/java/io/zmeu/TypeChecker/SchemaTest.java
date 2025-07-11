@@ -60,7 +60,7 @@ public class SchemaTest extends CheckerTest {
                 """));
         assertEquals(SchemaType.class, actual.getClass());
 
-        SchemaType vm = new SchemaType("Vm", checker.getEnv());
+        var vm = new SchemaType("Vm", checker.getEnv());
         vm.setProperty("x", ValueType.Number);
         assertEquals(vm, actual);
     }

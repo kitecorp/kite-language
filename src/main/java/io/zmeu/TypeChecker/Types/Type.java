@@ -14,6 +14,9 @@ public sealed abstract class Type extends Expression
     @Getter
     @Setter
     private String value;
+    @Getter
+    @Setter
+    private boolean immutable = false;
 
     public Type(String value) {
         this();

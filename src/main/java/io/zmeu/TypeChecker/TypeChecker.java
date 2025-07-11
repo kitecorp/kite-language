@@ -21,7 +21,7 @@ import java.util.*;
 @Log4j2
 public final class TypeChecker implements Visitor<Type> {
     private final LanguageAstPrinter printer = new LanguageAstPrinter();
-    private final Set<String> immutables = new HashSet<>();
+    private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
 
@@ -560,7 +560,7 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(ValDeclaration expression) {
         String var = expression.getId().string();
         try {
-            immutables.add(var);
+            vals.add(var);
             if (expression.hasInit()) {
                 return initType(expression, var);
             } else if (expression.hasType()) {
@@ -570,7 +570,7 @@ public final class TypeChecker implements Visitor<Type> {
                 throw new TypeError("Missing explicit and implicit type for expression: " + printer.visit(expression));
             }
         } catch (TypeError error) {
-            immutables.remove(var);
+            vals.remove(var);
             throw error;
         }
     }
@@ -580,8 +580,10 @@ public final class TypeChecker implements Visitor<Type> {
      */
     private Type initType(ValDeclaration expression, String var) {
         var implicitType = visit(expression.getInit());
+        implicitType.setImmutable(true);
         if (expression.hasType()) { // val type name
             var explicitType = visit(expression.getType());
+            explicitType.setImmutable(true);
             expect(implicitType, explicitType, expression);
             if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
@@ -603,8 +605,8 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(ObjectExpression expression) {
         TypeEnvironment previous = this.env;
         try {
-            var objectType = new ObjectType(this.env);
-            this.env = objectType.getEnvironment();
+            this.env = new TypeEnvironment(this.env);
+            var objectType = new ObjectType(env);
 
             for (ObjectLiteral property : expression.getProperties()) {
                 var t = visit(property); // check each property
@@ -638,12 +640,12 @@ public final class TypeChecker implements Visitor<Type> {
         var valueType = visit(expression.getRight());
         var expected = expect(valueType, varType, expression.getLeft());
         if (expression.getLeft() instanceof SymbolIdentifier symbolIdentifier) {
-            extracted(expression, symbolIdentifier, expression.getRight(), expected);
+            assign(expression, symbolIdentifier, expression.getRight(), expected);
         } else if (expression.getLeft() instanceof MemberExpression memberExpression) {
             SymbolIdentifier symbolIdentifier = getSymbolIdentifier(memberExpression);
             if (symbolIdentifier != null) {
                 // if trying to override a val object's property, we should forbid it
-                extracted(expression, symbolIdentifier, expression.getRight(), expected);
+                assign(expression, symbolIdentifier, expression.getRight(), expected);
             }
         }
         return expected;
@@ -663,11 +665,27 @@ public final class TypeChecker implements Visitor<Type> {
         return null;
     }
 
-    private void extracted(Expression expression, SymbolIdentifier symbolIdentifier, Expression right, Type expected) {
-        if (immutables.contains(symbolIdentifier.string())) {
-            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + symbolIdentifier.string() + "` in expression: " + printer.visit(expression));
+    private void assign(Expression expression, SymbolIdentifier identifier, Expression right, Type expected) {
+        /**
+         * check if right hand side type is immutable. For example a val object once it's assigned we can't change it's properties
+         * val x = { env: "test" }; x.env -> error
+         */
+        Type lookup = env.lookup(identifier.string());
+        if (lookup.isImmutable()) {
+            Type visit = visit(right);
+            if (Objects.equals(ObjectType.Object.getValue(), visit.getValue())) {
+                if (visit == lookup) {
+                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + identifier.string() + "` in expression: " + printer.visit(expression));
+                } else if (vals.contains(identifier.string())) {
+                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + identifier.string() + "` in expression: " + printer.visit(expression));
+                } else {
+                    env.assign(identifier.string(), expected);
+                    return;
+                }
+            }
+            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to immutable variable `" + identifier.string() + "` in expression: " + printer.visit(expression));
         }
-        env.assign(symbolIdentifier.string(), expected);
+        env.assign(identifier.string(), expected);
     }
 
     @Override
