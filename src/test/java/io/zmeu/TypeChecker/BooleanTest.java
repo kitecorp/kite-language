@@ -330,5 +330,35 @@ class BooleanTest extends CheckerTest {
         assertEquals(type, ValueType.Boolean);
     }
 
+    @Test
+    void testObjectNotEqual() {
+        var type = eval("""
+                val x = { "env": "prod" }
+                val y = { "env": "prod" }
+                x != y
+                """);
+        assertEquals(type, ValueType.Boolean);
+    }
+
+    @Test
+    void testVarObjectNotEqual() {
+        var type = eval("""
+                var x = { "env": "prod" }
+                var y = { "env": "prod" }
+                x != y
+                """);
+        assertEquals(type, ValueType.Boolean);
+    }
+
+    @Test
+    void testVarObjectEqual() {
+        var type = eval("""
+                var x = { "env": "prod" }
+                var y = { "env": "prod" }
+                x == y
+                """);
+        assertEquals(type, ValueType.Boolean);
+    }
+
 
 }
