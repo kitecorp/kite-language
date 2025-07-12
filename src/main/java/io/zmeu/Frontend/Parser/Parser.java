@@ -533,11 +533,16 @@ public class Parser {
     private Expression Expression() {
         return switch (lookAhead().type()) {
             case OpenBraces -> {
-                if (blockContext == BlockContext.OBJECT) {
-                    yield ObjectDeclaration();
-                } else {
-                    yield BlockExpression();
+                if (IsLookAheadAfter(Identifier, Colon)) {
+                    blockContext = BlockContext.OBJECT;
                 }
+                Expression expression;
+                if (blockContext == BlockContext.OBJECT) {
+                    expression = ObjectDeclaration();
+                } else {
+                    expression = BlockExpression();
+                }
+                yield expression;
             }
             default -> AssignmentExpression();
         };
