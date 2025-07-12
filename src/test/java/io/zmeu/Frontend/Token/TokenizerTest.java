@@ -84,6 +84,7 @@ public class TokenizerTest {
         log.info(result);
 
     }
+
     @Test
     void testMinus() {
         var result = tokenizer.tokenizeLiteral("-");
@@ -91,6 +92,7 @@ public class TokenizerTest {
         Assertions.assertEquals("-", result.value());
         log.info(result);
     }
+
     @Test
     void testMultiplication() {
         var result = tokenizer.tokenizeLiteral("*");
@@ -183,6 +185,7 @@ public class TokenizerTest {
         Assertions.assertEquals("}", result.value());
         log.info(result);
     }
+
     @Test
     void testOpenBrackets() {
         var result = tokenizer.tokenizeLiteral("[");
@@ -254,7 +257,8 @@ public class TokenizerTest {
         Assertions.assertEquals("/", result.value());
         log.info(result);
     }
-// Complex strings
+
+    // Complex strings
     @Test
     void testOpenBracesWithText() {
         var result = tokenizer.tokenizeLiteral("{ \"hey\" }");
@@ -262,6 +266,7 @@ public class TokenizerTest {
         Assertions.assertEquals("{", result.value());
         log.info(result);
     }
+
     @Test
     void testOpenNested() {
         var result = tokenizer.tokenize("{ { \"hey\" ");
@@ -272,7 +277,7 @@ public class TokenizerTest {
         log.info(result);
     }
 
-    ////////// COMMENTS /////////
+    /// /////// COMMENTS /////////
     @Test
     void testCommentIsIgnored() {
         var result = tokenizer.tokenizeLiteral("// a comment goes until the end of line \n");
@@ -320,6 +325,22 @@ public class TokenizerTest {
         var result = tokenizer.tokenizeLiteral("var");
         Assertions.assertEquals(TokenType.Var, result.type());
         Assertions.assertEquals("var", result.value());
+        log.info(result);
+    }
+
+    @Test
+    void testKeywordVal() {
+        var result = tokenizer.tokenizeLiteral("val");
+        Assertions.assertEquals(TokenType.Val, result.type());
+        Assertions.assertEquals("val", result.value());
+        log.info(result);
+    }
+
+    @Test
+    void testKeywordObject() {
+        var result = tokenizer.tokenizeLiteral("object");
+        Assertions.assertEquals(TokenType.Object, result.type());
+        Assertions.assertEquals("object", result.value());
         log.info(result);
     }
 
