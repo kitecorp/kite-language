@@ -653,8 +653,12 @@ public class Parser {
             var symbol = SymbolIdentifier();
             return param(symbol, type);
         } else {
+            TypeIdentifier type = null;
+            if (HasType()) {
+                type = typeParser.identifier();
+            }
             var symbol = SymbolIdentifier();
-            return param(symbol);
+            return param(symbol, type);
         }
     }
 

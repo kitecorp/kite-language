@@ -128,7 +128,7 @@ public class ParserIterator {
             }
 
             switch (next.type()) {
-                case Resource, Fun, Var, Val, For, While,  EOF, CloseBraces -> {
+                case Resource, Fun, Var, Val, For, While, EOF, CloseBraces -> {
                     return;
                 }
             }
@@ -145,16 +145,22 @@ public class ParserIterator {
         if (token.isLineTerminator()) {
             return false;
         }
-        if (token.is(TokenType.Identifier)) {
-            while (iterator.hasNext()) {
-                token = iterator.next();
-                if (token.is(TokenType.Dot)) {
-                    continue;
-                }
-                return token.is(TokenType.Identifier);
-            }
-        }
+        return switch (token.type()) {
+            case Identifier -> isComplexType(iterator);
+            case Object -> true;
+            default -> false;
+        };
 
+    }
+
+    private static boolean isComplexType(ListIterator<Token> iterator) {
+        while (iterator.hasNext()) {
+            var next = iterator.next();
+            if (next.is(TokenType.Dot)) {
+                continue;
+            }
+            return next.is(TokenType.Identifier);
+        }
         return false;
     }
 }

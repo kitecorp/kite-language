@@ -46,15 +46,15 @@ public class TypeParser {
     }
 
     public TypeIdentifier identifier() {
-//        if (parser.IsLookAhead(Colon)) {
-//            parser.eat(Colon);
-        if (parser.IsLookAhead(OpenParenthesis)) {
-            return FunctionType();
-        } else if (parser.IsLookAhead(Identifier)) {
-            return TypeIdentifier();
-        }
-//        }
-        return null;
+        return switch (lookahead().type()) {
+            case OpenParenthesis -> FunctionType();
+            case Identifier -> TypeIdentifier();
+            case Object -> {
+                var token = (Token) eat(Object);
+                yield TypeIdentifier.type(token.type().toString());
+            }
+            default -> null;
+        };
     }
 
     private TypeIdentifier FunctionType() {
