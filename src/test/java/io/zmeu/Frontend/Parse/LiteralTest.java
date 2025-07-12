@@ -1,11 +1,14 @@
 package io.zmeu.Frontend.Parse;
 
 import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parse.Literals.ObjectLiteral;
 import io.zmeu.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -99,6 +102,16 @@ public class LiteralTest extends ParserTest {
         );
         assertEquals(expected, res);
         log.info((res));
+    }
+
+    @Test
+    void testSimpleObject() {
+        var res = (Program) parse("{ a: 2}");
+        var expected = Program.of(
+                expressionStatement(objectExpression(ObjectLiteral.object("a", number(2)))
+                ));
+        assertEquals(expected, res);
+        log.info(printer.visit(res));
     }
 
     @Test
