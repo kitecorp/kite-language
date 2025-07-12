@@ -7,6 +7,7 @@ import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Statements.*;
+import io.zmeu.Frontend.Parser.errors.ParseError;
 import io.zmeu.Runtime.exceptions.InvalidInitException;
 import io.zmeu.SchemaContext;
 import io.zmeu.TypeChecker.Types.TypeParser;
@@ -70,10 +71,10 @@ import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 @Log4j2
 public class Parser {
     public static final String VAL_NOT_INITIALISED = "val \"%s\" must be initialized";
+    public TypeParser typeParser = new TypeParser(this);
     private ParserIterator iterator;
     private Program program = new Program();
     private SyntaxPrinter printer = new SyntaxPrinter();
-    public TypeParser typeParser = new TypeParser(this);
     /**
      * Used to detect when a val/var is declared in a schema or in a resource.
      * When in a schema, a val can be left uninitialised:
@@ -153,8 +154,14 @@ public class Parser {
                 default -> Statement();
             };
         } catch (RuntimeException error) {
-            ErrorSystem.error(error.getMessage());
-            log.error(error.getMessage());
+            if (error instanceof ParseError parseError && parseError.getActual() != null) {
+                String message = error.getMessage() + parseError.getActual().raw();
+                ErrorSystem.error(message);
+                log.error(message);
+            } else {
+                ErrorSystem.error(error.getMessage());
+                log.error(error.getMessage());
+            }
             iterator.synchronize();
             return null;
         }
@@ -637,9 +644,11 @@ public class Parser {
 
     private ParameterIdentifier FunParameter() {
         if (IsLookAhead(Identifier, OpenParenthesis)) { // OpenParenthesis because fun onClick(callback (Number)->Number) callback's type is a function
-            TypeIdentifier type = null;
+            TypeIdentifier type;
             if (IsLookAheadAfter(Identifier, Identifier)) { // param has type, parse it. If it doesn't the TypeChecker will throw an exception
                 type = typeParser.identifier();
+            } else { // enforce parameter type declaration
+                throw ErrorSystem.error("Type declaration expected for parameter: ", lookAhead(), lookAhead().type());
             }
             var symbol = SymbolIdentifier();
             return param(symbol, type);

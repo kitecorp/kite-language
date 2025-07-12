@@ -1,6 +1,7 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
+import io.zmeu.ErrorSystem;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.TypeChecker.Types.TypeFactory;
 import io.zmeu.TypeChecker.Types.ValueType;
@@ -28,7 +29,8 @@ public class FunctionTest extends CheckerTest {
 
     @Test
     void testNoParamTypes() {
-        assertThrows(IllegalArgumentException.class, () -> eval(" fun square(x)  number { return x * x } "));
+        eval(" fun square(x)  number { return x * x } ");
+        Assertions.assertTrue(ErrorSystem.hadErrors());
     }
 
     @Test

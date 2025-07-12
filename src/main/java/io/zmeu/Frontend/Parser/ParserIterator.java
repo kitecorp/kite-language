@@ -128,7 +128,7 @@ public class ParserIterator {
             }
 
             switch (next.type()) {
-                case Resource, Fun, Var, Val, For, While, Return, EOF, CloseBraces -> {
+                case Resource, Fun, Var, Val, For, While,  EOF, CloseBraces -> {
                     return;
                 }
             }

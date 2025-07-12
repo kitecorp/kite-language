@@ -107,7 +107,7 @@ public class SchemaTest extends RuntimeTest {
     void initDeclarationWithParams() {
         var res = eval("""
                 schema Vm {
-                    init(x){
+                    init(object x){
                        
                     }
                 }
@@ -116,7 +116,7 @@ public class SchemaTest extends RuntimeTest {
         log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
-        Assertions.assertEquals(FunValue.of("init", List.of(param("x")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
+        Assertions.assertEquals(FunValue.of("init", List.of(param("x","object")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
     }
 
     @Test

@@ -13,12 +13,12 @@ public class LambdaTest extends RuntimeTest {
     void funDeclaration() {
         Object res = eval("""
                 {
-                    fun onClick(callback){
+                    fun onClick(number callback){
                         var x = 10
                         var y = 20
                         callback(x+y)
                     }
-                    onClick((data)->data*10)
+                    onClick((number data)->data*10)
                 }""");
 
         log.warn((res));
@@ -28,7 +28,7 @@ public class LambdaTest extends RuntimeTest {
     @Test
     void lambdaAssignToVar() {
         Object res = eval("""
-                var f = (x) -> x*x
+                var f = (number x) -> x*x
                 f(2)
                 """);
 
@@ -39,7 +39,7 @@ public class LambdaTest extends RuntimeTest {
     @Test
     void lambdaInvoke() {
         Object res = eval("""
-                ((x) -> x*x) (2)
+                ((number x) -> x*x) (2)
                 """);
 
         log.warn((res));
@@ -51,7 +51,7 @@ public class LambdaTest extends RuntimeTest {
         Object res = eval("""
                 {
                 var y = 3
-                ((x) ->{ 
+                ((number x) ->{ 
                     var z=3 
                     x*y+z
                     }) (2)
@@ -66,7 +66,7 @@ public class LambdaTest extends RuntimeTest {
         Object res = eval("""
                 {
                 var y = 3
-                ((x) ->{ 
+                ((number x) ->{ 
                     var z=3 
                     var y=4
                     x*y+z
@@ -82,9 +82,9 @@ public class LambdaTest extends RuntimeTest {
         Object res = eval("""
                                 
                 var y = 3
-                fun foo(a) {
+                fun foo(number a) {
                     var z=3
-                    (x) -> {
+                    (number x) -> {
                         var y=4
                         x*y+z+a
                     }
