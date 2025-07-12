@@ -65,7 +65,7 @@ public class FunTest extends RuntimeTest {
     @Test
     void funEvaluateBlock() {
         var res = eval("""
-                fun myFun(x){
+                fun myFun(number x){
                    x
                 }
                 myFun(2)
@@ -95,7 +95,7 @@ public class FunTest extends RuntimeTest {
     @Test
     void funBody() {
         var res = eval("""
-                fun sqrt(x){
+                fun sqrt(number x){
                    x*x
                 }
                 sqrt(2)
@@ -107,7 +107,7 @@ public class FunTest extends RuntimeTest {
     @Test
     void funBodyOverlappingWithParam() {
         Assertions.assertThrows(VarExistsException.class, () -> interpret("""
-                fun sqrt(x){
+                fun sqrt(number x){
                    var x = 3
                    x*x
                 }
@@ -118,7 +118,7 @@ public class FunTest extends RuntimeTest {
     @Test
     void funBodyMultiParams() {
         var res = eval("""
-                fun sqrt(x,y){
+                fun sqrt(number x,number y){
                    var z = 1
                    x*y+z
                 }
@@ -133,9 +133,9 @@ public class FunTest extends RuntimeTest {
         var res = eval("""
                 {
                     var a = 100
-                    fun calc(x,y){
+                    fun calc(number x,number y){
                         var z = x+y
-                        fun inner(b){
+                        fun inner(number b){
                             b+z+a
                         }
                         inner
@@ -151,7 +151,7 @@ public class FunTest extends RuntimeTest {
     @Test
     void returnStatement() {
         var res = eval("""
-                fun fib(n) {
+                fun fib(number n) {
                    if (n <= 1) {
                         return n
                    }

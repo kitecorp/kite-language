@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;
@@ -24,12 +24,12 @@ public class FunTest extends ParserTest {
     @Test
     void testWithArgs() {
         var res = parse("""
-                fun square(x) { 
+                fun square(number x) { 
                     return x*x
                 }
                 """);
         var expected = program(
-                fun("square", List.of(param("x")), block(
+                fun("square", List.of(param("x", "number")), block(
                                 funReturn(binary("*", "x", "x"))
                         )
                 )
@@ -41,12 +41,12 @@ public class FunTest extends ParserTest {
     @Test
     void testWith2Args() {
         var res = parse("""
-                fun square(x,y) { 
+                fun square(number x,number y) { 
                     return x*y
                 }
                 """);
         var expected = program(
-                fun("square", List.of(param("x"), param("y")), block(
+                fun("square", List.of(param("x", "number"), param("y", "number")), block(
                                 funReturn(
                                         binary("*", "x", "y")
                                 )
@@ -60,12 +60,12 @@ public class FunTest extends ParserTest {
     @Test
     void testWithoutReturn() {
         var res = parse("""
-                fun square(x) { 
+                fun square(number x) { 
                     return
                 }
                 """);
         var expected = program(
-                fun("square", List.of(param("x")), block(
+                fun("square", List.of(param("x","number")), block(
                                 funReturn(ExpressionStatement.expressionStatement(TypeIdentifier.type(ValueType.Void)))
                         )
                 )

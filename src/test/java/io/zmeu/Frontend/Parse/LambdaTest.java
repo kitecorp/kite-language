@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parser.Expressions.CallExpression.call;
 import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
+import static io.zmeu.Frontend.Parser.Expressions.CallExpression.call;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -26,9 +26,9 @@ public class LambdaTest extends ParserTest {
 
     @Test
     void lambdaSimple() {
-        var res = parse("(x) -> x*x");
+        var res = parse("(number x) -> x*x");
         var expected = program(expressionStatement(
-                        lambda("x", binary("*", "x", "x"))
+                        lambda(param("x", type("number")), binary("*", "x", "x"))
                 )
         );
         assertEquals(expected, res);
@@ -57,7 +57,7 @@ public class LambdaTest extends ParserTest {
                         lambda(param("x", type(ValueType.Number)),
                                 block(
                                         expressionStatement(
-                                                call("print","x")
+                                                call("print", "x")
                                         )
                                 ))
                 )
@@ -68,9 +68,11 @@ public class LambdaTest extends ParserTest {
 
     @Test
     void lambdaTwoArgs() {
-        var res = parse("(x,y) -> x*y");
+        var res = parse("(number x,number y) -> x*y");
         var expected = program(
-                expressionStatement(lambda("x", "y", binary("*", "x", "y")))
+                expressionStatement(
+                        lambda(param("x", "number"),
+                                param("y", "number"), binary("*", "x", "y")))
         );
         assertEquals(expected, res);
         log.info((res));
@@ -78,10 +80,12 @@ public class LambdaTest extends ParserTest {
 
     @Test
     void lambdaBlock() {
-        var res = parse("(x,y) -> { x*y }");
+        var res = parse("(number x, number y) -> { x*y }");
         var expected = program(
                 expressionStatement(
-                        lambda("x", "y", block(expressionStatement(binary("*", "x", "y"))))
+                        lambda(param("x", "number"),
+                                param("y", "number"),
+                                block(expressionStatement(binary("*", "x", "y"))))
                 ));
         assertEquals(expected, res);
         log.info((res));
@@ -90,11 +94,11 @@ public class LambdaTest extends ParserTest {
     @Test
     void testWith2Args() {
         var res = parse("""
-                (x) -> { 
+                (number x) -> { 
                     return x*x
                 }
                 """);
-        var expected = program(expressionStatement(lambda("x", block(
+        var expected = program(expressionStatement(lambda(param("x", "number"), block(
                         funReturn(binary("*", "x", "x"))
                 )
         )));
@@ -105,11 +109,11 @@ public class LambdaTest extends ParserTest {
     @Test
     void testWithoutReturn() {
         var res = parse("""
-                (x) -> { 
+                (object x) -> { 
                     return
                 }
                 """);
-        var expected = program(expressionStatement(lambda("x", block(
+        var expected = program(expressionStatement(lambda(param("x", "object"), block(
                         funReturn(expressionStatement(type(ValueType.Void)))
                 )
         )));
@@ -131,11 +135,11 @@ public class LambdaTest extends ParserTest {
     @Test
     void callExpression() {
         var res = parse("""
-                ((x) -> x*x)(2) 
+                ((number x) -> x*x)(2) 
                 
                 """);
         var expected = program(
-                expressionStatement(call(lambda("x", binary("*", "x", "x")), 2)));
+                expressionStatement(call(lambda(param("x", "number"), binary("*", "x", "x")), 2)));
         log.warn((res));
         assertEquals(expected, res);
     }
@@ -143,12 +147,12 @@ public class LambdaTest extends ParserTest {
     @Test
     void callExpressionEmpty() {
         var res = parse("""
-                ((x) -> x*x)(2)()
+                ((number x) -> x*x)(2)()
                 
                 """);
         var expected = program(
                 expressionStatement(
-                        call(call(lambda("x", binary("*", "x", "x")), 2), Collections.emptyList())
+                        call(call(lambda(param("x","number"), binary("*", "x", "x")), 2), Collections.emptyList())
                 ));
         log.warn((res));
         assertEquals(expected, res);
@@ -157,11 +161,11 @@ public class LambdaTest extends ParserTest {
     @Test
     void callExpressionHi() {
         var res = parse("""
-                ((x) -> x*x)(2)("hi")
+                ((number x) -> x*x)(2)("hi")
                 """);
         var expected = program(
                 expressionStatement(
-                        call(call(lambda("x", binary("*", "x", "x")), 2), string("hi"))
+                        call(call(lambda(param("x","number"), binary("*", "x", "x")), 2), string("hi"))
                 ));
         log.warn((res));
         assertEquals(expected, res);
