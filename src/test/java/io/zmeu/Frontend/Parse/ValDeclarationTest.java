@@ -5,8 +5,12 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
+import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
 import static io.zmeu.Frontend.Parser.Program.program;
 import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,5 +89,68 @@ public class ValDeclarationTest extends ParserTest {
         log.info((res));
     }
 
+    @Test
+    void arrayOfVar() {
+        var res = parse("""
+                val x=3;
+                val y=2.2;
+                val z=[x,y];
+                """);
+        var expected = program(
+                valStatement(val("x", 3)),
+                valStatement(val("y", 2.2)),
+                valStatement(val("z", array(id("x"), id("y"))))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    /**
+     * During parsing we don't care about wrong types being placed in the array
+     */
+    @Test
+    void arrayOfVarMix() {
+        var res = parse("""
+                val x=3;
+                val y=2.2;
+                val s="s";
+                val z=[x,y,s,5];
+                """);
+        var expected = program(
+                valStatement(val("x", 3)),
+                valStatement(val("y", 2.2)),
+                valStatement(val("s", "s")),
+                valStatement(val("z", array(
+                                id("x"), id("y"), id("s"), number(5))
+                        )
+                )
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    /**
+     * During parsing we don't care about wrong types being placed in the array
+     */
+    @Test
+    void arrayOfVarMixObject() {
+        var res = parse("""
+                val x=3;
+                val y={ env: "prod" };
+                val s="s";
+                val z=[x,y,s,5];
+                """);
+        var expected = program(
+                valStatement(val("x", 3)),
+                valStatement(val("y", objectExpression(object("env", "prod")))),
+                valStatement(val("s", "s")),
+                valStatement(val("z", array(
+                                id("x"), id("y"), id("s"), number(5))
+                        )
+                )
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
 
 }
