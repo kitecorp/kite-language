@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class ArrayExpression extends Expression {
@@ -30,6 +32,13 @@ public final class ArrayExpression extends Expression {
         expression.items = List.of(id);
         return expression;
     }
+    public static ArrayExpression array(int... id) {
+        var expression = new ArrayExpression();
+        for (int i : id) {
+            expression.add(number(i));
+        }
+        return expression;
+    }
 
     public static ArrayExpression array(List<Literal> list) {
         var expression = new ArrayExpression();
@@ -39,6 +48,21 @@ public final class ArrayExpression extends Expression {
 
     public static ArrayExpression array() {
         return new ArrayExpression();
+    }
+
+    public void add(Literal literal) {
+        this.items.add(literal);
+    }
+
+    public boolean isEmpty() {
+        return this.items.isEmpty();
+    }
+
+    public boolean hasItems() {
+        return !this.items.isEmpty();
+    }
+    public Literal getFirst() {
+        return items.getFirst();
     }
 
 }

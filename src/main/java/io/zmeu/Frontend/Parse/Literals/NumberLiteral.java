@@ -60,7 +60,7 @@ public class NumberLiteral extends Literal {
         }
     }
 
-    public static Literal number(Object value) {
+    public static NumberLiteral number(Object value) {
         return new NumberLiteral(value);
     }
 
@@ -68,23 +68,23 @@ public class NumberLiteral extends Literal {
         return new NumberLiteral(value);
     }
 
-    public static Expression number(int value) {
+    public static NumberLiteral number(int value) {
         return new NumberLiteral(value);
     }
 
-    public static Expression number(double value) {
+    public static NumberLiteral number(double value) {
         return new NumberLiteral(value);
     }
 
-    public static Expression number(float value) {
+    public static NumberLiteral number(float value) {
         return new NumberLiteral(value);
     }
 
-    public static Literal of(float value) {
+    public static NumberLiteral of(float value) {
         return new NumberLiteral(value);
     }
 
-    public static Literal of(double value) {
+    public static NumberLiteral of(double value) {
         return new NumberLiteral(value);
     }
 
