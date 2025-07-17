@@ -2,9 +2,7 @@ package io.zmeu.Frontend.Parse;
 
 import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.ParserErrors;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -186,14 +184,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array(true, false, true))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
-    }
-
-    @Test
-    void testSimpleArrayWithNull() {
-        var res = (Program) parse("[1,'b']");
-        Assertions.assertTrue(ParserErrors.hadErrors());
-        Assertions.assertEquals(ParserErrors.errors(), "Array items must be of the same type: 1 != \"b\"");
         log.info(printer.visit(res));
     }
 

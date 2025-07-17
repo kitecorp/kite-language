@@ -105,7 +105,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(ArrayExpression expression) {
         var builder = new StringBuilder("[");
-        for (Literal item : expression.getItems()) {
+        for (var item : expression.getItems()) {
             builder.append(visit(item));
             builder.append(", ");
         }

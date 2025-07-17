@@ -1,13 +1,13 @@
 package io.zmeu.Frontend.Parser;
 
 import io.zmeu.BlockContext;
-import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.Frontend.Parser.errors.ParseError;
+import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.exceptions.InvalidInitException;
 import io.zmeu.SchemaContext;
 import io.zmeu.TypeChecker.Types.TypeParser;
@@ -560,7 +560,7 @@ public class Parser {
     }
 
     private @NotNull Expression OptArray() {
-        return IsLookAhead(CloseBrackets)? array(): ArrayItems(); 
+        return IsLookAhead(CloseBrackets) ? array() : ArrayItems();
     }
 
     /**
@@ -569,7 +569,7 @@ public class Parser {
     private ArrayExpression ArrayItems() {
         var array = new ArrayExpression();
         do {
-            array.add(ArrayItem(array));
+            array.add(ArrayItem());
         } while (!IsLookAhead(CloseBrackets) &&
                  !IsLookAhead(EOF) &&
                  IsLookAhead(Comma) &&
@@ -577,17 +577,17 @@ public class Parser {
         return array;
     }
 
-    private Literal ArrayItem(ArrayExpression array) {
-        eat(Number, String, True, False, Object, Identifier);
-        var item = Literal();
-
-        if (array.hasItems()) {
-            var first = array.getFirst();
-            if (!first.getClass().equals(item.getClass())) {
-                throw new IllegalStateException("Array items must be of the same type: " + printer.visit(first) + " != " + printer.visit(item));
+    /**
+     * We return an expression because it can be a Literal or an Identifier (variable name)
+     */
+    private Expression ArrayItem() {
+        return switch (lookAhead().type()) {
+            case Identifier -> SymbolIdentifier(); // Identifier() also checks for types
+            default -> {
+                eat(Number, String, True, False, Object);
+                yield Literal();
             }
-        }
-        return item;
+        };
     }
 
     /**

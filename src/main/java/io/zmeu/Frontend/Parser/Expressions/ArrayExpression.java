@@ -1,5 +1,6 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
+import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parse.Literals.Literal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,10 @@ import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class ArrayExpression extends Expression {
-    private List<Literal> items;
+    /**
+     * Literal or Identifeir (var/val)
+     */
+    private List<Expression> items;
 
     public ArrayExpression() {
         this.items = new ArrayList<>();
@@ -30,6 +34,18 @@ public final class ArrayExpression extends Expression {
     }
 
     public static ArrayExpression array(Literal... id) {
+        var expression = new ArrayExpression();
+        expression.items = List.of(id);
+        return expression;
+    }
+
+    public static ArrayExpression array(Expression... id) {
+        var expression = new ArrayExpression();
+        expression.items = List.of(id);
+        return expression;
+    }
+
+    public static ArrayExpression array(Identifier... id) {
         var expression = new ArrayExpression();
         expression.items = List.of(id);
         return expression;
@@ -69,7 +85,7 @@ public final class ArrayExpression extends Expression {
 
     public static ArrayExpression array(List<Literal> list) {
         var expression = new ArrayExpression();
-        expression.items = list;
+        expression.items.addAll(list);
         return expression;
     }
 
@@ -77,8 +93,8 @@ public final class ArrayExpression extends Expression {
         return new ArrayExpression();
     }
 
-    public void add(Literal literal) {
-        this.items.add(literal);
+    public void add(Expression expression) {
+        this.items.add(expression);
     }
 
     public boolean isEmpty() {
@@ -89,7 +105,7 @@ public final class ArrayExpression extends Expression {
         return !this.items.isEmpty();
     }
 
-    public Literal getFirst() {
+    public Expression getFirst() {
         return items.getFirst();
     }
 

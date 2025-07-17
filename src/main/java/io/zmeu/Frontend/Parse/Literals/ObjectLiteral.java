@@ -4,6 +4,8 @@ import io.zmeu.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+
 /**
  * A Object literal has the form of: { key: value } or empty string {}
  * ObjectLiteral
@@ -31,6 +33,10 @@ public class ObjectLiteral extends Literal {
 
     public static ObjectLiteral object(String key, Expression value) {
         return new ObjectLiteral(Identifier.id(key), value);
+    }
+
+    public static ObjectLiteral object(String key, String value) {
+        return new ObjectLiteral(Identifier.id(key), string(value));
     }
 
     public static ObjectLiteral object() {
