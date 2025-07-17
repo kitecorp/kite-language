@@ -1,7 +1,7 @@
 package io.zmeu.Frontend.Parser;
 
 import io.zmeu.BlockContext;
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
@@ -157,10 +157,10 @@ public class Parser {
         } catch (RuntimeException error) {
             if (error instanceof ParseError parseError && parseError.getActual() != null) {
                 String message = error.getMessage() + parseError.getActual().raw();
-                ErrorSystem.error(message);
+                ParserErrors.error(message);
                 log.error(message);
             } else {
-                ErrorSystem.error(error.getMessage());
+                ParserErrors.error(error.getMessage());
                 log.error(error.getMessage());
             }
             iterator.synchronize();
@@ -584,7 +584,7 @@ public class Parser {
         if (array.hasItems()) {
             var first = array.getFirst();
             if (!first.getClass().equals(item.getClass())) {
-                throw new IllegalStateException("Array items must be of the same type: " + first.getClass() + " != " + item.getClass());
+                throw new IllegalStateException("Array items must be of the same type: " + printer.visit(first) + " != " + printer.visit(item));
             }
         }
         return item;
@@ -695,7 +695,7 @@ public class Parser {
             if (IsLookAheadAfter(Identifier, Identifier)) { // param has type, parse it. If it doesn't the TypeChecker will throw an exception
                 type = typeParser.identifier();
             } else { // enforce parameter type declaration
-                throw ErrorSystem.error("Type declaration expected for parameter: ", lookAhead(), lookAhead().type());
+                throw ParserErrors.error("Type declaration expected for parameter: ", lookAhead(), lookAhead().type());
             }
             var symbol = SymbolIdentifier();
             return param(symbol, type);
@@ -863,7 +863,7 @@ public class Parser {
     }
 
     private RuntimeException Error(Token token, String message) {
-        return ErrorSystem.error(message, token);
+        return ParserErrors.error(message, token);
     }
 
 
@@ -967,7 +967,7 @@ public class Parser {
         if (IsLookAhead(TokenType.Identifier)) {
             name = Identifier();
         } else {
-            throw ErrorSystem.error("Missing identifier when declaring: resource " + type.string());
+            throw ParserErrors.error("Missing identifier when declaring: resource " + type.string());
         }
         context = SchemaContext.RESOURCE;
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");

@@ -1,7 +1,7 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.TypeChecker.Types.ResourceType;
 import io.zmeu.TypeChecker.Types.SchemaType;
@@ -24,7 +24,7 @@ public class ResourceTest extends CheckerTest {
                 
                 }
                 """);
-        Assertions.assertFalse(ErrorSystem.getErrors().isEmpty());
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
     }
 
     /**

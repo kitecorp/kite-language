@@ -1,6 +1,6 @@
 package io.zmeu.TypeChecker;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Parse.ParserTest;
 import io.zmeu.Frontend.Parser.Factory;
 import lombok.extern.log4j.Log4j2;
@@ -76,9 +76,9 @@ public class ValueTypesTest extends ParserTest {
         var actual = parse("""
                 var number x = 0.2
                 """);
-        var errors = ErrorSystem.getErrors();
+        var errors = ParserErrors.getErrors();
         log.info(actual);
-        log.info(ErrorSystem.errors());
+        log.info(ParserErrors.errors());
         Assertions.assertTrue(errors.isEmpty());
 
     }

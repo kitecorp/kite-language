@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.errors.ParseError;
 import lombok.extern.log4j.Log4j2;
@@ -61,7 +61,7 @@ public class IfBaseTest extends ParserTest {
         parse("""
                 if x) x=1
                 """);
-        ParseError parseError = ErrorSystem.getErrors().get(0);
+        ParseError parseError = ParserErrors.getErrors().get(0);
         Assertions.assertEquals(TokenType.OpenParenthesis, parseError.getExpected());
     }
 
@@ -70,7 +70,7 @@ public class IfBaseTest extends ParserTest {
         parse("""
                 if (x x=1
                 """);
-        ParseError parseError = ErrorSystem.getErrors().get(0);
+        ParseError parseError = ParserErrors.getErrors().get(0);
         Assertions.assertEquals(TokenType.CloseParenthesis, parseError.getExpected());
     }
 

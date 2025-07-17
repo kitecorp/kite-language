@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Lexical;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.TypeChecker.Types.Type;
 import io.zmeu.Visitors.Visitor;
@@ -73,7 +73,7 @@ public final class Resolver implements Visitor<Void> {
     @Override
     public Void visit(/* VariableExpression*/ Identifier identifier) {
         if (!scopes.isEmpty() && scopes.peek().get(identifier.string()) == Boolean.FALSE) {
-            throw ErrorSystem.error("Can't read local variable in its own initializer: " + identifier.string());
+            throw ParserErrors.error("Can't read local variable in its own initializer: " + identifier.string());
         }
 
         resolveLocal(identifier);
@@ -326,7 +326,7 @@ public final class Resolver implements Visitor<Void> {
     @Override
     public Void visit(ReturnStatement statement) {
         if (currentFunction == FunctionType.NONE) {
-            throw ErrorSystem.error("Can't return from top level code");
+            throw ParserErrors.error("Can't return from top level code");
         }
         if (statement.hasArgument()) {
             resolve(statement.getArgument());
@@ -375,7 +375,7 @@ public final class Resolver implements Visitor<Void> {
         Map<Identifier, Boolean> scope = scopes.peek();
 
         if (scope.containsKey(name)) {
-            throw ErrorSystem.error("Already a variable with this name in this scope: " + name.string());
+            throw ParserErrors.error("Already a variable with this name in this scope: " + name.string());
         }
 
         scope.put(name, false);

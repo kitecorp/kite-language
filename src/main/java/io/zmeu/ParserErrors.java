@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
-public class ErrorSystem {
+public class ParserErrors {
     private static boolean hadRuntimeError = false;
     @Getter
     private static final List<ParseError> errors = new ArrayList<>();

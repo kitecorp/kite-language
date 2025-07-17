@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class ResourceTest extends ParserTest {
     @Test
     void missingLeftBracketError() {
         parse("resource vm main   }");
-        var leftErr = ErrorSystem.getErrors().get(0);
+        var leftErr = ParserErrors.getErrors().get(0);
     }
 
     @Test

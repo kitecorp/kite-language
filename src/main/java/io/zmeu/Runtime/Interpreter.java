@@ -1,6 +1,6 @@
 package io.zmeu.Runtime;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
@@ -694,7 +694,7 @@ public final class Interpreter implements Visitor<Object> {
     public Object visit(Program program) {
         Object lastEval = new NullValue();
 
-        if (ErrorSystem.hadErrors()) {
+        if (ParserErrors.hadErrors()) {
             return null;
         }
         for (Statement i : program.getBody()) {

@@ -7,7 +7,9 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -32,10 +34,35 @@ public final class ArrayExpression extends Expression {
         expression.items = List.of(id);
         return expression;
     }
+
     public static ArrayExpression array(int... id) {
         var expression = new ArrayExpression();
-        for (int i : id) {
+        for (var i : id) {
             expression.add(number(i));
+        }
+        return expression;
+    }
+
+    public static ArrayExpression array(double... id) {
+        var expression = new ArrayExpression();
+        for (var i : id) {
+            expression.add(number(i));
+        }
+        return expression;
+    }
+
+    public static ArrayExpression array(boolean... id) {
+        var expression = new ArrayExpression();
+        for (var i : id) {
+            expression.add(bool(i));
+        }
+        return expression;
+    }
+
+    public static ArrayExpression array(String... id) {
+        var expression = new ArrayExpression();
+        for (var i : id) {
+            expression.add(string(i));
         }
         return expression;
     }
@@ -61,6 +88,7 @@ public final class ArrayExpression extends Expression {
     public boolean hasItems() {
         return !this.items.isEmpty();
     }
+
     public Literal getFirst() {
         return items.getFirst();
     }
