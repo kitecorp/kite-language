@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -110,6 +111,16 @@ public class LiteralTest extends ParserTest {
         var expected = Program.of(
                 expressionStatement(objectExpression(ObjectLiteral.object("a", number(2)))
                 ));
+        assertEquals(expected, res);
+        log.info(printer.visit(res));
+    }
+
+    @Test
+    void testSimpleArray() {
+        var res = (Program) parse("[]");
+        var expected = Program.of(
+                expressionStatement(array())
+        );
         assertEquals(expected, res);
         log.info(printer.visit(res));
     }

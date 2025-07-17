@@ -10,7 +10,7 @@ import io.zmeu.TypeChecker.TypeChecker;
 import io.zmeu.TypeChecker.Types.Type;
 
 public sealed interface Visitor<R>
-        permits Resolver, TypeChecker, Interpreter, AstPrinter, LanguageAstPrinter, SyntaxPrinter {
+        permits Resolver, TypeChecker, Interpreter, AstPrinter, SyntaxPrinter {
 
     default R visit(Expression expr) {
         return switch (expr) {
@@ -31,6 +31,7 @@ public sealed interface Visitor<R>
             case LambdaExpression expression -> visit(expression);
             case Type type -> visit(type);
             case ObjectExpression expression -> visit(expression);
+            case ArrayExpression arrayExpression -> visit(arrayExpression);
         };
     }
 
@@ -101,6 +102,8 @@ public sealed interface Visitor<R>
     R visit(ValDeclaration expression);
 
     R visit(ObjectExpression expression);
+
+    R visit(ArrayExpression expression);
 
     R visit(AssignmentExpression expression);
 

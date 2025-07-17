@@ -68,6 +68,16 @@ public final class AstPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(ArrayExpression expression) {
+        return "[" + expression.getItems()
+                .stream()
+                .map(this::visit)
+                .reduce((a, b) -> a + "," + b)
+                .orElse("")
+               + "]";
+    }
+
+    @Override
     public String visit(AssignmentExpression expression) {
         return parenthesize(expression.getOperator().toString(), expression.getLeft(), expression.getRight());
     }
