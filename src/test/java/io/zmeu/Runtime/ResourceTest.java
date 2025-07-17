@@ -1,7 +1,7 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.Values.ResourceValue;
 import io.zmeu.Runtime.Values.SchemaValue;
 import io.zmeu.Runtime.exceptions.NotFoundException;
@@ -23,7 +23,7 @@ public class ResourceTest extends RuntimeTest {
                 
                 }
                 """);
-        assertFalse(ErrorSystem.getErrors().isEmpty());
+        assertFalse(ParserErrors.getErrors().isEmpty());
     }
 
     /**

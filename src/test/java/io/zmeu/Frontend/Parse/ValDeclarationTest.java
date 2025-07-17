@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,13 +19,13 @@ public class ValDeclarationTest extends ParserTest {
     @Test
     void testDeclaration() {
         parse("val x");
-        assertTrue(ErrorSystem.hadErrors());
+        assertTrue(ParserErrors.hadErrors());
     }
 
     @Test
     void testDeclarations() {
         parse("val x,y");
-        assertTrue(ErrorSystem.hadErrors());
+        assertTrue(ParserErrors.hadErrors());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ValDeclarationTest extends ParserTest {
     @Test
     void testDeclarationsWithValues() {
         var res = parse("val x,y=2");
-        assertEquals("val \"x\" must be initialized", ErrorSystem.getErrors().getFirst().getMessage());
+        assertEquals("val \"x\" must be initialized", ParserErrors.getErrors().getFirst().getMessage());
     }
 
     @Test

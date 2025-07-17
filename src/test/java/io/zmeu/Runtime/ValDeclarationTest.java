@@ -1,7 +1,7 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Parser.Parser;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -17,8 +17,8 @@ public class ValDeclarationTest extends RuntimeTest {
     @Test
     void valNull() {
         var res = eval("val x");
-        Assertions.assertFalse(ErrorSystem.getErrors().isEmpty());
-        Assertions.assertEquals(Parser.VAL_NOT_INITIALISED.formatted("x"), ErrorSystem.getErrors().getFirst().getMessage());
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+        Assertions.assertEquals(Parser.VAL_NOT_INITIALISED.formatted("x"), ParserErrors.getErrors().getFirst().getMessage());
     }
 
     @Test

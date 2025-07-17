@@ -1,6 +1,6 @@
 package io.zmeu.Base;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Tokenizer;
 import io.zmeu.Frontend.Lexical.Resolver;
 import io.zmeu.Frontend.Parser.Parser;
@@ -27,12 +27,12 @@ public class RuntimeTest {
         this.parser = new Parser();
         this.tokenizer = new Tokenizer();
         this.resolver = new Resolver(interpreter);
-        ErrorSystem.clear();
+        ParserErrors.clear();
     }
 
     @AfterEach
     void cleanup() {
-        ErrorSystem.clear();
+        ParserErrors.clear();
         program = null;
     }
 

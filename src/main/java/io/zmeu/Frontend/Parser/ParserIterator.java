@@ -1,6 +1,6 @@
 package io.zmeu.Frontend.Parser;
 
-import io.zmeu.ErrorSystem;
+import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Visitors.AstPrinter;
@@ -87,10 +87,10 @@ public class ParserIterator {
     Token eat(String error, TokenType... type) {
         Token lookAhead = lookAhead();
         if (lookAhead.is(TokenType.EOF)) {
-            throw ErrorSystem.error(error, lookAhead, type);
+            throw ParserErrors.error(error, lookAhead, type);
         }
         if (!lookAhead.is(type)) {
-            throw ErrorSystem.error(error, lookAhead, type);
+            throw ParserErrors.error(error, lookAhead, type);
         }
         return eat();
     }
