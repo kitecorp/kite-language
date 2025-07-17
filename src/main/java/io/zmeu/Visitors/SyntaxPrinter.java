@@ -5,8 +5,19 @@ import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.TypeChecker.Types.Type;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.stream.Collectors;
+
 
 public non-sealed class SyntaxPrinter implements Visitor<String> {
+
+    private static @NotNull String formatParameter(ParameterIdentifier it) {
+        if (it.getType() == null || it.getType().getType() == null) {
+            return it.getName().string();
+        }
+        return it.getName().string() + " :" + it.getType().string();
+    }
 
     public String print(Expression expr) {
         return visit(expr);
@@ -14,12 +25,17 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(BinaryExpression expression) {
-        return "%s %s %s".formatted(visit(expression.getLeft()), expression.getOperator(), visit(expression.getRight()));
+        return visit(expression.getLeft()) + " " + expression.getOperator() + " " + visit(expression.getRight());
     }
 
     @Override
-    public String visit(CallExpression expression) {
-        return null;
+    public String visit(CallExpression<Expression> expression) {
+        var callName = visit(expression.getCallee());
+        var args = expression.getArguments()
+                .stream()
+                .map(this::visit)
+                .collect(Collectors.joining(","));
+        return callName + "(" + args + ")";
     }
 
     @Override
@@ -29,22 +45,17 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(LogicalExpression expression) {
-        return "%s %s %s".formatted(expression.getLeft(), expression.getOperator(), expression.getRight());
+        return "(" + visit(expression.getLeft()) + " " + expression.getOperator().toString() + " " + visit(expression.getRight()) + ")";
     }
 
     @Override
     public String visit(MemberExpression expression) {
-        return null;
+        return visit(expression.getObject()) + "." + visit(expression.getProperty());
     }
-
-//    @Override
-//    public String eval(ResourceExpression expression) {
-//        return "resource " + expression.getName().accept(this) + expression.getBlock().accept(this);
-//    }
 
     @Override
     public String visit(ThisExpression expression) {
-        return null;
+        return "this." + visit(expression.getInstance());
     }
 
     @Override
@@ -54,22 +65,57 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(VarDeclaration expression) {
-        return null;
+        var var = new StringBuilder("var ");
+        if (expression.hasType()) {
+            var.append(expression.getType().getType().getValue()).append(" ");
+        }
+        var.append(expression.getId().string());
+        if (expression.hasInit()) {
+            var.append(" = ").append(visit(expression.getInit()));
+        }
+        return var.toString();
     }
 
     @Override
     public String visit(ValDeclaration expression) {
-        return null;
+        StringBuilder val = new StringBuilder("val");
+        if (expression.hasType()) {
+            val.append(" ")
+                    .append(expression.getType().getType().getValue())
+                    .append(" ");
+        }
+        val.append(expression.getId().string());
+        if (expression.hasInit()) {
+            val.append(" = ").append(visit(expression.getInit()));
+        }
+        return val.toString();
     }
 
     @Override
     public String visit(ObjectExpression expression) {
-        return "";
+        var builder = new StringBuilder("{ ");
+        for (var literal : expression.getProperties()) {
+            builder.append(visit(literal));
+            builder.append("\n");
+        }
+        builder.append(" }");
+        return builder.toString();
+    }
+
+    @Override
+    public String visit(ArrayExpression expression) {
+        var builder = new StringBuilder("[");
+        for (Literal item : expression.getItems()) {
+            builder.append(visit(item));
+            builder.append(", ");
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override
     public String visit(AssignmentExpression expression) {
-        return visit(expression.getLeft()) + expression.getOperator() + visit(expression.getRight());
+        return visit(expression.getLeft()) + " " + expression.getOperator().toString() + " " + visit(expression.getRight());
     }
 
     @Override
@@ -99,12 +145,10 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(Program program) {
-        return "";
-    }
-
-    @Override
-    public String visit(Statement statement) {
-        return "";
+        return program.getBody()
+                .stream()
+                .map(this::visit)
+                .collect(Collectors.joining("\n"));
     }
 
     @Override
@@ -119,32 +163,53 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(FunctionDeclaration statement) {
-        return "";
+        return "fun " +
+               statement.getName().string() +
+               "("
+               + statement.getParams().stream().map(SyntaxPrinter::formatParameter).collect(Collectors.joining(","))
+               + ") "
+               + "{ \n"
+               + visit(statement.getBody())
+               + "\n} \n";
     }
 
     @Override
     public String visit(ExpressionStatement statement) {
-        return "";
+        return visit(statement.getStatement());
     }
 
     @Override
     public String visit(VarStatement statement) {
-        return "";
+        return "var " + statement.getDeclarations()
+                .stream()
+                .map(this::visit)
+                .collect(Collectors.joining(","));
     }
 
     @Override
     public String visit(ValStatement statement) {
-        return "";
+        return "val " + statement.getDeclarations()
+                .stream()
+                .map(this::visit)
+                .collect(Collectors.joining(","));
     }
 
     @Override
     public String visit(IfStatement statement) {
-        return "";
+        var string = new StringBuilder().append("if ").append(visit(statement.getTest())).append("{\n").append(visit(statement.getConsequent())).append("\n}\n");
+        if (statement.hasElse()) {
+            string.append(" else {\n")
+                    .append(visit(statement.getAlternate()))
+                    .append("\n}\n");
+        }
+        return string.toString();
     }
 
     @Override
     public String visit(WhileStatement statement) {
-        return "";
+        return "while (" + visit(statement.getTest()) + ") {\n"
+               + visit(statement.getBody())
+               + "\n}\n";
     }
 
     @Override
@@ -154,17 +219,21 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(SchemaDeclaration statement) {
-        return "";
+        return "schema " + visit(statement.getName()) + " {\n" +
+               visit(statement.getBody())
+               + "\n}\n";
     }
 
     @Override
     public String visit(ReturnStatement statement) {
-        return "";
+        return "return " + visit(statement.getArgument());
     }
 
     @Override
     public String visit(ResourceExpression expression) {
-        return "";
+        return "resource " + visit(expression.getType()) + " " + visit(expression.getName()) + " {\n"
+               + visit(expression.getBlock())
+               + "}\n";
     }
 
     @Override
@@ -182,7 +251,10 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(Identifier expression) {
-        return expression.string();
+        return switch (expression) {
+            case ParameterIdentifier parameterIdentifier -> formatParameter(parameterIdentifier);
+            default -> expression.string();
+        };
     }
 
     @Override
@@ -192,17 +264,23 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(ObjectLiteral expression) {
-        return "";
+        return "%s: %s".formatted(visit(expression.getKey()), visit(expression.getValue()));
     }
 
     @Override
     public String visit(StringLiteral expression) {
-        return expression.getValue();
+        return "\"" + expression.getValue() + "\"";
     }
 
     @Override
     public String visit(BlockExpression expression) {
-        return null;
+        StringBuilder result = new StringBuilder();
+        for (Statement statement : expression.getExpression()) {
+            result.append("\t");
+            result.append(visit(statement));
+            result.append("\n");
+        }
+        return result.toString();
     }
 
     @Override
@@ -218,7 +296,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     private String parenthesize(String name, Expression... exprs) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("(");
+        builder.append("(").append(name);
         for (Expression expr : exprs) {
             builder.append(" ");
             builder.append(visit(expr));

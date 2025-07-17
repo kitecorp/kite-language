@@ -7,7 +7,7 @@ import io.zmeu.Frontend.Parser.Parser;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.Interpreter;
-import io.zmeu.Visitors.LanguageAstPrinter;
+import io.zmeu.Visitors.SyntaxPrinter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -18,7 +18,7 @@ public class RuntimeTest {
     protected Environment global;
     protected Resolver resolver;
     protected Program program;
-    protected LanguageAstPrinter printer = new LanguageAstPrinter();
+    protected SyntaxPrinter printer = new SyntaxPrinter();
 
     @BeforeEach
     void reset() {

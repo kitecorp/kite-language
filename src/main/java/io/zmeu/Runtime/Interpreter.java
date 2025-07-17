@@ -23,7 +23,7 @@ import io.zmeu.Runtime.exceptions.*;
 import io.zmeu.SchemaContext;
 import io.zmeu.TypeChecker.TypeError;
 import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.Visitors.LanguageAstPrinter;
+import io.zmeu.Visitors.SyntaxPrinter;
 import io.zmeu.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -42,7 +42,7 @@ import static io.zmeu.Utils.BoolUtils.isTruthy;
 public final class Interpreter implements Visitor<Object> {
     private static boolean hadRuntimeError;
     @Getter
-    private final LanguageAstPrinter printer = new LanguageAstPrinter();
+    private final SyntaxPrinter printer = new SyntaxPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
     @Getter
     private Environment<Object> env;
@@ -683,6 +683,11 @@ public final class Interpreter implements Visitor<Object> {
             map.put(object.key(), object.value());
         }
         return map;
+    }
+
+    @Override
+    public Object visit(ArrayExpression expression) {
+        throw new RuntimeException("Arrays are not yet supported");
     }
 
     @Override

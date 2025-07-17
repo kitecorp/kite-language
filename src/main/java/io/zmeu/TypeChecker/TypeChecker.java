@@ -8,7 +8,7 @@ import io.zmeu.Runtime.exceptions.InvalidInitException;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.Runtime.exceptions.OperationNotImplementedException;
 import io.zmeu.TypeChecker.Types.*;
-import io.zmeu.Visitors.LanguageAstPrinter;
+import io.zmeu.Visitors.SyntaxPrinter;
 import io.zmeu.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +20,7 @@ import java.util.*;
 
 @Log4j2
 public final class TypeChecker implements Visitor<Type> {
-    private final LanguageAstPrinter printer = new LanguageAstPrinter();
+    private final SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
@@ -644,6 +644,11 @@ public final class TypeChecker implements Visitor<Type> {
         } finally {
             this.env = previous;
         }
+    }
+
+    @Override
+    public Type visit(ArrayExpression expression) {
+        throw new OperationNotImplementedException("Array expression not implemented");
     }
 
     private Type validatePropertyIsString(Identifier key) {
