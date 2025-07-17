@@ -5,6 +5,9 @@ import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class ValDeclaration extends Expression {
@@ -47,6 +50,18 @@ public final class ValDeclaration extends Expression {
         return new ValDeclaration(Identifier.id(id), init);
     }
 
+    public static ValDeclaration val(String id, int init) {
+        return new ValDeclaration(Identifier.id(id), number(init));
+    }
+
+    public static ValDeclaration val(String id, double init) {
+        return new ValDeclaration(Identifier.id(id), number(init));
+    }
+
+    public static ValDeclaration val(String id, String init) {
+        return new ValDeclaration(Identifier.id(id), string(init));
+    }
+
     public static ValDeclaration val(String id, TypeIdentifier type) {
         return new ValDeclaration(Identifier.id(id), type);
     }
@@ -67,7 +82,6 @@ public final class ValDeclaration extends Expression {
     public static ValDeclaration val(String id) {
         return new ValDeclaration(Identifier.id(id));
     }
-
 
 
     public static ValDeclaration val(String id, TypeIdentifier type, Expression init) {
