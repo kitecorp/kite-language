@@ -26,6 +26,7 @@ import java.util.List;
 import static io.zmeu.Frontend.Lexer.TokenType.*;
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
@@ -532,20 +533,61 @@ public class Parser {
 
     private Expression Expression() {
         return switch (lookAhead().type()) {
-            case OpenBraces -> {
-                if (IsLookAheadAfter(Identifier, Colon)) {
-                    blockContext = BlockContext.OBJECT;
-                }
-                Expression expression;
-                if (blockContext == BlockContext.OBJECT) {
-                    expression = ObjectDeclaration();
-                } else {
-                    expression = BlockExpression();
-                }
-                yield expression;
-            }
+            case OpenBraces -> ObjectExpression();
+            case OpenBrackets -> ArrayExpression();
             default -> AssignmentExpression();
         };
+    }
+
+    private @NotNull Expression ObjectExpression() {
+        if (IsLookAheadAfter(Identifier, Colon)) {
+            blockContext = BlockContext.OBJECT;
+        }
+        Expression expression;
+        if (blockContext == BlockContext.OBJECT) {
+            expression = ObjectDeclaration();
+        } else {
+            expression = BlockExpression();
+        }
+        return expression;
+    }
+
+    private Expression ArrayExpression() {
+        eat(OpenBrackets);
+        Expression expression = OptArray();
+        eat(CloseBrackets);
+        return expression;
+    }
+
+    private @NotNull Expression OptArray() {
+        return IsLookAhead(CloseBrackets)? array(): ArrayItems(); 
+    }
+
+    /**
+     * Parse array items. First item declares the type of the array and all following items must be of the same type
+     */
+    private ArrayExpression ArrayItems() {
+        var array = new ArrayExpression();
+        do {
+            array.add(ArrayItem(array));
+        } while (!IsLookAhead(CloseBrackets) &&
+                 !IsLookAhead(EOF) &&
+                 IsLookAhead(Comma) &&
+                 eat(Comma) != null);
+        return array;
+    }
+
+    private Literal ArrayItem(ArrayExpression array) {
+        eat(Number, String, True, False, Object, Identifier);
+        var item = Literal();
+
+        if (array.hasItems()) {
+            var first = array.getFirst();
+            if (!first.getClass().equals(item.getClass())) {
+                throw new IllegalStateException("Array items must be of the same type: " + first.getClass() + " != " + item.getClass());
+            }
+        }
+        return item;
     }
 
     /**
@@ -591,7 +633,7 @@ public class Parser {
         eat(CloseParenthesis, "Expected ')' but got: " + lookAhead());
         var type = typeParser.identifier();
 
-        Statement body = ExpressionStatement.expressionStatement(BlockExpression());
+        Statement body = expressionStatement(BlockExpression());
         return FunctionDeclaration.fun(name, params, type, body);
     }
 
@@ -624,7 +666,7 @@ public class Parser {
         var params = OptParameterList();
         eat(CloseParenthesis);
 
-        Statement body = ExpressionStatement.expressionStatement(BlockExpression());
+        Statement body = expressionStatement(BlockExpression());
         return InitStatement.of(params, body);
     }
 
