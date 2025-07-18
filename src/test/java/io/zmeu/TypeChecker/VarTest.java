@@ -102,6 +102,22 @@ public class VarTest extends CheckerTest {
     }
 
     @Test
+    void testImplicitMatchExplicit() {
+        eval("""
+                var number a = 42;
+                """);
+        var ta = checker.getEnv().lookup("a");
+        assertEquals(ValueType.Number, ta);
+    }
+
+    @Test
+    void testImplicitNotMatchExplicit() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var number a = true;
+                """));
+    }
+
+    @Test
     void testInferTypeFromValVar() {
         eval("""
                 val a = 42;

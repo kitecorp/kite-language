@@ -170,6 +170,23 @@ public class ValTest extends CheckerTest {
         assertEquals(ValueType.Number, tb);
     }
 
+
+    @Test
+    void testImplicitMatchExplicit() {
+        eval("""
+                val number a = 42;
+                """);
+        var ta = checker.getEnv().lookup("a");
+        assertEquals(ValueType.Number, ta);
+    }
+
+    @Test
+    void testImplicitNotMatchExplicit() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                val number a = true;
+                """));
+    }
+
     /**
      * val x = "foo";
      * val number y = x;  // should TypeError
