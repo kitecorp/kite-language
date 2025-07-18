@@ -583,6 +583,7 @@ public class Parser {
     private Expression ArrayItem() {
         return switch (lookAhead().type()) {
             case Identifier -> SymbolIdentifier(); // Identifier() also checks for types
+            case OpenBraces -> ObjectExpression();
             default -> {
                 eat(Number, String, True, False, Object);
                 yield Literal();

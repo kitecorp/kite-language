@@ -648,7 +648,17 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ArrayExpression expression) {
-        throw new OperationNotImplementedException("Array expression not implemented");
+        if (expression.isEmpty()) {
+            return ArrayType.ARRAY_TYPE;
+        }
+        var firstType = visit(expression.getItems().get(0));
+        for (Expression item : expression.getItems()) {
+            var itemType = visit(item);
+            if (!Objects.equals(itemType, firstType)) {
+                throw new TypeError("Array items must be of the same type: %s != %s".formatted(itemType, firstType));
+            }
+        }
+        return new ArrayType(env, firstType);
     }
 
     private Type validatePropertyIsString(Identifier key) {
