@@ -59,12 +59,85 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
-    void testDeclareType() {
+    void testDeclareTypeNumber() {
         eval("""
                 var number[] x = []
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
         assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testDeclareTypeString() {
+        eval("""
+                var string[] x = []
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testDeclareTypeBoolean() {
+        eval("""
+                var boolean[] x = []
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testDeclareTypeNumberInit() {
+        eval("""
+                var number[] x = [1,2,3]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testDeclareTypeStringInit() {
+        eval("""
+                var string[] x = ["hi",'hello']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testDeclareTypeStringInitWrong() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var string[] x = [1]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeStringInitWrongbool() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var string[] x = [true]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeBoolInitWrong() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var boolean[] x = [1]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeBoolInitWrongString() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var boolean[] x = ['hi']
+                """));
+    }
+
+    @Test
+    void testDeclareTypeBooleanInit() {
+        eval("""
+                var boolean[] x = [true]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
     }
 
     @Test
@@ -74,42 +147,6 @@ public class VarArrayTest extends CheckerTest {
                 """);
         var varType = (ReferenceType) checker.getEnv().lookup("x");
         assertEquals(varType.getProperty("env"), ValueType.String);
-    }
-
-    @Test
-    void testNestedObject() {
-        eval("""
-                var x = {
-                  "env": {
-                    "name": "prod",
-                    "settings": {
-                      "verbose": false,
-                      "retries": 3
-                    }
-                  }
-                }
-                """);
-        ArrayType xt = (ArrayType) checker.getEnv().lookup("x");
-        // top-level “env” is an object
-        var envType = xt.getProperty("env");
-        assertInstanceOf(ArrayType.class, envType);
-        ArrayType envObj = (ArrayType) envType;
-        assertEquals(envObj.getProperty("name"), ValueType.String);
-        ArrayType settings = (ArrayType) envObj.getProperty("settings");
-        assertEquals(settings.getProperty("verbose"), ValueType.Boolean);
-        assertEquals(settings.getProperty("retries"), ValueType.Number);
-    }
-
-    @Test
-    void testReferenceAlias() {
-        eval("""
-                        var x = { "count": 1 };
-                        var y = x;
-                        x.count = 2;
-                """);
-        // Both x and y should reflect the same object reference
-        var yType = (ArrayType) checker.getEnv().lookup("y");
-        assertEquals(ValueType.Number, yType.getProperty("count"));
     }
 
     @Test

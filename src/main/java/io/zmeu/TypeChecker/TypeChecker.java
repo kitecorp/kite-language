@@ -195,6 +195,12 @@ public final class TypeChecker implements Visitor<Type> {
             String string = "Expected type `" + expectedType + "` but got `" + actualType + "` in expression: " + printer.visit(expectedVal);
             throw new TypeError(string);
         }
+        if (actualType instanceof ArrayType arrayType && expectedType instanceof ArrayType expectedArrayType) {
+            if (!Objects.equals(arrayType.getType(), expectedArrayType.getType())) {
+                String string = "Expected type `" + expectedArrayType.getType() + "` but got `" + arrayType.getType() + "` in expression: " + printer.visit(expectedVal);
+                throw new TypeError(string);
+            }
+        }
         return actualType;
     }
 
@@ -575,7 +581,7 @@ public final class TypeChecker implements Visitor<Type> {
         var implicitType = visit(expression.getInit());
         if (expression.hasType()) {
             var explicitType = visit(expression.getType());
-            handleArrayType(implicitType, explicitType);
+            handleArrayType(implicitType,explicitType);
             expect(implicitType, explicitType, expression);
             if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
