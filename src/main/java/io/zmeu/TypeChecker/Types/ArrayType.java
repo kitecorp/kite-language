@@ -13,11 +13,11 @@ import org.jetbrains.annotations.Nullable;
 public final class ArrayType extends ReferenceType {
     public static final ArrayType ARRAY_TYPE = new ArrayType(null);
     /**
-     * type of the first element in the array which defines all the other element types
+     * type of the first element in the array which defines all the other element types or type of the declared array
      */
     @Getter
     @Setter
-    private Type implicitType;
+    private Type type;
     @Setter
     @Getter
     private boolean immutable = false;
@@ -26,9 +26,9 @@ public final class ArrayType extends ReferenceType {
         super(SystemType.ARRAY, environment);
     }
 
-    public ArrayType(@Nullable TypeEnvironment environment, Type implicitType) {
+    public ArrayType(@Nullable TypeEnvironment environment, Type type) {
         this(environment);
-        this.implicitType = implicitType;
+        this.type = type;
     }
 
 

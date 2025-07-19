@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public final class TypeIdentifier extends Identifier {
+public sealed class TypeIdentifier extends Identifier permits ArrayTypeIdentifier {
     private Type type;
     private PathIdentifier path;
 
