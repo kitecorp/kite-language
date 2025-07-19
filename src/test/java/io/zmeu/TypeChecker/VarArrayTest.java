@@ -59,12 +59,85 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
-    void testDeclareType() {
+    void testDeclareTypeNumber() {
         eval("""
                 var number[] x = []
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
         assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testDeclareTypeString() {
+        eval("""
+                var string[] x = []
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testDeclareTypeBoolean() {
+        eval("""
+                var boolean[] x = []
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testDeclareTypeNumberInit() {
+        eval("""
+                var number[] x = [1,2,3]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testDeclareTypeStringInit() {
+        eval("""
+                var string[] x = ["hi",'hello']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testDeclareTypeStringInitWrong() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var string[] x = [1]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeStringInitWrongbool() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var string[] x = [true]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeBoolInitWrong() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var boolean[] x = [1]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeBoolInitWrongString() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var boolean[] x = ['hi']
+                """));
+    }
+
+    @Test
+    void testDeclareTypeBooleanInit() {
+        eval("""
+                var boolean[] x = [true]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
     }
 
     @Test

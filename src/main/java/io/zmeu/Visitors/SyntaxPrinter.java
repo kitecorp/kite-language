@@ -7,6 +7,7 @@ import io.zmeu.Frontend.Parser.Statements.*;
 import io.zmeu.TypeChecker.Types.Type;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -105,9 +106,13 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(ArrayExpression expression) {
         var builder = new StringBuilder("[");
-        for (var item : expression.getItems()) {
+        List<Expression> items = expression.getItems();
+        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
+            var item = items.get(i);
             builder.append(visit(item));
-            builder.append(", ");
+            if (i < itemsSize - 1) {
+                builder.append(", ");
+            }
         }
         builder.append("]");
         return builder.toString();
