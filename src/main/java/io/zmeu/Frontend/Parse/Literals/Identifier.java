@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract sealed class Identifier extends Expression
-        permits ParameterIdentifier, PathIdentifier, PluginIdentifier, SymbolIdentifier, TypeIdentifier {
+        permits ParameterIdentifier, PathIdentifier, PluginIdentifier, SymbolIdentifier, TypeIdentifier{
     @Setter
     @Getter
     private Integer hops; // used to figure out the scope without creating extra classes

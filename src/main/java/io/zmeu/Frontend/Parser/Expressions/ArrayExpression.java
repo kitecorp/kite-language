@@ -1,5 +1,6 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
+import io.zmeu.Frontend.Parse.Literals.ArrayTypeIdentifier;
 import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parse.Literals.Literal;
 import lombok.Data;
@@ -19,8 +20,14 @@ public final class ArrayExpression extends Expression {
      * Literal or Identifeir (var/val)
      */
     private List<Expression> items;
+    private ArrayTypeIdentifier type;
 
     public ArrayExpression() {
+        this.items = new ArrayList<>();
+    }
+
+    public ArrayExpression(ArrayTypeIdentifier type) {
+        this.type = type;
         this.items = new ArrayList<>();
     }
 
@@ -91,6 +98,10 @@ public final class ArrayExpression extends Expression {
 
     public static ArrayExpression array() {
         return new ArrayExpression();
+    }
+
+    public static ArrayExpression array(ArrayTypeIdentifier type) {
+        return new ArrayExpression(type);
     }
 
     public void add(Expression expression) {

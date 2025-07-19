@@ -462,6 +462,9 @@ public class Parser {
             if (HasType()) { // type not mandatory outside a schema
                 type = typeParser.identifier();
             }
+            if (IsLookAhead(OpenBrackets)) {
+                type = ArrayDeclaration(type);
+            }
         }
         var id = Identifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : VarInitializer();
@@ -550,6 +553,34 @@ public class Parser {
             expression = BlockExpression();
         }
         return expression;
+    }
+
+    /**
+     * ArrayDeclaration
+     * ; []
+     * | '[' NumberLiteral ']'
+     * | '[' ForStatement ']'
+     */
+    private ArrayTypeIdentifier ArrayDeclaration(TypeIdentifier type) {
+        eat(OpenBrackets);
+        var expression = OptArrayDeclaration(type);
+        eat(CloseBrackets);
+        return expression;
+    }
+
+    private ArrayTypeIdentifier OptArrayDeclaration(TypeIdentifier type) {
+        if (IsLookAhead(CloseBrackets)){
+            return new ArrayTypeIdentifier(type);
+        }else if (IsLookAhead(Number)) {
+            eat(Number);
+            var array = new ArrayTypeIdentifier(type);
+            array.add(Literal());
+            return array;
+        } else if (IsLookAhead(For)) {
+            throw new RuntimeException("For declaration in array not supported yet: " + getIterator().getCurrent());
+        } else {
+            throw new RuntimeException("Can't index an array using token: " + getIterator().getCurrent());
+        }
     }
 
     private Expression ArrayExpression() {

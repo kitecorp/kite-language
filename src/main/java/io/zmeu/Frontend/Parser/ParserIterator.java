@@ -1,8 +1,8 @@
 package io.zmeu.Frontend.Parser;
 
-import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
+import io.zmeu.ParserErrors;
 import io.zmeu.Visitors.AstPrinter;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +26,17 @@ public class ParserIterator {
         this.iterator = tokens.listIterator();
     }
 
+    private static boolean isComplexType(ListIterator<Token> iterator) {
+        while (iterator.hasNext()) {
+            var next = iterator.next();
+            if (next.is(TokenType.Dot, TokenType.OpenBrackets, TokenType.CloseBrackets)) {
+                continue;
+            }
+            return next.is(TokenType.Identifier);
+        }
+        return false;
+    }
+
     public boolean hasNext() {
         return iterator.hasNext();
     }
@@ -40,7 +51,6 @@ public class ParserIterator {
         }
         return false;
     }
-
 
     boolean IsLookAheadAfter(TokenType after, TokenType... type) {
         int index = this.iterator.previousIndex() + 1;
@@ -151,16 +161,5 @@ public class ParserIterator {
             default -> false;
         };
 
-    }
-
-    private static boolean isComplexType(ListIterator<Token> iterator) {
-        while (iterator.hasNext()) {
-            var next = iterator.next();
-            if (next.is(TokenType.Dot)) {
-                continue;
-            }
-            return next.is(TokenType.Identifier);
-        }
-        return false;
     }
 }

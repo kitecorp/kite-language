@@ -55,12 +55,22 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(Identifier expression) {
-        if (expression instanceof TypeIdentifier identifier) {
-            Type type = env.lookup(identifier.getType().getValue());
-            return Objects.requireNonNullElseGet(type, () -> TypeFactory.fromString(identifier.getType().getValue()));
-        } else if (expression instanceof SymbolIdentifier identifier) {
-            Type type = env.lookup(identifier.getSymbol());
-            return Objects.requireNonNullElseGet(type, () -> TypeFactory.fromString(identifier.getSymbol()));
+        switch (expression) {
+            case ArrayTypeIdentifier identifier -> {
+                Type type = env.lookup(identifier.getType().getValue());
+                var res = Optional.ofNullable(type).orElseGet(() -> TypeFactory.fromString(identifier.getType().getValue()));
+                return new ArrayType(env, res);
+            }
+            case TypeIdentifier identifier -> {
+                Type type = env.lookup(identifier.getType().getValue());
+                return Optional.ofNullable(type).orElseGet(() -> TypeFactory.fromString(identifier.getType().getValue()));
+            }
+            case SymbolIdentifier identifier -> {
+                Type type = env.lookup(identifier.getSymbol());
+                return Optional.ofNullable(type).orElseGet(() -> TypeFactory.fromString(identifier.getSymbol()));
+            }
+            case null, default -> {
+            }
         }
         throw new TypeError(expression.string());
     }
@@ -186,6 +196,20 @@ public final class TypeChecker implements Visitor<Type> {
             throw new TypeError(string);
         }
         return actualType;
+    }
+
+    /**
+     * Explicit type declaration should allow assigning empty array like
+     * type[] name = []
+     */
+    private static void handleArrayType(Type implicit, Type explicit) {
+        if (explicit != null && explicit.getKind() == SystemType.ARRAY && implicit.getKind() == SystemType.ARRAY) {
+            if (implicit instanceof ArrayType arrayType && arrayType.getType() == null) {
+                if (explicit instanceof ArrayType expectedArrayType) {
+                    arrayType.setType(expectedArrayType.getType());
+                }
+            }
+        }
     }
 
     private Type expect(Type actualType, Type expectedType, Statement actualVal, Statement expectedVal) {
@@ -551,6 +575,7 @@ public final class TypeChecker implements Visitor<Type> {
         var implicitType = visit(expression.getInit());
         if (expression.hasType()) {
             var explicitType = visit(expression.getType());
+            handleArrayType(implicitType, explicitType);
             expect(implicitType, explicitType, expression);
             if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
