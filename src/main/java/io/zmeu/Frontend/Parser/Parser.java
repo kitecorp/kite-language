@@ -451,21 +451,7 @@ public class Parser {
      * ;
      */
     private VarDeclaration VarDeclaration() {
-        TypeIdentifier type = null;
-        if (context == SchemaContext.SCHEMA) {
-            if (HasType()) { // type mandatory inside a schema. Init/default value is optional
-                type = typeParser.identifier();
-            } else {
-                throw new RuntimeException("Type declaration expected during schema declaration: var " + printer.visit(Identifier()));
-            }
-        } else {
-            if (HasType()) { // type not mandatory outside a schema
-                type = typeParser.identifier();
-            }
-            if (IsLookAhead(OpenBrackets)) {
-                type = ArrayDeclaration(type);
-            }
-        }
+        var type = TypeIdentifier();
         var id = Identifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : VarInitializer();
         return VarDeclaration.of(id, type, init);
@@ -477,18 +463,7 @@ public class Parser {
      * ;
      */
     private ValDeclaration ValDeclaration() {
-        TypeIdentifier type = null;
-        if (context == SchemaContext.SCHEMA) {
-            if (HasType()) { // type mandatory inside a schema. Init/default value is optional
-                type = typeParser.identifier();
-            } else {
-                throw new RuntimeException("Type declaration expected during schema declaration: val " + Identifier().string());
-            }
-        } else {
-            if (HasType()) { // type not mandatory outside a schema
-                type = typeParser.identifier();
-            }
-        }
+        var type = TypeIdentifier();
         var id = Identifier();
         if (context != SchemaContext.SCHEMA) {
             if (!IsLookAhead(Equal)) {
@@ -497,6 +472,25 @@ public class Parser {
         }
         var init = ValInitializer();
         return ValDeclaration.val(id, type, init);
+    }
+
+    private TypeIdentifier TypeIdentifier() {
+        if (context == SchemaContext.SCHEMA) {
+            if (HasType()) { // type mandatory inside a schema. Init/default value is optional
+                return typeParser.identifier();
+            } else {
+                throw new RuntimeException("Type declaration expected during schema declaration: var " + printer.visit(Identifier()));
+            }
+        } else {
+            TypeIdentifier type = null;
+            if (HasType()) { // type not mandatory outside a schema
+                type = typeParser.identifier();
+            }
+            if (IsLookAhead(OpenBrackets)) {
+                type = ArrayDeclaration(type);
+            }
+            return type;
+        }
     }
 
 
