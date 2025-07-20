@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 public sealed class ReferenceType extends Type permits ArrayType, ObjectType, ResourceType, SchemaType {
     public static final ReferenceType Resource = new ReferenceType(SystemType.RESOURCE);
-    public static final ReferenceType Array = new ReferenceType(SystemType.ARRAY);
     public static final ReferenceType Object = new ReferenceType(SystemType.OBJECT);
     public static final ReferenceType Schema = new ReferenceType(SystemType.SCHEMA);
 
