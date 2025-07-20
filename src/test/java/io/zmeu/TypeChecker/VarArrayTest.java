@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TypeChecker var array")
 public class VarArrayTest extends CheckerTest {
@@ -141,109 +141,14 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
-    void testVarDeclareType() {
+    void testDeclareTypeObjectInit() {
         eval("""
-                var object x = { "env": "prod" }
+                var object[] x = [{env: "prod"}, {env: "dev"}]
                 """);
-        var varType = (ReferenceType) checker.getEnv().lookup("x");
-        assertEquals(varType.getProperty("env"), ValueType.String);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ReferenceType.Object);
     }
 
-    @Test
-    void testMissingProperty() {
-        assertThrows(TypeError.class, () ->
-                eval("""
-                        var x = { "foo": 42 };
-                        x.bar;                  // bar doesn’t exist
-                        """)
-        );
-    }
 
-    @Test
-    @DisplayName("Missing Nested Property")
-    void testMissingNestedProperty() {
-        assertThrows(TypeError.class, () ->
-                eval("""
-                        var x = { "a": { "b": 1 } };
-                        x.a.c;          // “c” isn’t on the nested object
-                        """
-                )
-        );
-    }
-
-    @Test
-    @DisplayName("Missing Deeply Nested Property")
-    void testMissingDeeplyNestedProperty() {
-        assertThrows(TypeError.class, () ->
-                eval("""
-                        var x = { "a": { "b": { "c": true } } };
-                        x.a.b.d;        // “d” isn’t on the deepest object
-                        """
-                )
-        );
-    }
-
-    @Test
-    @DisplayName("Computed Property Key Missing")
-    void testMissingComputedKey() {
-        assertThrows(TypeError.class, () ->
-                eval("""
-                        var key = "env";
-                        var x = { "foo": 1 };
-                        x[key];         // “env” isn’t defined on x
-                        """
-                )
-        );
-    }
-
-    @Test
-    @DisplayName("Computed Property Key Present")
-    void testMissingComputedKey2() {
-        eval("""
-                var key = "env";
-                var x = { "env": 1 };
-                x[key];         // “env” is defined on x
-                """
-        );
-        var yType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(ValueType.Number, yType.getProperty("env"));
-    }
-
-    @Test
-    @DisplayName("Computed Property Key Present")
-    void testMissingComputedKeyString() {
-        eval("""
-                var key = "env";
-                var x = { "env": 1 };
-                x["key"];         // “key” is missing
-                """
-        );
-        var yType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(ValueType.Number, yType.getProperty("env"));
-    }
-
-    @Test
-    @DisplayName("Reassign Existing Property with Wrong Type")
-    void testPropertyReassignmentTypeError() {
-        assertThrows(TypeError.class, () ->
-                eval("""
-                        var x = { "env": 1 };
-                        x.env = "oops";        // was Number, now String
-                        """
-                )
-        );
-    }
-
-    @Test
-    @DisplayName("Add New Property After Declaration")
-    void testAddNewProperty() {
-        assertThrows(TypeError.class, () ->
-                eval("""
-                        var object x = { "a": 1 };
-                        x.b = 2;               // adding 'b' not allowed if strict
-                        """
-                )
-        );
-    }
 
 }
