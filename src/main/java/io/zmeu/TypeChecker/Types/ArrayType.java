@@ -30,7 +30,4 @@ public final class ArrayType extends ReferenceType {
         this(environment);
         this.type = type;
     }
-
-
-
 }

@@ -209,11 +209,12 @@ public final class TypeChecker implements Visitor<Type> {
      * type[] name = []
      */
     private static void handleArrayType(Type implicit, Type explicit) {
-        if (explicit != null && explicit.getKind() == SystemType.ARRAY && implicit.getKind() == SystemType.ARRAY) {
-            if (implicit instanceof ArrayType arrayType && arrayType.getType() == null) {
-                if (explicit instanceof ArrayType expectedArrayType) {
-                    arrayType.setType(expectedArrayType.getType());
-                }
+        if (explicit == null || explicit.getKind() != SystemType.ARRAY || implicit.getKind() != SystemType.ARRAY) {
+            return;
+        }
+        if (implicit instanceof ArrayType implicitArray && implicitArray.getType() == null) {
+            if (explicit instanceof ArrayType expectedArrayType) {
+                implicitArray.setType(expectedArrayType.getType());
             }
         }
     }
@@ -680,7 +681,7 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(ArrayExpression expression) {
         if (expression.isEmpty()) {
-            return ArrayType.ARRAY_TYPE;
+            return new ArrayType(env);
         }
         var firstType = visit(expression.getItems().get(0));
         for (Expression item : expression.getItems()) {
