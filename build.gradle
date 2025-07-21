@@ -10,7 +10,7 @@ repositories {
     mavenCentral()
 }
 
-def lombok = '1.18.36'
+def lombok = '1.18.38'
 
 dependencies {
     implementation project(':api')
