@@ -33,6 +33,21 @@ public final class TypeChecker implements Visitor<Type> {
         this.env = environment;
     }
 
+    /**
+     * Explicit type declaration should allow assigning empty array like
+     * type[] name = []
+     */
+    private static void handleArrayType(Type implicit, Type explicit) {
+        if (explicit == null || explicit.getKind() != SystemType.ARRAY || implicit.getKind() != SystemType.ARRAY) {
+            return;
+        }
+        if (implicit instanceof ArrayType implicitArray && implicitArray.getType() == null) {
+            if (explicit instanceof ArrayType expectedArrayType) {
+                implicitArray.setType(expectedArrayType.getType());
+            }
+        }
+    }
+
     @Override
     public Type visit(Program program) {
         Type type = ValueType.Null;
@@ -51,7 +66,6 @@ public final class TypeChecker implements Visitor<Type> {
             throw exception;
         }
     }
-
 
     @Override
     public Type visit(Identifier expression) {
@@ -202,21 +216,6 @@ public final class TypeChecker implements Visitor<Type> {
             }
         }
         return actualType;
-    }
-
-    /**
-     * Explicit type declaration should allow assigning empty array like
-     * type[] name = []
-     */
-    private static void handleArrayType(Type implicit, Type explicit) {
-        if (explicit == null || explicit.getKind() != SystemType.ARRAY || implicit.getKind() != SystemType.ARRAY) {
-            return;
-        }
-        if (implicit instanceof ArrayType implicitArray && implicitArray.getType() == null) {
-            if (explicit instanceof ArrayType expectedArrayType) {
-                implicitArray.setType(expectedArrayType.getType());
-            }
-        }
     }
 
     private Type expect(Type actualType, Type expectedType, Statement actualVal, Statement expectedVal) {
@@ -569,7 +568,7 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(VarDeclaration expression) {
         String var = expression.getId().string();
         if (expression.hasInit()) {
-            return initType(expression, var);
+            return initType(expression, expression.getInit(), expression.getType(), var);
         } else if (expression.hasType()) {
             var explicitType = visit(expression.getType());
             return env.init(var, explicitType);
@@ -578,31 +577,6 @@ public final class TypeChecker implements Visitor<Type> {
         }
     }
 
-    private Type initType(VarDeclaration expression, String var) {
-        var implicitType = visit(expression.getInit());
-        if (expression.hasType()) {
-            var explicitType = visit(expression.getType());
-            handleArrayType(implicitType,explicitType);
-            expect(implicitType, explicitType, expression);
-            if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
-                // when it's an object implicit type is the object + all of it's env variable types { name: string }
-                // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
-                return env.init(var, implicitType);
-            }
-            return env.init(var, explicitType);
-        } else if (implicitType == ValueType.Null) {
-            throw new TypeError("Explicit type declaration required for: " + printer.visit(expression));
-        }
-        if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
-            // only needed when var is string because this var could be used to access a member on an object
-            if (expression.getInit() instanceof StringLiteral stringLiteral) {
-                return env.init(var, new StringType(stringLiteral.getValue()));
-            } else {
-                return env.init(var, visit(expression.getInit()));
-            }
-        }
-        return env.init(var, implicitType);
-    }
 
     @Override
     public Type visit(ValDeclaration expression) {
@@ -611,7 +585,7 @@ public final class TypeChecker implements Visitor<Type> {
             vals.add(var);
             Type returnType;
             if (expression.hasInit()) {
-                returnType = initType(expression, var);
+                returnType = initType(expression, expression.getInit(), expression.getType(), var);
             } else if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
                 returnType = env.init(var, explicitType);
@@ -631,10 +605,11 @@ public final class TypeChecker implements Visitor<Type> {
     /**
      * Check if implicit type (after the =) is the same as explicit type
      */
-    private Type initType(ValDeclaration expression, String var) {
-        var implicitType = visit(expression.getInit());
-        if (expression.hasType()) { // val type name
-            var explicitType = visit(expression.getType());
+    private Type initType(Expression expression, Expression init, TypeIdentifier typeIdentifier, String var) {
+        var implicitType = visit(init);
+        if (typeIdentifier != null) { // val type name
+            var explicitType = visit(typeIdentifier);
+            handleArrayType(implicitType, explicitType);
             expect(implicitType, explicitType, expression);
             if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
@@ -647,11 +622,11 @@ public final class TypeChecker implements Visitor<Type> {
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // member assignment like val x = a.b.c
-            if (expression.getInit() instanceof StringLiteral stringLiteral) {
+            if (init instanceof StringLiteral stringLiteral) {
                 // only needed when val is string because this val could be used to access a member on an object
                 return env.init(var, new StringType(stringLiteral.getValue()));
             } else {
-                return env.init(var, visit(expression.getInit())); // x[key] we need to find value of variable key so we store it here
+                return env.init(var, visit(init)); // x[key] we need to find value of variable key so we store it here
             }
         } else {
             return env.init(var, implicitType);
