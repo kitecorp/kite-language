@@ -150,5 +150,44 @@ public class ValArrayTest extends CheckerTest {
     }
 
 
+    @Test
+    void testReassign() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        val boolean[] x = []
+                        x=[]
+                        """)
+        );
+    }
+
+    @Test
+    void testAppend() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        val boolean[] x = []
+                        x += [true]
+                        """)
+        );
+    }
+
+    @Test
+    void testReassignNumber() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        val number[] x = []
+                        x=[]
+                        """)
+        );
+    }
+
+    @Test
+    void testAppendNumber() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        val number[] x = []
+                        x += [1]
+                        """)
+        );
+    }
 
 }

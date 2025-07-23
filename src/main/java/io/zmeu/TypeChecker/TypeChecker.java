@@ -210,7 +210,9 @@ public final class TypeChecker implements Visitor<Type> {
             throw new TypeError(string);
         }
         if (actualType instanceof ArrayType arrayType && expectedType instanceof ArrayType expectedArrayType) {
-            if (!Objects.equals(arrayType.getType().getKind(), expectedArrayType.getType().getKind())) {
+            if (arrayType.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
+                return expectedArrayType;
+            } else if (!Objects.equals(arrayType.getType().getKind(), expectedArrayType.getType().getKind())) {
                 String string = "Expected type `" + expectedArrayType.getType() + "` but got `" + arrayType.getType() + "` in expression: " + printer.visit(expectedVal);
                 throw new TypeError(string);
             }
