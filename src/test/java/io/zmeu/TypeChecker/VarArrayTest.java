@@ -150,5 +150,52 @@ public class VarArrayTest extends CheckerTest {
     }
 
 
+    @Test
+    void testReassign() {
+        eval("""
+                var boolean[] x = []
+                x=[true]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testAppend() {
+        eval("""
+                var boolean[] x = []
+                x += [true]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testReassignNumber() {
+        eval("""
+                var number[] x = []
+                x=[1]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testAppendNumber() {
+        eval("""
+                var number[] x = []
+                x += [1]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testAppendWrongType() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var number[] x = []
+                x += [true]
+                """));
+    }
 
 }
