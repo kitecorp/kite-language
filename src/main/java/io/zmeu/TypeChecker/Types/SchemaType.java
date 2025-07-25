@@ -7,14 +7,13 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class SchemaType extends ReferenceType {
 
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Getter
     private final TypeEnvironment instances;
 
@@ -31,16 +30,5 @@ public final class SchemaType extends ReferenceType {
         return instances.lookup(fieldName);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof SchemaType that)) return false;
-        if (!super.equals(o)) return false;
-        return Objects.equals(getEnvironment(), that.getEnvironment()) &&
-               Objects.equals(instances, that.instances);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), instances);
-    }
 }

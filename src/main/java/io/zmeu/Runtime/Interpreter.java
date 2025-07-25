@@ -1,6 +1,5 @@
 package io.zmeu.Runtime;
 
-import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Lexer.Token;
 import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
@@ -8,6 +7,7 @@ import io.zmeu.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
+import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.Environment.ActivationEnvironment;
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.Functions.Cast.BooleanCastFunction;
@@ -282,7 +282,7 @@ public final class Interpreter implements Visitor<Object> {
 
     private List<Class> allowTypes(String op) {
         return switch (op) {
-            case "+" ->List.of(
+            case "+" -> List.of(
                     NumberLiteral.class,
                     StringLiteral.class,
                     SymbolIdentifier.class,
@@ -575,19 +575,32 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(SchemaDeclaration expression) {
+        var environment = new Environment<>(env);
+        context = SchemaContext.SCHEMA;
+
+        for (var property : expression.getProperties()) {
+            if (property.defaultValue() instanceof BlockExpression blockExpression) {
+                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
+            } else {
+                environment.init(property.name().string(), visit(property.defaultValue()));
+            }
+        }
+        context = null;
+        var name = expression.getName();
+        return env.init(name.string(), SchemaValue.of(name, environment)); // install the type into the global env
 //        switch (expression.getProperties()) {
 //            case ExpressionStatement statement when statement.getStatement() instanceof BlockExpression blockExpression -> {
-//                var typeEnv = new Environment<>(env);
+//                var environment = new Environment<>(env);
 //                context = SchemaContext.SCHEMA;
-//                executeBlock(blockExpression.getExpression(), typeEnv); // install properties/methods of a type into the environment
+//                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
 //                context = null;
 //                var name = expression.getName();
-//                return env.init(name.string(), SchemaValue.of(name, typeEnv)); // install the type into the global env
+//                return env.init(name.string(), SchemaValue.of(name, environment)); // install the type into the global env
 //            }
 //            case null, default -> {
 //            }
 //        }
-        throw new RuntimeException("Invalid declaration:" + expression.getName());
+//        throw new RuntimeException("Invalid declaration: " + printer.visit(expression));
     }
 
     @Override
