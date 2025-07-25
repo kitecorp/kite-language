@@ -60,8 +60,8 @@ public class ResourceTest extends RuntimeTest {
     void resourceIsDefinedInSchema() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
+                    string name
+                    number maxCount=0
                 }
                 resource vm main {
                     name = "first"
@@ -98,8 +98,8 @@ public class ResourceTest extends RuntimeTest {
     void checkNumberOfDependencies() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
+                    string name
+                    number maxCount=0
                 }
                 resource vm main {
                     name = "first"
@@ -125,8 +125,8 @@ public class ResourceTest extends RuntimeTest {
     void checkMultipleOfDependenciesAreAddedToDependencyList() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
+                    string name
+                    number maxCount=0
                 }
                 resource vm main {
                     name = vm.third.name
@@ -156,8 +156,8 @@ public class ResourceTest extends RuntimeTest {
     void checkMultipleOfDependenciesAreAddedToDependencyListEarly() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
+                    string name
+                    number maxCount=0
                 }
                 resource vm second {
                     name = "second"
@@ -191,9 +191,9 @@ public class ResourceTest extends RuntimeTest {
     void resourceIsDefinedInSchemaDependencyFirst() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
-                    var number minCount=0
+                    string name
+                    number maxCount=0
+                    number minCount=0
                 }
                 resource vm second {
                     name = "second"
@@ -233,9 +233,9 @@ public class ResourceTest extends RuntimeTest {
     void evalDependencyFirstMissingProperty() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
-                    var number minCount=1
+                    string name
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource vm second {
                     name = "second"
@@ -274,9 +274,9 @@ public class ResourceTest extends RuntimeTest {
     void evalMultipleDependencies() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
-                    var number minCount=1
+                    string name
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource vm main {
                     name = "main"
@@ -325,9 +325,9 @@ public class ResourceTest extends RuntimeTest {
     void evalChainOfDependencies() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
-                    var number minCount=1
+                    string name
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource vm main {
                     name = "main"
@@ -377,9 +377,9 @@ public class ResourceTest extends RuntimeTest {
     void evalChainOfDependenciesDefaultSchema() {
         var res = eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
-                    var number minCount=1
+                    string name
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource vm main {
                     name = "main"
@@ -428,9 +428,9 @@ public class ResourceTest extends RuntimeTest {
     void circularSimpleDependencies() {
         assertThrows(RuntimeException.class, () -> eval("""
                 schema vm { 
-                    var string name
-                    var number maxCount=0
-                    var number minCount=1
+                    string name
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource  main vm {
                     name = "main"
@@ -449,9 +449,9 @@ public class ResourceTest extends RuntimeTest {
     void cycleDetectionSelf() {
         assertThrows(RuntimeException.class, () -> eval("""
                 schema vm { 
-                    var string name 
-                    var number maxCount=0
-                    var number minCount=1
+                    string name 
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource vm main {
                     name = "main"
@@ -466,9 +466,9 @@ public class ResourceTest extends RuntimeTest {
     void circularIndirectDependency() {
         assertThrows(RuntimeException.class, () -> eval("""
                 schema vm { 
-                    var string name 
-                    var number maxCount=0
-                    var number minCount=1
+                    string name 
+                    number maxCount=0
+                    number minCount=1
                 }
                 resource vm a {
                     name = "a"
@@ -504,7 +504,7 @@ public class ResourceTest extends RuntimeTest {
     void resourceInheritsDefaultSchemaValue() {
         var res = eval("""
                 schema vm {
-                   var number x = 2
+                   number x = 2
                 }
                 
                 resource vm main {
@@ -524,7 +524,7 @@ public class ResourceTest extends RuntimeTest {
     void resourceInheritsDefaultSchemaValueVal() {
         var res = eval("""
                 schema vm {
-                   val number x = 2
+                   number x = 2
                 }
                 
                 resource vm main {
@@ -544,7 +544,7 @@ public class ResourceTest extends RuntimeTest {
     void existingResourceGetsParsed() {
         var res = eval("""
                 schema vm {
-                   var number x = 2
+                   number x = 2
                 }
                 
                 existing resource vm main {
@@ -564,7 +564,7 @@ public class ResourceTest extends RuntimeTest {
     void resourceMemberAccess() {
         var res = eval("""
                 schema vm {
-                   var number x = 2
+                   number x = 2
                 }
                 
                 resource vm main  {
@@ -601,7 +601,7 @@ public class ResourceTest extends RuntimeTest {
     void resourceSetMemberAccess() {
         assertThrows(RuntimeError.class, () -> eval("""
                 schema vm {
-                   var number x = 2
+                   number x = 2
                 }
                 
                 resource vm  main {
@@ -615,7 +615,7 @@ public class ResourceTest extends RuntimeTest {
     void resourceInit() {
         var res = eval("""
                 schema vm {
-                   var number x = 2
+                   number x = 2
                 }
                 
                 resource vm main {
@@ -640,7 +640,7 @@ public class ResourceTest extends RuntimeTest {
     void resourceInitJson() {
         var res = eval("""
                 schema vm {
-                   var number x = 2
+                   number x = 2
                 }
                 
                 resource vm main  {
