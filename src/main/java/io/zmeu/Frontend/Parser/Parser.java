@@ -535,7 +535,7 @@ public class Parser {
     }
 
     private @NotNull Expression ObjectExpression() {
-        if (IsLookAheadAfter(Identifier, Colon)) {
+        if (IsLookAheadAfter(Identifier, Colon) || context == SchemaContext.SCHEMA) {
             blockContext = BlockContext.OBJECT;
         }
         Expression expression;
@@ -679,8 +679,13 @@ public class Parser {
     }
 
     private List<SchemaProperty> SchemaProperties() {
+        if (IsLookAhead(CloseBraces)) return Collections.emptyList();
+
         var params = new ArrayList<SchemaProperty>();
-        while (IsLookAhead(SemiColon, NewLine) && eat(SemiColon, NewLine) != null && !IsLookAhead(CloseBraces)) {
+        while (IsLookAhead(SemiColon, NewLine) && eatAll(SemiColon, NewLine) != null && !IsLookAhead(CloseBraces)) {
+            if (IsLookAhead(NewLine)) {
+                continue;
+            }
             params.add(SchemaProperty());
         }
 
@@ -688,7 +693,7 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        var type =  TypeIdentifier();
+        var type = TypeIdentifier();
         var name = Identifier();
         Expression value = null;
         if (IsLookAhead(Equal) && eat(Equal) != null) {
@@ -1210,6 +1215,16 @@ public class Parser {
 
     public Token eat(TokenType... type) {
         return iterator.eat("Expected token: %s but it was %s".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+    }
+
+    public Token eatAll(TokenType... type) {
+        Token token = null;
+        for (TokenType tokenType : type) {
+            if (IsLookAhead(tokenType)) {
+                token = eat(tokenType);
+            }
+        }
+        return token;
     }
 
     public Token eat(List<TokenType> list) {

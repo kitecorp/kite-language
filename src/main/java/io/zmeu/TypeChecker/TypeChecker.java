@@ -510,8 +510,20 @@ public final class TypeChecker implements Visitor<Type> {
 
         var schemaType = new SchemaType(name.string(), env);
         env.init(name, schemaType);
-
-//        executeBlock(blockExpression.getExpression(), schemaType.getEnvironment());
+        for (var property : body) {
+            var t1 = visit(property.type());
+            if (property.defaultValue() instanceof BlockExpression objectExpression) {
+                var t2 = executeBlock(objectExpression.getExpression(), schemaType.getEnvironment());
+                expect(t2, t1, property.defaultValue());
+                schemaType.setProperty(property.name().string(), t2);
+            } else {
+                var t2 = visit(property.defaultValue());
+                if (t2 != null) { // when property is not initialised
+                    expect(t2, t1, property.defaultValue());
+                }
+                schemaType.setProperty(property.name().string(), t1);
+            }
+        }
 
         return schemaType;
     }
