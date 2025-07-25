@@ -64,6 +64,10 @@ public class SchemaValue {
         return environment.get(key);
     }
 
+    public @Nullable boolean has(String key) {
+        return environment.hasVar(key);
+    }
+
     public Object init(String name, Object value) {
         return environment.init(name,value);
     }

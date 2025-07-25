@@ -51,10 +51,10 @@ public class SchemaTest extends RuntimeTest {
                     var int x
                 }
                 """);
-        log.warn((res));
+        log.warn(res);
         var actual = (SchemaValue) global.get("Vm");
 
-        assertNull(actual.getEnvironment().get("x"));
+        assertTrue(actual.has("x"));
     }
 
     @Disabled
