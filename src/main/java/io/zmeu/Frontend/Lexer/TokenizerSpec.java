@@ -60,7 +60,7 @@ class TokenizerSpec {
 // --------------------------------- Keywords --------------------------------------------------------
 //            new Entry("^\\blambda\\b", TokenType.Lambda),
             new Entry("^\\bvar\\b", TokenType.Var),
-            new Entry("^\\bval\\b", TokenType.Val),
+//            new Entry("^\\bval\\b", TokenType.Val),
             new Entry("^\\bif\\b", TokenType.If),
             new Entry("^\\belse\\b", TokenType.Else),
             new Entry("^\\bwhile\\b", TokenType.While),

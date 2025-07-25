@@ -5,6 +5,7 @@ import io.zmeu.Runtime.Values.FunValue;
 import io.zmeu.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class SchemaTest extends RuntimeTest {
     void declare() {
         var res = eval("""
                 schema Vm {
-                    
+                
                 }
                 """);
         log.warn((res));
@@ -33,7 +34,7 @@ public class SchemaTest extends RuntimeTest {
         var res = eval("""
                 schema Vm {
                     fun test(){
-                    
+                
                     }
                 }
                 """);
@@ -45,6 +46,20 @@ public class SchemaTest extends RuntimeTest {
 
     @Test
     void declareWithVariable() {
+        var res = eval("""
+                schema Vm {
+                    var int x
+                }
+                """);
+        log.warn((res));
+        var actual = (SchemaValue) global.get("Vm");
+
+        assertNull(actual.getEnvironment().get("x"));
+    }
+
+    @Disabled
+    @Test
+    void declareWithValVar() {
         var res = eval("""
                 schema Vm {
                     var int x
@@ -63,6 +78,33 @@ public class SchemaTest extends RuntimeTest {
         var res = eval("""
                 schema Vm {
                     var int x = 20.2
+                }
+                """);
+        log.warn((res));
+        var actual = (SchemaValue) global.get("Vm");
+
+        Assertions.assertEquals(20.2, actual.getEnvironment().get("x"));
+    }
+
+    @Test
+    void declareWithVariableInitString() {
+        var res = eval("""
+                schema Vm {
+                    var string x = "hello"
+                }
+                """);
+        log.warn((res));
+        var actual = (SchemaValue) global.get("Vm");
+
+        Assertions.assertEquals("hello", actual.getEnvironment().get("x"));
+    }
+
+    @Test
+    @Disabled
+    void declareWithVarValInit() {
+        var res = eval("""
+                schema Vm {
+                    var int x = 20.2
                     val int y = 20.2 // init can be a default value schema
                 }
                 """);
@@ -74,7 +116,8 @@ public class SchemaTest extends RuntimeTest {
     }
 
     @Test
-    void declareWithVariableInitString() {
+    @Disabled
+    void declareWithVariableValInitString() {
         var res = eval("""
                 schema Vm {
                     var string x = "hello"
@@ -93,7 +136,7 @@ public class SchemaTest extends RuntimeTest {
         var res = eval("""
                 schema Vm {
                     init(){
-                       
+                
                     }
                 }
                 """);
@@ -103,12 +146,13 @@ public class SchemaTest extends RuntimeTest {
 
         Assertions.assertEquals(FunValue.of("init", actual.getEnvironment()), actual.getEnvironment().lookup("init"));
     }
+
     @Test
     void initDeclarationWithParams() {
         var res = eval("""
                 schema Vm {
                     init(object x){
-                       
+                
                     }
                 }
                 """);
@@ -116,11 +160,27 @@ public class SchemaTest extends RuntimeTest {
         log.warn((res));
         var actual = (SchemaValue) global.get("Vm");
 
-        Assertions.assertEquals(FunValue.of("init", List.of(param("x","object")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
+        Assertions.assertEquals(FunValue.of("init", List.of(param("x", "object")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
     }
 
     @Test
     void initDeclarationWithParamsAssignment() {
+        var res = eval("""
+                schema Vm {
+                    var number x = 1;
+                }
+                """);
+
+        log.warn(res);
+        var actual = (SchemaValue) global.get("Vm");
+
+        assertEquals(res, actual);
+        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
+    }
+
+    @Test
+    @Disabled
+    void initDeclarationWithParamsValVarAssignment() {
         var res = eval("""
                 schema Vm {
                     var number x = 1;
@@ -141,6 +201,23 @@ public class SchemaTest extends RuntimeTest {
         var res = eval("""
                 schema Vm {
                     var Number x = 1;
+                }
+                """);
+
+        log.warn((res));
+        var actual = (SchemaValue) global.get("Vm");
+
+        assertNotNull(res);
+        assertEquals(res, actual);
+        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
+    }
+
+    @Test
+    @Disabled
+    void initDeclarationWithPathTypeVarVal() {
+        var res = eval("""
+                schema Vm {
+                    var Number x = 1;
                     val Number y = 1;
                 }
                 """);
@@ -155,10 +232,25 @@ public class SchemaTest extends RuntimeTest {
     }
 
     @Test
-    void initDeclarationWithWrontInit() {
+    void initDeclarationWithWrongVar() {
         var res = eval("""
                 schema Vm {
                     var Number x  = "test";
+                }
+                """);
+
+        log.warn((res));
+        var actual = (SchemaValue) global.get("Vm");
+
+        assertNotNull(res);
+        assertEquals(res, actual);
+    }
+
+    @Test
+    @Disabled
+    void initDeclarationWithWrontInit() {
+        var res = eval("""
+                schema Vm {
                     val Number y  = "test";
                 }
                 """);

@@ -8,6 +8,7 @@ import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.Runtime.exceptions.RuntimeError;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -519,6 +520,7 @@ public class ResourceTest extends RuntimeTest {
     }
 
     @Test
+    @Disabled
     void resourceInheritsDefaultSchemaValueVal() {
         var res = eval("""
                 schema vm {

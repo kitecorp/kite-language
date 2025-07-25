@@ -151,7 +151,7 @@ public class Parser {
                 case Resource, Existing -> ResourceDeclaration();
                 case Module -> ModuleDeclaration();
                 case Var -> VarDeclarations();
-                case Val -> ValDeclarations();
+//                case Val -> ValDeclarations();
                 default -> Statement();
             };
         } catch (RuntimeException error) {
@@ -297,7 +297,7 @@ public class Parser {
      * ;
      */
     private Statement ValDeclarations() {
-        eat(Val);
+//        eat(Val);
         var statement = ValStatementInit();
         return statement;
     }

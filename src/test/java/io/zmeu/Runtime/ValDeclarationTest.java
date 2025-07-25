@@ -5,12 +5,14 @@ import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Parser.Parser;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j2
+@Disabled
 public class ValDeclarationTest extends RuntimeTest {
 
 

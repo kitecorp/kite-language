@@ -5,6 +5,7 @@ import io.zmeu.Frontend.Parse.Literals.NullLiteral;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -321,6 +322,7 @@ class BooleanTest extends CheckerTest {
 
 
     @Test
+    @Disabled
     void testObjectEqual() {
         var type = eval("""
                 val x = { "env": "prod" }
@@ -331,6 +333,7 @@ class BooleanTest extends CheckerTest {
     }
 
     @Test
+    @Disabled
     void testObjectNotEqual() {
         var type = eval("""
                 val x = { "env": "prod" }

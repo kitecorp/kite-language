@@ -46,7 +46,7 @@ public enum TokenType {
     True("true"),
     Fun("fun"),
     Type("type"),
-    Val("val"),
+//    Val("val"),
     Var("var"),
     Param("param"),
     This("this"),
@@ -196,7 +196,7 @@ public enum TokenType {
             case "schema" -> Schema;
             case "return" -> Return;
             case "fun" -> Fun;
-            case "val" -> Val;
+//            case "val" -> Val;
             case "if" -> If;
             case "else" -> Else;
             case "while" -> While;

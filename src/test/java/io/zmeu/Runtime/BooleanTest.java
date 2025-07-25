@@ -3,6 +3,7 @@ package io.zmeu.Runtime;
 import io.zmeu.Base.RuntimeTest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -374,6 +375,7 @@ class BooleanTest extends RuntimeTest {
 
 
     @Test
+    @Disabled
     void testObjectEqual() {
         var type = (boolean) eval("""
                 val x = { "env": "prod" }
@@ -384,6 +386,7 @@ class BooleanTest extends RuntimeTest {
     }
 
     @Test
+    @Disabled
     void testObjectNotEqual() {
         var type = (boolean) eval("""
                 val x = { "env": "prod" }
@@ -394,6 +397,7 @@ class BooleanTest extends RuntimeTest {
     }
 
     @Test
+    @Disabled
     void testObjectNotEqualTrue() {
         var type = (boolean) eval("""
                 val x = { "env": "dev" }

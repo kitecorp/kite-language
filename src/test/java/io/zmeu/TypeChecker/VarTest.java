@@ -4,6 +4,7 @@ import io.zmeu.Base.CheckerTest;
 import io.zmeu.Runtime.exceptions.NotFoundException;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -118,6 +119,7 @@ public class VarTest extends CheckerTest {
     }
 
     @Test
+    @Disabled
     void testInferTypeFromValVar() {
         eval("""
                 val a = 42;
@@ -130,6 +132,7 @@ public class VarTest extends CheckerTest {
     }
 
     @Test
+    @Disabled
     void testInferTypeFromVarVal() {
         eval("""
                 var a = 42;

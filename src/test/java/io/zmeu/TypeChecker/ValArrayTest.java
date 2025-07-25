@@ -3,6 +3,7 @@ package io.zmeu.TypeChecker;
 import io.zmeu.Base.CheckerTest;
 import io.zmeu.TypeChecker.Types.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TypeChecker val array")
+@Disabled
 public class ValArrayTest extends CheckerTest {
 
     @Test
