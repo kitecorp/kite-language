@@ -29,6 +29,9 @@ import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
+import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
+import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 
 
@@ -558,9 +561,9 @@ public class Parser {
     }
 
     private ArrayTypeIdentifier OptArrayDeclaration(TypeIdentifier type) {
-        if (IsLookAhead(CloseBrackets)){
+        if (IsLookAhead(CloseBrackets)) {
             return new ArrayTypeIdentifier(type);
-        }else if (IsLookAhead(Number)) {
+        } else if (IsLookAhead(Number)) {
             eat(Number);
             var array = new ArrayTypeIdentifier(type);
             array.add(Literal());
@@ -665,12 +668,33 @@ public class Parser {
      */
     private Statement SchemaDeclaration() {
         eat(Schema);
-        var packageIdentifier = Identifier();
+        var schemaName = Identifier();
 
         context = SchemaContext.SCHEMA;
-        Expression body = BlockExpression();
+        eat(OpenBraces);
+        var body = SchemaProperties();
+        eat(CloseBraces);
         context = null;
-        return SchemaDeclaration.of(packageIdentifier, body);
+        return schema(schemaName, body);
+    }
+
+    private List<SchemaProperty> SchemaProperties() {
+        var params = new ArrayList<SchemaProperty>();
+        while (IsLookAhead(SemiColon, NewLine) && eat(SemiColon, NewLine) != null && !IsLookAhead(CloseBraces)) {
+            params.add(SchemaProperty());
+        }
+
+        return params;
+    }
+
+    private SchemaProperty SchemaProperty() {
+        var type =  TypeIdentifier();
+        var name = Identifier();
+        Expression value = null;
+        if (IsLookAhead(Equal) && eat(Equal) != null) {
+            value = Expression();
+        }
+        return schemaProperty(name, type, value);
     }
 
     /**

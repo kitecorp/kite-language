@@ -129,7 +129,7 @@ public class SchemaTest extends CheckerTest {
     void singlePropertyInitThrows() {
         Assertions.assertThrows(TypeError.class, () -> checker.visit(src("""
                 schema Vm {
-                   var  number  x   = true
+                   number  x   = true
                 }
                 """)));
     }

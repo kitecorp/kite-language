@@ -94,15 +94,6 @@ public class Factory {
         return (VarStatement) VarStatement.varStatement(VarDeclaration.of(id, type));
     }
 
-    public static SchemaDeclaration schema(Identifier type, Statement statement) {
-        return (SchemaDeclaration) SchemaDeclaration.of(type, statement);
-    }
-
-    public static SchemaDeclaration schema(Identifier type, Expression statement) {
-        return (SchemaDeclaration) SchemaDeclaration.of(type, statement);
-    }
-
-
     public static BlockExpression block(Statement operator) {
         return BlockExpression.block(operator);
     }

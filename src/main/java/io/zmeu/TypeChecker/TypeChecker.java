@@ -506,16 +506,14 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(SchemaDeclaration schema) {
         var name = schema.getName();
-        var body = schema.getBody();
+        var body = schema.getProperties();
 
         var schemaType = new SchemaType(name.string(), env);
         env.init(name, schemaType);
 
-        if (schema.getBody() instanceof ExpressionStatement statement && statement.getStatement() instanceof BlockExpression blockExpression) {
-            executeBlock(blockExpression.getExpression(), schemaType.getEnvironment());
-            return schemaType;
-        }
-        throw new RuntimeException("Invalid schema declaration: " + schema.getName());
+//        executeBlock(blockExpression.getExpression(), schemaType.getEnvironment());
+
+        return schemaType;
     }
 
     @Override

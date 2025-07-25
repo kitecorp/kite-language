@@ -1,65 +1,86 @@
 package io.zmeu.Frontend.Parser.Statements;
 
 import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parse.Literals.StringLiteral;
 import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import io.zmeu.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class SchemaDeclaration extends Statement {
     private Identifier name;
-    private Statement body;
+    private List<SchemaProperty> properties;
 
-    public SchemaDeclaration(Identifier name, @Nullable Statement body) {
+    public SchemaDeclaration(Identifier name, @Nullable List<SchemaProperty> properties) {
         this();
         this.name = name;
-        this.body = body;
+        this.properties = properties;
     }
 
-    public SchemaDeclaration(TypeIdentifier name, @Nullable Statement body) {
+    public SchemaDeclaration(TypeIdentifier name, @Nullable List<SchemaProperty> properties) {
         this();
         this.name = name;
-        this.body = body;
+        this.properties = properties;
     }
 
-    public SchemaDeclaration(Identifier name, @Nullable Expression body) {
-        this(name, ExpressionStatement.expressionStatement(body));
+    public SchemaDeclaration(TypeIdentifier name, @Nullable SchemaProperty... properties) {
+        this(name, List.of(properties));
     }
 
     public SchemaDeclaration() {
     }
 
-    public static Statement of(Identifier test, Expression body) {
-        return new SchemaDeclaration(test, body);
+    public static Statement schema(Identifier name, @Nullable SchemaProperty... properties) {
+        return new SchemaDeclaration(name, List.of(properties));
     }
 
-    public static Statement of(Identifier test, Statement body) {
-        return new SchemaDeclaration(test, body);
+    public static Statement schema(Identifier name, @Nullable List<SchemaProperty> properties) {
+        return new SchemaDeclaration(name, properties);
     }
 
-    public static Statement of(Identifier test, int value) {
-        return new SchemaDeclaration(test, NumberLiteral.of(value));
-    }
+    public record SchemaProperty(Identifier name, TypeIdentifier type, Expression defaultValue) {
 
-    public static Statement of(Identifier test, double value) {
-        return new SchemaDeclaration(test, NumberLiteral.of(value));
-    }
+        public SchemaProperty(Identifier name, String type) {
+            this(name, TypeIdentifier.type(type));
+        }
 
-    public static Statement of() {
-        return new SchemaDeclaration();
-    }
+        public SchemaProperty(Identifier name, TypeIdentifier type) {
+            this(name, type, null);
+        }
 
-    public static Statement of(Identifier test, float value) {
-        return new SchemaDeclaration(test, NumberLiteral.of(value));
-    }
+        public SchemaProperty(Identifier name, String type, Expression defaultValue) {
+            this(name, TypeIdentifier.type(type), defaultValue);
+        }
 
-    public static Statement of(Identifier test, String value) {
-        return new SchemaDeclaration(test, StringLiteral.of(value));
-    }
 
+        public static SchemaProperty schemaProperty(Identifier name, String type) {
+            return new SchemaProperty(name, type);
+        }
+
+        public static SchemaProperty schemaProperty(Identifier name, TypeIdentifier type) {
+            return new SchemaProperty(name, type);
+        }
+
+        public static SchemaProperty schemaProperty(Identifier name, TypeIdentifier type, Expression defaultValue) {
+            return new SchemaProperty(name, type, defaultValue);
+        }
+
+        public static SchemaProperty schemaProperty(String name, TypeIdentifier type, Expression defaultValue) {
+            return schemaProperty(Identifier.id(name), type, defaultValue);
+        }
+
+        public static SchemaProperty schemaProperty(String name, TypeIdentifier type, int defaultValue) {
+            return schemaProperty(Identifier.id(name), type, number(defaultValue));
+        }
+
+        public static SchemaProperty schemaProperty(Identifier name, String type, Expression defaultValue) {
+            return new SchemaProperty(name, type, defaultValue);
+        }
+    }
 }
