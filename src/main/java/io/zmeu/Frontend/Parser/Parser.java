@@ -342,12 +342,7 @@ public class Parser {
 
     private Expression BlockExpression(String errorOpen, String errorClose) {
         eat(OpenBraces, errorOpen);
-        Expression res;
-        if (IsLookAhead(CloseBraces)) {
-            res = block(Collections.emptyList());
-        } else {
-            res = block(StatementList(CloseBraces));
-        }
+        Expression res = IsLookAhead(CloseBraces) ? block(Collections.emptyList()) : block(StatementList(CloseBraces));
         if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
             eat(CloseBraces, errorClose);
         }
@@ -665,10 +660,7 @@ public class Parser {
 
     /**
      * SchemaDeclaration
-     * schema Name '{'
-     * VarDeclaration
-     * ValDeclaration
-     * '}'
+     * schema Name '{' SchemaProperty* '}'
      * ;
      */
     private Statement SchemaDeclaration() {
