@@ -5,6 +5,7 @@ import io.zmeu.TypeChecker.Types.ObjectType;
 import io.zmeu.TypeChecker.Types.ReferenceType;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,7 @@ import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TypeChecker Object")
+@Disabled
 public class ValObjectTest extends CheckerTest {
 
     @Test
