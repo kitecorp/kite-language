@@ -575,18 +575,18 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(SchemaDeclaration expression) {
-        switch (expression.getBody()) {
-            case ExpressionStatement statement when statement.getStatement() instanceof BlockExpression blockExpression -> {
-                var typeEnv = new Environment<>(env);
-                context = SchemaContext.SCHEMA;
-                executeBlock(blockExpression.getExpression(), typeEnv); // install properties/methods of a type into the environment
-                context = null;
-                var name = expression.getName();
-                return env.init(name.string(), SchemaValue.of(name, typeEnv)); // install the type into the global env
-            }
-            case null, default -> {
-            }
-        }
+//        switch (expression.getProperties()) {
+//            case ExpressionStatement statement when statement.getStatement() instanceof BlockExpression blockExpression -> {
+//                var typeEnv = new Environment<>(env);
+//                context = SchemaContext.SCHEMA;
+//                executeBlock(blockExpression.getExpression(), typeEnv); // install properties/methods of a type into the environment
+//                context = null;
+//                var name = expression.getName();
+//                return env.init(name.string(), SchemaValue.of(name, typeEnv)); // install the type into the global env
+//            }
+//            case null, default -> {
+//            }
+//        }
         throw new RuntimeException("Invalid declaration:" + expression.getName());
     }
 

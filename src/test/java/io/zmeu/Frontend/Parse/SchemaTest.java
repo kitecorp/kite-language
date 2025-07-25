@@ -1,20 +1,15 @@
 package io.zmeu.Frontend.Parse;
 
 import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.BlockExpression;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
-import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Factory.program;
-import static io.zmeu.Frontend.Parser.Factory.schema;
-import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
+import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
+import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -22,39 +17,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SchemaTest extends ParserTest {
 
     @Test
-    @Disabled
     void schemaDeclaration() {
         var actual = (Program) parse("""
                 schema square { 
-                    var Vm x =1
-                    val Vm y =1
+                    Vm x =1
+                    Vm y =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        BlockExpression.block(
-                                var(id("x"), type("Vm"), number(1)),
-                                valStatement(val(id("y"), type("Vm"), number(1))))
-                ));
-        log.warn((actual));
-        assertEquals((expected), (actual));
+                        schemaProperty("x", type("Vm"), 1),
+                        schemaProperty("y", type("Vm"), 1)
+                )
+        );
+        log.warn(actual);
+        assertEquals(expected, actual);
     }
 
     @Test
-    @Disabled
     void schemaDeclarationVar() {
         var actual = (Program) parse("""
                 schema square { 
-                    var Vm x =1
+                    Vm x =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        BlockExpression.block(
-                                var(id("x"), type("Vm"), number(1))
-                        )));
-        log.warn((actual));
-        assertEquals((expected), (actual));
+                        schemaProperty("x", type("Vm"), 1)
+                ));
+        log.warn(actual);
+        assertEquals(expected, actual);
     }
 
 }

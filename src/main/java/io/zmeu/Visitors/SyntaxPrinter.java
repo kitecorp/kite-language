@@ -224,9 +224,18 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(SchemaDeclaration statement) {
-        return "schema " + visit(statement.getName()) + " {\n" +
-               visit(statement.getBody())
-               + "\n}\n";
+        var builder = new StringBuilder("schema ");
+        builder.append(visit(statement.getName()));
+        builder.append(" {\n");
+        for (SchemaDeclaration.SchemaProperty property : statement.getProperties()) {
+            builder.append("\t");
+            builder.append(visit(property.type()));
+            builder.append(" ");
+            builder.append(property.name().string());
+            builder.append("\n");
+        }
+        builder.append("}\n");
+        return builder.toString();
     }
 
     @Override
