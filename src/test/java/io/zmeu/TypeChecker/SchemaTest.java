@@ -42,7 +42,7 @@ public class SchemaTest extends CheckerTest {
     void singleProperty() {
         var actual = checker.visit(src("""
                 schema Vm {
-                   number   x  
+                   var number   x  
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());
@@ -56,7 +56,7 @@ public class SchemaTest extends CheckerTest {
     void singlePropertyObject() {
         var actual = checker.visit(src("""
                 schema Vm {
-                   object   x  
+                   var object   x  
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());
@@ -73,7 +73,7 @@ public class SchemaTest extends CheckerTest {
         Assertions.assertThrows(TypeError.class, () -> {
             checker.visit(src("""
                     schema Vm {
-                       object   x  = false
+                       var object   x  = false
                     }
                     """));
         });
@@ -83,7 +83,7 @@ public class SchemaTest extends CheckerTest {
     void singlePropertyInit() {
         var actual = checker.visit(src("""
                 schema Vm {
-                   number    x = 1
+                   var number    x = 1
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());
@@ -97,7 +97,7 @@ public class SchemaTest extends CheckerTest {
     void objectInit() {
         var actual = checker.visit(src("""
                 schema Vm {
-                   object x = {
+                   var object x = {
                      size: 1
                    }
                 }
@@ -114,7 +114,7 @@ public class SchemaTest extends CheckerTest {
     void singlePropertyInitThrows() {
         Assertions.assertThrows(TypeError.class, () -> checker.visit(src("""
                 schema Vm {
-                   number  x   = true
+                   var number  x   = true
                 }
                 """)));
     }
@@ -123,8 +123,8 @@ public class SchemaTest extends CheckerTest {
     void multipleProperty() {
         var actual = checker.visit(src("""
                 schema Vm {
-                   number x  
-                   string y  
+                   var number x  
+                   var string y  
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());
@@ -139,8 +139,8 @@ public class SchemaTest extends CheckerTest {
     void multiplePropertyInit() {
         var actual = checker.visit(src("""
                 schema Vm {
-                   number x   = 2
-                   string y   = "test"
+                   var number x   = 2
+                   var string y   = "test"
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());

@@ -1,12 +1,12 @@
 package io.zmeu.Frontend.Parser.Expressions;
 
 import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
 import io.zmeu.Frontend.Parser.Statements.VarStatement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 
 @Data
@@ -55,14 +55,15 @@ public final class VarDeclaration extends Expression {
     }
 
     public static VarDeclaration var(String id, int init) {
-        return new VarDeclaration(Identifier.id(id), NumberLiteral.number(init));
+        return new VarDeclaration(Identifier.id(id), number(init));
     }
+
     public static VarDeclaration var(String id, String init) {
         return new VarDeclaration(Identifier.id(id), string(init));
     }
 
     public static VarDeclaration var(String id, double init) {
-        return new VarDeclaration(Identifier.id(id), NumberLiteral.number(init));
+        return new VarDeclaration(Identifier.id(id), number(init));
     }
 
     public static VarDeclaration var(String id, TypeIdentifier type) {
@@ -102,6 +103,14 @@ public final class VarDeclaration extends Expression {
 
     public static VarDeclaration var(String id, TypeIdentifier type, Expression init) {
         return VarDeclaration.of(Identifier.id(id), type, init);
+    }
+
+    public static VarDeclaration var(String id, TypeIdentifier type, int init) {
+        return VarDeclaration.of(Identifier.id(id), type, number(init));
+    }
+
+    public String name() {
+        return id.string();
     }
 
     public boolean hasInit() {
