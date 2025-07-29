@@ -451,7 +451,7 @@ public class Parser {
     private VarDeclaration VarDeclaration() {
         var type = TypeIdentifier();
         var id = Identifier();
-        var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : VarInitializer();
+        var init = IsLookAhead(lineTerminator, Comma, CloseBraces, EOF) ? null : VarInitializer();
         return VarDeclaration.of(id, type, init);
     }
 
@@ -682,8 +682,8 @@ public class Parser {
         if (IsLookAhead(CloseBraces)) return Collections.emptyList();
 
         var params = new ArrayList<SchemaProperty>();
-        while (IsLookAhead(SemiColon, NewLine) && eatAll(SemiColon, NewLine) != null && !IsLookAhead(CloseBraces)) {
-            if (IsLookAhead(NewLine)) {
+        while (IsLookAhead(lineTerminator) && eat(lineTerminator) != null && !IsLookAhead(CloseBraces)) {
+            if (IsLookAhead(lineTerminator)) {
                 continue;
             }
             params.add(SchemaProperty());
@@ -693,13 +693,8 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        var type = TypeIdentifier();
-        var name = Identifier();
-        Expression value = null;
-        if (IsLookAhead(Equal) && eat(Equal) != null) {
-            value = Expression();
-        }
-        return schemaProperty(name, type, value);
+        var statement = (VarStatement) VarDeclarations();
+        return schemaProperty(statement.getDeclarations().get(0));
     }
 
     /**
@@ -1219,7 +1214,7 @@ public class Parser {
 
     public Token eatAll(TokenType... type) {
         Token token = null;
-        for (TokenType tokenType : type) {
+        for (var tokenType : type) {
             if (IsLookAhead(tokenType)) {
                 token = eat(tokenType);
             }
@@ -1228,7 +1223,13 @@ public class Parser {
     }
 
     public Token eat(List<TokenType> list) {
-        return list.stream().map(this::eat).findFirst().orElse(null);
+        Token token = null;
+        for (var tokenType : list) {
+            if (IsLookAhead(tokenType)) {
+                token = eat(tokenType);
+            }
+        }
+        return token;
     }
 
     public Token eat(TokenType type, String error) {

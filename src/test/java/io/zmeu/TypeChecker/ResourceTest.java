@@ -57,9 +57,9 @@ public class ResourceTest extends CheckerTest {
     void resourceIsDefinedInSchema() {
         eval("""
                 schema vm {
-                    string name
-                    number maxCount = 0
-                    boolean enabled  = true
+                    var string name
+                    var number maxCount = 0
+                    var boolean enabled  = true
                 }
                 resource vm main {
                     name     = "first"
@@ -84,9 +84,9 @@ public class ResourceTest extends CheckerTest {
     void propertyAccessThroughOtherResource() {
         eval("""
                 schema vm {
-                    string name
-                    number maxCount = 0
-                    boolean enabled  = true
+                    var string name
+                    var number maxCount = 0
+                    var boolean enabled  = true
                 }
                 resource vm main {
                     name     = "first"
@@ -136,7 +136,7 @@ public class ResourceTest extends CheckerTest {
     void resourceInheritsDefaultSchemaValue() {
         var res = eval("""
                 schema vm {
-                   number x = 2
+                   var number x = 2
                 }
                 
                 resource vm main {
@@ -155,7 +155,7 @@ public class ResourceTest extends CheckerTest {
     void resourceMemberAccess() {
         var res = eval("""
                 schema vm {
-                   number x = 2
+                   var number x = 2
                 }
                 
                 resource vm main {
@@ -184,7 +184,7 @@ public class ResourceTest extends CheckerTest {
     void resourceSetValueOnMissingProperty() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 schema vm {
-                   number x = 2
+                   var number x = 2
                 }
                 
                 resource vm main {
@@ -198,7 +198,7 @@ public class ResourceTest extends CheckerTest {
     void resourceSetValueTypeOnWrongProperty() {
         Assertions.assertThrows(TypeError.class, () -> eval(("""
                 schema Vm {
-                   number x = 2
+                   var number x = 2
                 }
                 
                 resource Vm main {
@@ -212,7 +212,7 @@ public class ResourceTest extends CheckerTest {
     void resourceInit() {
         eval("""
                 schema vm {
-                   string x = "2"
+                   var string x = "2"
                 }
                 
                 resource vm main {
@@ -233,7 +233,7 @@ public class ResourceTest extends CheckerTest {
     void resourceInitBoolean() {
         eval("""
                 schema vm {
-                   boolean x
+                   var boolean x
                 }
                 
                 resource vm main {

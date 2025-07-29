@@ -579,11 +579,17 @@ public final class Interpreter implements Visitor<Object> {
         context = SchemaContext.SCHEMA;
 
         for (var property : expression.getProperties()) {
-            if (property.defaultValue() instanceof BlockExpression blockExpression) {
-                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
+            var declaration = property.declaration();
+            if (declaration.hasInit() && declaration.getInit() instanceof BlockExpression blockExpression) {
+                executeBlock(blockExpression.getExpression(), environment);
             } else {
-                environment.init(property.name().string(), visit(property.defaultValue()));
+                environment.init(declaration.getId().string(), visit(declaration.getInit()));
             }
+//            if (property.defaultValue() instanceof BlockExpression blockExpression) {
+//                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
+//            } else {
+//                environment.init(property.name().string(), visit(property.defaultValue()));
+//            }
         }
         context = null;
         var name = expression.getName();

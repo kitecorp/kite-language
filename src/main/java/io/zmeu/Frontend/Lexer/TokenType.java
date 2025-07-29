@@ -227,6 +227,6 @@ public enum TokenType {
         return Character.isWhitespace(character);
     }
 
-    public static List<TokenType> lineTerminator = List.of(NewLine, SemiColon);
+    public static final List<TokenType> lineTerminator = List.of(NewLine, SemiColon);
 
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Factory.program;
 import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
 import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.schema;
@@ -20,14 +21,14 @@ public class SchemaTest extends ParserTest {
     void schemaDeclaration() {
         var actual = (Program) parse("""
                 schema square { 
-                    Vm x =1
-                    Vm y =1
+                   var Vm x =1
+                   var Vm y =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty("x", type("Vm"), 1),
-                        schemaProperty("y", type("Vm"), 1)
+                        schemaProperty(var("x", type("Vm"), 1)),
+                        schemaProperty(var("y", type("Vm"), 1))
                 )
         );
         log.warn(actual);
@@ -38,12 +39,12 @@ public class SchemaTest extends ParserTest {
     void schemaDeclarationVar() {
         var actual = (Program) parse("""
                 schema square { 
-                    Vm x =1
+                   var Vm x =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty("x", type("Vm"), 1)
+                        schemaProperty(var("x", type("Vm"), 1))
                 ));
         log.warn(actual);
         assertEquals(expected, actual);

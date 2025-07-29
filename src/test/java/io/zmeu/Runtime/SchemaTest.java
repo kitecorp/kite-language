@@ -48,7 +48,7 @@ public class SchemaTest extends RuntimeTest {
     void declareWithVariable() {
         var res = eval("""
                 schema Vm {
-                     int x
+                    var int x
                 }
                 """);
         log.warn(res);
@@ -61,8 +61,8 @@ public class SchemaTest extends RuntimeTest {
     void declareMultipleProperties() {
         var res = eval("""
                 schema Vm {
-                    int x
-                    int y // init not mandatory in schema
+                   var int x
+                   var int y // init not mandatory in schema
                 }
                 """);
         log.warn(res);
@@ -78,7 +78,7 @@ public class SchemaTest extends RuntimeTest {
     void declareWithVariableInit() {
         var res = eval("""
                 schema Vm {
-                    int x = 20.2
+                   var int x = 20.2
                 }
                 """);
         log.warn((res));
@@ -91,7 +91,7 @@ public class SchemaTest extends RuntimeTest {
     void declareWithVariableInitString() {
         var res = eval("""
                 schema Vm {
-                    string x = "hello"
+                   var string x = "hello"
                 }
                 """);
         log.warn((res));
@@ -104,8 +104,8 @@ public class SchemaTest extends RuntimeTest {
     void declareWithVarValInit() {
         var res = eval("""
                 schema Vm {
-                    int x = 20.2
-                    int y = 20.2 // init can be a default value schema
+                   var int x = 20.2
+                   var int y = 20.2 // init can be a default value schema
                 }
                 """);
         log.warn((res));
@@ -119,8 +119,8 @@ public class SchemaTest extends RuntimeTest {
     void declareWithVariableValInitString() {
         var res = eval("""
                 schema Vm {
-                     string x = "hello"
-                     String y = "hello"
+                    var string x = "hello"
+                    var String y = "hello"
                 }
                 """);
         log.warn((res));
@@ -166,7 +166,7 @@ public class SchemaTest extends RuntimeTest {
     void initDeclarationWithParamsAssignment() {
         var res = eval("""
                 schema Vm {
-                    number x = 1;
+                    var number x = 1;
                 }
                 """);
 
@@ -199,7 +199,7 @@ public class SchemaTest extends RuntimeTest {
     void initDeclarationWithPathType() {
         var res = eval("""
                 schema Vm {
-                    Number x = 1;
+                   var Number x = 1;
                 }
                 """);
 
@@ -215,8 +215,8 @@ public class SchemaTest extends RuntimeTest {
     void initDeclarationWithPathTypeVarVal() {
         var res = eval("""
                 schema Vm {
-                     Number x = 1;
-                     Number y = 1;
+                    var Number x = 1;
+                    var Number y = 1;
                 }
                 """);
 
@@ -233,7 +233,7 @@ public class SchemaTest extends RuntimeTest {
     void initDeclarationWithWrongVar() {
         var res = eval("""
                 schema Vm {
-                    Number x  = "test";
+                   var Number x  = "test";
                 }
                 """);
 
@@ -248,7 +248,7 @@ public class SchemaTest extends RuntimeTest {
     void initDeclarationWithWrontInit() {
         var res = eval("""
                 schema Vm {
-                     Number y  = "test";
+                    var Number y  = "test";
                 }
                 """);
 
