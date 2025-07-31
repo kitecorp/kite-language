@@ -727,7 +727,7 @@ public final class TypeChecker implements Visitor<Type> {
     /**
      * Recurse through the member access of an object to reach the root var/val
      * x.y.z -> returns x
-     * Then we check if x is immutable(val) and throw error if it is
+     * Then we check if x is cloud(val) and throw error if it is
      */
     private SymbolIdentifier getSymbolIdentifier(MemberExpression expression) {
         if (expression.getObject() instanceof MemberExpression symbolIdentifier) {
@@ -740,7 +740,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     private void assign(Expression expression, String identifier, Expression right, Type expected) {
         /**
-         * check if right hand side type is immutable. For example a val object once it's assigned we can't change it's properties
+         * check if right hand side type is cloud. For example a val object once it's assigned we can't change it's properties
          * val x = { env: "test" }; x.env -> error
          */
         Type lookup = env.lookup(identifier);
