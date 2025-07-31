@@ -26,6 +26,7 @@ import java.util.List;
 import static io.zmeu.Frontend.Lexer.TokenType.*;
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -293,6 +294,7 @@ public class Parser {
         var statement = VarStatementInit();
         return statement;
     }
+
 
     /**
      * ValStatement
@@ -693,8 +695,53 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
+        AnnotationDeclaration annotation = null;
+        if (IsLookAhead(AT)) {
+            annotation = (AnnotationDeclaration) AnnotationDeclaration();
+        }
         var statement = (VarStatement) VarDeclarations();
-        return schemaProperty(statement.getDeclarations().get(0));
+        return schemaProperty(statement.getDeclarations().get(0), annotation);
+    }
+
+    /**
+     * Annotation
+     * : '@' Identifier ( '(' ArgList ')' )?
+     * ;
+     */
+    private Expression AnnotationDeclaration() {
+        eat(AT);
+        var name = Identifier();
+        if (IsLookAhead(OpenParenthesis)) {
+            eat(OpenParenthesis);
+        }
+        var statement = AnnotationArgs();
+        if (IsLookAhead(CloseParenthesis)) {
+            eat(CloseParenthesis);
+        }
+        return switch (statement){
+            case ArrayExpression identifier -> annotation(name, identifier);
+            case ObjectExpression expression -> annotation(name, expression);
+            case Identifier identifier -> annotation(name, identifier);
+            case null -> annotation(name);
+            default -> throw new IllegalStateException("Unexpected value: " + statement);
+        };
+    }
+
+    private Expression AnnotationArgs() {
+        switch (lookAhead().type()) {
+            case OpenBrackets -> {
+                return ArrayExpression();
+            }
+            case Identifier -> {
+                return Identifier();
+            }
+            case OpenBraces -> {
+                return ObjectDeclaration();
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     /**

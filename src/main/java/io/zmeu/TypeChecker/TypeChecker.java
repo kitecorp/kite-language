@@ -681,6 +681,19 @@ public final class TypeChecker implements Visitor<Type> {
         return new ArrayType(env, firstType);
     }
 
+    @Override
+    public Type visit(AnnotationDeclaration expression) {
+        if (expression.getValue() != null) {
+            return visit(expression.getValue());
+        } else if (expression.getArgs() != null) {
+            return visit(expression.getArgs());
+        } else if (expression.getObject() != null) {
+            return visit(expression.getObject());
+        } else {
+            return visit(expression.getName());
+        }
+    }
+
     private Type validatePropertyIsString(Identifier key) {
         return switch (key) {
             case SymbolIdentifier symbolIdentifier -> visit(symbolIdentifier.getSymbol());

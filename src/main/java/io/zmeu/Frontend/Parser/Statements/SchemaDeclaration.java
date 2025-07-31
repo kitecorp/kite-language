@@ -2,6 +2,7 @@ package io.zmeu.Frontend.Parser.Statements;
 
 import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
+import io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.zmeu.Frontend.Parser.Expressions.VarDeclaration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,9 +43,13 @@ public final class SchemaDeclaration extends Statement {
         return new SchemaDeclaration(name, properties);
     }
 
-    public record SchemaProperty(VarDeclaration declaration) {
+    public record SchemaProperty(VarDeclaration declaration, AnnotationDeclaration annotation) {
         public static SchemaProperty schemaProperty(VarDeclaration declaration) {
-            return new SchemaProperty(declaration);
+            return new SchemaProperty(declaration, null);
+        }
+
+        public static SchemaProperty schemaProperty(VarDeclaration declaration, AnnotationDeclaration annotation) {
+            return new SchemaProperty(declaration, annotation);
         }
     }
 }

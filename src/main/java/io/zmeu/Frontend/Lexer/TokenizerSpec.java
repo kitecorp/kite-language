@@ -56,6 +56,7 @@ class TokenizerSpec {
             new Entry("^&&", TokenType.Logical_And),
             new Entry("^\\|\\|", TokenType.Logical_Or),
             new Entry("^!", TokenType.Logical_Not),
+            new Entry("^@", TokenType.AT),
 
 // --------------------------------- Keywords --------------------------------------------------------
 //            new Entry("^\\blambda\\b", TokenType.Lambda),
