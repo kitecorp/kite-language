@@ -78,6 +78,25 @@ public final class AstPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(AnnotationDeclaration expression) {
+        var string = new StringBuilder("@" + visit(expression.getName()));
+        if (expression.getArgs() != null) {
+            string.append("(")
+                    .append(visit(expression.getArgs()))
+                    .append(")");
+        } else if (expression.getValue() != null) {
+            string.append("(")
+                    .append(visit(expression.getValue()))
+                    .append(")");
+        } else if (expression.getObject() != null) {
+            string.append("(")
+                    .append(visit(expression.getObject()))
+                    .append(")");
+        }
+        return string.toString() + "\n";
+    }
+
+    @Override
     public String visit(AssignmentExpression expression) {
         return parenthesize(expression.getOperator().toString(), expression.getLeft(), expression.getRight());
     }

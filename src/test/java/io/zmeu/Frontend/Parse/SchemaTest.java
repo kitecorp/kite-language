@@ -1,12 +1,16 @@
 package io.zmeu.Frontend.Parse;
 
+import io.zmeu.Frontend.Parser.Expressions.ArrayExpression;
 import io.zmeu.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
+import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Factory.program;
 import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
@@ -31,6 +35,108 @@ public class SchemaTest extends ParserTest {
                         schemaProperty(var("y", type("Vm"), 1))
                 )
         );
+        log.warn(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @Cloud var Vm x =1
+                }
+                """);
+        var expected = program(
+                schema(id("square"),
+                        schemaProperty(var("x", type("Vm"), 1), annotation("Cloud"))
+                )
+        );
+        log.warn(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudWithArgsVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @Cloud(importable) var Vm x =1
+                }
+                """);
+        var expected = program(
+                schema(id("square"),
+                        schemaProperty(var("x", type("Vm"), 1), annotation("Cloud", id("importable")))
+                )
+        );
+        log.warn(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudArrayVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @Cloud([importable]) var Vm x =1
+                }
+                """);
+        ArrayExpression array = ArrayExpression.array(id("importable"));
+
+        var expected = program(
+                schema(id("square"),
+                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), array))
+                )
+        );
+        log.warn(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudNumbersVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @Cloud([1,2,3]) var Vm x =1
+                }
+                """);
+        ArrayExpression array = ArrayExpression.array(1, 2, 3);
+
+        var expected = program(
+                schema(id("square"),
+                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), array))
+                )
+        );
+        log.warn(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudStringsVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @Cloud(["test"]) var Vm x =1
+                }
+                """);
+        ArrayExpression array = ArrayExpression.array("test");
+
+        var expected = program(
+                schema(id("square"),
+                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), array))
+                )
+        );
+        log.warn(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaObjectVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @Cloud({env="test"}) var Vm x =1
+                }
+                """);
+        var expected = program(
+                schema(id("square"),
+                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), objectExpression(object("env", "test")))
+                        )
+                ));
         log.warn(actual);
         assertEquals(expected, actual);
     }

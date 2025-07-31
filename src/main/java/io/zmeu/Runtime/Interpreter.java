@@ -710,6 +710,11 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     @Override
+    public Object visit(AnnotationDeclaration expression) {
+        throw new RuntimeException("Annotations are not yet supported");
+    }
+
+    @Override
     public Object visit(Program program) {
         Object lastEval = new NullValue();
 
