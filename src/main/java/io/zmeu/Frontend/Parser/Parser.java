@@ -153,7 +153,7 @@ public class Parser {
                 case Fun -> FunctionDeclaration();
                 case Type -> TypeDeclaration();
                 case Schema -> SchemaDeclaration();
-                case Resource, Existing -> ResourceDeclaration();
+                case Existing, Resource -> ResourceDeclaration();
                 case Module -> ModuleDeclaration();
                 case Var -> VarDeclarations();
 //                case Val -> ValDeclarations();
@@ -233,8 +233,10 @@ public class Parser {
 
     /**
      * ForStatement
-     * : for Identifier in Items
+     * : '['? 'for' Identifier 'in' Items ':'? '{' BlockExpression '}'? ']'? ResourceDeclaration
      * : Items
+     * | Range
+     * |
      * ;
      */
     private Statement ForStatement() {
@@ -250,10 +252,15 @@ public class Parser {
         }
 
 //        var update = ForStatementIncrement();
-        eatIf(CloseParenthesis);
+        eatIf(CloseParenthesis, Colon, CloseBrackets);
         eatWhitespace();
 
-        var body = Statement();
+        Statement body = null;
+        if (IsLookAhead(Resource, Existing)) {
+            body = ResourceDeclaration();
+        } else {
+            body = Statement();
+        }
         return ForStatement.builder()
                 .body(body)
                 .range(range)
@@ -587,9 +594,16 @@ public class Parser {
      */
     private Expression ArrayExpression() {
         eat(OpenBrackets);
-        Expression expression = OptArray();
-        eat(CloseBrackets);
-        return expression;
+        if (IsLookAhead(For)) {
+            var statement = (ForStatement) ForStatement();
+            var expression = new ArrayExpression();
+            expression.setForStatement(statement);
+            return expression;
+        } else {
+            var optArray = OptArray();
+            eat(CloseBrackets);
+            return optArray;
+        }
     }
 
     private @NotNull Expression OptArray() {

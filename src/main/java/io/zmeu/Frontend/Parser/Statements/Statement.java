@@ -25,6 +25,9 @@ import lombok.Data;
  */
 @Data
 public abstract sealed class Statement
-        permits ModuleExpression, ResourceExpression, TypeExpression, Program, EmptyStatement, ExpressionStatement, ForStatement, FunctionDeclaration, IfStatement, InitStatement, ReturnStatement, SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
+        permits ModuleExpression, ResourceExpression, TypeExpression,
+        Program, EmptyStatement, ExpressionStatement, ForStatement,
+        FunctionDeclaration, IfStatement, InitStatement, ReturnStatement,
+        SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
 
 }

@@ -3,6 +3,7 @@ package io.zmeu.Frontend.Parser.Expressions;
 import io.zmeu.Frontend.Parse.Literals.ArrayTypeIdentifier;
 import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parse.Literals.Literal;
+import io.zmeu.Frontend.Parser.Statements.ForStatement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,6 +22,7 @@ public final class ArrayExpression extends Expression {
      */
     private List<Expression> items;
     private ArrayTypeIdentifier type;
+    private ForStatement forStatement;
 
     public ArrayExpression() {
         this.items = new ArrayList<>();
@@ -43,6 +45,11 @@ public final class ArrayExpression extends Expression {
     public static ArrayExpression array(Literal... id) {
         var expression = new ArrayExpression();
         expression.items = List.of(id);
+        return expression;
+    }
+    public static ArrayExpression array(ForStatement statement) {
+        var expression = new ArrayExpression();
+        expression.setForStatement(statement);
         return expression;
     }
 
@@ -102,6 +109,10 @@ public final class ArrayExpression extends Expression {
 
     public static ArrayExpression array(ArrayTypeIdentifier type) {
         return new ArrayExpression(type);
+    }
+
+    public boolean isForStatement() {
+        return this.forStatement != null;
     }
 
     public void add(Expression expression) {
