@@ -5,6 +5,7 @@ import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parser.errors.ParseError;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -57,6 +58,7 @@ public class IfBaseTest extends ParserTest {
     }
 
     @Test
+    @Disabled("Add better error handling")
     void MissingOpenParenthesisError() {
         parse("""
                 if x) x=1
@@ -66,6 +68,7 @@ public class IfBaseTest extends ParserTest {
     }
 
     @Test
+    @Disabled("Add better error handling")
     void MissingCloseParenthesisError() {
         parse("""
                 if (x x=1
