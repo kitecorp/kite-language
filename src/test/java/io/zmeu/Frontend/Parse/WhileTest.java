@@ -1,17 +1,19 @@
 package io.zmeu.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Expressions.AssignmentExpression;
-import io.zmeu.Frontend.Parser.Expressions.BinaryExpression;
-import io.zmeu.Frontend.Parser.Expressions.VarDeclaration;
-import io.zmeu.Frontend.Parse.Literals.Identifier;
 import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
+import io.zmeu.Frontend.Parser.Expressions.BinaryExpression;
 import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.*;
+import io.zmeu.Frontend.Parser.Statements.ForStatement;
+import io.zmeu.Frontend.Parser.Statements.WhileStatement;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
+import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
+import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -26,11 +28,8 @@ public class WhileTest extends ParserTest {
                 """);
         var expected = Program.of(
                 WhileStatement.builder()
-                        .test(BinaryExpression.binary(Identifier.id("x"), NumberLiteral.of(10), ">"))
-                        .body(ExpressionStatement.expressionStatement(BlockExpression
-                                .block(ExpressionStatement
-                                        .expressionStatement(AssignmentExpression
-                                                .assign("+=", Identifier.id("x"), NumberLiteral.of(1))
+                        .test(BinaryExpression.binary(id("x"), NumberLiteral.of(10), ">"))
+                        .body(expressionStatement(block(expressionStatement(assign("+=", id("x"), NumberLiteral.of(1))
                                         )
                                 )
                         )).build()
@@ -43,20 +42,17 @@ public class WhileTest extends ParserTest {
     @Test
     void testFor() {
         var res = parse("""
-                for (var i=0; i<10; i+=1) { 
-                    x+=1
+                for i in 0..10 {
+                    i+=1
                 }
                 """);
         var expected = Program.of(
                 ForStatement.builder()
-                        .init(VarStatement.builder()
-                                .declarations(List.of(VarDeclaration.of(Identifier.id("i"), NumberLiteral.of(0))))
-                                .build())
-                        .test(BinaryExpression.binary(Identifier.id("i"), NumberLiteral.of(10), "<"))
-                        .update(AssignmentExpression.assign("+=", Identifier.id("i"), NumberLiteral.of(1)))
-                        .body(ExpressionStatement.expressionStatement(BlockExpression.block(
-                                ExpressionStatement.expressionStatement(
-                                        AssignmentExpression.assign("+=", Identifier.id("x"), NumberLiteral.of(1))
+                        .item(id("i"))
+                        .range(Range.of(0, 10))
+                        .body(expressionStatement(block(
+                                expressionStatement(
+                                        assign("+=", id("i"), number(1))
                                 )
                         )))
                         .build()
@@ -64,7 +60,7 @@ public class WhileTest extends ParserTest {
 
         );
 
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -76,11 +72,10 @@ public class WhileTest extends ParserTest {
                 }
                 """);
         var expected = Program.of(ForStatement.builder()
-                .init(null)
-                .update(null)
-                .body(ExpressionStatement.expressionStatement(BlockExpression.block(
-                        ExpressionStatement.expressionStatement(
-                                AssignmentExpression.assign("+=", Identifier.id("x"), NumberLiteral.of(1))
+                .item(null)
+                .body(expressionStatement(block(
+                        expressionStatement(
+                                assign("+=", id("x"), NumberLiteral.of(1))
                         )
                 )))
                 .build()

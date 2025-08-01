@@ -39,6 +39,7 @@ public enum TokenType {
     Return("return"),
     Init("init"),
     For("for"),
+    In("in"),
     While("while"),
     If("if"),
     Else("else"),
@@ -108,6 +109,7 @@ public enum TokenType {
     CloseBrackets("]"),
     Comma(","),
     Dot("."),
+    Range(".."),
 
     /*****   Operators   ******/
     OptionalOperator("?"),

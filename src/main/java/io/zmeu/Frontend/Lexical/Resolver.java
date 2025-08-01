@@ -303,14 +303,14 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(ForStatement statement) {
-        beginScope();
-        if (statement.getInit() != null) {
-            resolve(statement.getInit());
-        }
-        resolve(statement.getTest());
-        resolve(statement.getUpdate());
-        resolveNoBlock(statement.getBody()); // we are already inside the block opened above
-        endScope();
+//        beginScope();
+//        if (statement.getItem() != null) {
+//            resolve(statement.getItem());
+//        }
+//        resolve(statement.getTest());
+//        resolve(statement.getUpdate());
+//        resolveNoBlock(statement.getBody()); // we are already inside the block opened above
+//        endScope();
         return null;
     }
 

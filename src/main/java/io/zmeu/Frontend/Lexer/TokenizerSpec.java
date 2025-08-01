@@ -19,6 +19,7 @@ class TokenizerSpec {
             new Entry("^\\[", TokenType.OpenBrackets),
             new Entry("^\\]", TokenType.CloseBrackets),
             new Entry("^,", TokenType.Comma),
+            new Entry("^\\.{2}", TokenType.Range),
             new Entry("^\\.", TokenType.Dot),
 // ---------------------------------- Literals ----------------------------------------------
             // match string: " str ", ' str '
@@ -66,6 +67,7 @@ class TokenizerSpec {
             new Entry("^\\belse\\b", TokenType.Else),
             new Entry("^\\bwhile\\b", TokenType.While),
             new Entry("^\\bfor\\b", TokenType.For),
+            new Entry("^\\bin\\b", TokenType.In),
             new Entry("^\\btrue\\b", TokenType.True),
             new Entry("^\\bfalse\\b", TokenType.False),
             new Entry("^\\bnull\\b", TokenType.Null),

@@ -6,6 +6,7 @@ import io.zmeu.Frontend.Lexer.TokenType;
 import io.zmeu.Frontend.Parse.Literals.*;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Statements.*;
+import io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
 import io.zmeu.Frontend.Parser.errors.ParseError;
 import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.exceptions.InvalidInitException;
@@ -15,6 +16,7 @@ import io.zmeu.TypeChecker.Types.ValueType;
 import io.zmeu.Visitors.SyntaxPrinter;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.Range;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +32,6 @@ import static io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration.annotati
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
 import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
 import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
@@ -232,35 +233,49 @@ public class Parser {
 
     /**
      * ForStatement
-     * : for ( OptStatementInit ; OptExpression ; OptExpression ) Statement
+     * : for Identifier in Items
+     * : Items
      * ;
      */
     private Statement ForStatement() {
         eat(For);
-        eat(OpenParenthesis);
 
-        Statement init = ForStatementInit();
-        eat(SemiColon);
-
-        var test = ForStatementTest();
-        eat(SemiColon);
-
-        var update = ForStatementIncrement();
-        eat(CloseParenthesis);
-        if (IsLookAhead(NewLine)) {
-            /* while(x)
-             *   x=2
-             */
-            eat(NewLine);
+        var varName = Identifier();
+        eat(In);
+        Range<Integer> range = null;
+        if (IsLookAheadAfter(Number, Range)) {
+            range = RangeDeclaration();
+        } else {
+            ArrayItems();
         }
+
+//        var update = ForStatementIncrement();
+        eatIf(CloseParenthesis);
+        eatWhitespace();
 
         var body = Statement();
         return ForStatement.builder()
-                .test(test)
                 .body(body)
-                .init(init)
-                .update(update)
+                .range(range)
+                .item(varName)
                 .build();
+    }
+
+    @Nullable
+    private Range<Integer> RangeDeclaration() {
+        eat(Number);
+        if (Literal() instanceof NumberLiteral minLiteral) {
+            eatAll(Range, Number);
+            if (Literal() instanceof NumberLiteral maxLiteral) {
+                var min = minLiteral.getValue().intValue();
+                var max = maxLiteral.getValue().intValue();
+                return org.apache.commons.lang3.Range.of(min, max);
+            } else {
+                throw new IllegalArgumentException("Expected a number literal in a range expression but got: " + getIterator().getCurrent());
+            }
+        } else {
+            throw new IllegalArgumentException("Expected a number literal in a range expression but got: " + getIterator().getCurrent());
+        }
     }
 
     @Nullable
@@ -271,17 +286,6 @@ public class Parser {
     @Nullable
     private Expression ForStatementTest() {
         return IsLookAhead(SemiColon) ? null : Expression();
-    }
-
-    private Statement ForStatementInit() {
-        return switch (lookAhead().type()) {
-            case Var -> {
-                eat(Var);
-                yield VarStatementInit();
-            }
-            case SemiColon -> null;
-            default -> ExpressionStatement();
-        };
     }
 
     /**
@@ -577,6 +581,10 @@ public class Parser {
         }
     }
 
+    /**
+     * ; ArrayExpression
+     * : '[' ArrayItems ']'
+     */
     private Expression ArrayExpression() {
         eat(OpenBrackets);
         Expression expression = OptArray();
@@ -718,7 +726,7 @@ public class Parser {
         if (IsLookAhead(CloseParenthesis)) {
             eat(CloseParenthesis);
         }
-        return switch (statement){
+        return switch (statement) {
             case ArrayExpression identifier -> annotation(name, identifier);
             case ObjectExpression expression -> annotation(name, expression);
             case Identifier identifier -> annotation(name, identifier);
@@ -805,7 +813,7 @@ public class Parser {
     }
 
     private Expression OptExpression() {
-        return IsLookAhead(lineTerminator) ? TypeIdentifier.type(ValueType.Void) : Expression();
+        return IsLookAhead(lineTerminator) ? io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type(ValueType.Void) : Expression();
     }
 
     /**
@@ -1257,6 +1265,13 @@ public class Parser {
 
     public Token eat(TokenType... type) {
         return iterator.eat("Expected token: %s but it was %s".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+    }
+
+    public Token eatIf(TokenType... type) {
+        if (IsLookAhead(type)) {
+            return iterator.eat("Expected token: %s but it was %s".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+        }
+        return null;
     }
 
     public Token eatAll(TokenType... type) {
