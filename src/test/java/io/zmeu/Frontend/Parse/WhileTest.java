@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -40,7 +41,7 @@ public class WhileTest extends ParserTest {
     }
 
     @Test
-    void testFor() {
+    void testForInRange() {
         var res = parse("""
                 for i in 0..10 {
                     i+=1
@@ -56,32 +57,28 @@ public class WhileTest extends ParserTest {
                                 )
                         )))
                         .build()
-
-
         );
-
         log.info(res);
         assertEquals(expected, res);
     }
 
     @Test
-    void testForInfinity() {
+    void testFor() {
         var res = parse("""
-                for (; ; ) { 
-                    x+=1
-                }
+                [for i in 0..10: i+=1]
                 """);
-        var expected = Program.of(ForStatement.builder()
-                .item(null)
-                .body(expressionStatement(block(
-                        expressionStatement(
-                                assign("+=", id("x"), NumberLiteral.of(1))
-                        )
-                )))
-                .build()
+        var expected = Program.of(
+                expressionStatement(array(
+                        ForStatement.builder()
+                                .item(id("i"))
+                                .range(Range.of(0, 10))
+                                .body(expressionStatement(
+                                        assign("+=", id("i"), number(1))
+                                ))
+                                .build()
+                ))
         );
-
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
