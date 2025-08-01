@@ -564,13 +564,15 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ForStatement statement) {
-        List<Statement> statements = statement.discardBlock();
-        statements.add(ExpressionStatement.expressionStatement(statement.getUpdate()));
-        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
-        if (statement.getInit() == null) {
-            return executeBlock(whileStatement, env);
-        }
-        return executeBlock(BlockExpression.block(statement.getInit(), whileStatement), env);
+//        visit()
+//        List<Statement> statements = statement.discardBlock();
+//        statements.add(ExpressionStatement.expressionStatement(statement.getUpdate()));
+//        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
+//        if (statement.getItem() == null) {
+//            return executeBlock(whileStatement, env);
+//        }
+//        return executeBlock(BlockExpression.block(statement.getItem(), whileStatement), env);
+        throw new OperationNotImplementedException("For statement not implemented");
     }
 
     @Override

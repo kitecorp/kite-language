@@ -494,13 +494,15 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ForStatement statement) {
-        List<Statement> statements = statement.discardBlock();
-        statements.add(ExpressionStatement.expressionStatement(statement.getUpdate()));
-        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
-        if (statement.getInit() == null) {
-            return executeBlock(whileStatement, env);
-        }
-        return executeBlock(BlockExpression.block(statement.getInit(), whileStatement), env);
+        visit(statement.getItem());
+        visit(statement.getArray());
+        return visit(statement.getBody());
+//        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
+//        if (statement.getItem() == null) {
+//            return executeBlock(whileStatement, env);
+//        }
+//        return executeBlock(BlockExpression.block(statement.getItem(), whileStatement), env);
+
     }
 
     @Override

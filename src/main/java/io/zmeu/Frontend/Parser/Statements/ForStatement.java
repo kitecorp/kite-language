@@ -1,10 +1,12 @@
 package io.zmeu.Frontend.Parser.Statements;
 
-import io.zmeu.Frontend.Parser.Expressions.Expression;
+import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.zmeu.Frontend.Parser.Expressions.ArrayExpression;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.Range;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -20,20 +22,12 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public final class ForStatement extends Statement {
-    private Expression test;
     @Nullable
-    private Statement init;
-    private Expression update;
+    private Identifier item;
+    private ArrayExpression array;
     private Statement body;
-
-
-    private ForStatement(Expression test, @Nullable VarStatement init, @Nullable Statement body,
-                         @Nullable Expression update) {
-        this.update = update;
-        this.init = init;
-        this.test = test;
-        this.body = body;
-    }
+    @Nullable
+    private Range<Integer> range;
 
     public ForStatement() {
     }
@@ -44,7 +38,11 @@ public final class ForStatement extends Statement {
 
 
     public boolean hasInit() {
-        return init != null;
+        return item != null;
+    }
+
+    public boolean hasRange() {
+        return range != null;
     }
 
     public List<Statement> discardBlock() {
