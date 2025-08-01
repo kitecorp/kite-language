@@ -1,7 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
 import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parser.Expressions.BinaryExpression;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.ForStatement;
 import io.zmeu.Frontend.Parser.Statements.WhileStatement;
@@ -13,8 +12,10 @@ import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.zmeu.Frontend.Parser.Statements.IfStatement.If;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -29,7 +30,7 @@ public class WhileTest extends ParserTest {
                 """);
         var expected = Program.of(
                 WhileStatement.builder()
-                        .test(BinaryExpression.binary(id("x"), NumberLiteral.of(10), ">"))
+                        .test(binary(id("x"), NumberLiteral.of(10), ">"))
                         .body(expressionStatement(block(expressionStatement(assign("+=", id("x"), NumberLiteral.of(1))
                                         )
                                 )
@@ -75,6 +76,28 @@ public class WhileTest extends ParserTest {
                                 .body(expressionStatement(
                                         assign("+=", id("i"), number(1))
                                 ))
+                                .build()
+                ))
+        );
+        log.info(res);
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void testForConditional() {
+        var res = parse("""
+                [for i in 0..10: if i>2 i+=1]
+                """);
+        var expected = Program.of(
+                expressionStatement(array(
+                        ForStatement.builder()
+                                .item(id("i"))
+                                .range(Range.of(0, 10))
+                                .body(
+                                        If(binary(">", "i", 2),
+                                                expressionStatement(assign("+=", id("i"), number(1)))
+                                        )
+                                )
                                 .build()
                 ))
         );

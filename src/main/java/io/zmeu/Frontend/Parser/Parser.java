@@ -640,14 +640,14 @@ public class Parser {
 
     /**
      * IfStatement
-     * : if ( Expression ) Statement? (else Statement)?
+     * : if '('? Expression ')'? Statement? (else Statement)?
      * ;
      */
     private Statement IfStatement() {
         eat(If);
-        eat(OpenParenthesis);
+        eatIf(OpenParenthesis);
         var test = Expression();
-        eat(CloseParenthesis);
+        eatIf(CloseParenthesis);
         if (IsLookAhead(NewLine)) {
             // if(x) x=2
             eat(NewLine);
