@@ -4,6 +4,7 @@ import io.zmeu.Base.CheckerTest;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.BlockExpression;
 import io.zmeu.Frontend.Parser.Statements.ForStatement;
+import io.zmeu.TypeChecker.Types.ArrayType;
 import io.zmeu.TypeChecker.Types.ValueType;
 import org.apache.commons.lang3.Range;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +25,7 @@ import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionS
 import static io.zmeu.Frontend.Parser.Statements.IfStatement.If;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @DisplayName("TypeChecker Loops")
 public class ForLoopTest extends CheckerTest {
@@ -57,7 +59,20 @@ public class ForLoopTest extends CheckerTest {
                 [for i in 0..10: i+=1]
                 """);
 
-        assertEquals(ValueType.Number, res);
+        assertInstanceOf(ArrayType.class, res);
+        var varType = (ArrayType) res;
+        assertEquals(ValueType.Number, varType.getType());
+    }
+
+    @Test
+    void testForString() {
+        var res = eval("""
+                [for i in 0..10: "item-$i"]
+                """);
+
+        assertInstanceOf(ArrayType.class, res);
+        var varType = (ArrayType) res;
+        assertEquals(ValueType.String, varType.getType());
     }
 
     @Test
