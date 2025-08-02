@@ -625,10 +625,20 @@ public final class Interpreter implements Visitor<Object> {
             List<Object> result = new ArrayList<>(maximum);
             for (int i = minimum; i <= maximum; i++) {
                 forEnv.assign(index, i);
-
-
-                Object e = executeBlock(statement.getBody(), forEnv);
-                result.add(e);
+                if (statement.getBody() instanceof IfStatement ifStatement) {
+                    var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
+                    if (test) {
+                        result.add(executeBlock(ifStatement.getConsequent(), forEnv));
+                    } else {
+                        var alternate = ifStatement.getAlternate();
+                        if (alternate != null) {
+                            result.add(executeBlock(alternate, forEnv));
+                        }
+                    }
+                } else {
+                    Object e = executeBlock(statement.getBody(), forEnv);
+                    result.add(e);
+                }
             }
             return result;
         }
