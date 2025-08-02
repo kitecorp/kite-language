@@ -131,4 +131,7 @@ public final class ArrayExpression extends Expression {
         return items.getFirst();
     }
 
+    public boolean hasForStatement() {
+        return forStatement != null;
+    }
 }

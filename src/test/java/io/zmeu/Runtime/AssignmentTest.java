@@ -261,6 +261,15 @@ public class AssignmentTest extends RuntimeTest {
         assertTrue(res);
         log.warn((res));
     }
+    @Test
+    void AssignLessPlusAssignment() {
+        var res = (Number) eval("""
+                var x=1
+                x += 2
+                """);
+        assertEquals(3, res);
+        log.warn((res));
+    }
 
     @Test
     void AssignLessEqFalse() {
