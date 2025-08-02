@@ -675,6 +675,10 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ArrayExpression expression) {
+        if (expression.getForStatement() != null) {
+            return new ArrayType(env, visit(expression.getForStatement()));
+        }
+
         if (expression.isEmpty()) {
             return new ArrayType(env);
         }
