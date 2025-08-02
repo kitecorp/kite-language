@@ -163,6 +163,7 @@ public class ForLoopTest extends ParserTest {
                 varStatement(var("envs", array(objectExpression(object("client", string("amazon"))), objectExpression(object("client", string("bmw")))))),
                 expressionStatement(array(ForStatement.builder()
                         .item(id("index"))
+                        .array(id("envs"))
                         .body(
                                 resource("Bucket", "photos",
                                         (BlockExpression) block(assign("name", "'name-${index.value}'")))
