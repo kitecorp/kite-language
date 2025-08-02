@@ -29,11 +29,13 @@ public class ForTest extends RuntimeTest {
     @DisplayName("When using block, a result is returned of the last expression")
     void testForInRange() {
         var res = eval("""
-                for i in 0..3 {
-                    i+=1
+                var x = 1
+                for i in 1..3 {
+                    x += i
                 }
                 """);
-        assertEquals(4, res);
+        // 1+1+2+3=7
+        assertEquals(7, res);
     }
 
     @Test
