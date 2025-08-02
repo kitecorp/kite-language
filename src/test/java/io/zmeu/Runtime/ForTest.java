@@ -68,22 +68,18 @@ public class ForTest extends RuntimeTest {
     @Test
     void testFor() {
         var res = eval("""
-                [for i in 0..10: i+=1]
+                [for i in 1..3: i+=1]
                 """);
 
-        assertInstanceOf(ArrayType.class, res);
-        var varType = (ArrayType) res;
-        assertEquals(ValueType.Number, varType.getType());
+        assertEquals(List.of(2, 3, 4), res);
     }
 
     @Test
     void testForConditional() {
         var res = eval("""
-                [for i in 0..10: if i>2 i+=1]
+                [for i in 0..10: if i>2 i]
                 """);
-        assertInstanceOf(ArrayType.class, res);
-        var varType = (ArrayType) res;
-        assertEquals(ValueType.Number, varType.getType());
+        assertEquals(List.of(3, 4, 5, 6, 7, 8, 9, 10), res);
     }
 
     @Test

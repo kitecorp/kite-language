@@ -126,10 +126,6 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(Identifier expression) {
-        return lookupVar(expression);
-    }
-
-    private Object lookupVar(Identifier expression) {
         return env.lookup(expression.string(), expression.getHops());
     }
 
@@ -618,8 +614,25 @@ public final class Interpreter implements Visitor<Object> {
                 result = executeBlock(body, forEnv);
             }
             return result;
+        } else if (statement.getBody() != null) {
+            var range = statement.getRange();
+            int minimum = range.getMinimum();
+            int maximum = range.getMaximum();
+
+            String index = statement.getItem().string();
+            var forEnv = new Environment<>(env, Map.of(index, minimum));
+
+            List<Object> result = new ArrayList<>(maximum);
+            for (int i = minimum; i <= maximum; i++) {
+                forEnv.assign(index, i);
+
+
+                Object e = executeBlock(statement.getBody(), forEnv);
+                result.add(e);
+            }
+            return result;
         }
-        return null;
+        throw new OperationNotImplementedException("For statement operation not implemented");
     }
 
     @Override

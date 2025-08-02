@@ -1,13 +1,13 @@
 package io.zmeu.Frontend.Lexical;
 
-import io.zmeu.ParserErrors;
 import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.Visitors.Visitor;
 import io.zmeu.Frontend.Parser.Expressions.*;
 import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.*;
+import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.Interpreter;
+import io.zmeu.TypeChecker.Types.Type;
+import io.zmeu.Visitors.Visitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -93,7 +93,7 @@ public final class Resolver implements Visitor<Void> {
     @Override
     public Void visit(BlockExpression expression) {
         beginScope();
-        resolve(expression.getExpression());
+        expression.getExpression().forEach(this::resolve);
         endScope();
         return null;
     }
@@ -303,14 +303,23 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(ForStatement statement) {
-        beginScope();
-        declare(statement.getItem());
-        if (statement.getItem() != null) {
-            resolve(statement.getItem());
+        if (statement.isBodyBlock()) {
+            beginScope();
         }
-        define(statement.getItem());
-        resolveNoBlock(statement.getBody()); // we are already inside the block opened above
-        endScope();
+        if (statement.getItem() != null) {
+            declare(statement.getItem());
+            resolve(statement.getItem());
+            define(statement.getItem());
+        }
+        if (statement.isBodyBlock()) {
+            resolveNoBlock(statement.getBody()); // we are already inside the block opened above
+        } else {
+            resolve(statement.getBody());
+
+        }
+        if (statement.isBodyBlock()) {
+            endScope();
+        }
         return null;
     }
 
@@ -361,6 +370,13 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(ArrayExpression expression) {
+        beginScope();
+        if (expression.hasForStatement()) {
+            resolve(expression.getForStatement());
+        } else if (expression.hasItems()) {
+            expression.getItems().forEach(this::resolve);
+        }
+        endScope();
 
         return null;
     }
