@@ -1,5 +1,6 @@
 package io.zmeu.Frontend.Parse;
 
+import io.zmeu.Frontend.Parser.Expressions.AssignmentExpression;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,7 @@ public class ModuleTest extends ParserTest {
                 }
                 """);
         var expected = program(module("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
-                block(assign("name", "bucket-prod"))));
+                block(AssignmentExpression.assign("name", "bucket-prod"))));
         assertEquals(expected, res);
         log.info((res));
     }
