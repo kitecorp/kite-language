@@ -2,6 +2,7 @@ package io.zmeu.Frontend.Parse;
 
 import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
 import io.zmeu.Frontend.Parser.Program;
+import io.zmeu.Frontend.Parser.Statements.BlockExpression;
 import io.zmeu.Frontend.Parser.Statements.ForStatement;
 import io.zmeu.Frontend.Parser.Statements.WhileStatement;
 import lombok.extern.log4j.Log4j2;
@@ -16,6 +17,7 @@ import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.zmeu.Frontend.Parser.Expressions.ResourceExpression.resource;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -143,6 +145,29 @@ public class ForLoopTest extends ParserTest {
                                         .body(expressionStatement(objectExpression(object("name", string("item-$index")))))
                                         .build()
                         )))
+        );
+        log.info(res);
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void arrayResourcesAssignedToVar() {
+        var res = parse("""
+                var envs = [{client: 'amazon'},{client: 'bmw'}]
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index.value}'
+                }
+                """);
+        var expected = Program.of(
+                varStatement(var("envs", array(objectExpression(object("client", string("amazon"))), objectExpression(object("client", string("bmw")))))),
+                expressionStatement(array(ForStatement.builder()
+                        .item(id("index"))
+                        .body(
+                                resource("Bucket", "photos",
+                                        (BlockExpression) block(assign("name", "'name-${index.value}'")))
+                        )
+                        .build()))
         );
         log.info(res);
         assertEquals(expected, res);

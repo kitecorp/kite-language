@@ -26,6 +26,14 @@ public final class ResourceExpression extends Statement implements DeferredObser
         this.name = new SymbolIdentifier();
     }
 
+    public static Statement resource(String type, String name, BlockExpression operator) {
+        return resource(TypeIdentifier.type(type), Identifier.id(name), operator);
+    }
+
+    public static Statement resource(boolean existing, String type, String name, BlockExpression operator) {
+        return resource(existing, TypeIdentifier.type(type), Identifier.id(name), operator);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
