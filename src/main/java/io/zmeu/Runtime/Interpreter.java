@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;
 import static io.zmeu.Utils.BoolUtils.isTruthy;
@@ -443,6 +444,9 @@ public final class Interpreter implements Visitor<Object> {
                         return env.assign(identifier.string(), left + numberLiteralRight);
                     } else if (existing instanceof String str && right instanceof Number number) {
                         return env.assign(identifier.string(), str + number);
+                    } else if (existing instanceof List list) { // var x = []; x+=1; x==[1]
+                        list.add(right);
+                        return list;
                     }
                 } else {
                     return env.assign(identifier.string(), right);
@@ -575,19 +579,15 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(ForStatement statement) {
         if (statement.hasRange()) {
-            if (statement.isBodyBlock()) {
-                var range = statement.getRange();
-                int minimum = range.getMinimum();
-                int maximum = range.getMaximum();
-
-                String index = statement.getItem().string();
-                var forEnv = new Environment<>(env, Map.of(index, minimum));
-
+            return ForWithRange(statement);
+        } else if (statement.hasArray()) {
+            var array = visit(statement.getArray());// get array items
+            if (array instanceof List<?> list) {
+                var forEnv = new Environment<>(env);
                 Object result = null;
-                var body = statement.discardBlock();
-                for (int i = minimum; i <= maximum; i++) {
-                    forEnv.assign(index, i);
-                    result = executeBlock(body, forEnv);
+                for (Object item : list) {
+                    forEnv.initOrAssign(statement.getItem().string(), item);
+                    result = executeBlock(statement.getBody(), forEnv);
                 }
                 return result;
             }
@@ -600,6 +600,26 @@ public final class Interpreter implements Visitor<Object> {
 //        }
 //        return executeBlock(BlockExpression.block(statement.getItem(), whileStatement), env);
         throw new OperationNotImplementedException("For statement not implemented");
+    }
+
+    private Object ForWithRange(ForStatement statement) {
+        if (statement.isBodyBlock()) {
+            var range = statement.getRange();
+            int minimum = range.getMinimum();
+            int maximum = range.getMaximum();
+
+            String index = statement.getItem().string();
+            var forEnv = new Environment<>(env, Map.of(index, minimum));
+
+            Object result = null;
+            var body = statement.discardBlock();
+            for (int i = minimum; i <= maximum; i++) {
+                forEnv.assign(index, i);
+                result = executeBlock(body, forEnv);
+            }
+            return result;
+        }
+        return null;
     }
 
     @Override
@@ -738,7 +758,12 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.hasForStatement()) {
             return executeBlock(expression.getForStatement(), env);
         }
-        throw new RuntimeException("Invalid array expression");
+        if (expression.hasItems()) {
+            return expression.getItems().stream().map(this::visit).collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
+
     }
 
     @Override

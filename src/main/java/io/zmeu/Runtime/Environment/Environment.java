@@ -82,6 +82,14 @@ public class Environment<T> implements IEnvironment<T> {
         return value;
     }
 
+    public T initOrAssign(String varName, T value) {
+        if (hasVar(varName)) {
+            return assign(varName, value);
+        } else {
+            return init(varName, value);
+        }
+    }
+
     @Override
     @Nullable
     public T lookup(@Nullable String varName) {

@@ -8,6 +8,7 @@ public class OperationNotImplementedException extends RuntimeException {
     public OperationNotImplementedException(Statement message) {
         super(msg.formatted(message));
     }
+
     public OperationNotImplementedException(String message) {
         super(msg.formatted(message));
     }

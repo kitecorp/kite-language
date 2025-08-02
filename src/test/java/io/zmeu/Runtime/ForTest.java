@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,6 +49,20 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals("test 0123", res);
+    }
+
+    @Test
+    @DisplayName("Adding elements to array works in with += operator")
+    void testForInListString() {
+        var res = eval("""
+                var envs = ["dev","prod"]
+                var res = []
+                for env in envs {
+                    res += env
+                }
+                """);
+        assertEquals(List.of("dev", "prod"), res);
+        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
     }
 
     @Test
