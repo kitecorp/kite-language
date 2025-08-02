@@ -2,6 +2,7 @@ package io.zmeu.TypeChecker.Types;
 
 import io.zmeu.TypeChecker.TypeEnvironment;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,12 +10,13 @@ import org.jetbrains.annotations.Nullable;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class ResourceType extends ReferenceType {
+    @Getter
     private final SchemaType schema;
     private final String name;
 
-    public ResourceType(String typeName, SchemaType schema, @Nullable TypeEnvironment env) {
+    public ResourceType(String name, SchemaType schema, @Nullable TypeEnvironment env) {
         super(ReferenceType.Resource.getValue());
-        this.name = typeName;
+        this.name = name;
         this.schema = schema;
         this.environment = env;
     }

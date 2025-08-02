@@ -3,6 +3,7 @@ package io.zmeu.TypeChecker;
 import io.zmeu.Base.CheckerTest;
 import io.zmeu.ParserErrors;
 import io.zmeu.Runtime.exceptions.NotFoundException;
+import io.zmeu.TypeChecker.Types.ArrayType;
 import io.zmeu.TypeChecker.Types.ResourceType;
 import io.zmeu.TypeChecker.Types.SchemaType;
 import io.zmeu.TypeChecker.Types.ValueType;
@@ -247,4 +248,23 @@ public class ResourceTest extends CheckerTest {
         Assertions.assertInstanceOf(ResourceType.class, resource);
     }
 
+    @Test
+    void arrayResourcesAssignedToVar() {
+        var array = eval("""
+                schema Bucket {
+                   var string name
+                }
+                var envs = [{client: 'amazon'},{client: 'bmw'}]
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index.value}'
+                }
+                """);
+
+        Assertions.assertInstanceOf(ArrayType.class, array);
+        var arrayType = (ArrayType) array;
+        var resourceType = (ResourceType) arrayType.getType();
+        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
+        assertEquals(res, arrayType.getType());
+    }
 }

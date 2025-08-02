@@ -209,11 +209,15 @@ public final class TypeChecker implements Visitor<Type> {
             String string = "Expected type `" + expectedType + "` but got `" + actualType + "` in expression: " + printer.visit(expectedVal);
             throw new TypeError(string);
         }
-        if (actualType instanceof ArrayType arrayType && expectedType instanceof ArrayType expectedArrayType) {
-            if (arrayType.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
+        if (actualType instanceof ArrayType actualArray && expectedType instanceof ArrayType expectedArrayType) {
+            if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
                 return expectedArrayType;
-            } else if (!Objects.equals(arrayType.getType().getKind(), expectedArrayType.getType().getKind())) {
-                String string = "Expected type `" + expectedArrayType.getType() + "` but got `" + arrayType.getType() + "` in expression: " + printer.visit(expectedVal);
+            } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
+                // when we pass expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
+                // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
+                return actualType;
+            } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
+                String string = "Expected type `" + expectedArrayType.getType() + "` but got `" + actualArray.getType() + "` in expression: " + printer.visit(expectedVal);
                 throw new TypeError(string);
             }
         }
@@ -498,16 +502,13 @@ public final class TypeChecker implements Visitor<Type> {
         if (statement.hasRange()) {
             typeEnv.init(statement.getItem(), ValueType.Number);
         } else if (statement.getArray() != null) {
-            typeEnv.init(statement.getItem(), visit(statement.getArray()));
+            Type visit = visit(statement.getArray());
+            // make sure it's an iterable array (for item in vars); vars must be array of any kind
+            expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
+            var arrayType = (ArrayType) visit; // the kind of the item we set 'item' to the type of the array elements type
+            typeEnv.init(statement.getItem(), arrayType.getType());
         }
-//        visit(statement.getArray());
         return executeBlock(statement.getBody(), typeEnv);
-//        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
-//        if (statement.getItem() == null) {
-//            return executeBlock(whileStatement, env);
-//        }
-//        return executeBlock(BlockExpression.block(statement.getItem(), whileStatement), env);
-
     }
 
     @Override
