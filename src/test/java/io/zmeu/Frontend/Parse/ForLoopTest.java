@@ -10,10 +10,12 @@ import org.junit.jupiter.api.Test;
 
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
+import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -120,6 +122,25 @@ public class ForLoopTest extends ParserTest {
                                         .item(id("index"))
                                         .range(Range.of(1, 5))
                                         .body(expressionStatement(string("item-$index")))
+                                        .build()
+                        )))
+        );
+        log.info(res);
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void arrayObjectsAssignedToVar() {
+        var res = parse("""
+                var x = [for index in 1..5: { name: 'item-$index'}]
+                """);
+        var expected = Program.of(
+                varStatement(var("x",
+                        array(
+                                ForStatement.builder()
+                                        .item(id("index"))
+                                        .range(Range.of(1, 5))
+                                        .body(expressionStatement(objectExpression(object("name", string("item-$index")))))
                                         .build()
                         )))
         );
