@@ -79,6 +79,7 @@ public class ForLoopTest extends CheckerTest {
         assertInstanceOf(ArrayType.class, res);
         var varType = (ArrayType) res;
         assertEquals(ValueType.String, varType.getType());
+        assertEquals(res, checker.getEnv().lookup("x"));
     }
 
     @Test

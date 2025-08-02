@@ -30,6 +30,7 @@ import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
 import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
+import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
@@ -927,7 +928,7 @@ public class Parser {
         while (!IsLookAhead(EOF) && IsLookAhead(Equality_Operator)) {
             var operator = eat();
             Expression right = EqualityExpression();
-            expression = BinaryExpression.binary(expression, right, operator.value().toString());
+            expression = binary(expression, right, operator.value().toString());
         }
         return expression;
     }
@@ -943,7 +944,7 @@ public class Parser {
         while (!IsLookAhead(EOF) && IsLookAhead(RelationalOperator)) {
             var operator = eat();
             Expression right = RelationalExpression();
-            expression = BinaryExpression.binary(expression, right, operator.value().toString());
+            expression = binary(expression, right, operator.value().toString());
         }
         return expression;
     }
@@ -994,7 +995,7 @@ public class Parser {
         while (match("+", "-")) {
             var operator = eat();
             Expression right = this.MultiplicativeExpression();
-            left = BinaryExpression.binary(left, right, operator.value().toString());
+            left = binary(left, right, operator.value().toString());
         }
 
         return left;

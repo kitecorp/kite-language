@@ -436,7 +436,18 @@ public final class Interpreter implements Visitor<Object> {
                     env.assign(identifier.string(), dependency.value());
                     return dependency;
                 }
-                return env.assign(identifier.string(), right);
+                if (Objects.equals(expression.getOperator(), (TokenType.Equal_Complex.getField()))) {
+                    var existing = env.lookup(identifier.string());
+                    if (existing instanceof Integer left && right instanceof Integer numberLiteralRight) {
+                        return env.assign(identifier.string(), left + numberLiteralRight);
+                    } else if (existing instanceof Float left && right instanceof Float numberLiteralRight) {
+                        return env.assign(identifier.string(), left + numberLiteralRight);
+                    } else if (existing instanceof Double left && right instanceof Double numberLiteralRight) {
+                        return env.assign(identifier.string(), left + numberLiteralRight);
+                    }
+                } else {
+                    return env.assign(identifier.string(), right);
+                }
             }
             case null, default -> {
             }
@@ -564,8 +575,24 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ForStatement statement) {
-//        visit()
-//        List<Statement> statements = statement.discardBlock();
+        if (statement.hasRange()) {
+            if (statement.isBodyBlock()) {
+                var range = statement.getRange();
+                var forEnv = new Environment<>(env);
+
+                var item = statement.getItem().string();
+                forEnv.init(item, range.getMinimum());
+                int bound = range.getMaximum();
+                Object result = null;
+                var body = statement.discardBlock();
+                for (int i = range.getMinimum(); i <= bound; i++) {
+                    result = executeBlock(body, forEnv);
+//                    forEnv.assign(item, i);
+                }
+                return result;
+            }
+        }
+        //        List<Statement> statements = statement.discardBlock();
 //        statements.add(ExpressionStatement.expressionStatement(statement.getUpdate()));
 //        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
 //        if (statement.getItem() == null) {
@@ -708,7 +735,10 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ArrayExpression expression) {
-        throw new RuntimeException("Arrays are not yet supported");
+        if (expression.hasForStatement()) {
+            return executeBlock(expression.getForStatement(), env);
+        }
+        throw new RuntimeException("Invalid array expression");
     }
 
     @Override
