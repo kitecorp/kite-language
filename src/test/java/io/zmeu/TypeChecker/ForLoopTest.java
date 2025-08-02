@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TypeChecker Loops")
-public class LoopTest extends CheckerTest {
+public class ForLoopTest extends CheckerTest {
 
     @Test
     void testBlock() {
