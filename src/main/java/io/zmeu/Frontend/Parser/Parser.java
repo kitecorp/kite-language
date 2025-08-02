@@ -261,7 +261,7 @@ public class Parser {
         if (IsLookAhead(Resource, Existing)) {
             body = ResourceDeclaration();
         } else {
-            body = Statement();
+            body = ForBody();
         }
         return ForStatement.builder()
                 .body(body)
@@ -269,6 +269,15 @@ public class Parser {
                 .array(arrayName)
                 .item(varName)
                 .build();
+    }
+
+    private Statement ForBody() {
+        return switch (lookAhead().type()) {
+            case If -> IfStatement();
+            case NewLine -> new EmptyStatement();
+            case EOF -> null;
+            default -> ExpressionStatement();
+        };
     }
 
     @Nullable
@@ -830,7 +839,7 @@ public class Parser {
     }
 
     private Expression OptExpression() {
-        return IsLookAhead(lineTerminator) ? io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type(ValueType.Void) : Expression();
+        return IsLookAhead(lineTerminator) ? TypeIdentifier.type(ValueType.Void) : Expression();
     }
 
     /**
