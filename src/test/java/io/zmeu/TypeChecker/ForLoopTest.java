@@ -5,24 +5,23 @@ import io.zmeu.Frontend.Parser.Program;
 import io.zmeu.Frontend.Parser.Statements.BlockExpression;
 import io.zmeu.Frontend.Parser.Statements.ForStatement;
 import io.zmeu.TypeChecker.Types.ArrayType;
+import io.zmeu.TypeChecker.Types.ObjectType;
 import io.zmeu.TypeChecker.Types.ValueType;
-import org.apache.commons.lang3.Range;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
 import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.zmeu.Frontend.Parser.Expressions.ResourceExpression.resource;
 import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
 import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.IfStatement.If;
 import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -65,7 +64,17 @@ public class ForLoopTest extends CheckerTest {
     }
 
     @Test
-    void testForString() {
+    void testForConditional() {
+        var res = eval("""
+                [for i in 0..10: if i>2 i+=1]
+                """);
+        assertInstanceOf(ArrayType.class, res);
+        var varType = (ArrayType) res;
+        assertEquals(ValueType.Number, varType.getType());
+    }
+
+    @Test
+    void testForStringDoubleQuotes() {
         var res = eval("""
                 [for i in 0..10: "item-$i"]
                 """);
@@ -76,68 +85,31 @@ public class ForLoopTest extends CheckerTest {
     }
 
     @Test
-    void testForConditional() {
-        var res = parse("""
-                [for i in 0..10: if i>2 i+=1]
-                """);
-        var expected = Program.of(
-                expressionStatement(array(
-                        ForStatement.builder()
-                                .item(id("i"))
-                                .range(Range.of(0, 10))
-                                .body(
-                                        If(binary(">", "i", 2),
-                                                expressionStatement(assign("+=", id("i"), number(1)))
-                                        )
-                                )
-                                .build()
-                ))
-        );
-
-        assertEquals(expected, res);
-    }
-
-    @Test
     void arrayAssignedToVar() {
-        var res = parse("""
+        var res = eval("""
                 var x = [for index in 1..5: 'item-$index']
                 """);
-        var expected = Program.of(
-                varStatement(var("x",
-                        array(
-                                ForStatement.builder()
-                                        .item(id("index"))
-                                        .range(Range.of(1, 5))
-                                        .body(expressionStatement(string("item-$index")))
-                                        .build()
-                        )))
-        );
 
-        assertEquals(expected, res);
+        assertInstanceOf(ArrayType.class, res);
+        var varType = (ArrayType) res;
+        assertEquals(ValueType.String, varType.getType());
     }
 
     @Test
     void arrayObjectsAssignedToVar() {
-        var res = parse("""
+        var res = eval("""
                 var x = [for index in 1..5: { name: 'item-$index'}]
                 """);
-        var expected = Program.of(
-                varStatement(var("x",
-                        array(
-                                ForStatement.builder()
-                                        .item(id("index"))
-                                        .range(Range.of(1, 5))
-                                        .body(expressionStatement(objectExpression(object("name", string("item-$index")))))
-                                        .build()
-                        )))
-        );
+        assertInstanceOf(ArrayType.class, res);
 
-        assertEquals(expected, res);
+        var varType = (ArrayType) res;
+        var objectType = new ObjectType(new TypeEnvironment(varType.getEnvironment().getParent(), Map.of("name", ValueType.String)));
+        assertEquals(objectType, varType.getType());
     }
 
     @Test
     void arrayResourcesAssignedToVar() {
-        var res = parse("""
+        var res = eval("""
                 var envs = [{client: 'amazon'},{client: 'bmw'}]
                 [for index in envs]
                 resource Bucket photos {
