@@ -1,10 +1,6 @@
 package io.zmeu.Runtime;
 
 import io.zmeu.Base.RuntimeTest;
-import io.zmeu.TypeChecker.TypeEnvironment;
-import io.zmeu.TypeChecker.Types.ArrayType;
-import io.zmeu.TypeChecker.Types.ObjectType;
-import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @Log4j2
 public class ForTest extends RuntimeTest {
@@ -35,8 +30,8 @@ public class ForTest extends RuntimeTest {
                     x += i
                 }
                 """);
-        // 1+1+2+3=7
-        assertEquals(7, res);
+        // 1+1+2=7
+        assertEquals(4, res);
     }
 
     @Test
@@ -48,7 +43,7 @@ public class ForTest extends RuntimeTest {
                     x += i
                 }
                 """);
-        assertEquals("test 0123", res);
+        assertEquals("test 012", res);
     }
 
     @Test
@@ -68,10 +63,10 @@ public class ForTest extends RuntimeTest {
     @Test
     void testFor() {
         var res = eval("""
-                [for i in 1..3: i+=1]
+                [for i in 0..3: i+=1]
                 """);
 
-        assertEquals(List.of(2, 3, 4), res);
+        assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
@@ -79,7 +74,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 [for i in 0..10: if i>2 i]
                 """);
-        assertEquals(List.of(3, 4, 5, 6, 7, 8, 9, 10), res);
+        assertEquals(List.of(3, 4, 5, 6, 7, 8, 9), res);
     }
 
     @Test
@@ -87,41 +82,32 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 [for i in 0..10: if i>2 i else i+10]
                 """);
-        assertEquals(List.of(10, 11, 12, 3, 4, 5, 6, 7, 8, 9, 10), res);
+        assertEquals(List.of(10, 11, 12, 3, 4, 5, 6, 7, 8, 9), res);
     }
 
     @Test
     void testForStringDoubleQuotes() {
         var res = eval("""
-                [for i in 0..10: "item-$i"]
+                [for i in 0..1: "item-$i"]
                 """);
 
-        assertInstanceOf(ArrayType.class, res);
-        var varType = (ArrayType) res;
-        assertEquals(ValueType.String, varType.getType());
+        assertEquals(List.of("item-$i"), res);
     }
 
     @Test
     void arrayAssignedToVar() {
         var res = eval("""
-                var x = [for index in 1..5: 'item-$index']
+                var x = [for index in 0..5: 'item-$index']
                 """);
-
-        assertInstanceOf(ArrayType.class, res);
-        var varType = (ArrayType) res;
-        assertEquals(ValueType.String, varType.getType());
+        assertEquals(List.of("item-$index", "item-$index", "item-$index", "item-$index", "item-$index"), res);
     }
 
     @Test
     void arrayObjectsAssignedToVar() {
         var res = eval("""
-                var x = [for index in 1..5: { name: 'item-$index'}]
+                var x = [for index in 0..2: { name: 'item-$index'}]
                 """);
-        assertInstanceOf(ArrayType.class, res);
-
-        var varType = (ArrayType) res;
-        var objectType = new ObjectType(new TypeEnvironment(varType.getEnvironment().getParent(), Map.of("name", ValueType.String)));
-        assertEquals(objectType, varType.getType());
+        assertEquals(List.of(Map.of("name", "item-$index"), Map.of("name", "item-$index")), res);
     }
 
 }

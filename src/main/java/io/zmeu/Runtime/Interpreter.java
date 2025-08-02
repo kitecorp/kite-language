@@ -609,7 +609,7 @@ public final class Interpreter implements Visitor<Object> {
 
             Object result = null;
             var body = statement.discardBlock();
-            for (int i = minimum; i <= maximum; i++) {
+            for (int i = minimum; i < maximum; i++) {
                 forEnv.assign(index, i);
                 result = executeBlock(body, forEnv);
             }
@@ -623,7 +623,7 @@ public final class Interpreter implements Visitor<Object> {
             var forEnv = new Environment<>(env, Map.of(index, minimum));
 
             List<Object> result = new ArrayList<>(maximum);
-            for (int i = minimum; i <= maximum; i++) {
+            for (int i = minimum; i < maximum; i++) {
                 forEnv.assign(index, i);
                 if (statement.getBody() instanceof IfStatement ifStatement) {
                     var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
