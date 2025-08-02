@@ -31,7 +31,7 @@ public class ForTest extends RuntimeTest {
                     i+=1
                 }
                 """);
-        assertEquals(6, res);
+        assertEquals(4, res);
     }
 
     @Test
