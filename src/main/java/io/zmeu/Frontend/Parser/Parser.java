@@ -245,10 +245,11 @@ public class Parser {
         var varName = Identifier();
         eat(In);
         Range<Integer> range = null;
+        Identifier arrayName = null;
         if (IsLookAheadAfter(Number, Range)) {
             range = RangeDeclaration();
         } else {
-            ArrayItems();
+            arrayName = SymbolIdentifier();
         }
 
 //        var update = ForStatementIncrement();
@@ -264,6 +265,7 @@ public class Parser {
         return ForStatement.builder()
                 .body(body)
                 .range(range)
+                .array(arrayName)
                 .item(varName)
                 .build();
     }

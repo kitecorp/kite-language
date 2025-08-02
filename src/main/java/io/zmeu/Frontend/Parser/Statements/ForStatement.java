@@ -1,7 +1,6 @@
 package io.zmeu.Frontend.Parser.Statements;
 
 import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Expressions.ArrayExpression;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +23,7 @@ import java.util.List;
 public final class ForStatement extends Statement {
     @Nullable
     private Identifier item;
-    private ArrayExpression array;
+    private Identifier array;// for i in varName (typically array)
     private Statement body;
     @Nullable
     private Range<Integer> range;

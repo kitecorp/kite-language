@@ -494,9 +494,14 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ForStatement statement) {
-        visit(statement.getItem());
-        visit(statement.getArray());
-        return visit(statement.getBody());
+        var typeEnv = new TypeEnvironment(env);
+        if (statement.hasRange()) {
+            typeEnv.init(statement.getItem(), ValueType.Number);
+        } else if (statement.getArray() != null) {
+            typeEnv.init(statement.getItem(), visit(statement.getArray()));
+        }
+//        visit(statement.getArray());
+        return executeBlock(statement.getBody(), typeEnv);
 //        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
 //        if (statement.getItem() == null) {
 //            return executeBlock(whileStatement, env);
