@@ -6,6 +6,7 @@ import io.zmeu.TypeChecker.Types.ArrayType;
 import io.zmeu.TypeChecker.Types.ObjectType;
 import io.zmeu.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -25,6 +26,7 @@ public class ForTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("When using block, a result is returned of the last expression")
     void testForInRange() {
         var res = eval("""
                 for i in 0..3 {
@@ -32,6 +34,18 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(4, res);
+    }
+
+    @Test
+    @DisplayName("When using block, a result is returned of the last expression")
+    void testForInRangeString() {
+        var res = eval("""
+                var x = "test "
+                for i in 0..3 {
+                    x += i
+                }
+                """);
+        assertEquals("test 0123", res);
     }
 
     @Test
