@@ -30,10 +30,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;
 import static io.zmeu.Utils.BoolUtils.isTruthy;
@@ -436,7 +433,7 @@ public final class Interpreter implements Visitor<Object> {
                     env.assign(identifier.string(), dependency.value());
                     return dependency;
                 }
-                if (Objects.equals(expression.getOperator(), (TokenType.Equal_Complex.getField()))) {
+                if (Objects.equals(expression.getOperator(), TokenType.Equal_Complex.getField())) {
                     var existing = env.lookup(identifier.string());
                     if (existing instanceof Integer left && right instanceof Integer numberLiteralRight) {
                         return env.assign(identifier.string(), left + numberLiteralRight);
@@ -444,6 +441,8 @@ public final class Interpreter implements Visitor<Object> {
                         return env.assign(identifier.string(), left + numberLiteralRight);
                     } else if (existing instanceof Double left && right instanceof Double numberLiteralRight) {
                         return env.assign(identifier.string(), left + numberLiteralRight);
+                    } else if (existing instanceof String str && right instanceof Number number) {
+                        return env.assign(identifier.string(), str + number);
                     }
                 } else {
                     return env.assign(identifier.string(), right);
@@ -578,16 +577,17 @@ public final class Interpreter implements Visitor<Object> {
         if (statement.hasRange()) {
             if (statement.isBodyBlock()) {
                 var range = statement.getRange();
-                var forEnv = new Environment<>(env);
+                int minimum = range.getMinimum();
+                int maximum = range.getMaximum();
 
-                var item = statement.getItem().string();
-                forEnv.init(item, range.getMinimum());
-                int bound = range.getMaximum();
+                String index = statement.getItem().string();
+                var forEnv = new Environment<>(env, Map.of(index, minimum));
+
                 Object result = null;
                 var body = statement.discardBlock();
-                for (int i = range.getMinimum(); i <= bound; i++) {
+                for (int i = minimum; i <= maximum; i++) {
+                    forEnv.assign(index, i);
                     result = executeBlock(body, forEnv);
-//                    forEnv.assign(item, i);
                 }
                 return result;
             }
