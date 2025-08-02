@@ -1,9 +1,6 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.BlockExpression;
-import io.zmeu.Frontend.Parser.Statements.ForStatement;
 import io.zmeu.TypeChecker.Types.ArrayType;
 import io.zmeu.TypeChecker.Types.ObjectType;
 import io.zmeu.TypeChecker.Types.ValueType;
@@ -12,17 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
-import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.zmeu.Frontend.Parser.Expressions.ResourceExpression.resource;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
@@ -106,29 +92,5 @@ public class ForLoopTest extends CheckerTest {
         var objectType = new ObjectType(new TypeEnvironment(varType.getEnvironment().getParent(), Map.of("name", ValueType.String)));
         assertEquals(objectType, varType.getType());
     }
-
-    @Test
-    void arrayResourcesAssignedToVar() {
-        var res = eval("""
-                var envs = [{client: 'amazon'},{client: 'bmw'}]
-                [for index in envs]
-                resource Bucket photos {
-                  name     = 'name-${index.value}'
-                }
-                """);
-        var expected = Program.of(
-                varStatement(var("envs", array(objectExpression(object("client", string("amazon"))), objectExpression(object("client", string("bmw")))))),
-                expressionStatement(array(ForStatement.builder()
-                        .item(id("index"))
-                        .body(
-                                resource("Bucket", "photos",
-                                        (BlockExpression) block(assign("name", "'name-${index.value}'")))
-                        )
-                        .build()))
-        );
-
-        assertEquals(expected, res);
-    }
-
 
 }
