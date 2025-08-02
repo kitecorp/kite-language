@@ -83,6 +83,14 @@ public class ForTest extends RuntimeTest {
     }
 
     @Test
+    void testForConditionalElse() {
+        var res = eval("""
+                [for i in 0..10: if i>2 i else i+10]
+                """);
+        assertEquals(List.of(10, 11, 12, 3, 4, 5, 6, 7, 8, 9, 10), res);
+    }
+
+    @Test
     void testForStringDoubleQuotes() {
         var res = eval("""
                 [for i in 0..10: "item-$i"]
