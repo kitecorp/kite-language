@@ -60,4 +60,7 @@ public final class ForStatement extends Statement {
         return false;
     }
 
+    public boolean hasArray() {
+        return array != null;
+    }
 }
