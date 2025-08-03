@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Lexer;
+package io.kite.Frontend.Lexer;
 
 import java.util.Arrays;
 import java.util.List;

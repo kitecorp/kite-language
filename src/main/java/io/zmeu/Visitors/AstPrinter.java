@@ -1,10 +1,10 @@
-package io.zmeu.Visitors;
+package io.kite.Visitors;
 
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.TypeChecker.Types.Type;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.*;
+import io.kite.TypeChecker.Types.Type;
 
 public final class AstPrinter implements Visitor<String> {
 

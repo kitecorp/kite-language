@@ -1,20 +1,20 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Base.CheckerTest;
-import io.zmeu.Runtime.exceptions.NotFoundException;
-import io.zmeu.Runtime.exceptions.VarExistsException;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.Base.CheckerTest;
+import io.kite.Runtime.exceptions.NotFoundException;
+import io.kite.Runtime.exceptions.VarExistsException;
+import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
-import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.kite.Frontend.Parser.Expressions.ValDeclaration.val;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

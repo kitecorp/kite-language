@@ -1,17 +1,17 @@
-package io.zmeu.TypeChecker.Types;
+package io.kite.TypeChecker.Types;
 
-import io.zmeu.Frontend.Lexer.Token;
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
-import io.zmeu.Frontend.Parser.Parser;
+import io.kite.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
+import io.kite.Frontend.Parser.Parser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static io.zmeu.Frontend.Lexer.TokenType.*;
-import static io.zmeu.Frontend.Lexer.TokenType.Colon;
+import static io.kite.Frontend.Lexer.TokenType.*;
+import static io.kite.Frontend.Lexer.TokenType.Colon;
 
 public class TypeParser {
 

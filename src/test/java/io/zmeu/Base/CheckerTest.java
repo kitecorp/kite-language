@@ -1,8 +1,8 @@
-package io.zmeu.Base;
+package io.kite.Base;
 
-import io.zmeu.Frontend.Parse.ParserTest;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.TypeChecker.TypeChecker;
+import io.kite.Frontend.Parse.ParserTest;
+import io.kite.Frontend.Parser.Program;
+import io.kite.TypeChecker.TypeChecker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 

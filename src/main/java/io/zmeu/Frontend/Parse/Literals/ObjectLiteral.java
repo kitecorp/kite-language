@@ -1,10 +1,10 @@
-package io.zmeu.Frontend.Parse.Literals;
+package io.kite.Frontend.Parse.Literals;
 
-import io.zmeu.Frontend.Parser.Expressions.Expression;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
 /**
  * A Object literal has the form of: { key: value } or empty string {}

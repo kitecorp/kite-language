@@ -1,6 +1,6 @@
-package io.zmeu.Frontend.Parser.Expressions;
+package io.kite.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parse.Literals.ObjectLiteral;
+import io.kite.Frontend.Parse.Literals.ObjectLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

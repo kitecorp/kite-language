@@ -1,9 +1,9 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Base.CheckerTest;
-import io.zmeu.TypeChecker.Types.ObjectType;
-import io.zmeu.TypeChecker.Types.SchemaType;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.Types.ObjectType;
+import io.kite.TypeChecker.Types.SchemaType;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

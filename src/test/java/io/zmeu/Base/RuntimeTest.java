@@ -1,13 +1,13 @@
-package io.zmeu.Base;
+package io.kite.Base;
 
-import io.zmeu.ParserErrors;
-import io.zmeu.Frontend.Lexer.Tokenizer;
-import io.zmeu.Frontend.Lexical.Resolver;
-import io.zmeu.Frontend.Parser.Parser;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Runtime.Environment.Environment;
-import io.zmeu.Runtime.Interpreter;
-import io.zmeu.Visitors.SyntaxPrinter;
+import io.kite.ParserErrors;
+import io.kite.Frontend.Lexer.Tokenizer;
+import io.kite.Frontend.Lexical.Resolver;
+import io.kite.Frontend.Parser.Parser;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Interpreter;
+import io.kite.Visitors.SyntaxPrinter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 

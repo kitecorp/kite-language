@@ -1,8 +1,8 @@
-package io.zmeu.Runtime;
+package io.kite.Runtime;
 
-import io.zmeu.Base.RuntimeTest;
-import io.zmeu.Runtime.Values.FunValue;
-import io.zmeu.Runtime.Values.SchemaValue;
+import io.kite.Base.RuntimeTest;
+import io.kite.Runtime.Values.FunValue;
+import io.kite.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2

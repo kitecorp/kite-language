@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

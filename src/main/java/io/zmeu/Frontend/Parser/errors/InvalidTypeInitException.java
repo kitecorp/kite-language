@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser.errors;
+package io.kite.Frontend.Parser.errors;
 
 public class InvalidTypeInitException extends RuntimeException {
     private Object expectedValueType;

@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Lexer;
+package io.kite.Frontend.Lexer;
 
 public class TokenException extends RuntimeException {
     private int line;

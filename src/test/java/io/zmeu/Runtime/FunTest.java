@@ -1,14 +1,14 @@
-package io.zmeu.Runtime;
+package io.kite.Runtime;
 
-import io.zmeu.Base.RuntimeTest;
-import io.zmeu.Frontend.Parser.Expressions.VarDeclaration;
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parser.Statements.BlockExpression;
-import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
-import io.zmeu.Frontend.Parser.Statements.VarStatement;
-import io.zmeu.Runtime.Values.FunValue;
-import io.zmeu.Runtime.exceptions.VarExistsException;
+import io.kite.Base.RuntimeTest;
+import io.kite.Frontend.Parser.Expressions.VarDeclaration;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Frontend.Parser.Statements.BlockExpression;
+import io.kite.Frontend.Parser.Statements.ExpressionStatement;
+import io.kite.Frontend.Parser.Statements.VarStatement;
+import io.kite.Runtime.Values.FunValue;
+import io.kite.Runtime.exceptions.VarExistsException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

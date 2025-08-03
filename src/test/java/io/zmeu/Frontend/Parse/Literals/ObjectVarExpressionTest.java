@@ -1,24 +1,24 @@
-package io.zmeu.Frontend.Parse.Literals;
+package io.kite.Frontend.Parse.Literals;
 
-import io.zmeu.Frontend.Parse.ParserTest;
-import io.zmeu.TypeChecker.Types.ReferenceType;
+import io.kite.Frontend.Parse.ParserTest;
+import io.kite.TypeChecker.Types.ReferenceType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.*;
-import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.zmeu.Frontend.Parser.Expressions.MemberExpression.member;
-import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.zmeu.Frontend.Parser.Factory.expressionStatement;
-import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.*;
+import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.kite.Frontend.Parser.Expressions.MemberExpression.member;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.kite.Frontend.Parser.Factory.expressionStatement;
+import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

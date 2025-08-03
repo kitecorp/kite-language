@@ -1,6 +1,6 @@
-package io.zmeu.TypeChecker.Types;
+package io.kite.TypeChecker.Types;
 
-import io.zmeu.Frontend.Parser.Expressions.Expression;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;

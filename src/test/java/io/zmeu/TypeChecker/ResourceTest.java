@@ -1,12 +1,12 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Base.CheckerTest;
-import io.zmeu.ParserErrors;
-import io.zmeu.Runtime.exceptions.NotFoundException;
-import io.zmeu.TypeChecker.Types.ArrayType;
-import io.zmeu.TypeChecker.Types.ResourceType;
-import io.zmeu.TypeChecker.Types.SchemaType;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.Base.CheckerTest;
+import io.kite.ParserErrors;
+import io.kite.Runtime.exceptions.NotFoundException;
+import io.kite.TypeChecker.Types.ArrayType;
+import io.kite.TypeChecker.Types.ResourceType;
+import io.kite.TypeChecker.Types.SchemaType;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;

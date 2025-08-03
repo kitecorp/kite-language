@@ -1,9 +1,9 @@
-package io.zmeu.Frontend.Parse.Literals;
+package io.kite.Frontend.Parse.Literals;
 
-import io.zmeu.TypeChecker.Types.ReferenceType;
-import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.TypeChecker.Types.TypeFactory;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.TypeChecker.Types.ReferenceType;
+import io.kite.TypeChecker.Types.Type;
+import io.kite.TypeChecker.Types.TypeFactory;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

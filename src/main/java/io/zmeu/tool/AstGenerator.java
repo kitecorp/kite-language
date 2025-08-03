@@ -1,4 +1,4 @@
-package io.zmeu.tool;
+package io.kite.tool;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,7 +11,7 @@ public class AstGenerator {
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
             System.err.println("Usage: generate_ast <output directory>");
-            var cwd = Paths.get(".").normalize().toAbsolutePath() + "/src/main/java/io/zmeu/Frontend/Parser";
+            var cwd = Paths.get(".").normalize().toAbsolutePath() + "/src/main/java/io/kite/Frontend/Parser";
             System.out.println(cwd);
             args = new String[]{cwd};
         }
@@ -69,7 +69,7 @@ public class AstGenerator {
                 """.formatted(className, fieldList, constructorInit.toString());
         var imports = "";
         if (fieldList.contains("Token")) {
-            imports = "import io.zmeu.Frontend.Lexer.Token;";
+            imports = "import io.kite.Frontend.Lexer.Token;";
         }
 
         // Fields.

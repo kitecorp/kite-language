@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser.Expressions;
+package io.kite.Frontend.Parser.Expressions;
 
 public class Expressions {
     public static Expression logical(Object operator, Expression left, Expression right) {

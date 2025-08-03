@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;

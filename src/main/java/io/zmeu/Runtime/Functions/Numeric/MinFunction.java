@@ -1,7 +1,7 @@
-package io.zmeu.Runtime.Functions.Numeric;
+package io.kite.Runtime.Functions.Numeric;
 
-import io.zmeu.Runtime.Callable;
-import io.zmeu.Runtime.Interpreter;
+import io.kite.Runtime.Callable;
+import io.kite.Runtime.Interpreter;
 
 import java.util.ArrayList;
 import java.util.Collections;

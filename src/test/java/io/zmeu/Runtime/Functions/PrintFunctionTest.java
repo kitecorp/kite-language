@@ -1,6 +1,6 @@
-package io.zmeu.Runtime.Functions;
+package io.kite.Runtime.Functions;
 
-import io.zmeu.Base.RuntimeTest;
+import io.kite.Base.RuntimeTest;
 import org.junit.jupiter.api.Test;
 
 class PrintFunctionTest extends RuntimeTest {

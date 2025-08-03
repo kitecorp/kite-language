@@ -1,9 +1,9 @@
-package io.zmeu.Frontend.Parser.Expressions;
+package io.kite.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parse.Literals.SymbolIdentifier;
-import io.zmeu.Frontend.Parser.Statements.BlockExpression;
-import io.zmeu.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.SymbolIdentifier;
+import io.kite.Frontend.Parser.Statements.BlockExpression;
+import io.kite.Frontend.Parser.Statements.Statement;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 

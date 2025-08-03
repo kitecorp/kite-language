@@ -1,16 +1,16 @@
-package io.zmeu;
+package io.kite;
 
 import org.junit.platform.suite.api.SelectPackages;
 import org.junit.platform.suite.api.Suite;
 
 @Suite
 @SelectPackages({
-        "io.zmeu.Frontend.Parse",
-        "io.zmeu.TypeChecker",
-        "io.zmeu.Runtime",
-        "io.zmeu.Frontend.Token",
-        "io.zmeu.Frontend.Parser",
-        "io.zmeu.Frontend.Lexical"
+        "io.kite.Frontend.Parse",
+        "io.kite.TypeChecker",
+        "io.kite.Runtime",
+        "io.kite.Frontend.Token",
+        "io.kite.Frontend.Parser",
+        "io.kite.Frontend.Lexical"
 })
 public class _Suite {
 }

@@ -1,10 +1,10 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Expressions.CallExpression;
-import io.zmeu.Frontend.Parser.Expressions.MemberExpression;
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.ExpressionStatement;
+import io.kite.Frontend.Parser.Expressions.CallExpression;
+import io.kite.Frontend.Parser.Expressions.MemberExpression;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

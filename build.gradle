@@ -3,7 +3,7 @@ plugins {
     id('org.gradlex.extra-java-module-info') version "1.12"
 }
 
-group 'io.zmeu'
+group 'io.kite'
 version '0.1.0'
 
 repositories {
@@ -59,7 +59,7 @@ tasks.register('testJar', Jar) {
     archiveClassifier.set('test')
 //    from sourceSets.test.output
     from(sourceSets.test.output) {
-        include 'io/zmeu/Base/**'
+        include 'io/kite/Base/**'
     }
 }
 

@@ -1,6 +1,6 @@
-package io.zmeu.Base;
+package io.kite.Base;
 
-import io.zmeu.TypeChecker.TypeChecker;
+import io.kite.TypeChecker.TypeChecker;
 import org.junit.jupiter.api.BeforeEach;
 
 public class SrcTest extends RuntimeTest {

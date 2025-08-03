@@ -1,6 +1,6 @@
-package io.zmeu.Runtime.Functions.Cast;
+package io.kite.Runtime.Functions.Cast;
 
-import io.zmeu.Base.RuntimeTest;
+import io.kite.Base.RuntimeTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

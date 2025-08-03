@@ -1,6 +1,6 @@
-package io.zmeu.Utils;
+package io.kite.Utils;
 
-import io.zmeu.Frontend.Parse.Literals.BooleanLiteral;
+import io.kite.Frontend.Parse.Literals.BooleanLiteral;
 
 public class BoolUtils {
     public static boolean isTruthy(Object object) {

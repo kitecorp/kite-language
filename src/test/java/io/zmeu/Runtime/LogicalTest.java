@@ -1,6 +1,6 @@
-package io.zmeu.Runtime;
+package io.kite.Runtime;
 
-import io.zmeu.Base.RuntimeTest;
+import io.kite.Base.RuntimeTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

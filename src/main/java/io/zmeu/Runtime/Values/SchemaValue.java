@@ -1,8 +1,8 @@
-package io.zmeu.Runtime.Values;
+package io.kite.Runtime.Values;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Runtime.Environment.Environment;
-import io.zmeu.Runtime.Environment.IEnvironment;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Environment.IEnvironment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

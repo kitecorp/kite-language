@@ -1,16 +1,16 @@
-package io.zmeu.Runtime;
+package io.kite.Runtime;
 
-import io.zmeu.Base.RuntimeTest;
-import io.zmeu.Frontend.Parse.Literals.SymbolIdentifier;
-import io.zmeu.Runtime.Values.NullValue;
+import io.kite.Base.RuntimeTest;
+import io.kite.Frontend.Parse.Literals.SymbolIdentifier;
+import io.kite.Runtime.Values.NullValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.BooleanLiteral.bool;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
 public class LiteralTest extends RuntimeTest {
     @Test

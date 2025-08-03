@@ -1,4 +1,4 @@
-package io.zmeu.Runtime.exceptions;
+package io.kite.Runtime.exceptions;
 
 public class VarExistsException extends RuntimeException {
     private static final String msg = "Variable is already declared: %s";

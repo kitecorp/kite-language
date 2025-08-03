@@ -1,16 +1,16 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Base.CheckerTest;
-import io.zmeu.TypeChecker.Types.ObjectType;
-import io.zmeu.TypeChecker.Types.ReferenceType;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.Types.ObjectType;
+import io.kite.TypeChecker.Types.ReferenceType;
+import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TypeChecker Object")

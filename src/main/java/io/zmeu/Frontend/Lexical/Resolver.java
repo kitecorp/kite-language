@@ -1,13 +1,13 @@
-package io.zmeu.Frontend.Lexical;
+package io.kite.Frontend.Lexical;
 
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.ParserErrors;
-import io.zmeu.Runtime.Interpreter;
-import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.Visitors.Visitor;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.*;
+import io.kite.ParserErrors;
+import io.kite.Runtime.Interpreter;
+import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.Visitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

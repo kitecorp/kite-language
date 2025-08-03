@@ -1,6 +1,6 @@
-package io.zmeu.Frontend.Parse.Literals;
+package io.kite.Frontend.Parse.Literals;
 
-import io.zmeu.TypeChecker.Types.ReferenceType;
+import io.kite.TypeChecker.Types.ReferenceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

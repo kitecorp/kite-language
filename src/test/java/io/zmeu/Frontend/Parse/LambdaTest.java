@@ -1,6 +1,6 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,16 +8,16 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
-import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parser.Expressions.CallExpression.call;
-import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.LambdaExpression.lambda;
-import static io.zmeu.Frontend.Parser.Statements.ReturnStatement.funReturn;
+import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
+import static io.kite.Frontend.Parser.Expressions.CallExpression.call;
+import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.kite.Frontend.Parser.Statements.LambdaExpression.lambda;
+import static io.kite.Frontend.Parser.Statements.ReturnStatement.funReturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

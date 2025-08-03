@@ -1,4 +1,4 @@
-package io.zmeu.Runtime.exceptions;
+package io.kite.Runtime.exceptions;
 
 import lombok.Getter;
 

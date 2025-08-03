@@ -1,7 +1,7 @@
-package io.zmeu.Frontend.Lexical;
+package io.kite.Frontend.Lexical;
 
-import io.zmeu.Frontend.Parser.errors.ParseError;
-import io.zmeu.Base.RuntimeTest;
+import io.kite.Frontend.Parser.errors.ParseError;
+import io.kite.Base.RuntimeTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

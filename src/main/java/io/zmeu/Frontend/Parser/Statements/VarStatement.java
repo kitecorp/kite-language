@@ -1,7 +1,7 @@
-package io.zmeu.Frontend.Parser.Statements;
+package io.kite.Frontend.Parser.Statements;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parser.Expressions.VarDeclaration;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parser.Expressions.VarDeclaration;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 
 /**
  * <p>

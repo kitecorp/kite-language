@@ -1,4 +1,4 @@
-package io.zmeu.Runtime.exceptions;
+package io.kite.Runtime.exceptions;
 
 public class InvalidInitException extends RuntimeException{
     public InvalidInitException(String message) {

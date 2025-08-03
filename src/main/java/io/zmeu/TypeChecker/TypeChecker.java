@@ -1,15 +1,15 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.Runtime.exceptions.InvalidInitException;
-import io.zmeu.Runtime.exceptions.NotFoundException;
-import io.zmeu.Runtime.exceptions.OperationNotImplementedException;
-import io.zmeu.TypeChecker.Types.*;
-import io.zmeu.Visitors.SyntaxPrinter;
-import io.zmeu.Visitors.Visitor;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.exceptions.InvalidInitException;
+import io.kite.Runtime.exceptions.NotFoundException;
+import io.kite.Runtime.exceptions.OperationNotImplementedException;
+import io.kite.TypeChecker.Types.*;
+import io.kite.Visitors.SyntaxPrinter;
+import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;

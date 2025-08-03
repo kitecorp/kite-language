@@ -1,6 +1,6 @@
-package io.zmeu.Runtime.exceptions;
+package io.kite.Runtime.exceptions;
 
-import io.zmeu.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.Token;
 import lombok.Getter;
 
 

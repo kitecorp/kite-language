@@ -1,6 +1,6 @@
-package io.zmeu.Runtime.Environment;
+package io.kite.Runtime.Environment;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public interface IEnvironment<T> {
