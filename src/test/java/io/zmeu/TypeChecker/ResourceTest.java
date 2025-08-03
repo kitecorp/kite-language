@@ -267,4 +267,23 @@ public class ResourceTest extends CheckerTest {
         var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
         assertEquals(res, arrayType.getType());
     }
+
+    @Test
+    void testIfConditionReturnsResource() {
+        var array = eval("""
+                schema Bucket {
+                   var string name
+                }
+                if true {
+                    resource Bucket photos {
+                      name     = 'name'
+                    }
+                }
+                """);
+
+        Assertions.assertInstanceOf(ResourceType.class, array);
+        var resourceType = (ResourceType) array;
+        var res = new ResourceType("photos", resourceType.getSchema(), resourceType.getEnvironment());
+        assertEquals(res, resourceType);
+    }
 }

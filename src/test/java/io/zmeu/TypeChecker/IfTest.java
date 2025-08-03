@@ -1,9 +1,7 @@
 package io.zmeu.TypeChecker;
 
 import io.zmeu.Base.CheckerTest;
-import io.zmeu.TypeChecker.Types.ResourceType;
 import io.zmeu.TypeChecker.Types.ValueType;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,23 +25,5 @@ public class IfTest extends CheckerTest {
         assertEquals(ValueType.Number, actual);
     }
 
-    @Test
-    void arrayResourcesAssignedToVar() {
-        var array = eval("""
-                schema Bucket {
-                   var string name
-                }
-                if true {
-                    resource Bucket photos {
-                      name     = 'name'
-                    }
-                }
-                """);
-
-        Assertions.assertInstanceOf(ResourceType.class, array);
-        var resourceType = (ResourceType) array;
-        var res = new ResourceType("photos", resourceType.getSchema(), resourceType.getEnvironment());
-        assertEquals(res, resourceType);
-    }
 
 }
