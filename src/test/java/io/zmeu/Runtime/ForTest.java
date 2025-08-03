@@ -30,7 +30,7 @@ public class ForTest extends RuntimeTest {
                     x += i
                 }
                 """);
-        // 1+1+2=7
+        // 1+1+2=4
         assertEquals(4, res);
     }
 
@@ -75,6 +75,7 @@ public class ForTest extends RuntimeTest {
                 [for i in 0..10: if i>2 i]
                 """);
         assertEquals(List.of(3, 4, 5, 6, 7, 8, 9), res);
+        log.info(res);
     }
 
     @Test
@@ -100,6 +101,7 @@ public class ForTest extends RuntimeTest {
                 var x = [for index in 0..5: 'item-$index']
                 """);
         assertEquals(List.of("item-$index", "item-$index", "item-$index", "item-$index", "item-$index"), res);
+        log.info(res);
     }
 
     @Test
