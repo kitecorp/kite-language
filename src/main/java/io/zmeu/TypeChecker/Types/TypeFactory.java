@@ -1,4 +1,4 @@
-package io.zmeu.TypeChecker.Types;
+package io.kite.TypeChecker.Types;
 
 public class TypeFactory {
     private final static FunStore funStore = FunStore.getInstance();

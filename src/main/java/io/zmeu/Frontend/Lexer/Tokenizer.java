@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Lexer;
+package io.kite.Frontend.Lexer;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;

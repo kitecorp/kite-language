@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Lexer;
+package io.kite.Frontend.Lexer;
 
 import org.apache.commons.lang3.ArrayUtils;
 

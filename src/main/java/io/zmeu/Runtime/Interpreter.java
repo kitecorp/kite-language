@@ -1,30 +1,30 @@
-package io.zmeu.Runtime;
+package io.kite.Runtime;
 
-import io.zmeu.Frontend.Lexer.Token;
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.ParserErrors;
-import io.zmeu.Runtime.Environment.ActivationEnvironment;
-import io.zmeu.Runtime.Environment.Environment;
-import io.zmeu.Runtime.Functions.Cast.BooleanCastFunction;
-import io.zmeu.Runtime.Functions.Cast.DecimalCastFunction;
-import io.zmeu.Runtime.Functions.Cast.IntCastFunction;
-import io.zmeu.Runtime.Functions.Cast.StringCastFunction;
-import io.zmeu.Runtime.Functions.DateFunction;
-import io.zmeu.Runtime.Functions.Numeric.*;
-import io.zmeu.Runtime.Functions.PrintFunction;
-import io.zmeu.Runtime.Functions.PrintlnFunction;
-import io.zmeu.Runtime.Values.*;
-import io.zmeu.Runtime.exceptions.*;
-import io.zmeu.SchemaContext;
-import io.zmeu.TypeChecker.TypeError;
-import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.Visitors.SyntaxPrinter;
-import io.zmeu.Visitors.Visitor;
+import io.kite.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.*;
+import io.kite.ParserErrors;
+import io.kite.Runtime.Environment.ActivationEnvironment;
+import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Functions.Cast.BooleanCastFunction;
+import io.kite.Runtime.Functions.Cast.DecimalCastFunction;
+import io.kite.Runtime.Functions.Cast.IntCastFunction;
+import io.kite.Runtime.Functions.Cast.StringCastFunction;
+import io.kite.Runtime.Functions.DateFunction;
+import io.kite.Runtime.Functions.Numeric.*;
+import io.kite.Runtime.Functions.PrintFunction;
+import io.kite.Runtime.Functions.PrintlnFunction;
+import io.kite.Runtime.Values.*;
+import io.kite.Runtime.exceptions.*;
+import io.kite.SchemaContext;
+import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.SyntaxPrinter;
+import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +33,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.zmeu.Frontend.Parser.Statements.FunctionDeclaration.fun;
-import static io.zmeu.Utils.BoolUtils.isTruthy;
+import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
+import static io.kite.Utils.BoolUtils.isTruthy;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {

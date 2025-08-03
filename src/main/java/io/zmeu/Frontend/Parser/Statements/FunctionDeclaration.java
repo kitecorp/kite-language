@@ -1,8 +1,8 @@
-package io.zmeu.Frontend.Parser.Statements;
+package io.kite.Frontend.Parser.Statements;
 
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.Expression;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parser.Expressions.Expression;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;

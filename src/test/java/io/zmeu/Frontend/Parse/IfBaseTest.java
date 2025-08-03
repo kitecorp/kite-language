@@ -1,22 +1,22 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.ParserErrors;
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Parser.errors.ParseError;
+import io.kite.ParserErrors;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Parser.errors.ParseError;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.IfStatement.If;
+import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.kite.Frontend.Parser.Statements.IfStatement.If;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

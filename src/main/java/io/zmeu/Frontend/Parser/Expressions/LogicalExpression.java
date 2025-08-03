@@ -1,6 +1,6 @@
-package io.zmeu.Frontend.Parser.Expressions;
+package io.kite.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Lexer.TokenType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

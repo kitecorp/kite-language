@@ -1,4 +1,4 @@
-package io.zmeu.TypeChecker.Types;
+package io.kite.TypeChecker.Types;
 
 import java.util.HashMap;
 import java.util.Map;

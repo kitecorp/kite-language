@@ -1,10 +1,10 @@
-package io.zmeu;
+package io.kite;
 
-import io.zmeu.Frontend.Lexer.Token;
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Parser.errors.ErrorList;
-import io.zmeu.Frontend.Parser.errors.ParseError;
-import io.zmeu.Runtime.exceptions.RuntimeError;
+import io.kite.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Parser.errors.ErrorList;
+import io.kite.Frontend.Parser.errors.ParseError;
+import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 

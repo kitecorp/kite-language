@@ -1,7 +1,7 @@
-package io.zmeu.Frontend.Token;
+package io.kite.Frontend.Token;
 
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Lexer.Tokenizer;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Lexer.Tokenizer;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

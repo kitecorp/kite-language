@@ -1,19 +1,19 @@
-package io.zmeu.Frontend.Parser;
+package io.kite.Frontend.Parser;
 
-import io.zmeu.BlockContext;
-import io.zmeu.Frontend.Lexer.Token;
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
-import io.zmeu.Frontend.Parser.errors.ParseError;
-import io.zmeu.ParserErrors;
-import io.zmeu.Runtime.exceptions.InvalidInitException;
-import io.zmeu.SchemaContext;
-import io.zmeu.TypeChecker.Types.TypeParser;
-import io.zmeu.TypeChecker.Types.ValueType;
-import io.zmeu.Visitors.SyntaxPrinter;
+import io.kite.BlockContext;
+import io.kite.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
+import io.kite.Frontend.Parser.errors.ParseError;
+import io.kite.ParserErrors;
+import io.kite.Runtime.exceptions.InvalidInitException;
+import io.kite.SchemaContext;
+import io.kite.TypeChecker.Types.TypeParser;
+import io.kite.TypeChecker.Types.ValueType;
+import io.kite.Visitors.SyntaxPrinter;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Range;
@@ -25,17 +25,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static io.zmeu.Frontend.Lexer.TokenType.*;
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.ParameterIdentifier.param;
-import static io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
-import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
-import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.schema;
-import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
+import static io.kite.Frontend.Lexer.TokenType.*;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
+import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
+import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
+import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
+import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 
 
 /**

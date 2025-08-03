@@ -1,9 +1,9 @@
-package io.zmeu.Frontend.Parser;
+package io.kite.Frontend.Parser;
 
-import io.zmeu.Frontend.Lexer.Token;
-import io.zmeu.Frontend.Lexer.TokenType;
-import io.zmeu.ParserErrors;
-import io.zmeu.Visitors.AstPrinter;
+import io.kite.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.TokenType;
+import io.kite.ParserErrors;
+import io.kite.Visitors.AstPrinter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

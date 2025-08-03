@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser.Statements;
+package io.kite.Frontend.Parser.Statements;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

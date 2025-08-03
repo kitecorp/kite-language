@@ -1,11 +1,11 @@
-package io.zmeu.Runtime;
+package io.kite.Runtime;
 
-import io.zmeu.Base.RuntimeTest;
-import io.zmeu.ParserErrors;
-import io.zmeu.Runtime.Values.ResourceValue;
-import io.zmeu.Runtime.Values.SchemaValue;
-import io.zmeu.Runtime.exceptions.NotFoundException;
-import io.zmeu.Runtime.exceptions.RuntimeError;
+import io.kite.Base.RuntimeTest;
+import io.kite.ParserErrors;
+import io.kite.Runtime.Values.ResourceValue;
+import io.kite.Runtime.Values.SchemaValue;
+import io.kite.Runtime.exceptions.NotFoundException;
+import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Disabled;
@@ -730,6 +730,29 @@ public class ResourceTest extends RuntimeTest {
                    var string name
                 }
                 if true {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = name
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+    }
+
+    @Test
+    @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
+    void testForReturnsResourceNestedVar() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                for i in 0..2 {
                     var name = 'prod'
                     resource vm main {
                       name     = name

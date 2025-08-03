@@ -1,6 +1,6 @@
-package io.zmeu.Utils;
+package io.kite.Utils;
 
-import io.zmeu.api.annotations.Property;
+import io.kite.api.annotations.Property;
 
 import java.lang.reflect.Field;
 

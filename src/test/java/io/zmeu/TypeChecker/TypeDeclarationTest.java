@@ -1,14 +1,14 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Frontend.Parse.ParserTest;
+import io.kite.Frontend.Parse.ParserTest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.VarStatement.statement;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.VarStatement.statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

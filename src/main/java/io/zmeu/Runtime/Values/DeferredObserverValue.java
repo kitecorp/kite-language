@@ -1,6 +1,6 @@
-package io.zmeu.Runtime.Values;
+package io.kite.Runtime.Values;
 
-import io.zmeu.Runtime.Interpreter;
+import io.kite.Runtime.Interpreter;
 
 public interface DeferredObserverValue {
     Object notify(Interpreter interpreter);

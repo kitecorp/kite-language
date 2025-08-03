@@ -1,4 +1,4 @@
-package io.zmeu.Plugin.AWS;
+package io.kite.Plugin.AWS;
 
 public class SsmParameter  {
 

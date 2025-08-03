@@ -1,7 +1,7 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Base.CheckerTest;
-import io.zmeu.TypeChecker.Types.*;
+import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.Types.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

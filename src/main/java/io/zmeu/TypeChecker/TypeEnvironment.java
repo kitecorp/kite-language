@@ -1,8 +1,8 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Runtime.Environment.Environment;
-import io.zmeu.Runtime.Values.ResourceValue;
-import io.zmeu.TypeChecker.Types.*;
+import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Values.ResourceValue;
+import io.kite.TypeChecker.Types.*;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.Nullable;
 

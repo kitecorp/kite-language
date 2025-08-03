@@ -1,11 +1,11 @@
-package io.zmeu.Frontend.visitors;
+package io.kite.Frontend.visitors;
 
-import io.zmeu.Frontend.Parser.Expressions.BinaryExpression;
-import io.zmeu.Frontend.Parser.Expressions.GroupExpression;
-import io.zmeu.Frontend.Parser.Expressions.LogicalExpression;
-import io.zmeu.Frontend.Parser.Expressions.UnaryExpression;
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Visitors.AstPrinter;
+import io.kite.Frontend.Parser.Expressions.BinaryExpression;
+import io.kite.Frontend.Parser.Expressions.GroupExpression;
+import io.kite.Frontend.Parser.Expressions.LogicalExpression;
+import io.kite.Frontend.Parser.Expressions.UnaryExpression;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Visitors.AstPrinter;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

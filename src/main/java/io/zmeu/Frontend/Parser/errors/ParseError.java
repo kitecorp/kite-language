@@ -1,7 +1,7 @@
-package io.zmeu.Frontend.Parser.errors;
+package io.kite.Frontend.Parser.errors;
 
-import io.zmeu.Frontend.Lexer.Token;
-import io.zmeu.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Lexer.Token;
+import io.kite.Frontend.Lexer.TokenType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

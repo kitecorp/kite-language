@@ -1,6 +1,6 @@
-package io.zmeu.TypeChecker.Types;
+package io.kite.TypeChecker.Types;
 
-import io.zmeu.TypeChecker.TypeEnvironment;
+import io.kite.TypeChecker.TypeEnvironment;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

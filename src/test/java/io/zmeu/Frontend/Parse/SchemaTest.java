@@ -1,20 +1,20 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Expressions.ArrayExpression;
-import io.zmeu.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Expressions.ArrayExpression;
+import io.kite.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parse.Literals.TypeIdentifier.type;
-import static io.zmeu.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
-import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.zmeu.Frontend.Parser.Factory.program;
-import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
-import static io.zmeu.Frontend.Parser.Statements.SchemaDeclaration.schema;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.kite.Frontend.Parser.Factory.program;
+import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
+import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

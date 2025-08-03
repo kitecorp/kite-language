@@ -1,12 +1,12 @@
-package io.zmeu.Frontend.Parser.Expressions;
+package io.kite.Frontend.Parser.Expressions;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Frontend.Parse.Literals.StringLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

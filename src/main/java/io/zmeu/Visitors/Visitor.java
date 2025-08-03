@@ -1,13 +1,13 @@
-package io.zmeu.Visitors;
+package io.kite.Visitors;
 
-import io.zmeu.Frontend.Lexical.Resolver;
-import io.zmeu.Frontend.Parse.Literals.*;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.*;
-import io.zmeu.Runtime.Interpreter;
-import io.zmeu.TypeChecker.TypeChecker;
-import io.zmeu.TypeChecker.Types.Type;
+import io.kite.Frontend.Lexical.Resolver;
+import io.kite.Frontend.Parse.Literals.*;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.Interpreter;
+import io.kite.TypeChecker.TypeChecker;
+import io.kite.TypeChecker.Types.Type;
 
 public sealed interface Visitor<R>
         permits Resolver, TypeChecker, Interpreter, AstPrinter, SyntaxPrinter {

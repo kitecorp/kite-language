@@ -1,19 +1,19 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.ParserErrors;
+import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
-import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.zmeu.Frontend.Parser.Expressions.ValDeclaration.val;
-import static io.zmeu.Frontend.Parser.Program.program;
-import static io.zmeu.Frontend.Parser.Statements.ValStatement.valStatement;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parser.Expressions.ValDeclaration.val;
+import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

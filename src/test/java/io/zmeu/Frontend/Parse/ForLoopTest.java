@@ -1,28 +1,28 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parser.Program;
-import io.zmeu.Frontend.Parser.Statements.BlockExpression;
-import io.zmeu.Frontend.Parser.Statements.ForStatement;
-import io.zmeu.Frontend.Parser.Statements.WhileStatement;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.BlockExpression;
+import io.kite.Frontend.Parser.Statements.ForStatement;
+import io.kite.Frontend.Parser.Statements.WhileStatement;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Range;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parse.Literals.Identifier.id;
-import static io.zmeu.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.zmeu.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.zmeu.Frontend.Parse.Literals.StringLiteral.string;
-import static io.zmeu.Frontend.Parser.Expressions.ArrayExpression.array;
-import static io.zmeu.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.zmeu.Frontend.Parser.Expressions.BinaryExpression.binary;
-import static io.zmeu.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.zmeu.Frontend.Parser.Expressions.ResourceExpression.resource;
-import static io.zmeu.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.zmeu.Frontend.Parser.Statements.BlockExpression.block;
-import static io.zmeu.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.zmeu.Frontend.Parser.Statements.IfStatement.If;
-import static io.zmeu.Frontend.Parser.Statements.VarStatement.varStatement;
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
+import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parser.Expressions.ResourceExpression.resource;
+import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
+import static io.kite.Frontend.Parser.Statements.IfStatement.If;
+import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

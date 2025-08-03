@@ -1,6 +1,6 @@
-package io.zmeu.Frontend.Parser.Statements;
+package io.kite.Frontend.Parser.Statements;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.Identifier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

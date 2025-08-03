@@ -1,10 +1,10 @@
-package io.zmeu.Frontend.Parser;
+package io.kite.Frontend.Parser;
 
-import io.zmeu.Frontend.Parse.Literals.Identifier;
-import io.zmeu.Frontend.Parse.Literals.NumberLiteral;
-import io.zmeu.Frontend.Parse.Literals.TypeIdentifier;
-import io.zmeu.Frontend.Parser.Expressions.*;
-import io.zmeu.Frontend.Parser.Statements.*;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Statements.*;
 
 import java.util.Arrays;
 

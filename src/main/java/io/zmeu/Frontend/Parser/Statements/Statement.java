@@ -1,9 +1,9 @@
-package io.zmeu.Frontend.Parser.Statements;
+package io.kite.Frontend.Parser.Statements;
 
-import io.zmeu.Frontend.Parser.Expressions.ModuleExpression;
-import io.zmeu.Frontend.Parser.Expressions.ResourceExpression;
-import io.zmeu.Frontend.Parser.Expressions.TypeExpression;
-import io.zmeu.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Expressions.ModuleExpression;
+import io.kite.Frontend.Parser.Expressions.ResourceExpression;
+import io.kite.Frontend.Parser.Expressions.TypeExpression;
+import io.kite.Frontend.Parser.Program;
 import lombok.Data;
 
 /**

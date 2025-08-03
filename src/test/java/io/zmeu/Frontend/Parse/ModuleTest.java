@@ -1,12 +1,12 @@
-package io.zmeu.Frontend.Parse;
+package io.kite.Frontend.Parse;
 
-import io.zmeu.Frontend.Parser.Expressions.AssignmentExpression;
+import io.kite.Frontend.Parser.Expressions.AssignmentExpression;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.zmeu.Frontend.Parser.Expressions.ModuleExpression.module;
-import static io.zmeu.Frontend.Parser.Factory.*;
+import static io.kite.Frontend.Parser.Expressions.ModuleExpression.module;
+import static io.kite.Frontend.Parser.Factory.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

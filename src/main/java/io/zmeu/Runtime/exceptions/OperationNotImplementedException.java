@@ -1,6 +1,6 @@
-package io.zmeu.Runtime.exceptions;
+package io.kite.Runtime.exceptions;
 
-import io.zmeu.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.Parser.Statements.Statement;
 
 public class OperationNotImplementedException extends RuntimeException {
     private static final String msg = "Operation not implemented: %s";

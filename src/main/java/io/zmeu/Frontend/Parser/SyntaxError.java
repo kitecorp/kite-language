@@ -1,4 +1,4 @@
-package io.zmeu.Frontend.Parser;
+package io.kite.Frontend.Parser;
 
 public class SyntaxError extends RuntimeException {
     public SyntaxError() {

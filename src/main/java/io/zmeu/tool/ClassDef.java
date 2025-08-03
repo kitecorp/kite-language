@@ -1,4 +1,4 @@
-package io.zmeu.tool;
+package io.kite.tool;
 
 import lombok.Data;
 

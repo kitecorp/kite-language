@@ -1,6 +1,6 @@
-package io.zmeu.TypeChecker;
+package io.kite.TypeChecker;
 
-import io.zmeu.Frontend.Parser.Expressions.Expression;
+import io.kite.Frontend.Parser.Expressions.Expression;
 
 public class TypeError extends RuntimeException {
     public TypeError(Expression t1, Expression t2) {

@@ -1,8 +1,8 @@
-package io.zmeu.Runtime.Environment;
+package io.kite.Runtime.Environment;
 
-import io.zmeu.Runtime.Values.ResourceValue;
-import io.zmeu.Runtime.exceptions.NotFoundException;
-import io.zmeu.Runtime.exceptions.VarExistsException;
+import io.kite.Runtime.Values.ResourceValue;
+import io.kite.Runtime.exceptions.NotFoundException;
+import io.kite.Runtime.exceptions.VarExistsException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
