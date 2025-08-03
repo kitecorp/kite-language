@@ -2,10 +2,7 @@ package io.zmeu.TypeChecker;
 
 import io.zmeu.Runtime.Environment.Environment;
 import io.zmeu.Runtime.Values.ResourceValue;
-import io.zmeu.TypeChecker.Types.ReferenceType;
-import io.zmeu.TypeChecker.Types.Type;
-import io.zmeu.TypeChecker.Types.TypeFactory;
-import io.zmeu.TypeChecker.Types.ValueType;
+import io.zmeu.TypeChecker.Types.*;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.Nullable;
 
