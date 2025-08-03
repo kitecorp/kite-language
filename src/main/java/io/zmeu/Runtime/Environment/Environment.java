@@ -36,6 +36,10 @@ public class Environment<T> implements IEnvironment<T> {
         this.variables.putAll(variables);
     }
 
+    public static <T> Environment<T> copyOfVariables(Environment<T> environment) {
+        return new Environment<>(environment, environment.variables);
+    }
+
     public Environment(@Nullable Environment<T> parent, ResourceValue variables) {
         this(parent);
         for (Field field : variables.getClass().getDeclaredFields()) {

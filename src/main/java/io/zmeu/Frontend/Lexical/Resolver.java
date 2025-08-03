@@ -293,6 +293,9 @@ public final class Resolver implements Visitor<Void> {
                         define(identifier);
 //                        resolve(identifier);
                     }
+                    if (assignmentExpression.getRight() instanceof Identifier identifier) {
+                        resolve(identifier);
+                    }
                 }
             }
         }
