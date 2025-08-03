@@ -9,6 +9,9 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 @Data
 public class SchemaValue {
     public static final String INSTANCES = "instances";
@@ -30,6 +33,7 @@ public class SchemaValue {
     public static SchemaValue of(Identifier name, Environment environment) {
         return new SchemaValue(name, environment);
     }
+
     public static SchemaValue of(String name, Environment environment) {
         return new SchemaValue(Identifier.id(name), environment);
     }
@@ -69,7 +73,7 @@ public class SchemaValue {
     }
 
     public Object init(String name, Object value) {
-        return environment.init(name,value);
+        return environment.init(name, value);
     }
 
     public Object initInstance(String name, Object instance) {
@@ -79,4 +83,10 @@ public class SchemaValue {
     public ResourceValue getInstance(String name) {
         return instances.get(name);
     }
+
+    public ResourceValue getInstanceOrElseGet(String name, Supplier<? extends ResourceValue> supplier) {
+        return Optional.ofNullable(instances.get(name)).orElseGet(supplier);
+    }
+
+
 }

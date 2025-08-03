@@ -82,6 +82,20 @@ public final class Interpreter implements Visitor<Object> {
         hadRuntimeError = true;
     }
 
+    private ResourceValue getInstance(ResourceExpression resource, SchemaValue installedSchema, Environment typeEnvironment) {
+        var instance = installedSchema.getInstance(resource.name());
+        if (instance == null) {
+            // clone all properties from schema properties to the new resource
+            var resourceEnv = Environment.copyOfVariables(typeEnvironment);
+            resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
+            var res = new ResourceValue(resource.name(), resourceEnv, installedSchema, resource.isExisting());
+            // init any kind of new resource
+            installedSchema.initInstance(resource.name(), res);
+            return res;
+        }
+        return instance;
+    }
+
     @Override
     public Object visit(int expression) {
         return expression;
@@ -490,15 +504,7 @@ public final class Interpreter implements Visitor<Object> {
 
         Environment typeEnvironment = installedSchema.getEnvironment();
 
-        var instance = installedSchema.getInstance(resource.name());
-        if (instance == null) {
-            // clone all properties from schema properties to the new resource
-            var resourceEnv = new Environment(typeEnvironment, typeEnvironment.getVariables());
-            resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-            instance = new ResourceValue(resource.name(), resourceEnv, installedSchema, resource.isExisting());
-            // init any kind of new resource
-            installedSchema.initInstance(resource.name(), instance);
-        }
+        var instance = getInstance(resource, installedSchema, typeEnvironment);
         try {
 //            var init = installedSchema.getMethodOrNull("init");
 //            if (init != null) {

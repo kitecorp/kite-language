@@ -676,4 +676,73 @@ public class ResourceTest extends RuntimeTest {
         assertEquals(resource, res);
     }
 
+    @Test
+    @DisplayName("Resolve var name using single quotes string interpolation inside if statement")
+    void testIfConditionReturnsResourceNestedVarStringInterpolation() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                if true {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = '$name'
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+    }
+
+    @Test
+    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    void testIfConditionReturnsResourceNestedVarStringInterpolationDoubleQuotes() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                if true {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = "$name"
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+    }
+
+    @Test
+    @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
+    void testIfConditionReturnsResourceNestedVar() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                if true {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = name
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+    }
+
 }
