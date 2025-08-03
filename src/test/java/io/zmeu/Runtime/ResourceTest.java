@@ -655,5 +655,25 @@ public class ResourceTest extends RuntimeTest {
         assertInstanceOf(ResourceValue.class, resource);
     }
 
+    @Test
+    void testIfConditionReturnsResource() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                if true {
+                    resource vm main {
+                      name     = 'prod'
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+    }
 
 }
