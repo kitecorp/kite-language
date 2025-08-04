@@ -12,5 +12,5 @@ import org.junit.platform.suite.api.Suite;
         "io.kite.Frontend.Parser",
         "io.kite.Frontend.Lexical"
 })
-public class _Suite {
+public class AllTestsSuite {
 }
