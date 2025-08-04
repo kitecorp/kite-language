@@ -557,6 +557,7 @@ public final class Interpreter implements Visitor<Object> {
 //            } else {
 
             resource.setEvaluated(true);
+            resource.setEvaluating(false);
             for (Statement it : resource.getArguments()) {
                 var result = executeBlock(it, instance.getProperties());
                 if (result instanceof Deferred deferred) {
