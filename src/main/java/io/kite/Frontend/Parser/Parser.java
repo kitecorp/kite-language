@@ -1086,16 +1086,21 @@ public class Parser {
         }
         eat(Resource);
         var type = typeParser.TypeIdentifier();
-        Identifier name = null;
-        if (IsLookAhead(TokenType.Identifier)) {
-            name = Identifier();
-        } else {
-            throw ParserErrors.error("Missing identifier when declaring: resource " + type.string());
-        }
+        Identifier name = resourceSymbol(type);
         context = SchemaContext.RESOURCE;
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
         context = null;
         return ResourceExpression.resource(existing, type, name, (BlockExpression) body);
+    }
+
+    private Identifier resourceSymbol(TypeIdentifier type) {
+        if (IsLookAhead(TokenType.Identifier)) {
+            return Identifier();
+        } else if (IsLookAhead(String)) {
+            var id = eat(String);
+            return new SymbolIdentifier(id.value());
+        }
+        throw ParserErrors.error("Missing identifier when declaring: resource " + type.string());
     }
 
     /**
