@@ -28,9 +28,12 @@ import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
@@ -38,6 +41,7 @@ import static io.kite.Utils.BoolUtils.isTruthy;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
+    private static final Pattern INTERPOLATION = Pattern.compile("\\$\\{([^}]+)\\}|\\$([A-Za-z_][A-Za-z0-9_]*)");
     private static boolean hadRuntimeError;
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
@@ -46,10 +50,10 @@ public final class Interpreter implements Visitor<Object> {
     private Environment<Object> env;
     private SchemaContext context;
 
+
     public Interpreter() {
         this(new Environment());
     }
-
 
     public Interpreter(Environment<Object> environment) {
         this.env = environment;
@@ -82,15 +86,49 @@ public final class Interpreter implements Visitor<Object> {
         hadRuntimeError = true;
     }
 
-    private ResourceValue getInstance(ResourceExpression resource, SchemaValue installedSchema, Environment typeEnvironment) {
-        var instance = installedSchema.getInstance(resource.name());
+    public static List<String> extractVarNames(String input) {
+        List<String> vars = new ArrayList<>();
+        Matcher m = INTERPOLATION.matcher(input);
+        while (m.find()) {
+            // If group(1) is non-null, we matched ${…}, otherwise group(2) is the bare $ident
+            String name = (m.group(1) != null) ? m.group(1) : m.group(2);
+            vars.add(name);
+        }
+        return vars;
+    }
+
+    /**
+     * Replaces all interpolated variables (${var} and $var) in the input
+     * using the provided map.  If a variable is missing from the map, it
+     * will be replaced with the empty string (change that behavior as needed).
+     *
+     * @param input  The template, e.g. "Hello $user, you owe ${amount} USD"
+     * @param values Map from variable name → replacement value
+     * @return the interpolated string
+     */
+    public static String replaceVariables(String input, Map<String, String> values) {
+        Matcher m = INTERPOLATION.matcher(input);
+        var sb = new StringBuilder();
+        while (m.find()) {
+            String varName = (m.group(1) != null) ? m.group(1) : m.group(2);
+            // lookup replacement; default to empty-string if missing
+            String replacement = values.getOrDefault(varName, "");
+            // quote any literal chars in the replacement
+            m.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+    private ResourceValue getInstance(ResourceExpression resource, String resourceName, SchemaValue installedSchema, Environment typeEnvironment) {
+        var instance = installedSchema.getInstance(resourceName);
         if (instance == null) {
             // clone all properties from schema properties to the new resource
             var resourceEnv = new Environment(env, typeEnvironment.getVariables());
             resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-            var res = new ResourceValue(resource.name(), resourceEnv, installedSchema, resource.isExisting());
+            var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
             // init any kind of new resource
-            installedSchema.initInstance(resource.name(), res);
+            installedSchema.initInstance(resourceName, res);
             return res;
         }
         return instance;
@@ -496,15 +534,19 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(ResourceExpression resource) {
         if (resource.getName() == null) {
-            throw new InvalidInitException("Resource does not have a name: " + resource.name());
+            throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
         }
         context = SchemaContext.RESOURCE;
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
         Environment typeEnvironment = installedSchema.getEnvironment();
+        String resourceName = resource.name();
+        if (resource.getName() instanceof SymbolIdentifier) {// apply resource name interpolation
+            resourceName = ResourceName(resource);
+        }
 
-        var instance = getInstance(resource, installedSchema, typeEnvironment);
+        var instance = getInstance(resource, resourceName, installedSchema, typeEnvironment);
         try {
 //            var init = installedSchema.getMethodOrNull("init");
 //            if (init != null) {
@@ -547,6 +589,22 @@ public final class Interpreter implements Visitor<Object> {
         } finally {
             context = null;
         }
+    }
+
+    private @NotNull String ResourceName(ResourceExpression resource) {
+        var strings = new ArrayList<String>();
+        var map = new HashMap<String, String>();
+        List<String> strings1 = extractVarNames(resource.name());
+        for (String identifier : strings1) {
+            var visit = visit(new SymbolIdentifier(identifier, resource.getName().getHops())); // same hops as the resource
+            var string = visit.toString();
+            strings.add(string);
+            map.put(identifier, string);
+        }
+        if (map.isEmpty()) {
+            return resource.name();
+        }
+        return replaceVariables(resource.name(), map);
     }
 
     @Override
@@ -611,13 +669,17 @@ public final class Interpreter implements Visitor<Object> {
             int maximum = range.getMaximum();
 
             String index = statement.getItem().string();
+            // env to hold init variable
             var forEnv = new Environment<>(env, Map.of(index, minimum));
 
             Object result = null;
             var body = statement.discardBlock();
             for (int i = minimum; i < maximum; i++) {
                 forEnv.assign(index, i);
-                result = executeBlock(body, forEnv);
+                // env to be created on each iteration since the same variables can be declared multiple times
+                // during a loop so we need a new env each time @testForReturnsResourceNestedVar
+                var environment = new Environment<>(forEnv);
+                result = executeBlock(body, environment);
             }
             return result;
         } else if (statement.getBody() != null) {

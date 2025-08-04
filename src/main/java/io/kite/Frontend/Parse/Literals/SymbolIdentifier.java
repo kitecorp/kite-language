@@ -15,14 +15,15 @@ public final class SymbolIdentifier extends Identifier {
         super();
     }
 
-    @Override
-    public String string() {
-        return symbol;
-    }
-
     public SymbolIdentifier(String symbol) {
         this();
         this.symbol = symbol;
+    }
+
+    public SymbolIdentifier(String symbol, Integer hops) {
+        this();
+        this.symbol = symbol;
+        setHops(hops);
     }
 
     public SymbolIdentifier(Object symbol) {
@@ -43,6 +44,11 @@ public final class SymbolIdentifier extends Identifier {
 
     public static SymbolIdentifier id(String left) {
         return new SymbolIdentifier(left);
+    }
+
+    @Override
+    public String string() {
+        return symbol;
     }
 
 

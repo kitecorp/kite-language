@@ -720,6 +720,7 @@ public class ResourceTest extends RuntimeTest {
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
+        assertEquals("prod", resource.argVal("name"));
     }
 
     @Test
@@ -766,6 +767,58 @@ public class ResourceTest extends RuntimeTest {
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
+    }
+
+
+    @Test
+    @DisplayName("Create multiple resources in a loop")
+    void testMultipleResourcesAreCreatedForLoop() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var vm[] vms = []
+                for i in 0..2 {
+                    var name = 'prod'
+                    resource vm 'main-$i' {
+                      name     = name
+                    }
+                    vms += vm.main
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+
+        assertEquals(2, schema.getInstances().getVariables().size());
+        assertNotNull(schema.getInstances().get("main-0"));
+        assertNotNull(schema.getInstances().get("main-1"));
+    }
+
+    @Test
+    @DisplayName("Create multiple resources in a loop by string interpolation")
+    void testMultipleResourcesAreCreatedForLoopUsingStringInterpolation() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var vm[] vms = []
+                var items = ['prod','test']
+                for i in items {
+                    var name = 'prod'
+                    resource vm 'main-$i' {
+                      name     = name
+                    }
+                    vms += vm.main
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+
+        assertEquals(2, schema.getInstances().getVariables().size());
+        assertNotNull(schema.getInstances().get("main-prod"));
+        assertNotNull(schema.getInstances().get("main-test"));
     }
 
 }
