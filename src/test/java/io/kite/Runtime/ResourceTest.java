@@ -8,6 +8,7 @@ import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -819,6 +820,25 @@ public class ResourceTest extends RuntimeTest {
         assertEquals(2, schema.getInstances().getVariables().size());
         assertNotNull(schema.getInstances().get("main-prod"));
         assertNotNull(schema.getInstances().get("main-test"));
+    }
+
+    @Test
+    @DisplayName("Throw is same resource name repeats")
+    void testThrowIfSameResourceNameRepeats() {
+        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+                schema vm {
+                   var string name
+                }
+                var vm[] vms = []
+                var items = ['prod','test']
+                for i in items {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = name
+                    }
+                    vms += vm.main
+                }
+                """));
     }
 
 }

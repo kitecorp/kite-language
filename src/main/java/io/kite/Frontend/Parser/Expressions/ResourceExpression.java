@@ -20,6 +20,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private Identifier name;
     private BlockExpression block;
     private boolean isEvaluated;
+    private boolean isEvaluating;
     private boolean existing;
 
     private ResourceExpression() {

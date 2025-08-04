@@ -7,4 +7,10 @@ public interface DeferredObserverValue {
 
     boolean isEvaluated();
 
+    boolean isEvaluating();
+
+    void setEvaluated(boolean evaluated);
+
+    void setEvaluating(boolean evaluating);
+
 }
