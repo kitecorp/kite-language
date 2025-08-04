@@ -121,17 +121,13 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private ResourceValue getInstance(ResourceExpression resource, String resourceName, SchemaValue installedSchema, Environment typeEnvironment) {
-        var instance = installedSchema.getInstance(resourceName);
-        if (instance == null) {
-            // clone all properties from schema properties to the new resource
-            var resourceEnv = new Environment(env, typeEnvironment.getVariables());
-            resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-            var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
-            // init any kind of new resource
-            installedSchema.initInstance(resourceName, res);
-            return res;
-        }
-        return instance;
+        // clone all properties from schema properties to the new resource
+        var resourceEnv = new Environment(env, typeEnvironment.getVariables());
+        resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
+        var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
+        // init any kind of new resource
+        installedSchema.initInstance(resourceName, res);
+        return res;
     }
 
     @Override
@@ -545,8 +541,10 @@ public final class Interpreter implements Visitor<Object> {
         if (resource.getName() instanceof SymbolIdentifier) {// apply resource name interpolation
             resourceName = ResourceName(resource);
         }
-
-        var instance = getInstance(resource, resourceName, installedSchema, typeEnvironment);
+        // notifying an existing resource that it's dependencies were satisfied else create a new resource
+        var instance = resource.isEvaluating() ?
+                installedSchema.getInstance(resourceName) :
+                getInstance(resource, resourceName, installedSchema, typeEnvironment);
         try {
 //            var init = installedSchema.getMethodOrNull("init");
 //            if (init != null) {
