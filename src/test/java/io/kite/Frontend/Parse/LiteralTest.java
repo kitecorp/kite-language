@@ -96,6 +96,18 @@ public class LiteralTest extends ParserTest {
     }
 
     @Test
+    void testInterpolationChar() {
+        var res = parse(""" 
+                "$i"
+                """);
+        var expected = Program.of(
+                expressionStatement("$i")
+        );
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
     void testNumberStringShouldEvalToNumber() {
         var res = parse("42");
         var expected = Program.of(

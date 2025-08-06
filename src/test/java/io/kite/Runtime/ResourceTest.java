@@ -807,7 +807,7 @@ public class ResourceTest extends RuntimeTest {
                 var items = ['prod','test']
                 for i in items {
                     var name = 'prod'
-                    resource vm 'main-$i' {
+                    resource vm main {
                       name     = name
                     }
                     vms += vm.main
