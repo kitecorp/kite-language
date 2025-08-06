@@ -1,6 +1,10 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.Statements.VarStatement;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -99,6 +103,25 @@ public class VarDeclarationTest extends ParserTest {
         );
         assertEquals(expected, res);
         log.info((res));
+    }
+
+    @Test
+    void interpolation() {
+        var res = (Program) parse("""
+                var x="world";
+                var y="hello $x";
+                """);
+        var expected = program(
+                statement(var("x", "world")),
+                statement(var("y", "hello $x"))
+        );
+        assertEquals(expected, res);
+        var statement = (VarStatement) res.getBody().get(1);
+        var x = statement.getDeclarations().get(0);
+        var literal = (StringLiteral) x.getInit();
+        Assertions.assertTrue(literal.isInterpolated());
+        Assertions.assertEquals("x", literal.getInterpolationVars().get(0));
+        log.info(res);
     }
 
     @Test

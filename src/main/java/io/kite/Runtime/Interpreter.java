@@ -28,12 +28,9 @@ import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
@@ -41,7 +38,6 @@ import static io.kite.Utils.BoolUtils.isTruthy;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
-    private static final Pattern INTERPOLATION = Pattern.compile("\\$\\{([^}]+)\\}|\\$([A-Za-z_][A-Za-z0-9_]*)");
     private static boolean hadRuntimeError;
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
@@ -84,40 +80,6 @@ public final class Interpreter implements Visitor<Object> {
     static void runtimeError(RuntimeError error) {
         System.err.printf("%s\n[line %d]%n", error.getMessage(), error.getToken().line());
         hadRuntimeError = true;
-    }
-
-    public static List<String> extractVarNames(String input) {
-        List<String> vars = new ArrayList<>();
-        Matcher m = INTERPOLATION.matcher(input);
-        while (m.find()) {
-            // If group(1) is non-null, we matched ${…}, otherwise group(2) is the bare $ident
-            String name = (m.group(1) != null) ? m.group(1) : m.group(2);
-            vars.add(name);
-        }
-        return vars;
-    }
-
-    /**
-     * Replaces all interpolated variables (${var} and $var) in the input
-     * using the provided map.  If a variable is missing from the map, it
-     * will be replaced with the empty string (change that behavior as needed).
-     *
-     * @param input  The template, e.g. "Hello $user, you owe ${amount} USD"
-     * @param values Map from variable name → replacement value
-     * @return the interpolated string
-     */
-    public static String replaceVariables(String input, Map<String, String> values) {
-        Matcher m = INTERPOLATION.matcher(input);
-        var sb = new StringBuilder();
-        while (m.find()) {
-            String varName = (m.group(1) != null) ? m.group(1) : m.group(2);
-            // lookup replacement; default to empty-string if missing
-            String replacement = values.getOrDefault(varName, "");
-            // quote any literal chars in the replacement
-            m.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-        }
-        m.appendTail(sb);
-        return sb.toString();
     }
 
     private ResourceValue getInstance(ResourceExpression resource, String resourceName, SchemaValue installedSchema, Environment typeEnvironment) {
@@ -538,9 +500,6 @@ public final class Interpreter implements Visitor<Object> {
 
         Environment typeEnvironment = installedSchema.getEnvironment();
         String resourceName = resource.name();
-        if (resource.getName() instanceof SymbolIdentifier) {// apply resource name interpolation
-            resourceName = ResourceName(resource);
-        }
         // notifying an existing resource that it's dependencies were satisfied else create a new resource
         var instance = resource.isEvaluating() ?
                 installedSchema.getInstance(resourceName) :
@@ -590,22 +549,6 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    private @NotNull String ResourceName(ResourceExpression resource) {
-        var strings = new ArrayList<String>();
-        var map = new HashMap<String, String>();
-        List<String> strings1 = extractVarNames(resource.name());
-        for (String identifier : strings1) {
-            var visit = visit(new SymbolIdentifier(identifier, resource.getName().getHops())); // same hops as the resource
-            var string = visit.toString();
-            strings.add(string);
-            map.put(identifier, string);
-        }
-        if (map.isEmpty()) {
-            return resource.name();
-        }
-        return replaceVariables(resource.name(), map);
-    }
-
     @Override
     public Object visit(ThisExpression expression) {
         return null;
@@ -642,10 +585,14 @@ public final class Interpreter implements Visitor<Object> {
         } else if (statement.hasArray()) {
             var array = visit(statement.getArray());// get array items
             if (array instanceof List<?> list) {
-                var forEnv = new Environment<>(env);
+                var forEnv = new Environment<>(env, Map.of("keyName", statement.getItem().string()));
                 Object result = null;
-                for (Object item : list) {
+                for (int i = 0; i < list.size(); i++) {
+                    Object item = list.get(i);
+
                     forEnv.initOrAssign(statement.getItem().string(), item);
+                    forEnv.initOrAssign("value", item);
+                    forEnv.initOrAssign("index", i);
                     result = executeBlock(statement.getBody(), forEnv);
                 }
                 return result;
