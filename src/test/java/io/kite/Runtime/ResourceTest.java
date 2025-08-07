@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
@@ -883,9 +885,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
 
-        assertEquals(2, schema.getInstances().getVariables().size());
-        assertNotNull(schema.getInstances().get("main[0]"));
-        assertNotNull(schema.getInstances().get("main[1]")); // vm.main[0]
+        List<ResourceValue> arrays = schema.getArrays();
+        assertEquals(2, arrays.size());
+        assertNotNull(arrays.get(0));
+        assertNotNull(arrays.get(1)); // vm.main[0]
     }
 
     @Test
