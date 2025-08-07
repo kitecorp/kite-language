@@ -884,8 +884,8 @@ public class ResourceTest extends RuntimeTest {
 
 
         assertEquals(2, schema.getInstances().getVariables().size());
-        assertNotNull(schema.getInstances().get("main-0"));
-        assertNotNull(schema.getInstances().get("main-1"));
+        assertNotNull(schema.getInstances().get("main[0]"));
+        assertNotNull(schema.getInstances().get("main[1]")); // vm.main[0]
     }
 
     @Test

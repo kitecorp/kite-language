@@ -39,6 +39,7 @@ import static io.kite.Utils.BoolUtils.isTruthy;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
+    public static final String INDEX = "index";
     private static boolean hadRuntimeError;
     private final Deque<Callstack> callstack = new ArrayDeque<>();
 
@@ -97,6 +98,17 @@ public final class Interpreter implements Visitor<Object> {
             throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName, printer.visit(resource)));
         }
         return res;
+    }
+
+    private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
+        var iterator = callstack.iterator();
+        while (iterator.hasNext()) {
+            Callstack next = iterator.next();
+            if (next.getClass().equals(forStatementClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -537,6 +549,9 @@ public final class Interpreter implements Visitor<Object> {
 
         Environment typeEnvironment = installedSchema.getEnvironment();
         String resourceName = resource.name();
+        if (ExecutionContextIn(ForStatement.class)) {
+            resourceName = resourceName + env.lookup(INDEX);
+        }
         // notifying an existing resource that it's dependencies were satisfied else create a new resource
         var instance = resource.isEvaluating() ?
                 installedSchema.getInstance(resourceName) :
@@ -651,14 +666,15 @@ public final class Interpreter implements Visitor<Object> {
             int minimum = range.getMinimum();
             int maximum = range.getMaximum();
 
-            String index = statement.getItem().string();
             // env to hold init variable
-            var forEnv = new Environment<>(env, Map.of(index, minimum));
+            var forEnv = new Environment<>(env, Map.of(statement.getItem().string(), minimum));
 
             Object result = null;
             var body = statement.discardBlock();
             for (int i = minimum; i < maximum; i++) {
-                forEnv.assign(index, i);
+                forEnv.initOrAssign(statement.getItem().string(), i); // during range, i, index and value are all the same
+                forEnv.initOrAssign("value", i);
+                forEnv.initOrAssign("index", i);
                 // env to be created on each iteration since the same variables can be declared multiple times
                 // during a loop so we need a new env each time @testForReturnsResourceNestedVar
                 var environment = new Environment<>(forEnv);
@@ -675,7 +691,9 @@ public final class Interpreter implements Visitor<Object> {
 
             List<Object> result = new ArrayList<>(maximum);
             for (int i = minimum; i < maximum; i++) {
-                forEnv.assign(index, i);
+                forEnv.initOrAssign(statement.getItem().string(), i);
+                forEnv.initOrAssign("value", i);
+                forEnv.initOrAssign("index", statement.getItem().string());
                 if (statement.getBody() instanceof IfStatement ifStatement) {
                     var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
                     if (test) {
@@ -886,7 +904,7 @@ public final class Interpreter implements Visitor<Object> {
         try {
             Object res = null;
             for (Statement statement : statements) {
-                res = execute(statement);
+                res = visit(statement);
             }
             return res;
         } catch (RuntimeError error) {
@@ -901,7 +919,7 @@ public final class Interpreter implements Visitor<Object> {
             this.env = environment;
             Object res = null;
             for (Statement statement : statements) {
-                res = execute(statement);
+                res = visit(statement);
             }
             return res;
         } finally {
@@ -923,18 +941,10 @@ public final class Interpreter implements Visitor<Object> {
         Environment previous = this.env;
         try {
             this.env = environment;
-            return execute(statement);
+            return visit(statement);
         } finally {
             this.env = previous;
         }
-    }
-
-    private Object execute(Statement stmt) {
-        return Visitor.super.visit(stmt);
-    }
-
-    private Object execute(Expression stmt) {
-        return visit(stmt);
     }
 
 }
