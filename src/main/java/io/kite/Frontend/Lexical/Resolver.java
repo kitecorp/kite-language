@@ -286,20 +286,9 @@ public final class Resolver implements Visitor<Void> {
             resolve(expression.getName());
         }
         for (Statement argument : expression.getArguments()) {
-            if (argument instanceof ExpressionStatement statement) {
-                if (statement.getStatement() instanceof AssignmentExpression assignmentExpression) {
-                    if (assignmentExpression.getLeft() instanceof Identifier identifier) {
-                        declare(identifier);
-                        define(identifier);
-//                        resolve(identifier);
-                    }
-                    if (assignmentExpression.getRight() instanceof Identifier identifier) {
-                        resolve(identifier);
-                    }
-                }
-            }
+            visit(argument);
         }
-//        resolve(expression.getArguments());
+        resolve(expression.getArguments());
         endScope();
         return null;
     }

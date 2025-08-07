@@ -773,6 +773,50 @@ public class ResourceTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    void testInterpolationSingleQuotes() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var name = 'prod'
+                resource vm main {
+                  name     = '$name'
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+        assertEquals("prod", resource.argVal("name"));
+    }
+
+    @Test
+    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    void testInterpolationSingleQuotesCurlyBraces() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var name = 'prod'
+                resource vm main {
+                  name     = '${name}'
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+        assertEquals("prod", resource.argVal("name"));
+    }
+
+    @Test
     @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
     void testIfConditionReturnsResourceNestedVar() {
         var res = eval("""
