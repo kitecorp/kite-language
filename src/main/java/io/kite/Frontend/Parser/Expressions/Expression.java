@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public sealed abstract class Expression
+public sealed abstract class Expression implements Callstack
         permits Identifier, Literal, AnnotationDeclaration,
         ArrayExpression, AssignmentExpression, BinaryExpression, CallExpression,
         ErrorExpression, GroupExpression, LogicalExpression, MemberExpression, ObjectExpression,

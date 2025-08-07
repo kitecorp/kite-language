@@ -1,5 +1,6 @@
 package io.kite.Frontend.Parser.Statements;
 
+import io.kite.Frontend.Parser.Expressions.Callstack;
 import io.kite.Frontend.Parser.Expressions.ModuleExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Expressions.TypeExpression;
@@ -24,7 +25,7 @@ import lombok.Data;
  * ;
  */
 @Data
-public abstract sealed class Statement
+public abstract sealed class Statement implements Callstack
         permits ModuleExpression, ResourceExpression, TypeExpression,
         Program, EmptyStatement, ExpressionStatement, ForStatement,
         FunctionDeclaration, IfStatement, InitStatement, ReturnStatement,

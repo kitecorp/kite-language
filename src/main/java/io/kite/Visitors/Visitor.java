@@ -8,11 +8,12 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.Types.Type;
+import org.jetbrains.annotations.Nullable;
 
 public sealed interface Visitor<R>
         permits Resolver, TypeChecker, Interpreter, AstPrinter, SyntaxPrinter {
 
-    default R visit(Expression expr) {
+    default R visit(@Nullable Expression expr) {
         return switch (expr) {
             case BinaryExpression expression -> visit(expression);
             case AssignmentExpression expression -> visit(expression);
@@ -48,7 +49,7 @@ public sealed interface Visitor<R>
         };
     }
 
-    default R visit(Statement statement) {
+    default R visit(@Nullable Statement statement) {
         return switch (statement) {
             case ResourceExpression resourceExpression -> visit(resourceExpression);
             case Program program -> visit(program);

@@ -28,6 +28,7 @@ import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -39,6 +40,8 @@ import static io.kite.Utils.BoolUtils.isTruthy;
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
     private static boolean hadRuntimeError;
+    private final Deque<Callstack> callstack = new ArrayDeque<>();
+
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
@@ -91,7 +94,7 @@ public final class Interpreter implements Visitor<Object> {
         try {
             installedSchema.initInstance(resourceName, res);
         } catch (DeclarationExistsException e) {
-            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName,printer.visit(resource)));
+            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName, printer.visit(resource)));
         }
         return res;
     }
@@ -123,7 +126,26 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(Expression expression) {
-        return executeBlock(expression, env);
+        if (expression != null) {
+            callstack.push(expression);
+        }
+        var res = executeBlock(expression, env);
+        if (expression != null) {
+            callstack.pop();
+        }
+        return res;
+    }
+
+    @Override
+    public Object visit(@Nullable Statement statement) {
+        if (statement != null) {
+            callstack.push(statement);
+        }
+        var res = Visitor.super.visit(statement);
+        if (statement != null) {
+            callstack.pop();
+        }
+        return res;
     }
 
     @Override
