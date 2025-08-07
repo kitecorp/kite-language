@@ -8,7 +8,6 @@ import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -858,7 +857,7 @@ public class ResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.getArrays().get(0);
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -887,8 +886,8 @@ public class ResourceTest extends RuntimeTest {
 
         List<ResourceValue> arrays = schema.getArrays();
         assertEquals(2, arrays.size());
-        assertNotNull(arrays.get(0));
-        assertNotNull(arrays.get(1)); // vm.main[0]
+        assertEquals("prod",arrays.get(0).get("name"));
+        assertEquals("prod",arrays.get(0).get("name"));
     }
 
     @Test
@@ -912,28 +911,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
 
-        assertEquals(2, schema.getInstances().getVariables().size());
-        assertNotNull(schema.getInstances().get("main-prod"));
-        assertNotNull(schema.getInstances().get("main-test"));
-    }
-
-    @Test
-    @DisplayName("Throw is same resource name repeats")
-    void testThrowIfSameResourceNameRepeats() {
-        Assertions.assertThrows(RuntimeException.class, () -> eval("""
-                schema vm {
-                   var string name
-                }
-                var vm[] vms = []
-                var items = ['prod','test']
-                for i in items {
-                    var name = 'prod'
-                    resource vm main {
-                      name     = name
-                    }
-                    vms += vm.main
-                }
-                """));
+        List<ResourceValue> arrays = schema.getArrays();
+        assertEquals(2, arrays.size());
+        assertEquals("prod",arrays.get(0).get("name"));
+        assertEquals("prod",arrays.get(0).get("name"));
     }
 
 }

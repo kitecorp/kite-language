@@ -695,7 +695,7 @@ public final class Interpreter implements Visitor<Object> {
             for (int i = minimum; i < maximum; i++) {
                 forEnv.initOrAssign(statement.getItem().string(), i);
                 forEnv.initOrAssign("value", i);
-                forEnv.initOrAssign("index", statement.getItem().string());
+                forEnv.initOrAssign("index", i);
                 if (statement.getBody() instanceof IfStatement ifStatement) {
                     var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
                     if (test) {
