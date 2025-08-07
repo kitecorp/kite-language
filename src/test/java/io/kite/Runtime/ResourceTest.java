@@ -873,7 +873,7 @@ public class ResourceTest extends RuntimeTest {
                 var vm[] vms = []
                 for i in 0..2 {
                     var name = 'prod'
-                    resource vm 'main-$i' {
+                    resource vm main {
                       name     = name
                     }
                     vms += vm.main

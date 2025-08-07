@@ -2,7 +2,7 @@ package io.kite.Runtime.Environment;
 
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.exceptions.NotFoundException;
-import io.kite.Runtime.exceptions.VarExistsException;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -69,7 +69,7 @@ public class Environment<T> implements IEnvironment<T> {
     @Override
     public T init(String name, Object value) {
         if (variables.containsKey(name)) {
-            throw new VarExistsException(name);
+            throw new DeclarationExistsException(name);
         }
         this.put(name, (T) value);
         return (T) value;
