@@ -88,6 +88,17 @@ public class VarDeclarationTest extends RuntimeTest {
     }
 
     @Test
+    void testInterpolation() {
+        var res = eval("""
+                var x = "world"
+                var y = "hello $x"
+                """);
+        assertEquals("hello world", res);
+        assertEquals("hello world", global.get("y"));
+        log.info(res);
+    }
+
+    @Test
     void varMultiDeclaration() {
         var res = eval("""
                 {
