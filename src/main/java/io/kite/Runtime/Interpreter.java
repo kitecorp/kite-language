@@ -88,7 +88,11 @@ public final class Interpreter implements Visitor<Object> {
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
         var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
         // init any kind of new resource
-        installedSchema.initInstance(resourceName, res);
+        try {
+            installedSchema.initInstance(resourceName, res);
+        } catch (DeclarationExistsException e) {
+            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName,printer.visit(resource)));
+        }
         return res;
     }
 

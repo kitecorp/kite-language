@@ -8,7 +8,7 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import io.kite.Frontend.Parser.Statements.VarStatement;
 import io.kite.Runtime.Values.FunValue;
-import io.kite.Runtime.exceptions.VarExistsException;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -106,7 +106,7 @@ public class FunTest extends RuntimeTest {
 
     @Test
     void funBodyOverlappingWithParam() {
-        Assertions.assertThrows(VarExistsException.class, () -> interpret("""
+        Assertions.assertThrows(DeclarationExistsException.class, () -> interpret("""
                 fun sqrt(number x){
                    var x = 3
                    x*x

@@ -2,7 +2,7 @@ package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
 import io.kite.Runtime.exceptions.NotFoundException;
-import io.kite.Runtime.exceptions.VarExistsException;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -54,7 +54,7 @@ public class ValTest extends CheckerTest {
     @Test
     void testDuplicateValDeclaration() {
         checker.visit(val("x", number(1)));
-        assertThrows(VarExistsException.class,
+        assertThrows(DeclarationExistsException.class,
                 () -> checker.visit(val("x", number(2))));
     }
 
