@@ -90,7 +90,8 @@ public class Environment<T> implements IEnvironment<T> {
         if (hasVar(varName)) {
             return assign(varName, value);
         } else {
-            return init(varName, value);
+            this.put(varName, value);
+            return value;
         }
     }
 
