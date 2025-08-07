@@ -93,7 +93,11 @@ public final class Interpreter implements Visitor<Object> {
         var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
         // init any kind of new resource
         try {
-            installedSchema.initInstance(resourceName, res);
+            if (ExecutionContextIn(ForStatement.class)) {
+                installedSchema.addToArray(resourceName, res);
+            } else {
+                installedSchema.initInstance(resourceName, res);
+            }
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName, printer.visit(resource)));
         }
@@ -549,9 +553,7 @@ public final class Interpreter implements Visitor<Object> {
 
         Environment typeEnvironment = installedSchema.getEnvironment();
         String resourceName = resource.name();
-        if (ExecutionContextIn(ForStatement.class)) {
-            resourceName = resourceName + env.lookup(INDEX);
-        }
+
         // notifying an existing resource that it's dependencies were satisfied else create a new resource
         var instance = resource.isEvaluating() ?
                 installedSchema.getInstance(resourceName) :
