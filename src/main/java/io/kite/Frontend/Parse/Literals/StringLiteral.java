@@ -56,14 +56,14 @@ public class StringLiteral extends Literal {
         }
     }
 
-    public String getInterpolatedString(String... values) {
-        if (values.length != this.interpolationVars.size()) {
+    public String getInterpolatedString(List<String> values) {
+        if (values.size() != this.interpolationVars.size()) {
             throw new IllegalArgumentException("The number of values does not match the number of interpolation variables");
         }
         var map = new HashMap<String, String>();
         for (int i = 0; i < this.interpolationVars.size(); i++) {
             String interpolationVar = this.interpolationVars.get(i);
-            map.put(interpolationVar, values[i]);
+            map.put(interpolationVar, values.get(i));
         }
         return StringLiteralUtils.replaceVariables(getValue(), map);
     }

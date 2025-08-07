@@ -156,6 +156,14 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(StringLiteral expression) {
+        if (expression.isInterpolated()) {
+            var values = new ArrayList<String>(expression.getInterpolationVars().size());
+            for (String interpolationVar : expression.getInterpolationVars()) {
+                var value = env.lookup(interpolationVar, 0);
+                values.add(value.toString());
+            }
+            return expression.getInterpolatedString(values);
+        }
         return expression.getValue();
     }
 
