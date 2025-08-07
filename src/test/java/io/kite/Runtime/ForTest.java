@@ -92,7 +92,7 @@ public class ForTest extends RuntimeTest {
                 [for i in 0..1: "item-$i"]
                 """);
 
-        assertEquals(List.of("item-$i"), res);
+        assertEquals(List.of("item-0"), res);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var x = [for index in 0..5: 'item-$index']
                 """);
-        assertEquals(List.of("item-$index", "item-$index", "item-$index", "item-$index", "item-$index"), res);
+        assertEquals(List.of("item-0", "item-1", "item-2", "item-3", "item-4"), res);
         log.info(res);
     }
 
@@ -109,7 +109,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var x = [for index in 0..2: { name: 'item-$index'}]
                 """);
-        assertEquals(List.of(Map.of("name", "item-$index"), Map.of("name", "item-$index")), res);
+        assertEquals(List.of(Map.of("name", "item-0"), Map.of("name", "item-1")), res);
     }
 
 }
