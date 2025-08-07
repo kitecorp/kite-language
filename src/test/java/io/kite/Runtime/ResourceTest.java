@@ -155,6 +155,38 @@ public class ResourceTest extends RuntimeTest {
     }
 
     @Test
+    void checkMultipleOfDependenciesAreAddedToDependencyListDIfferentOrder() {
+        var res = eval("""
+                schema vm { 
+                    var string name
+                    var number maxCount=0
+                }
+                
+                resource vm second  {
+                    name = "second"
+                    maxCount = 2
+                }
+                resource vm main {
+                    name = vm.third.name
+                    maxCount=vm.second.maxCount
+                }
+                resource vm third  {
+                    name = "third"
+                    maxCount = 3
+                }
+                """);
+        log.warn((res));
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+        assertNotNull(resource);
+
+        var second = schema.getInstances().get("second");
+        assertNotNull(second);
+        assertEquals(2, resource.getDependencies().size());
+    }
+
+    @Test
     void checkMultipleOfDependenciesAreAddedToDependencyListEarly() {
         var res = eval("""
                 schema vm { 
@@ -857,10 +889,68 @@ public class ResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getArrays().get(0);
+        var resource = schema.getArrays().get("main").get(0);
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
+    }
+
+    @Test
+    @DisplayName("Multiple resources with resource name interpolation")
+    void multiResourcesWithInterpolation() {
+        eval("""
+                schema vm {
+                   var string name
+                }
+                for i in 0..2 {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = '$name-$i'
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        assertNotNull(schema);
+        assertEquals(2, schema.getArrays().size());
+
+        ResourceValue resource = schema.getArrays().get("main").get(0);
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals("prod-0", resource.get("name"));
+        assertEquals("prod-1", schema.getArrays().get("main").get(1).get("name"));
+    }
+
+    @Test
+    @DisplayName("Multiple resources with dependencies")
+    void multiResourcesWithDependencies() {
+        eval("""
+                schema vm {
+                   var string name
+                }
+                for i in 0..2 {
+                    var name = 'prod'
+                    resource vm cidr {
+                      name     = vm.vpc.name
+                    }
+                    resource vm vpc {
+                      name     = '$name-$i'
+                    }
+                
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        assertNotNull(schema);
+//        assertEquals(4, schema.getArrays().size());
+
+        List<ResourceValue> vpcs = schema.getArrays().get("vpc");
+        List<ResourceValue> cidr = schema.getArrays().get("cidr");
+        assertInstanceOf(ResourceValue.class, vpcs.get(0));
+        assertInstanceOf(ResourceValue.class, cidr.get(0));
+        assertEquals("prod-0", cidr.get(0).get("name"));
+        assertEquals("prod-1", cidr.get(1).get("name"));
     }
 
 
@@ -884,10 +974,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
 
-        List<ResourceValue> arrays = schema.getArrays();
+        List<ResourceValue> arrays = schema.getArrays().get("main");
         assertEquals(2, arrays.size());
-        assertEquals("prod",arrays.get(0).get("name"));
-        assertEquals("prod",arrays.get(0).get("name"));
+        assertEquals("prod", arrays.get(0).get("name"));
+        assertEquals("prod", arrays.get(0).get("name"));
     }
 
     @Test
@@ -911,10 +1001,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
 
-        List<ResourceValue> arrays = schema.getArrays();
+        List<ResourceValue> arrays = schema.getArrays().get("main");
         assertEquals(2, arrays.size());
-        assertEquals("prod",arrays.get(0).get("name"));
-        assertEquals("prod",arrays.get(0).get("name"));
+        assertEquals("prod", arrays.get(0).get("name"));
+        assertEquals("prod", arrays.get(0).get("name"));
     }
 
 }
