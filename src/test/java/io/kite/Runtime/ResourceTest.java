@@ -702,7 +702,7 @@ public class ResourceTest extends RuntimeTest {
 
     @Test
     @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
-    void testIfConditionReturnsResourceNestedVarStringInterpolationDoubleQuotes() {
+    void testInterpolationNestedInIf() {
         var res = eval("""
                 schema vm {
                    var string name
@@ -712,6 +712,54 @@ public class ResourceTest extends RuntimeTest {
                     resource vm main {
                       name     = "$name"
                     }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+        assertEquals("prod", resource.argVal("name"));
+    }
+
+    @Test
+    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    void testInterpolationNestedDeepInIf() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                if true {
+                    var name = 'prod'
+                    if true {
+                        resource vm main {
+                          name     = "$name"
+                        }
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+        assertEquals("prod", resource.argVal("name"));
+    }
+
+    @Test
+    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    void testInterpolation() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var name = 'prod'
+                resource vm main {
+                  name     = "$name"
                 }
                 """);
 

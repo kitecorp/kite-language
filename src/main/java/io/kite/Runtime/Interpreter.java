@@ -157,9 +157,12 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(StringLiteral expression) {
         if (expression.isInterpolated()) {
+            // when doing string interpolation on a property assignment we should look in the parent environment
+            // for the interpolated string not in the "properties/environment of the resource"
+            var hops = SchemaContext.RESOURCE == context ? 1 : 0;
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
-                var value = env.lookup(interpolationVar, 0);
+                var value = env.lookup(interpolationVar, hops);
                 values.add(value.toString());
             }
             return expression.getInterpolatedString(values);
