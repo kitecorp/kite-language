@@ -153,4 +153,8 @@ public class Environment<T> implements IEnvironment<T> {
     public void remove(String key) {
         variables.remove(key);
     }
+
+    public int size() {
+        return variables.size();
+    }
 }

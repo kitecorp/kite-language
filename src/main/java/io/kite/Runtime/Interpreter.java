@@ -86,23 +86,6 @@ public final class Interpreter implements Visitor<Object> {
         hadRuntimeError = true;
     }
 
-    private ResourceValue getInstance(ResourceExpression resource, String resourceName, SchemaValue installedSchema, Environment typeEnvironment) {
-        // clone all properties from schema properties to the new resource
-        var resourceEnv = new Environment(env, typeEnvironment.getVariables());
-        resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
-        // init any kind of new resource
-        try {
-            if (ExecutionContextIn(ForStatement.class)) {
-                installedSchema.addToArray(resourceName, res);
-            } else {
-                installedSchema.initInstance(resourceName, res);
-            }
-        } catch (DeclarationExistsException e) {
-            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName, printer.visit(resource)));
-        }
-        return res;
-    }
 
     private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
         var iterator = callstack.iterator();
@@ -344,7 +327,8 @@ public final class Interpreter implements Visitor<Object> {
                     StringLiteral.class,
                     SymbolIdentifier.class,
                     CallExpression.class,
-                    BinaryExpression.class
+                    BinaryExpression.class,
+                    MemberExpression.class
             );
             // allow addition for numbers and string
             case "-", "/", "*", "%" -> List.of(
@@ -527,10 +511,13 @@ public final class Interpreter implements Visitor<Object> {
         // Since that environment points to the parent(type env) it will also find the properties
         if (value instanceof SchemaValue schemaValue) { // vm.main -> if user references the schema we search for the instances of those schemas
             String name = resourceName.string();
-            if (schemaValue.getInstances().get(name) == null) {
+            if (schemaValue.getInstances().get(name) == null && schemaValue.hasArrays() && schemaValue.getArrays().get(name) == null) {
                 // if instance was not installed yet -> it will be installed later so we return a deferred object
                 return new Deferred(schemaValue, name);
             } else {
+                if (schemaValue.hasArrays() && schemaValue.getArrays().get(name) != null) {
+                    return schemaValue.getArrays().lookup(name).get(0);
+                }
                 return schemaValue.getInstances().lookup(name);
             }
         } else if (value instanceof ResourceValue resourceValue) {
@@ -553,54 +540,75 @@ public final class Interpreter implements Visitor<Object> {
 
         Environment typeEnvironment = installedSchema.getEnvironment();
         String resourceName = resource.name();
-
-        // notifying an existing resource that it's dependencies were satisfied else create a new resource
-        var instance = resource.isEvaluating() ?
-                installedSchema.getInstance(resourceName) :
-                getInstance(resource, resourceName, installedSchema, typeEnvironment);
+        if (ExecutionContextIn(ForStatement.class)) {
+//            resourceName = "%s-%s".formatted(resourceName, env.lookup(INDEX));
+        }
         try {
-//            var init = installedSchema.getMethodOrNull("init");
-//            if (init != null) {
-//                var args = new ArrayList<>();
-//                for (Statement it : resource.getArguments()) {
-//                    Object objectRuntimeValue = executeBlock(it, resourceEnv);
-//                    args.add(objectRuntimeValue);
-//                }
-//                functionCall(FunValue.of(init.name(), init.getParams(), init.getBody(), resourceEnv/* this env */), args);
-//            } else {
-
-            resource.setEvaluated(true);
-            resource.setEvaluating(false);
-            for (Statement it : resource.getArguments()) {
-                var result = executeBlock(it, instance.getProperties());
-                if (result instanceof Deferred deferred) {
-                    instance.addDependency(deferred.resource());
-
-                    CycleDetection.detect(instance);
-
-                    resource.setEvaluated(false);
-
-                    deferredObservable.addObserver(resource, deferred);
-                } else if (result instanceof Dependency dependency) {
-                    instance.addDependency(dependency.resource().getName());
-
-                    CycleDetection.detect(instance);
-                }
-            }
-            if (resource.isEvaluated()) {
-                deferredObservable.notifyObservers(this, resource.name());
-                return instance;
+            if (resource.isEvaluating()) {
+                // notifying an existing resource that it's dependencies were satisfied else create a new resource
+                return getResourceValue(resource, resource.getValue());
             } else {
-                // if not fully evaluated, doesn't make sense to notify observers(resources that depend on this resource)
-                // because they will not be able to be reevaluated
-                return instance;
+                return getResourceValue(resource, initResource(resource, resourceName, installedSchema, typeEnvironment));
             }
-        } catch (NotFoundException e) {
-//            throw new NotFoundException("Field '%s' not found on resource '%s'".formatted(e.getObjectNotFound(), expression.name()),e);
-            throw e;
         } finally {
             context = null;
         }
+    }
+
+    private ResourceValue initResource(ResourceExpression resource, String resourceName, SchemaValue installedSchema, Environment typeEnvironment) {
+        // clone all properties from schema properties to the new resource
+        var resourceEnv = new Environment(env, typeEnvironment.getVariables());
+        resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
+        var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
+        // init any kind of new resource
+        try {
+            if (ExecutionContextIn(ForStatement.class)) {
+                installedSchema.addToArray(res);
+            } else {
+                installedSchema.initInstance(resourceName, res);
+            }
+        } catch (DeclarationExistsException e) {
+            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName, printer.visit(resource)));
+        }
+        resource.setValue(res);
+        return res;
+    }
+
+    private ResourceValue getResourceValue(ResourceExpression resource, ResourceValue instance) {
+        resource.setEvaluated(true);
+        resource.setEvaluating(false);
+        for (Statement it : resource.getArguments()) {
+            var result = executeBlock(it, instance.getProperties());
+            if (result instanceof Deferred deferred) {
+                instance.addDependency(deferred.resource());
+
+                CycleDetection.detect(instance);
+
+                resource.setEvaluated(false);
+
+                deferredObservable.addObserver(resource, deferred);
+            } else if (result instanceof Dependency dependency) {
+                instance.addDependency(dependency.resource().getName());
+
+                CycleDetection.detect(instance);
+            }
+        }
+        if (resource.isEvaluated()) {
+            deferredObservable.notifyObservers(this, resource.name());
+            return instance;
+        } else {
+            // if not fully evaluated, doesn't make sense to notify observers(resources that depend on this resource)
+            // because they will not be able to be reevaluated
+            return instance;
+        }
+    }
+
+    private ResourceValue initResource(SchemaValue installedSchema, String resourceName) {
+        ResourceValue instance = installedSchema.getInstance(resourceName);
+        if (instance == null && installedSchema.hasArrays()) {
+            return installedSchema.getArrays().get(resourceName).get(0);
+        }
+        return instance;
     }
 
     @Override

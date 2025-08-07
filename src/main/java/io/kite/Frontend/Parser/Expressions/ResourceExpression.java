@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Values.DeferredObserverValue;
+import io.kite.Runtime.Values.ResourceValue;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private boolean isEvaluated;
     private boolean isEvaluating;
     private boolean existing;
+    private ResourceValue value;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
