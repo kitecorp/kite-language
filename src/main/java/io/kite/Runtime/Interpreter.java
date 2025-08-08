@@ -98,6 +98,18 @@ public final class Interpreter implements Visitor<Object> {
         return false;
     }
 
+    @Nullable
+    private Callstack ExecutionContext(Class<?> forStatementClass) {
+        var iterator = callstack.iterator();
+        while (iterator.hasNext()) {
+            Callstack next = iterator.next();
+            if (next.getClass().equals(forStatementClass)) {
+                return next;
+            }
+        }
+        return null;
+    }
+
     @Override
     public Object visit(int expression) {
         return expression;
@@ -510,23 +522,30 @@ public final class Interpreter implements Visitor<Object> {
         // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
         // Since that environment points to the parent(type env) it will also find the properties
         if (value instanceof SchemaValue schemaValue) { // vm.main -> if user references the schema we search for the instances of those schemas
-            String name = resourceName.string();
-            if (schemaValue.getInstances().get(name) == null && schemaValue.hasArrays() && schemaValue.getArrays().get(name) == null) {
-                // if instance was not installed yet -> it will be installed later so we return a deferred object
-                return new Deferred(schemaValue, name);
-            } else {
-                if (schemaValue.hasArrays() && schemaValue.getArrays().get(name) != null) {
-                    return schemaValue.getArrays().lookup(name).get(0);
+            if (ExecutionContextIn(ForStatement.class)) {
+                if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
+                    return getProperty(schemaValue, "%s[%s]".formatted(resourceName.string(), resourceExpression.getIndex()));
                 }
-                return schemaValue.getInstances().lookup(name);
+            } else {
+                String name = resourceName.string();
+                return getProperty(schemaValue, name);
             }
         } else if (value instanceof ResourceValue resourceValue) {
-            if (expression.getObject() instanceof MemberExpression) {
+            if (expression.getObject() instanceof MemberExpression memberExpression) {
                 return new Dependency(resourceValue, resourceValue.lookup(resourceName.string()));
             }
             return resourceValue.lookup(resourceName.string());
         } // else it could be a resource or any other type like a NumericLiteral or something else
         return value;
+    }
+
+    private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
+        if (schemaValue.getInstances().get(name) == null) {
+            // if instance was not installed yet -> it will be installed later so we return a deferred object
+            return new Deferred(schemaValue, name);
+        } else {
+            return schemaValue.getInstances().lookup(name);
+        }
     }
 
     @Override
@@ -539,42 +558,37 @@ public final class Interpreter implements Visitor<Object> {
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
         Environment typeEnvironment = installedSchema.getEnvironment();
-        String resourceName = resource.name();
         if (ExecutionContextIn(ForStatement.class)) {
-//            resourceName = "%s-%s".formatted(resourceName, env.lookup(INDEX));
+            resource.setIndex(env.lookup(INDEX));
         }
         try {
             if (resource.isEvaluating()) {
                 // notifying an existing resource that it's dependencies were satisfied else create a new resource
-                return getResourceValue(resource, resource.getValue());
+                return detectCycle(resource, resource.getValue());
             } else {
-                return getResourceValue(resource, initResource(resource, resourceName, installedSchema, typeEnvironment));
+                return detectCycle(resource, initResource(resource, installedSchema, typeEnvironment));
             }
         } finally {
             context = null;
         }
     }
 
-    private ResourceValue initResource(ResourceExpression resource, String resourceName, SchemaValue installedSchema, Environment typeEnvironment) {
+    private ResourceValue initResource(ResourceExpression resource, SchemaValue installedSchema, Environment typeEnvironment) {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resourceName, resourceEnv, installedSchema, resource.isExisting());
-        // init any kind of new resource
+        var res = new ResourceValue(resource.name(), resourceEnv, installedSchema, resource.isExisting());
         try {
-            if (ExecutionContextIn(ForStatement.class)) {
-                installedSchema.addToArray(res);
-            } else {
-                installedSchema.initInstance(resourceName, res);
-            }
+            // init any kind of new resource
+            installedSchema.initInstance(resource.name(), res);
+            resource.setValue(res);
         } catch (DeclarationExistsException e) {
-            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resourceName, printer.visit(resource)));
+            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resource.name(), printer.visit(resource)));
         }
-        resource.setValue(res);
         return res;
     }
 
-    private ResourceValue getResourceValue(ResourceExpression resource, ResourceValue instance) {
+    private ResourceValue detectCycle(ResourceExpression resource, ResourceValue instance) {
         resource.setEvaluated(true);
         resource.setEvaluating(false);
         for (Statement it : resource.getArguments()) {
@@ -601,14 +615,6 @@ public final class Interpreter implements Visitor<Object> {
             // because they will not be able to be reevaluated
             return instance;
         }
-    }
-
-    private ResourceValue initResource(SchemaValue installedSchema, String resourceName) {
-        ResourceValue instance = installedSchema.getInstance(resourceName);
-        if (instance == null && installedSchema.hasArrays()) {
-            return installedSchema.getArrays().get(resourceName).get(0);
-        }
-        return instance;
     }
 
     @Override

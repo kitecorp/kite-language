@@ -1,7 +1,10 @@
 package io.kite.Runtime.Values;
 
 import io.kite.Runtime.Environment.Environment;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -80,6 +83,10 @@ public class ResourceValue {
 
     public Object lookup(@Nullable String varName) {
         return properties.lookup(varName);
+    }
+
+    public Object lookup(@Nullable String varName, Integer hops) {
+        return properties.lookup(varName, hops);
     }
 
     public Object lookup(@Nullable Object varName) {
