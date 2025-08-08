@@ -34,7 +34,7 @@ public class CycleDetection {
         if (activePath.contains(resource.name())) {
             String message = "Cycle detected at resource: " + resource.name();
             log.error(message);
-            throw new RuntimeException(message);
+            throw new CycleException(message);
         }
 
         // If the resource is already visited, skip it

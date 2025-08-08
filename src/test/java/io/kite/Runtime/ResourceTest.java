@@ -8,6 +8,7 @@ import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -985,6 +986,30 @@ public class ResourceTest extends RuntimeTest {
         ResourceValue cidr1 = cidr.get("cidr[1]");
         assertEquals("prod-0", cidr0.get("name"));
         assertEquals("prod-1", cidr1.get("name"));
+    }
+
+    @Test
+    @DisplayName("Multiple resources with dependencies")
+    void dependsOnEarlyResourceCycle() {
+        Assertions.assertThrows(CycleException.class, () -> eval("""
+                schema vm {
+                   var string name
+                   var string color 
+                }
+                for i in 0..2 {
+                    var name = 'prod'
+                
+                    resource vm vpc {
+                      name     = '$name-$i'
+                      color    = vm.cidr.color 
+                    }
+                    resource vm cidr {
+                      name     = vm.vpc.name
+                      color    = vm.vpc.color
+                    }
+                
+                }
+                """));
     }
 
 
