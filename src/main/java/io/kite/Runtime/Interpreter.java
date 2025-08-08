@@ -519,23 +519,28 @@ public final class Interpreter implements Visitor<Object> {
             throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
         }
         var value = executeBlock(expression.getObject(), env);
-        // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
-        // Since that environment points to the parent(type env) it will also find the properties
-        if (value instanceof SchemaValue schemaValue) { // vm.main -> if user references the schema we search for the instances of those schemas
-            if (ExecutionContextIn(ForStatement.class)) {
-                if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
-                    return getProperty(schemaValue, "%s[%s]".formatted(resourceName.string(), resourceExpression.getIndex()));
+        switch (value) {
+            case SchemaValue schemaValue -> {
+                if (ExecutionContextIn(ForStatement.class)) {
+                    if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
+                        return getProperty(schemaValue, "%s[%s]".formatted(resourceName.string(), resourceExpression.getIndex()));
+                    }
+                } else {
+                    String name = resourceName.string();
+                    return getProperty(schemaValue, name);
                 }
-            } else {
-                String name = resourceName.string();
-                return getProperty(schemaValue, name);
             }
-        } else if (value instanceof ResourceValue resourceValue) {
-            if (expression.getObject() instanceof MemberExpression memberExpression) {
-                return new Dependency(resourceValue, resourceValue.lookup(resourceName.string()));
+            case ResourceValue resourceValue -> {
+                // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
+                // Since that environment points to the parent(type env) it will also find the properties
+                if (expression.getObject() instanceof MemberExpression memberExpression) {
+                    return new Dependency(resourceValue, resourceValue.lookup(resourceName.string()));
+                }
+                return resourceValue.lookup(resourceName.string());
             }
-            return resourceValue.lookup(resourceName.string());
-        } // else it could be a resource or any other type like a NumericLiteral or something else
+            case null, default -> {
+            }
+        }
         return value;
     }
 
