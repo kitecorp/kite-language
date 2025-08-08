@@ -952,6 +952,41 @@ public class ResourceTest extends RuntimeTest {
         assertEquals("prod-1", cidr1.get("name"));
     }
 
+    @Test
+    @DisplayName("Multiple resources with dependencies")
+    void dependsOnEarlyResource() {
+        eval("""
+                schema vm {
+                   var string name
+                }
+                for i in 0..2 {
+                    var name = 'prod'
+                
+                    resource vm vpc {
+                      name     = '$name-$i'
+                    }
+                    resource vm cidr {
+                      name     = vm.vpc.name
+                    }
+                
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        assertNotNull(schema);
+//        assertEquals(4, schema.getArrays().size());
+
+        var vpcs = schema.getInstances();
+        var cidr = schema.getInstances();
+        ResourceValue actualValue = vpcs.get("vpc[0]");
+        assertInstanceOf(ResourceValue.class, actualValue);
+        ResourceValue cidr0 = cidr.get("cidr[0]");
+        ResourceValue cidr1 = cidr.get("cidr[1]");
+        assertEquals("prod-0", cidr0.get("name"));
+        assertEquals("prod-1", cidr1.get("name"));
+    }
+
 
     @Test
     @DisplayName("Create multiple resources in a loop")
