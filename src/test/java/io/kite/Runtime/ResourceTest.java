@@ -1066,4 +1066,30 @@ public class ResourceTest extends RuntimeTest {
         assertEquals("prod", arrays.get("main[1]").get("name"));
     }
 
+    @Test
+    @DisplayName("Create multiple resources in a loop by using index")
+    void testMultipleResourcesAreCreatedForLoopUsingIndex() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var vm[] vms = []
+                var items = ['prod','test']
+                for i in items {
+                    resource vm main {
+                      name     = "$value"
+                    }
+                    vms += vm.main
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+
+        var arrays = schema.getInstances();
+        assertEquals(2, arrays.size());
+        assertEquals("prod", arrays.get("main[0]").get("name"));
+        assertEquals("test", arrays.get("main[1]").get("name"));
+    }
+
 }
