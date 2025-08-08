@@ -887,10 +887,10 @@ public class ResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-//        var resource = schema.getArrays().get("main").get(0);
-//
-//        assertInstanceOf(ResourceValue.class, resource);
-//        assertEquals(resource, res);
+        var resource = schema.getInstances().get("main[0]");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
     }
 
     @Test
@@ -911,12 +911,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
         assertNotNull(schema);
-//        assertEquals(2, schema.getArrays().size());
-//
-//        ResourceValue resource = schema.getArrays().get("main").get(0);
-//        assertInstanceOf(ResourceValue.class, resource);
-//        assertEquals("prod-0", resource.get("name"));
-//        assertEquals("prod-1", schema.getArrays().get("main").get(1).get("name"));
+        assertEquals(2, schema.getInstances().size());
+
+        assertEquals("prod-0", schema.getInstances().get("main[0]").get("name"));
+        assertEquals("prod-1", schema.getInstances().get("main[1]").get("name"));
     }
 
     @Test
@@ -975,10 +973,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
 
-//        List<ResourceValue> arrays = schema.getArrays().get("main");
-//        assertEquals(2, arrays.size());
-//        assertEquals("prod", arrays.get(0).get("name"));
-//        assertEquals("prod", arrays.get(0).get("name"));
+        var arrays = schema.getInstances();
+        assertEquals(2, arrays.size());
+        assertEquals("prod", arrays.get("main[0]").get("name"));
+        assertEquals("prod", arrays.get("main[1]").get("name"));
     }
 
     @Test
@@ -1002,10 +1000,10 @@ public class ResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
 
-//        List<ResourceValue> arrays = schema.getArrays().get("main");
-//        assertEquals(2, arrays.size());
-//        assertEquals("prod", arrays.get(0).get("name"));
-//        assertEquals("prod", arrays.get(0).get("name"));
+        var arrays = schema.getInstances();
+        assertEquals(2, arrays.size());
+        assertEquals("prod", arrays.get("main[0]").get("name"));
+        assertEquals("prod", arrays.get("main[1]").get("name"));
     }
 
 }
