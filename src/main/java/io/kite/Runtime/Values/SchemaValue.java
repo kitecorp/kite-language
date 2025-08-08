@@ -9,8 +9,6 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -23,9 +21,6 @@ public class SchemaValue {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final Environment<ResourceValue> instances;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private final Environment<List<ResourceValue>> arrays;
     private final String type;
 
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
@@ -33,7 +28,6 @@ public class SchemaValue {
         this.instances = new Environment<>(environment);
         this.environment = environment;
         this.environment.init(INSTANCES, instances);
-        arrays = new Environment<>();
     }
 
     public static SchemaValue of(Identifier name, Environment environment) {
@@ -92,19 +86,6 @@ public class SchemaValue {
 
     public ResourceValue getInstanceOrElseGet(String name, Supplier<? extends ResourceValue> supplier) {
         return Optional.ofNullable(instances.get(name)).orElseGet(supplier);
-    }
-
-    public boolean addToArray(ResourceValue element) {
-        var list = arrays.get(element.name());
-        if (list == null) {
-            list = new ArrayList<>();
-            arrays.init(element.name(), list);
-        }
-        return list.add(element);
-    }
-
-    public boolean hasArrays() {
-        return !arrays.getVariables().isEmpty();
     }
 
 }

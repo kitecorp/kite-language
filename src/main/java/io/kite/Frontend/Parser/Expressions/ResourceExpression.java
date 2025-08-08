@@ -24,6 +24,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private boolean isEvaluating;
     private boolean existing;
     private ResourceValue value;
+    private Object index;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -86,6 +87,16 @@ public final class ResourceExpression extends Statement implements DeferredObser
     }
 
     public String name() {
+        if (index != null) {
+            String formatted = "%s[%s]".formatted(name.string(), index);
+            if (value != null) {
+                value.setName(formatted);
+            }
+            return formatted;
+        }
+        if (value != null) {
+            value.setName(name.string());
+        }
         return name.string();
     }
 
