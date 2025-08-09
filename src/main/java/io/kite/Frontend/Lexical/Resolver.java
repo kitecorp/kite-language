@@ -298,11 +298,7 @@ public final class Resolver implements Visitor<Void> {
         if (statement.isBodyBlock()) {
             beginScope();
         }
-        if (statement.getItem() != null) {
-            declare(statement.getItem());
-            resolve(statement.getItem());
-            define(statement.getItem());
-        }
+        forInit(statement.getItem());
         if (statement.isBodyBlock()) {
             resolveNoBlock(statement.getBody()); // we are already inside the block opened above
         } else {
@@ -313,6 +309,14 @@ public final class Resolver implements Visitor<Void> {
             endScope();
         }
         return null;
+    }
+
+    private void forInit(Identifier statement) {
+        if (statement != null) {
+            declare(statement);
+            resolve(statement);
+            define(statement);
+        }
     }
 
     @Override
@@ -405,7 +409,16 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(AssignmentExpression expression) {
+        if (expression.getRight() instanceof Identifier right) {
+//            declare(right);
+//            define(right);
+        }
         resolve(expression.getRight());
+
+        if (expression.getLeft() instanceof Identifier left) {
+//            declare(left);
+//            define(left);
+        }
         resolve(expression.getLeft());
         return null;
     }

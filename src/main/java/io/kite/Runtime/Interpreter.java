@@ -563,9 +563,7 @@ public final class Interpreter implements Visitor<Object> {
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
         Environment typeEnvironment = installedSchema.getEnvironment();
-        if (ExecutionContextIn(ForStatement.class)) {
-            resource.setIndex(env.lookup(INDEX));
-        }
+        setResourceName(resource);
         try {
             if (resource.isEvaluating()) {
                 // notifying an existing resource that it's dependencies were satisfied else create a new resource
@@ -575,6 +573,19 @@ public final class Interpreter implements Visitor<Object> {
             }
         } finally {
             context = null;
+        }
+    }
+
+    private void setResourceName(ResourceExpression resource) {
+        if (ExecutionContext(ForStatement.class) instanceof ForStatement forStatement) {
+            Object visit = visit(forStatement.getItem());
+            if (visit instanceof String s) {
+                resource.setIndex("\"%s\"".formatted(s));
+            } else if (visit instanceof Number number) {
+                resource.setIndex(number);
+            } else {
+                throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
+            }
         }
     }
 
@@ -651,6 +662,12 @@ public final class Interpreter implements Visitor<Object> {
         return result;
     }
 
+    /**
+     * We don't support the implicit "each" when iterating over a list. The variable is explicitly defined so you can reference it
+     * We follow the explicit is better than implicit design. Compared to competitors where they declare it like for_each = toset(["eastus", "westus"])
+     * they need an implicit variable to be declared (each). We think this is confusing for the user and adds extra complexity and
+     * things to be remembered
+     */
     @Override
     public Object visit(ForStatement statement) {
         if (statement.hasRange()) {
@@ -658,14 +675,12 @@ public final class Interpreter implements Visitor<Object> {
         } else if (statement.hasArray()) {
             var array = visit(statement.getArray());// get array items
             if (array instanceof List<?> list) {
-                var forEnv = new Environment<>(env, Map.of("keyName", statement.getItem().string()));
+                var forEnv = new Environment<>(env);
                 Object result = null;
                 for (int i = 0; i < list.size(); i++) {
                     Object item = list.get(i);
 
                     forEnv.initOrAssign(statement.getItem().string(), item);
-                    forEnv.initOrAssign("value", item);
-                    forEnv.initOrAssign("index", i);
                     result = executeBlock(statement.getBody(), forEnv);
                 }
                 return result;
@@ -694,8 +709,6 @@ public final class Interpreter implements Visitor<Object> {
             var body = statement.discardBlock();
             for (int i = minimum; i < maximum; i++) {
                 forEnv.initOrAssign(statement.getItem().string(), i); // during range, i, index and value are all the same
-                forEnv.initOrAssign("value", i);
-                forEnv.initOrAssign("index", i);
                 // env to be created on each iteration since the same variables can be declared multiple times
                 // during a loop so we need a new env each time @testForReturnsResourceNestedVar
                 var environment = new Environment<>(forEnv);
@@ -713,8 +726,7 @@ public final class Interpreter implements Visitor<Object> {
             List<Object> result = new ArrayList<>(maximum);
             for (int i = minimum; i < maximum; i++) {
                 forEnv.initOrAssign(statement.getItem().string(), i);
-                forEnv.initOrAssign("value", i);
-                forEnv.initOrAssign("index", i);
+
                 if (statement.getBody() instanceof IfStatement ifStatement) {
                     var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
                     if (test) {
