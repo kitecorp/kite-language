@@ -86,6 +86,14 @@ public final class Interpreter implements Visitor<Object> {
         hadRuntimeError = true;
     }
 
+    private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
+        if (schemaValue.getInstances().get(name) == null) {
+            // if instance was not installed yet -> it will be installed later so we return a deferred object
+            return new Deferred(schemaValue, name);
+        } else {
+            return schemaValue.getInstances().lookup(name);
+        }
+    }
 
     private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
         var iterator = callstack.iterator();
@@ -484,11 +492,6 @@ public final class Interpreter implements Visitor<Object> {
             }
             case SymbolIdentifier identifier -> {
                 Object right = executeBlock(expression.getRight(), env);
-                //            Integer distance = locals.get(identifier);
-                if (right instanceof Dependency dependency) {
-                    env.assign(identifier.string(), dependency.value());
-                    return dependency;
-                }
                 if (Objects.equals(expression.getOperator(), TokenType.Equal_Complex.getField())) {
                     var existing = env.lookup(identifier.string());
                     if (existing instanceof Integer left && right instanceof Integer numberLiteralRight) {
@@ -503,6 +506,9 @@ public final class Interpreter implements Visitor<Object> {
                         list.add(right);
                         return list;
                     }
+                } else if (right instanceof Dependency dependency) {
+                    var res = env.assign(identifier.string(), dependency.value());
+                    return dependency;
                 } else {
                     return env.assign(identifier.string(), right);
                 }
@@ -542,15 +548,6 @@ public final class Interpreter implements Visitor<Object> {
             }
         }
         return value;
-    }
-
-    private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
-        if (schemaValue.getInstances().get(name) == null) {
-            // if instance was not installed yet -> it will be installed later so we return a deferred object
-            return new Deferred(schemaValue, name);
-        } else {
-            return schemaValue.getInstances().lookup(name);
-        }
     }
 
     @Override
@@ -624,13 +621,10 @@ public final class Interpreter implements Visitor<Object> {
             }
         }
         if (resource.isEvaluated()) {
-            deferredObservable.notifyObservers(this, resource.name());
-            return instance;
-        } else {
             // if not fully evaluated, doesn't make sense to notify observers(resources that depend on this resource)
-            // because they will not be able to be reevaluated
-            return instance;
+            deferredObservable.notifyObservers(this, resource.name());
         }
+        return instance;
     }
 
     @Override
