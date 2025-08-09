@@ -96,9 +96,7 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
-        var iterator = callstack.iterator();
-        while (iterator.hasNext()) {
-            Callstack next = iterator.next();
+        for (Callstack next : callstack) {
             if (next.getClass().equals(forStatementClass)) {
                 return true;
             }
