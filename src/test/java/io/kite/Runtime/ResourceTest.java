@@ -1062,8 +1062,10 @@ public class ResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("main[0]").get("name"));
-        assertEquals("prod", arrays.get("main[1]").get("name"));
+        assertEquals("prod", arrays.get("""
+                main["prod"]""").get("name"));
+        assertEquals("prod", arrays.get("""
+                main["test"]""").get("name"));
     }
 
     @Test
@@ -1077,7 +1079,7 @@ public class ResourceTest extends RuntimeTest {
                 var items = ['prod','test']
                 for i in items {
                     resource vm main {
-                      name     = "$value"
+                      name     = i
                     }
                     vms += vm.main
                 }
@@ -1088,8 +1090,10 @@ public class ResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("main[0]").get("name"));
-        assertEquals("test", arrays.get("main[1]").get("name"));
+        assertEquals("prod", arrays.get("""
+                main["prod"]""").get("name"));
+        assertEquals("test", arrays.get("""
+                main["test"]""").get("name"));
     }
 
 }
