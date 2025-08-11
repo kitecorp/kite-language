@@ -47,6 +47,21 @@ public class ForTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Check variable i is local to the for loop by declaring multiple loops")
+    void testForInit() {
+        var res = eval("""
+                var x = "test "
+                for i in 0..3 {
+                    x += i
+                }
+                for i in 0..3 {
+                    x += i
+                }
+                """);
+        assertEquals("test 012012", res);
+    }
+
+    @Test
     @DisplayName("Adding elements to array works in with += operator")
     void testForInListString() {
         var res = eval("""
@@ -75,6 +90,17 @@ public class ForTest extends RuntimeTest {
                 [for i in 0..10: if i>2 i]
                 """);
         assertEquals(List.of(3, 4, 5, 6, 7, 8, 9), res);
+        log.info(res);
+    }
+
+    @DisplayName("Check variable i is local to the for loop by declaring multiple loops")
+    @Test
+    void testMultipleLoopsDontConflict() {
+        var res = eval("""
+                [for i in 0..10: if i>2 i]
+                [for i in 0..10: if i>3 i]
+                """);
+        assertEquals(List.of(4, 5, 6, 7, 8, 9), res);
         log.info(res);
     }
 
