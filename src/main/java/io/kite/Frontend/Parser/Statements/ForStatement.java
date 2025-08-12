@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parser.Statements;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +24,7 @@ import java.util.List;
 public final class ForStatement extends Statement {
     @Nullable
     private Identifier item;
-    private Identifier array;// for i in varName (typically array)
+    private Expression array;// for i in varName (typically array)
     private Statement body;
     @Nullable
     private Range<Integer> range;

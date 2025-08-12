@@ -25,9 +25,9 @@ public class ParserErrors {
 
     public static ParseError error(String message, Token token, TokenType type) {
         if (token.is(TokenType.EOF)) {
-            log.error("Line: " + token.line() + " at end. " + message);
+            log.error("error on line: {} at end. {}", token.line(), message);
         } else {
-            log.error("Line: " + token.line() + " at  " + token.raw() + ": " + message);
+            log.error("error on line {} at `{}` : {}", token.line(), token.raw(), message);
         }
         ParseError parseError = ParseError.builder()
                 .actual(token)

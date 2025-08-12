@@ -246,9 +246,12 @@ public class Parser {
         var varName = Identifier();
         eat(In);
         Range<Integer> range = null;
-        Identifier arrayName = null;
+        @NotNull Expression arrayName = null;
         if (IsLookAheadAfter(Number, Range)) {
             range = RangeDeclaration();
+        } else if (IsLookAhead(OpenBrackets)) {
+            eat(OpenBrackets);
+            arrayName = OptArray();
         } else {
             arrayName = SymbolIdentifier();
         }
@@ -612,14 +615,14 @@ public class Parser {
             expression.setForStatement(statement);
             return expression;
         } else {
-            var optArray = OptArray();
-            eat(CloseBrackets);
-            return optArray;
+            return OptArray();
         }
     }
 
     private @NotNull Expression OptArray() {
-        return IsLookAhead(CloseBrackets) ? array() : ArrayItems();
+        var res= IsLookAhead(CloseBrackets) ? array() : ArrayItems();
+        eat(CloseBrackets);
+        return res;
     }
 
     /**
@@ -1295,7 +1298,7 @@ public class Parser {
     }
 
     public Token eat(TokenType... type) {
-        return iterator.eat("Expected token: %s but it was %s".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+        return iterator.eat("Expected token %s but it was '%s'".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
     }
 
     public Token eatIf(TokenType... type) {
