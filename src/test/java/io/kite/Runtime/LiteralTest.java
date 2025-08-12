@@ -40,6 +40,38 @@ public class LiteralTest extends RuntimeTest {
     }
 
     @Test
+    void stringLiteralMultiline() {
+        var res = interpreter.visit("""
+                "hello     
+                
+                
+                world!"
+                """);
+        Assertions.assertEquals("""
+                "hello     
+                
+                
+                world!"
+                """, res);
+    }
+
+    @Test
+    void stringLiteralMultilineSingleQuotes() {
+        var res = interpreter.visit("""
+                'hello
+                
+                
+                world!'
+                """);
+        Assertions.assertEquals("""
+                'hello
+                
+                
+                world!'
+                """, res);
+    }
+
+    @Test
     void stringLiterals() {
         var res = interpreter.visit("hello world!");
         Assertions.assertEquals("hello world!", res);
