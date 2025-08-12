@@ -133,7 +133,7 @@ public class ParserIterator {
     public void synchronize() {
         while (hasNext()) {
             var next = eat();
-            if (next.isLineTerminator()) {
+            if (!next.isLineTerminator()) {
                 continue;
             }
 
