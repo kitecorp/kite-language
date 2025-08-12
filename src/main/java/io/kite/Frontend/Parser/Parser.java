@@ -572,6 +572,7 @@ public class Parser {
         } else {
             expression = BlockExpression();
         }
+        blockContext = null;
         return expression;
     }
 
