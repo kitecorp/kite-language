@@ -14,6 +14,7 @@ public class NotFoundException extends RuntimeException {
         super(message + objectNotFound);
         this.objectNotFound = objectNotFound;
     }
+
     public NotFoundException(String message, Throwable objectNotFound) {
         super(message, objectNotFound);
     }

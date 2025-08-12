@@ -76,6 +76,45 @@ public class ForTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Inline string array")
+    void testInlineStringArray() {
+        var res = eval("""
+                var res = []
+                for env in ["dev","prod"] {
+                    res += env
+                }
+                """);
+        assertEquals(List.of("dev", "prod"), res);
+        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
+    }
+
+    @Test
+    @DisplayName("Inline numbers array")
+    void testInlineNumbersArray() {
+        var res = eval("""
+                var res = []
+                for env in [1,2,3,4,5] {
+                    res += env
+                }
+                """);
+        assertEquals(List.of(1, 2, 3, 4, 5), res);
+        assertEquals(List.of(1, 2, 3, 4, 5), interpreter.getEnv().lookup("res"));
+    }
+
+    @Test
+    @DisplayName("Inline objects array")
+    void testInlineObjectsArray() {
+        var res = eval("""
+                var res = []
+                for env in [{client: "dev"}, {client: "prod"}] {
+                    res += env
+                }
+                """);
+        assertEquals(List.of(Map.of("client", "dev"), Map.of("client", "prod")), res);
+        assertEquals(List.of(Map.of("client", "dev"), Map.of("client", "prod")), interpreter.getEnv().lookup("res"));
+    }
+
+    @Test
     void testFor() {
         var res = eval("""
                 [for i in 0..3: i+=1]
