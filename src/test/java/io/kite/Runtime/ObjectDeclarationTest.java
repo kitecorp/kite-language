@@ -111,6 +111,35 @@ public class ObjectDeclarationTest extends RuntimeTest {
         assertEquals("white", o.get("color"));
         log.info((res));
     }
+
+    @Test
+    void varMultiDeclarationStringKey() {
+        var res = eval("""
+                var x = { 
+                    size: 2
+                    "color": "white"
+                }
+                """);
+        var o = (Map) global.get("x");
+        assertEquals(2, o.get("size"));
+        assertEquals("white", o.get("color"));
+        log.info((res));
+    }
+
+    @Test
+    void varMultiDeclarationSingleQuote() {
+        var res = eval("""
+                var x = { 
+                    size: 2
+                    'color-name': "white"
+                }
+                """);
+        var o = (Map) global.get("x");
+        assertEquals(2, o.get("size"));
+        assertEquals("white", o.get("color-name"));
+        log.info((res));
+    }
+
     @Test
     void varMultiDeclarationObject() {
         var res = eval("""
@@ -124,7 +153,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var o = (Map) global.get("x");
         assertEquals(2, o.get("size"));
         var env = (Map<String, Object>) o.get("env");
-        assertEquals("white", env.get("color") );
+        assertEquals("white", env.get("color"));
         log.info((res));
     }
 
