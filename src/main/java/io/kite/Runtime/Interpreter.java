@@ -542,6 +542,9 @@ public final class Interpreter implements Visitor<Object> {
                 }
                 return resourceValue.lookup(resourceName.string());
             }
+            case Map map -> {
+                return map.get(resourceName.string());
+            }
             case null, default -> {
             }
         }

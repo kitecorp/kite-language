@@ -113,6 +113,21 @@ public class ObjectDeclarationTest extends RuntimeTest {
     }
 
     @Test
+    void varPropertyAccess() {
+        var res = eval("""
+                var x = { 
+                    size: 2
+                    color: "white"
+                }
+                var y = x.color
+                """);
+        var y = (String) global.get("y");
+        assertEquals("white", y);
+        log.info(res);
+    }
+
+
+    @Test
     void varMultiDeclarationStringKey() {
         var res = eval("""
                 var x = { 
