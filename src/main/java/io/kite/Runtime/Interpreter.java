@@ -28,6 +28,7 @@ import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
@@ -519,36 +520,42 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(MemberExpression expression) {
-        if (!(expression.getProperty() instanceof SymbolIdentifier resourceName)) {
-            throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
-        }
+        var propertyName = getSymbolIdentifier(expression);
         var value = executeBlock(expression.getObject(), env);
         switch (value) {
             case SchemaValue schemaValue -> {
                 if (ExecutionContextIn(ForStatement.class)) {
                     if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
-                        return getProperty(schemaValue, "%s[%s]".formatted(resourceName.string(), resourceExpression.getIndex()));
+                        return getProperty(schemaValue, "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
                     }
                 } else {
-                    String name = resourceName.string();
-                    return getProperty(schemaValue, name);
+                    return getProperty(schemaValue, propertyName);
                 }
             }
             case ResourceValue resourceValue -> {
                 // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
                 // Since that environment points to the parent(type env) it will also find the properties
                 if (expression.getObject() instanceof MemberExpression memberExpression) {
-                    return new Dependency(resourceValue, resourceValue.lookup(resourceName.string()));
+                    return new Dependency(resourceValue, resourceValue.lookup(propertyName));
                 }
-                return resourceValue.lookup(resourceName.string());
+                return resourceValue.lookup(propertyName);
             }
             case Map map -> {
-                return map.get(resourceName.string());
+                return map.get(propertyName);
             }
             case null, default -> {
             }
         }
         return value;
+    }
+
+    private @NotNull String getSymbolIdentifier(MemberExpression expression) {
+        if (expression.getProperty() instanceof SymbolIdentifier resourceName) {
+            return resourceName.string();
+        } else if (expression.getProperty() instanceof StringLiteral literal){
+            return literal.getValue();
+        }
+        throw new OperationNotImplementedException("Membership expression not implemented for: " + printer.visit(expression));
     }
 
     @Override

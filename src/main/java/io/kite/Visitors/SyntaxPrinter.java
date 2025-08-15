@@ -51,6 +51,9 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(MemberExpression expression) {
+        if (expression.isComputed()) {
+            return visit(expression.getObject()) + "[" + visit(expression.getProperty()) + "]";
+        }
         return visit(expression.getObject()) + "." + visit(expression.getProperty());
     }
 

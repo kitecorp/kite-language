@@ -142,6 +142,36 @@ public class ObjectDeclarationTest extends RuntimeTest {
         log.info(res);
     }
 
+    @Test
+    void varPropertyAccessKeyString() {
+        var res = eval("""
+                var x = { 
+                    size: 2
+                    color: "white"
+                }
+                var y = x["color"]
+                """);
+        var y = (String) global.get("y");
+        assertEquals("white", y);
+        log.info(res);
+    }
+
+
+    @Test
+    void varPropertyAccessNestedKeyString() {
+        var res = eval("""
+                var x = { 
+                    size: 2
+                    color: {
+                      name: "white"
+                    }
+                }
+                var y = x.color["name"]
+                """);
+        var y = (String) global.get("y");
+        assertEquals("white", y);
+        log.info(res);
+    }
 
     @Test
     void varMultiDeclarationStringKey() {
