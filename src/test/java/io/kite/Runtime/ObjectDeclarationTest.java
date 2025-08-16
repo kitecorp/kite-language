@@ -130,7 +130,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varPropertyAccessNested() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     color: {
                       name: "white"
                     }
@@ -146,7 +146,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varPropertyAccessKeyString() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     color: "white"
                 }
                 var y = x["color"]
@@ -161,7 +161,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varPropertyAccessNestedKeyString() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     color: {
                       name: "white"
                     }
@@ -177,7 +177,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varMultiDeclarationStringKey() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     "color": "white"
                 }
                 """);
@@ -191,8 +191,38 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varMultiDeclarationSingleQuote() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     'color-name': "white"
+                }
+                """);
+        var o = (Map) global.get("x");
+        assertEquals(2, o.get("size"));
+        assertEquals("white", o.get("color-name"));
+        log.info((res));
+    }
+
+    @Test
+    void varMultiDeclarationSingleQuoteStringInterpolation() {
+        var res = eval("""
+                var color = "color-name"
+                var x = { 
+                    size: 2,
+                    '${color}': "white"
+                }
+                """);
+        var x = (Map) global.get("x");
+        assertEquals(2, x.get("size"));
+        assertEquals("white", x.get("color-name"));
+        log.info((res));
+    }
+
+    @Test
+    void varMultiDeclarationDoubleQuoteStringInterpolation() {
+        var res = eval("""
+                var color = "color-name"
+                var x = { 
+                    size: 2,
+                    "${color}": "white"
                 }
                 """);
         var o = (Map) global.get("x");
