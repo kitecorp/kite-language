@@ -421,6 +421,7 @@ public class Parser {
      * ;
      */
     private ObjectLiteral ObjectLiteral() {
+        blockContext = BlockContext.OBJECT;
         var id = ObjectKeyIdentifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : ObjectInitializer();
         return ObjectLiteral.object(id, init);
