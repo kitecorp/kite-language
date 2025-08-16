@@ -421,7 +421,6 @@ public class Parser {
      * ;
      */
     private ObjectLiteral ObjectLiteral() {
-        blockContext = BlockContext.OBJECT;
         var id = ObjectKeyIdentifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : ObjectInitializer();
         return ObjectLiteral.object(id, init);
@@ -564,7 +563,7 @@ public class Parser {
     }
 
     private @NotNull Expression ObjectExpression() {
-        if (IsLookAheadAfter(Identifier, Colon) || context == SchemaContext.SCHEMA) {
+        if (IsLookAheadAfter(Identifier,CloseBraces, List.of(Colon)) || context == SchemaContext.SCHEMA) {
             blockContext = BlockContext.OBJECT;
         }
         Expression expression;
@@ -1285,6 +1284,10 @@ public class Parser {
 
     boolean IsLookAheadAfter(TokenType after, TokenType... type) {
         return iterator.IsLookAheadAfter(after, type);
+    }
+
+    boolean IsLookAheadAfter(TokenType after, TokenType endToken, List<TokenType> type) {
+        return iterator.IsLookAheadAfter(after, endToken, type);
     }
 
     boolean HasType() {
