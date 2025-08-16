@@ -1239,7 +1239,7 @@ public class Parser {
         };
     }
 
-    private Identifier ObjectKeyIdentifier() {
+    private Expression ObjectKeyIdentifier() {
         return switch (lookAhead().type()) {
             case String -> {
                 var id = eat(String);
