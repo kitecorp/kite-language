@@ -15,19 +15,19 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ObjectLiteral extends Literal {
-    private Identifier key;
+    private Expression key;
     private Expression value;
 
     public ObjectLiteral() {
     }
 
-    public ObjectLiteral(Identifier key, Expression value) {
+    public ObjectLiteral(Expression key, Expression value) {
         this();
-        this.key = key;
+        setKey(key);
         this.value = value;
     }
 
-    public static ObjectLiteral object(Identifier key, Expression value) {
+    public static ObjectLiteral object(Expression key, Expression value) {
         return new ObjectLiteral(key, value);
     }
 
@@ -46,6 +46,24 @@ public class ObjectLiteral extends Literal {
     @Override
     public Object getVal() {
         return value;
+    }
+
+    public String keyString() {
+        return switch (key) {
+            case StringLiteral literal -> literal.getValue();
+            case SymbolIdentifier identifier -> identifier.string();
+            default -> null;
+        };
+    }
+
+    public void setKey(Expression key) {
+        if (key instanceof StringLiteral literal) {
+            this.key = literal;
+        } else if (key instanceof SymbolIdentifier identifier) {
+            this.key = identifier;
+        } else {
+            throw new IllegalArgumentException("Invalid key type: " + key);
+        }
     }
 
     public record ObjectLiteralPair(String key, Object value) {

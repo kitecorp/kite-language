@@ -663,7 +663,7 @@ public final class TypeChecker implements Visitor<Type> {
 
             for (ObjectLiteral property : expression.getProperties()) {
                 var t = visit(property); // check each property
-                objectType.setProperty(property.getKey().string(), t);
+                objectType.setProperty(property.keyString(), t);
 
                 var keyType = validatePropertyIsString(property.getKey()); // also check the key but it's only available after bein set in the env
                 expect(keyType, ValueType.String, property.getKey()); // make sure the key is alwasy string
@@ -706,11 +706,12 @@ public final class TypeChecker implements Visitor<Type> {
         }
     }
 
-    private Type validatePropertyIsString(Identifier key) {
+    private Type validatePropertyIsString(Expression key) {
         return switch (key) {
             case SymbolIdentifier symbolIdentifier -> visit(symbolIdentifier.getSymbol());
             case Identifier symbolIdentifier -> visit(symbolIdentifier.string());
             case null -> null;
+            default -> throw new IllegalStateException("Unexpected value: " + key);
         };
     }
 

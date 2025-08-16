@@ -193,7 +193,7 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.getKey() == null || expression.getValue() == null) {
             return new ObjectLiteralPair();
         }
-        var key = expression.getKey().string();
+        var key = expression.keyString();
         var value = visit(expression.getValue());
         return new ObjectLiteralPair(key, value);
     }
