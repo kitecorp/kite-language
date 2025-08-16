@@ -563,7 +563,7 @@ public class Parser {
     }
 
     private @NotNull Expression ObjectExpression() {
-        if (IsLookAheadAfter(Identifier,CloseBraces, List.of(Colon)) || context == SchemaContext.SCHEMA) {
+        if (IsLookAheadAfterUntil(Identifier, CloseBraces, Colon) || context == SchemaContext.SCHEMA) {
             blockContext = BlockContext.OBJECT;
         }
         Expression expression;
@@ -621,7 +621,7 @@ public class Parser {
     }
 
     private @NotNull Expression OptArray() {
-        var res= IsLookAhead(CloseBrackets) ? array() : ArrayItems();
+        var res = IsLookAhead(CloseBrackets) ? array() : ArrayItems();
         eat(CloseBrackets);
         return res;
     }
@@ -1286,7 +1286,7 @@ public class Parser {
         return iterator.IsLookAheadAfter(after, type);
     }
 
-    boolean IsLookAheadAfter(TokenType after, TokenType endToken, List<TokenType> type) {
+    boolean IsLookAheadAfterUntil(TokenType after, TokenType endToken, TokenType... type) {
         return iterator.IsLookAheadAfter(after, endToken, type);
     }
 
