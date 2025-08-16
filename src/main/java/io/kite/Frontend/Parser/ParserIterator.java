@@ -70,7 +70,7 @@ public class ParserIterator {
         return false;
     }
 
-    boolean IsLookAheadAfter(TokenType after, TokenType endToken,  List<TokenType> type) {
+    boolean IsLookAheadAfter(TokenType after, TokenType endToken,  TokenType... type) {
         int index = this.iterator.previousIndex() + 1;
         var iterator = this.tokens.listIterator(index);
         while (iterator.hasNext()) {
@@ -80,7 +80,7 @@ public class ParserIterator {
             }
             if (token.is(after)) {
                 token = iterator.next();
-                if (token.is(type.toArray(new TokenType[0]))) {
+                if (token.is(type)) {
                     return true;
                 }
             }
