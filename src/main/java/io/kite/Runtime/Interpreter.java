@@ -1,5 +1,6 @@
 package io.kite.Runtime;
 
+import io.kite.ContextStack;
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parse.Literals.*;
@@ -50,6 +51,7 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private Environment<Object> env;
     private SchemaContext context;
+    private Deque<ContextStack> contextStacks = new ArrayDeque<>();
 
 
     public Interpreter() {
@@ -603,6 +605,7 @@ public final class Interpreter implements Visitor<Object> {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
         }
+
         context = SchemaContext.RESOURCE;
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
@@ -966,10 +969,13 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(FunctionDeclaration declaration) {
+        contextStacks.push(ContextStack.FUNCTION);
         var name = declaration.getName();
         var params = declaration.getParams();
         var body = declaration.getBody();
-        return env.init(name.string(), FunValue.of(name, params, body, env));
+        Object init = env.init(name.string(), FunValue.of(name, params, body, env));
+        contextStacks.pop();
+        return init;
     }
 
     @Override
