@@ -687,7 +687,8 @@ public final class Interpreter implements Visitor<Object> {
                 for (int i = 0; i < list.size(); i++) {
                     Object item = list.get(i);
 
-                    forEnv.initOrAssign(statement.getItem().string(), item);
+                    forInit(forEnv, statement.getIndex(), i);
+                    forInit(forEnv, statement.getItem(), item);
                     result = executeBlock(statement.getBody(), forEnv);
                 }
                 return result;
@@ -703,6 +704,12 @@ public final class Interpreter implements Visitor<Object> {
         throw new OperationNotImplementedException("For statement not implemented");
     }
 
+    private static void forInit(Environment<Object> forEnv, Identifier statement, Object i) {
+        if (statement != null) {
+            forEnv.initOrAssign(statement.string(), i);
+        }
+    }
+
     private Object ForWithRange(ForStatement statement) {
         if (statement.isBodyBlock()) {
             var range = statement.getRange();
@@ -715,9 +722,9 @@ public final class Interpreter implements Visitor<Object> {
             Object result = null;
             var body = statement.discardBlock();
             for (int i = minimum; i < maximum; i++) {
-                forEnv.initOrAssign(statement.getItem().string(), i); // during range, i, index and value are all the same
-                // env to be created on each iteration since the same variables can be declared multiple times
-                // during a loop so we need a new env each time @testForReturnsResourceNestedVar
+                forInit(forEnv, statement.getIndex(), i);
+                forInit(forEnv, statement.getItem(), i);
+
                 var environment = new Environment<>(forEnv);
                 result = executeBlock(body, environment);
             }
@@ -732,7 +739,8 @@ public final class Interpreter implements Visitor<Object> {
 
             List<Object> result = new ArrayList<>(maximum);
             for (int i = minimum; i < maximum; i++) {
-                forEnv.initOrAssign(statement.getItem().string(), i);
+                forInit(forEnv, statement.getIndex(), i);
+                forInit(forEnv, statement.getItem(), i);
 
                 if (statement.getBody() instanceof IfStatement ifStatement) {
                     var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
