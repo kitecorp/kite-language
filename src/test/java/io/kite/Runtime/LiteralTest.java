@@ -3,6 +3,7 @@ package io.kite.Runtime;
 import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Parse.Literals.SymbolIdentifier;
 import io.kite.Runtime.Values.NullValue;
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +13,7 @@ import static io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
+@Log4j2
 public class LiteralTest extends RuntimeTest {
     @Test
     void literal() {
@@ -37,6 +39,27 @@ public class LiteralTest extends RuntimeTest {
                 "hello world!"
                 """);
         Assertions.assertEquals("\"hello world!\"\n", res);
+    }
+
+    @Test
+    void stringEscape() {
+        var res = interpreter.visit("what\'s up?");
+        Assertions.assertEquals("what's up?", res);
+        log.info(res.toString());
+    }
+
+    @Test
+    void stringEscapeDoubleQuote() {
+        var res = interpreter.visit("what\"s up?");
+        Assertions.assertEquals("what\"s up?", res);
+        log.info(res.toString());
+    }
+
+    @Test
+    void tab() {
+        var res = interpreter.visit("\twhat's up?");
+        Assertions.assertEquals("\twhat's up?", res);
+        log.info(res.toString());
     }
 
     @Test
