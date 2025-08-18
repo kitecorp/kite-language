@@ -32,11 +32,11 @@ public class ObjectLiteral extends Literal {
     }
 
     public static ObjectLiteral object(String key, Expression value) {
-        return new ObjectLiteral(Identifier.id(key), value);
+        return new ObjectLiteral(StringLiteral.string(key), value);
     }
 
     public static ObjectLiteral object(String key, String value) {
-        return new ObjectLiteral(Identifier.id(key), string(value));
+        return new ObjectLiteral(StringLiteral.string(key), string(value));
     }
 
     public static ObjectLiteral object() {
