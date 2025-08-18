@@ -77,6 +77,7 @@ public class LiteralTest extends RuntimeTest {
                 world!"
                 """, res);
     }
+
     @Test
     void stringLiteralMultilineInline() {
         var res = interpreter.visit("""
@@ -84,6 +85,17 @@ public class LiteralTest extends RuntimeTest {
                  world!"
                 """);
         Assertions.assertEquals("\"hello\n world!\"\n", res);
+    }
+
+    @Test
+    void stringLiteralMultilineInlineComments() {
+        var res = interpreter.visit("""
+                "hello     
+                 world!
+                 // comments
+                 "
+                """);
+        Assertions.assertEquals("\"hello\n world!\n // comments\n \"\n", res);
     }
 
     @Test
