@@ -605,6 +605,9 @@ public final class Interpreter implements Visitor<Object> {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
         }
+        if (contextStacks.contains(ContextStack.FUNCTION)) {
+            throw new InvalidInitException("Resource cannot be declared inside a function: " + printer.visit(resource));
+        }
 
         context = SchemaContext.RESOURCE;
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
