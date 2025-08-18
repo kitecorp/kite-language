@@ -206,7 +206,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("  42  ")
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 }
