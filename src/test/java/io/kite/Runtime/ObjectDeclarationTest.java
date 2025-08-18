@@ -204,10 +204,11 @@ public class ObjectDeclarationTest extends RuntimeTest {
     @Test
     void varMultiDeclarationSingleQuoteStringInterpolation() {
         var res = eval("""
-                var color = "color-name"
+                var key = "color-name"
+                var value = "white"
                 var x = { 
                     size: 2,
-                    '${color}': "white"
+                    '$key': '$value'
                 }
                 """);
         var x = (Map) global.get("x");
