@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parser;
 
 import io.kite.BlockContext;
+import io.kite.ContextStack;
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parse.Literals.*;
@@ -20,10 +21,7 @@ import org.apache.commons.lang3.Range;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
 import static io.kite.Frontend.Parse.Literals.Identifier.id;
@@ -90,6 +88,7 @@ public class Parser {
      */
     private SchemaContext context;
     private BlockContext blockContext;
+    private Deque<ContextStack> contextStack = new ArrayDeque<>();
 
     public Parser(List<Token> tokens) {
         setTokens(tokens);
@@ -707,9 +706,12 @@ public class Parser {
         var params = OptParameterList();
         eat(CloseParenthesis, "Expected ')' but got: " + lookAhead());
         var type = typeParser.identifier();
+        contextStack.push(ContextStack.FUNCTION);
 
         Statement body = expressionStatement(BlockExpression());
-        return FunctionDeclaration.fun(name, params, type, body);
+        Statement fun = FunctionDeclaration.fun(name, params, type, body);
+        contextStack.pop();
+        return fun;
     }
 
     /**
@@ -1094,6 +1096,9 @@ public class Parser {
      * ;
      */
     private Statement ResourceDeclaration() {
+        if (contextStack.contains(ContextStack.FUNCTION)) {
+            throw ParserErrors.error("Resource declaration not allowed in function body: ", lookAhead(), lookAhead().type());
+        }
         boolean existing = false;
         if (IsLookAhead(Existing)) {
             eat(Existing);
