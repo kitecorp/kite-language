@@ -220,17 +220,79 @@ public class ObjectDeclarationTest extends RuntimeTest {
     @Test
     void varMultiDeclarationDoubleQuoteStringInterpolation() {
         var res = eval("""
-                var color = "color-name"
+                var key = "color-name"
+                var value = "white"
                 var x = { 
                     size: 2,
-                    "${color}": "white"
+                    "$key": "$value"
                 }
                 """);
-        var o = (Map) global.get("x");
-        assertEquals(2, o.get("size"));
-        assertEquals("white", o.get("color-name"));
+        var x = (Map) global.get("x");
+        assertEquals(2, x.get("size"));
+
+        var keyName = x.get("color-name");
+        assertNotNull(keyName);
+        assertEquals("white", keyName);
         log.info((res));
     }
+
+    @Test
+    void varMultiDeclarationDoubleQuoteStringInterpolationCurlyBraces() {
+        var res = eval("""
+                var key = "color-name"
+                var value = "white"
+                var x = { 
+                    size: 2,
+                    "${key}": "${value}"
+                }
+                """);
+        var x = (Map) global.get("x");
+        assertEquals(2, x.get("size"));
+
+        var keyName = x.get("color-name");
+        assertNotNull(keyName);
+        assertEquals("white", keyName);
+        log.info((res));
+    }
+
+    @Test
+    void varMultiDeclarationSingleQuoteStringInterpolationCurlyBraces() {
+        var res = eval("""
+                var key = "color-name"
+                var value = "white"
+                var x = { 
+                    size: 2,
+                    '${key}': '${value}'
+                }
+                """);
+        var x = (Map) global.get("x");
+        assertEquals(2, x.get("size"));
+
+        var keyName = x.get("color-name");
+        assertNotNull(keyName);
+        assertEquals("white", keyName);
+        log.info((res));
+    }
+
+    @Test
+    void varMultiDeclarationVarValue() {
+        var res = eval("""
+                var key = "color-name"
+                var value = "white"
+                var x = { 
+                    size: 2,
+                    '${key}': value
+                }
+                """);
+        var x = (Map) global.get("x");
+        assertEquals(2, x.get("size"));
+
+        var keyName = x.get("color-name");
+        assertNotNull(keyName);
+        assertEquals("white", keyName);
+        log.info((res));
+    }
+
 
     @Test
     void varMultiDeclarationObject() {
