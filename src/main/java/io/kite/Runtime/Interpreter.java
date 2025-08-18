@@ -96,6 +96,88 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
+    private static @NotNull Object compare(String op, Number ln, Number rn) {
+        // if both were ints, do int math → preserve integer result
+        if (ln instanceof Integer a && rn instanceof Integer b) {
+            return compare(op, a, b);
+        }
+        // otherwise treat both as doubles
+        double a = ln.doubleValue(), b = rn.doubleValue();
+        return compare(op, a, b);
+    }
+
+    private static @NotNull Object compare(String op, Integer a, Integer b) {
+        return switch (op) {
+            case "+" -> a + b;
+            case "-" -> a - b;
+            case "*" -> a * b;
+            case "/" -> a / b;
+            case "%" -> a % b;
+            case "==" -> a.equals(b);
+            case "!=" -> !a.equals(b);
+            case "<" -> a < b;
+            case "<=" -> a <= b;
+            case ">" -> a > b;
+            case ">=" -> a >= b;
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+        };
+    }
+
+    private static @NotNull Object compare(String op, double a, double b) {
+        return switch (op) {
+            case "+" -> a + b;
+            case "-" -> a - b;
+            case "*" -> a * b;
+            case "/" -> a / b;
+            case "%" -> a % b;
+            case "==" -> a == b;
+            case "!=" -> a != b;
+            case "<" -> a < b;
+            case "<=" -> a <= b;
+            case ">" -> a > b;
+            case ">=" -> a >= b;
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+        };
+    }
+
+    private static @NotNull Object compare(String op, Boolean l, Boolean r) {
+        return switch (op) {
+            case "==" -> l.equals(r);
+            case "!=" -> !l.equals(r);
+            case "<" -> l.compareTo(r) < 0;
+            case "<=" -> l.compareTo(r) <= 0;
+            case ">" -> l.compareTo(r) > 0;
+            case ">=" -> l.compareTo(r) >= 0;
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+        };
+    }
+
+    private static @NotNull Object compare(String op, String l, String r) {
+        return switch (op) {
+            case "+" -> l + r;
+            case "==" -> StringUtils.equals(l, r);
+            case "!=" -> !StringUtils.equals(l, r);
+            case "<" -> StringUtils.compare(l, r) < 0;
+            case "<=" -> StringUtils.compare(l, r) <= 0;
+            case ">" -> StringUtils.compare(l, r) > 0;
+            case ">=" -> StringUtils.compare(l, r) >= 0;
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+        };
+    }
+
+    private static @NotNull Object compare(String op, Number l, String r) {
+        return switch (op) {
+            case "+" -> l + r;
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+        };
+    }
+
+    private static void forInit(Environment<Object> forEnv, Identifier statement, Object i) {
+        if (statement != null) {
+            forEnv.initOrAssign(statement.string(), i);
+        }
+    }
+
     private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
         for (Callstack next : callstack) {
             if (next.getClass().equals(forStatementClass)) {
@@ -270,60 +352,13 @@ public final class Interpreter implements Visitor<Object> {
 
         if (expression.getOperator() instanceof String op) {
             if (left instanceof Number ln && right instanceof Number rn) {
-                // if both were ints, do int math → preserve integer result
-                if (ln instanceof Integer a && rn instanceof Integer b) {
-                    return switch (op) {
-                        case "+" -> a + b;
-                        case "-" -> a - b;
-                        case "*" -> a * b;
-                        case "/" -> a / b;
-                        case "%" -> a % b;
-                        case "==" -> a.equals(b);
-                        case "!=" -> !a.equals(b);
-                        case "<" -> a < b;
-                        case "<=" -> a <= b;
-                        case ">" -> a > b;
-                        case ">=" -> a >= b;
-                        default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-                    };
-                }
-                // otherwise treat both as doubles
-                double a = ln.doubleValue(), b = rn.doubleValue();
-                return switch (op) {
-                    case "+" -> a + b;
-                    case "-" -> a - b;
-                    case "*" -> a * b;
-                    case "/" -> a / b;
-                    case "%" -> a % b;
-                    case "==" -> a == b;
-                    case "!=" -> a != b;
-                    case "<" -> a < b;
-                    case "<=" -> a <= b;
-                    case ">" -> a > b;
-                    case ">=" -> a >= b;
-                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-                };
+                return compare(op, ln, rn);
             } else if (left instanceof String l && right instanceof String r) {
-                return switch (op) {
-                    case "+" -> l + r;
-                    case "==" -> StringUtils.equals(l, r);
-                    case "!=" -> !StringUtils.equals(l, r);
-                    case "<" -> StringUtils.compare(l, r) < 0;
-                    case "<=" -> StringUtils.compare(l, r) <= 0;
-                    case ">" -> StringUtils.compare(l, r) > 0;
-                    case ">=" -> StringUtils.compare(l, r) >= 0;
-                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-                };
+                return compare(op, l, r);
             } else if (left instanceof Boolean l && right instanceof Boolean r) {
-                return switch (op) {
-                    case "==" -> l.equals(r);
-                    case "!=" -> !l.equals(r);
-                    case "<" -> l.compareTo(r) < 0;
-                    case "<=" -> l.compareTo(r) <= 0;
-                    case ">" -> l.compareTo(r) > 0;
-                    case ">=" -> l.compareTo(r) >= 0;
-                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-                };
+                return compare(op, l, r);
+            } else if (left instanceof Number l && right instanceof String string) {
+                return compare(op, l, string);
             } else if (left instanceof HashMap l && right instanceof HashMap r) {
                 return switch (op) {
                     case "==" -> Objects.equals(l, r);
@@ -702,12 +737,6 @@ public final class Interpreter implements Visitor<Object> {
 //        }
 //        return executeBlock(BlockExpression.block(statement.getItem(), whileStatement), env);
         throw new OperationNotImplementedException("For statement not implemented");
-    }
-
-    private static void forInit(Environment<Object> forEnv, Identifier statement, Object i) {
-        if (statement != null) {
-            forEnv.initOrAssign(statement.string(), i);
-        }
     }
 
     private Object ForWithRange(ForStatement statement) {
