@@ -126,6 +126,18 @@ public class ForTest extends RuntimeTest {
         assertEquals(List.of("dev", "prod"), res);
         assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
     }
+    @Test
+    @DisplayName("Key Value access")
+    void testKeyValue() {
+        var res = eval("""
+                var res = []
+                for index, item in [{client: "dev"}, {client: "prod"}] {
+                    res += index + " " + item.client
+                }
+                """);
+        assertEquals(List.of("client dev", "client prod"), res);
+        assertEquals(List.of("client dev", "client prod"), interpreter.getEnv().lookup("res"));
+    }
 
     @Test
     @DisplayName("Allow both index and value in for loop")
