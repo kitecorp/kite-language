@@ -710,6 +710,7 @@ public final class TypeChecker implements Visitor<Type> {
         return switch (key) {
             case SymbolIdentifier symbolIdentifier -> visit(symbolIdentifier.getSymbol());
             case Identifier symbolIdentifier -> visit(symbolIdentifier.string());
+            case StringLiteral symbolIdentifier -> visit(symbolIdentifier);
             case null -> null;
             default -> throw new IllegalStateException("Unexpected value: " + key);
         };

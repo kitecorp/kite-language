@@ -1239,13 +1239,20 @@ public class Parser {
         };
     }
 
+    /**
+     * Key will always be a string as it cannot be a symbol like a variable so if it is a symbol we treat it like a string
+     */
     private Expression ObjectKeyIdentifier() {
         return switch (lookAhead().type()) {
             case String -> {
                 var id = eat(String);
                 yield new StringLiteral(id.value().toString());
             }
-            default -> SymbolIdentifier();
+            case Identifier -> {
+                var id = eat(Identifier);
+                yield new StringLiteral(id.value().toString());
+            }
+            default -> throw new RuntimeException("Unexpected token type: " + lookAhead().type());
         };
     }
 
