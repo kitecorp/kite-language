@@ -1243,7 +1243,7 @@ public class Parser {
         return switch (lookAhead().type()) {
             case String -> {
                 var id = eat(String);
-                yield new SymbolIdentifier(id.value().toString());
+                yield new StringLiteral(id.value().toString());
             }
             default -> SymbolIdentifier();
         };

@@ -193,9 +193,14 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.getKey() == null || expression.getValue() == null) {
             return new ObjectLiteralPair();
         }
-        var key = expression.keyString();
-        var value = visit(expression.getValue());
-        return new ObjectLiteralPair(key, value);
+        var res = switch (expression.getKey()) {
+            case SymbolIdentifier symbolIdentifier ->
+                    new ObjectLiteralPair(symbolIdentifier.string(), visit(expression.getValue()));
+            case StringLiteral stringLiteral ->
+                    new ObjectLiteralPair((String) visit(stringLiteral), visit(expression.getValue()));
+            default -> throw new IllegalArgumentException("Invalid object literal key: " + expression.getKey());
+        };
+        return res;
     }
 
     @Override
@@ -552,7 +557,7 @@ public final class Interpreter implements Visitor<Object> {
     private @NotNull String getSymbolIdentifier(MemberExpression expression) {
         if (expression.getProperty() instanceof SymbolIdentifier resourceName) {
             return resourceName.string();
-        } else if (expression.getProperty() instanceof StringLiteral literal){
+        } else if (expression.getProperty() instanceof StringLiteral literal) {
             return literal.getValue();
         }
         throw new OperationNotImplementedException("Membership expression not implemented for: " + printer.visit(expression));
