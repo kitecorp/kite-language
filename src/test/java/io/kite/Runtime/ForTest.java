@@ -115,6 +115,20 @@ public class ForTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Access object values in loop")
+    void testAccessObjectValuesInLoop() {
+        var res = eval("""
+                var res = []
+                for env in [{client: "dev"}, {client: "prod"}] {
+                    res += env.client
+                }
+                """);
+        assertEquals(List.of("dev", "prod"), res);
+        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
+    }
+
+
+    @Test
     void testFor() {
         var res = eval("""
                 [for i in 0..3: i+=1]
