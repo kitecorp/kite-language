@@ -127,6 +127,53 @@ public class ForTest extends RuntimeTest {
         assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
     }
 
+    @Test
+    @DisplayName("Allow both index and value in for loop")
+    void testBothIndexAndValue() {
+        var res = eval("""
+                var indices = []
+                var values = []
+                for index, value in [1,2,3] {
+                    indices += index
+                    values += value
+                }
+                """);
+
+        assertEquals(List.of(0, 1, 2), interpreter.getEnv().lookup("indices"));
+        assertEquals(List.of(1, 2, 3), interpreter.getEnv().lookup("values"));
+    }
+
+    @Test
+    @DisplayName("Allow both index and value in for loop string")
+    void testBothIndexAndValueString() {
+        var res = eval("""
+                var indices = []
+                var values = []
+                for index, value in ["env1","env2"] {
+                    indices += index
+                    values += value
+                }
+                """);
+
+        assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
+        assertEquals(List.of("env1", "env2"), interpreter.getEnv().lookup("values"));
+    }
+
+    @Test
+    @DisplayName("Allow both index and value in for loop object")
+    void testBothIndexAndValueObject() {
+        var res = eval("""
+                var indices = []
+                var values = []
+                for index, value in [{client: "dev"}, {client: "prod"}] {
+                    indices += index
+                    values += value.client
+                }
+                """);
+        assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
+        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("values"));
+    }
+
 
     @Test
     void testFor() {

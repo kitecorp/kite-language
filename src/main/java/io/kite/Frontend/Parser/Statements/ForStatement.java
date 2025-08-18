@@ -24,6 +24,7 @@ import java.util.List;
 public final class ForStatement extends Statement {
     @Nullable
     private Identifier item;
+    private Identifier index;
     private Expression array;// for i in varName (typically array) or an actual array ['a', 'b', 'c']
     private Statement body;
     @Nullable

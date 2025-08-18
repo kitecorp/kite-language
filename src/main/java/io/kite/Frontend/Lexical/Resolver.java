@@ -299,6 +299,7 @@ public final class Resolver implements Visitor<Void> {
             beginScope();
         }
         forInit(statement.getItem());
+        forInit(statement.getIndex());
         if (statement.isBodyBlock()) {
             resolveNoBlock(statement.getBody()); // we are already inside the block opened above
         } else {

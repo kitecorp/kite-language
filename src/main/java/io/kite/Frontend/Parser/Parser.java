@@ -244,6 +244,16 @@ public class Parser {
         eat(For);
 
         var varName = Identifier();
+        Identifier index = null;
+        if (IsLookAhead(Comma)) {
+            eat(Comma);
+            index = IsLookAhead(Identifier) ? Identifier() : null;
+            if (index != null) { // switch names. Index is always the first name in the for declaration
+                var tmp = index;
+                index = varName;
+                varName = tmp;
+            }
+        }
         eat(In);
         Range<Integer> range = null;
         @NotNull Expression arrayName = null;
@@ -270,6 +280,7 @@ public class Parser {
                 .body(body)
                 .range(range)
                 .array(arrayName)
+                .index(index)
                 .item(varName)
                 .build();
     }
