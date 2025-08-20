@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parser.Expressions.TypeExpression.type;
 import static io.kite.Frontend.Parser.Program.program;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,7 +21,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationNumber() {
         var res = parse("type int = 1");
-        var expected = program(TypeExpression.type("int", number(1)));
+        var expected = program(type("int", number(1)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -28,7 +29,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationDecimal() {
         var res = parse("type int = 1.1");
-        var expected = program(TypeExpression.type("int", number(1.1)));
+        var expected = program(type("int", number(1.1)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -36,7 +37,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationTrue() {
         var res = parse("type bool = true");
-        var expected = program(TypeExpression.type("bool", BooleanLiteral.bool(true)));
+        var expected = program(type("bool", BooleanLiteral.bool(true)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -44,7 +45,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationFalse() {
         var res = parse("type bool = false");
-        var expected = program(TypeExpression.type("bool", BooleanLiteral.bool(false)));
+        var expected = program(type("bool", BooleanLiteral.bool(false)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -52,7 +53,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationString() {
         var res = parse("type hey = 'hello'");
-        var expected = program(TypeExpression.type("hey", StringLiteral.string("hello")));
+        var expected = program(type("hey", StringLiteral.string("hello")));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -60,7 +61,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationObject() {
         var res = parse("type hey = { env: 'dev' }");
-        var expected = program(TypeExpression.type("hey", objectExpression(object("env", "dev"))));
+        var expected = program(type("hey", objectExpression(object("env", "dev"))));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -68,7 +69,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationEmptyObject() {
         var res = parse("type hey = { }");
-        var expected = program(TypeExpression.type("hey", objectExpression()));
+        var expected = program(type("hey", objectExpression()));
         assertEquals(expected, res);
         log.info(res);
     }
