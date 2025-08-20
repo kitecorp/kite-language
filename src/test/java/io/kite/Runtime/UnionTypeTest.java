@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,6 +55,16 @@ public class UnionTypeTest extends RuntimeTest {
         Assertions.assertTrue(global.hasVar("x"));
         assertEquals(List.of("hello", "world"), res);
         assertEquals(List.of("hello", "world"), global.get("x"));
+        log.info(res);
+    }
+
+    @Test
+    void typeUnionObject() {
+        var res = eval("""
+                type x = { name: "hello" } | { name: "world" }
+                """);
+        Assertions.assertTrue(global.hasVar("x"));
+        assertEquals(List.of(Map.of("name", "hello"), Map.of("name", "world")), res);
         log.info(res);
     }
 
