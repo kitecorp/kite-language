@@ -1,6 +1,5 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.Expressions.ObjectExpression;
 import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
@@ -76,6 +76,17 @@ public class TypeTest extends ParserTest {
         log.info(res);
     }
 
+    @Test
+    void typeDeclarationAnotherType() {
+        var res = parse("""
+                type int = 1
+                type INT = int
+                """);
+        var expected = program(type("int", number(1)), type("INT", symbol("int")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
 
     @Test
     void typeDeclarationUnionNumberError() {
@@ -120,9 +131,26 @@ public class TypeTest extends ParserTest {
     @Test
     void typeUnionObjects() {
         var res = parse("type hey = { env: 'dev' } | { env: 'prod' }");
-        var expected = program(type("hey", objectExpression(object("env", "dev")), ObjectExpression.objectExpression(object("env", "prod"))));
+        var expected = program(type("hey", objectExpression(object("env", "dev")), objectExpression(object("env", "prod"))));
         assertEquals(expected, res);
         log.info(res);
     }
+
+
+    @Test
+    void typeUnionAnotherTypes() {
+        var res = parse("""
+                type one = 1
+                type two = 2
+                type INT = one | two
+                """);
+        var expected = program(
+                type("one", number(1)),
+                type("two", number(2)),
+                type("INT", symbol("one"), symbol("two")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
 
 }
