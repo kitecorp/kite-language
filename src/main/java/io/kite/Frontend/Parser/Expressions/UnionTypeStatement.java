@@ -8,7 +8,6 @@ import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 @Data
 public final class UnionTypeStatement extends Statement {
@@ -66,19 +65,6 @@ public final class UnionTypeStatement extends Statement {
 
     public static Statement type(String name, Expression block) {
         return new UnionTypeStatement(Identifier.id(name), block);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UnionTypeStatement that)) return false;
-        if (!super.equals(o)) return false;
-        return Objects.equals(getName(), that.getName()) && Objects.equals(getExpressions(), that.getExpressions());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getName(), getExpressions());
     }
 
     public String name() {
