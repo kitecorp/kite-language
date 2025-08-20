@@ -26,10 +26,22 @@ public final class TypeExpression extends Statement {
         this.expression = List.of(expression);
     }
 
+    private TypeExpression(String name, Expression expression) {
+        this(Identifier.id(name), expression);
+    }
+
     private TypeExpression(Identifier name, List<Expression> expression) {
         this();
         this.name = name;
         this.expression = expression;
+    }
+
+    private TypeExpression(Identifier name, Expression... expression) {
+        this(name, List.of(expression));
+    }
+
+    private TypeExpression(String name, Expression... expression) {
+        this(Identifier.symbol(name), List.of(expression));
     }
 
     public static Statement type() {
@@ -41,6 +53,10 @@ public final class TypeExpression extends Statement {
     }
 
     public static Statement type(Identifier name, List<Expression> block) {
+        return new TypeExpression(name, block);
+    }
+
+    public static Statement type(String name, Expression... block) {
         return new TypeExpression(name, block);
     }
 
