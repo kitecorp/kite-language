@@ -240,7 +240,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     private Type expect(Type actualType, UnionType expectedType, Expression expectedVal) {
         if (expectedType.getTypes().contains(actualType)) {
-            return actualType;
+            return expectedType;
         }
         String string = MessageFormat.format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                 printer.visit(expectedType),
@@ -300,23 +300,19 @@ public final class TypeChecker implements Visitor<Type> {
             var value = executeBlock(expression.getObject(), env);
             // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
             // Since that environment points to the parent(type env) it will also find the properties
-            switch (value) {
-                case SchemaType schemaValue -> {
-                    return schemaValue.getInstances().lookup(resourceName.string());  // vm.main -> if user references the schema we search for the instances of those schemas
-                }
+            return switch (value) {
+                case SchemaType schemaValue -> // vm.main -> if user references the schema we search for the instances of those schemas
+                        schemaValue.getInstances().lookup(resourceName.string());
                 case ResourceType iEnvironment -> {
                     try {
-                        return iEnvironment.lookup(resourceName.string());
+                        yield iEnvironment.lookup(resourceName.string());
                     } catch (NotFoundException e) {
                         throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
                     }
                 }
-                case ObjectType objectType -> {
-                    return accessMemberType(expression, resourceName.string(), objectType);
-                }
-                case null, default -> {
-                }
-            }
+                case ObjectType objectType -> accessMemberType(expression, resourceName.string(), objectType);
+                case null, default -> null;
+            };
             // else it could be a resource or any other type like a NumericLiteral or something else
         } else if (expression.getProperty() instanceof StringLiteral stringLiteral) {
             var value = executeBlock(expression.getObject(), env);
@@ -658,7 +654,8 @@ public final class TypeChecker implements Visitor<Type> {
             var explicitType = visit(typeIdentifier);
             handleArrayType(implicitType, explicitType);
             if (explicitType instanceof UnionType unionType) {
-                expect(implicitType, unionType, expression);
+                var unionType1 = expect(implicitType, unionType, expression);
+                return env.init(var, unionType1);
             } else {
                 expect(implicitType, explicitType, expression);
             }
