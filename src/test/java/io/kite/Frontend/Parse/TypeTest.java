@@ -1,5 +1,6 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parse.Literals.NullLiteral;
 import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -56,6 +57,14 @@ public class TypeTest extends ParserTest {
     void typeDeclarationString() {
         var res = parse("type hey = 'hello'");
         var expected = program(type("hey", string("hello")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeDeclarationNull() {
+        var res = parse("type nil = null");
+        var expected = program(type("nil", NullLiteral.nullLiteral()));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -148,6 +157,19 @@ public class TypeTest extends ParserTest {
                 type("one", number(1)),
                 type("two", number(2)),
                 type("INT", symbol("one"), symbol("two")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeUnionAnotherMixedTypes() {
+        var res = parse("""
+                type zero = 0
+                type INT = 1 | 'hello' | true | { env: 'dev' } | zero 
+                """);
+        var expected = program(
+                type("zero", number(0)),
+                type("INT", number(1), string("hello"), bool(true), objectExpression(object("env", "dev")), symbol("zero")));
         assertEquals(expected, res);
         log.info(res);
     }
