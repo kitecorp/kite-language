@@ -10,7 +10,7 @@ import static io.kite.Frontend.Parser.Program.program;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-@DisplayName("Parser Type")
+@DisplayName("Parser Type alias")
 public class TypeTest extends ParserTest {
 
     @Test
