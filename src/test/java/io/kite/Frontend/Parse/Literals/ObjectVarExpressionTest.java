@@ -1,7 +1,6 @@
 package io.kite.Frontend.Parse.Literals;
 
 import io.kite.Frontend.Parse.ParserTest;
-import io.kite.TypeChecker.Types.ReferenceType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import static io.kite.Frontend.Parse.Literals.Identifier.id;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
-import static io.kite.Frontend.Parse.Literals.TypeIdentifier.*;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.kite.Frontend.Parser.Expressions.MemberExpression.member;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
@@ -63,11 +62,11 @@ public class ObjectVarExpressionTest extends ParserTest {
     @Test
     void varInitToFalse() {
         var res = parse("var object x = { a:false}");
-        var expected = program(varStatement(var("x", type(ReferenceType.Object),
+        var expected = program(varStatement(var("x", type("object"),
                 objectExpression(object("a", bool(false)))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
