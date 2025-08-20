@@ -201,7 +201,7 @@ public class VarObjectTest extends CheckerTest {
         assertThrows(TypeError.class, () ->
                 eval("""
                         var object x = { "a": 1 };
-                        x.b = 2;               // adding 'b' not allowed if strict
+                        x.b = 2;
                         """
                 )
         );
