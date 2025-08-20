@@ -69,6 +69,18 @@ public class UnionTypeTest extends RuntimeTest {
     }
 
     @Test
+    void typeUnionAnotherTypes() {
+        var res = eval("""
+                type one = 1
+                type two = 2
+                type INT = one | two
+                """);
+        Assertions.assertTrue(global.hasVar("INT"));
+        assertEquals(List.of(List.of(1), List.of(2)), res);
+        log.info(res);
+    }
+
+    @Test
     void typeUnionNum() {
         var res = eval("type num = 1 | 2 | 5");
         Assertions.assertTrue(global.hasVar("num"));
