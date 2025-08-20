@@ -33,4 +33,9 @@ public final class UnionType extends ReferenceType {
         this.types = types;
     }
 
+    public UnionType(String typeName, @Nullable TypeEnvironment env, Expression... types) {
+        super(SystemType.UNION_TYPE, typeName, env);
+        this.types = Set.of(types);
+    }
+
 }
