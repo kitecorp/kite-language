@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Program.program;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -51,6 +53,14 @@ public class TypeTest extends ParserTest {
     void typeDeclarationString() {
         var res = parse("type hey = 'hello'");
         var expected = program(TypeExpression.type("hey", StringLiteral.string("hello")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeDeclarationObject() {
+        var res = parse("type hey = { env: 'dev' }");
+        var expected = program(TypeExpression.type("hey", objectExpression(object("env", "dev"))));
         assertEquals(expected, res);
         log.info(res);
     }
