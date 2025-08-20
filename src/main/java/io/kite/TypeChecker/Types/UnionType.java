@@ -16,8 +16,10 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public final class UnionType extends ReferenceType {
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    /**
+     * We use set because we don't care if a value is declared multiple times in the union type
+     * type x = 1 | 2 | 3 -> types = [ number ]
+     */
     @Getter
     @Setter
     private Set<Expression> types;

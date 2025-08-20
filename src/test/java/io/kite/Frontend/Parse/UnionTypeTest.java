@@ -162,6 +162,16 @@ public class UnionTypeTest extends ParserTest {
     }
 
     @Test
+    void typeUnionAnotherExisting() {
+        var res = parse("""
+                type bool = boolean
+                """);
+        var expected = program(type("bool", symbol("boolean")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
     void typeUnionAnotherMixedTypes() {
         var res = parse("""
                 type zero = 0
