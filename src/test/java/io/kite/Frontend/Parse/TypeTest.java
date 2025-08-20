@@ -1,15 +1,16 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parse.Literals.BooleanLiteral;
-import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.ObjectExpression;
 import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Expressions.TypeExpression.type;
 import static io.kite.Frontend.Parser.Program.program;
@@ -38,7 +39,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationTrue() {
         var res = parse("type bool = true");
-        var expected = program(type("bool", BooleanLiteral.bool(true)));
+        var expected = program(type("bool", bool(true)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -46,7 +47,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationFalse() {
         var res = parse("type bool = false");
-        var expected = program(type("bool", BooleanLiteral.bool(false)));
+        var expected = program(type("bool", bool(false)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -54,7 +55,7 @@ public class TypeTest extends ParserTest {
     @Test
     void typeDeclarationString() {
         var res = parse("type hey = 'hello'");
-        var expected = program(type("hey", StringLiteral.string("hello")));
+        var expected = program(type("hey", string("hello")));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -76,7 +77,6 @@ public class TypeTest extends ParserTest {
     }
 
 
-
     @Test
     void typeDeclarationUnionNumberError() {
         var res = parse("type int = 1 | 1");
@@ -84,5 +84,45 @@ public class TypeTest extends ParserTest {
         log.info(res);
     }
 
+    @Test
+    void typeUnionNumbers() {
+        var res = parse("type ints = 1 | 2");
+        var expected = program(type("ints", number(1), number(2)));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeUnionDecimals() {
+        var res = parse("type ints = 1.2 | 2.2");
+        var expected = program(type("ints", number(1.2), number(2.2)));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeUnionBooleans() {
+        var res = parse("type booleans = true | false");
+        var expected = program(type("booleans", bool(true), bool(false)));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeUnionStrings() {
+        var res = parse("type hey = 'hello' | \"world\"  ");
+        var expected = program(type("hey", string("hello"), string("world")));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+
+    @Test
+    void typeUnionObjects() {
+        var res = parse("type hey = { env: 'dev' } | { env: 'prod' }");
+        var expected = program(type("hey", objectExpression(object("env", "dev")), ObjectExpression.objectExpression(object("env", "prod"))));
+        assertEquals(expected, res);
+        log.info(res);
+    }
 
 }
