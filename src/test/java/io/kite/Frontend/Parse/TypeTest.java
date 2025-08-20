@@ -1,19 +1,25 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parser.Expressions.TypeExpression;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parser.Program.program;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Type")
 public class TypeTest extends ParserTest {
 
-//    @Test
-//    void typeDeclaration() {
-//        var res = parse("type vm = 1");
-//        var expected = program(TypeExpression.type("vm", number(1)));
-//        assertEquals(expected, res);
-//        log.info((res));
-//    }
+    @Test
+    void typeDeclaration() {
+        var res = parse("type int = 1");
+        var expected = program(TypeExpression.type("int", number(1)));
+        assertEquals(expected, res);
+        log.info(res);
+    }
 //
 //    @Test
 //    void missingLeftBracketError() {

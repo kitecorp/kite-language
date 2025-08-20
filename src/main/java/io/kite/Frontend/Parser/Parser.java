@@ -1131,18 +1131,31 @@ public class Parser {
     private Statement TypeDeclaration() {
         eat(Type);
         var name = Identifier();
+        eat(Equal);
 
-        Expression body = TypeParams();
+        var body = TypeParams();
         return TypeExpression.type(name, body);
     }
 
     /**
      * : TypeParams
-     * | '(' Literal | TypeIdentifier ')'[]?
+     * | (Literal '|')*
+     * | (TypeIdentifier '|')*
      */
-    private Expression TypeParams() {
-
-        return null;
+    private ArrayList<Expression> TypeParams() {
+        var params = new ArrayList<Expression>();
+        while (!IsLookAhead(lineTerminator) && !IsLookAhead(EOF)) {
+            var param = switch (lookAhead().type()) {
+                case String, Number, Object, True, False -> {
+                    var eaten = eat(lookAhead().type());
+                    yield Literal();
+                }
+                case Identifier -> Identifier();
+                default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
+            };
+            params.add(param);
+        }
+        return params;
     }
 
 
@@ -1293,13 +1306,14 @@ public class Parser {
     }
 
     private Literal Literal() {
-        Token current = iterator.getCurrent();
+        var current = iterator.getCurrent();
+        var value = current.value();
         return switch (current.type()) {
-            case True, False -> BooleanLiteral.bool(current.value());
+            case True, False -> BooleanLiteral.bool(value);
             case Null -> NullLiteral.nullLiteral();
-            case Number -> NumberLiteral.number(current.value());
-            case String -> new StringLiteral(current.value());
-            case Object -> new ObjectLiteral(id(current.value().toString()), Literal());
+            case Number -> NumberLiteral.number(value);
+            case String -> new StringLiteral(value);
+            case Object -> new ObjectLiteral(id(value.toString()), Literal());
 //            default -> new ErrorExpression(current.value());
             default -> NullLiteral.nullLiteral();
         };
