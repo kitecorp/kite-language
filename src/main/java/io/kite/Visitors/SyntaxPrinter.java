@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 
 public non-sealed class SyntaxPrinter implements Visitor<String> {
 
@@ -27,6 +29,15 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(BinaryExpression expression) {
         return visit(expression.getLeft()) + " " + expression.getOperator() + " " + visit(expression.getRight());
+    }
+
+    @Override
+    public String visit(UnionTypeStatement expression) {
+        return "type " + visit(requireNonNull(expression.getName())) + " = " +
+               expression.getExpressions()
+                       .stream()
+                       .map(this::visit)
+                       .reduce((a, b) -> a + " | " + b).orElse("");
     }
 
     @Override

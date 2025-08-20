@@ -13,13 +13,13 @@ import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.kite.Frontend.Parser.Expressions.TypeExpression.type;
+import static io.kite.Frontend.Parser.Expressions.UnionTypeStatement.type;
 import static io.kite.Frontend.Parser.Program.program;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
 @DisplayName("Parser Type alias")
-public class TypeTest extends ParserTest {
+public class UnionTypeTest extends ParserTest {
 
     @Test
     void typeDeclarationNumber() {

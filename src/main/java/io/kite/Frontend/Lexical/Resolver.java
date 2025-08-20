@@ -120,6 +120,11 @@ public final class Resolver implements Visitor<Void> {
     }
 
     @Override
+    public Void visit(UnionTypeStatement expression) {
+        return null;
+    }
+
+    @Override
     public Void visit(CallExpression<Expression> expression) {
         resolve(expression.getCallee());
         for (Expression argument : expression.getArguments()) {

@@ -1133,7 +1133,7 @@ public class Parser {
         eat(Equal);
 
         var body = TypeParams();
-        return TypeExpression.type(name, body);
+        return UnionTypeStatement.type(name, body);
     }
 
     /**

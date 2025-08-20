@@ -23,6 +23,11 @@ public final class AstPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(UnionTypeStatement expression) {
+        return expression.name() + " = " + expression.getExpressions().stream().map(this::visit).reduce((a, b) -> a + " | " + b).orElse("");
+    }
+
+    @Override
     public String visit(CallExpression expression) {
         return null;
     }

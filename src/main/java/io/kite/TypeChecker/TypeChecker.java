@@ -174,6 +174,11 @@ public final class TypeChecker implements Visitor<Type> {
         return expect(t1, t2, left);
     }
 
+    @Override
+    public Type visit(UnionTypeStatement expression) {
+        throw new RuntimeException("union type expression not implemented yet");
+    }
+
     private void expectOperatorType(Type type, List<SystemType> allowedTypes, BinaryExpression expression) {
         if (!allowedTypes.contains(type.getKind())) {
             throw new TypeError("Unexpected type `" + type.getValue() + "` in expression: " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
