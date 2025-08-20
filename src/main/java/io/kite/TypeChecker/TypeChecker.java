@@ -16,7 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 public final class TypeChecker implements Visitor<Type> {
@@ -176,7 +178,17 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(UnionTypeStatement expression) {
-        throw new RuntimeException("union type expression not implemented yet");
+        var nameType = visit(expression.name());
+        expect(nameType, ValueType.String, expression.getName());
+
+        var unionType = new UnionType(expression.name(), env);
+        for (Expression it : expression.getExpressions()) {
+            var type = visit(it);
+            unionType.getTypes().add(type);
+        }
+
+        env.init(expression.getName(), unionType);
+        return unionType;
     }
 
     private void expectOperatorType(Type type, List<SystemType> allowedTypes, BinaryExpression expression) {
@@ -203,9 +215,6 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     private Type expect(Type actualType, Type expectedType, Expression expectedVal) {
-//        if (actualType == ValueType.Null) {
-//            return expectedType;
-//        }
         if (expectedType == ValueType.Null) {
             return actualType;
         }
@@ -227,6 +236,18 @@ public final class TypeChecker implements Visitor<Type> {
             }
         }
         return actualType;
+    }
+
+    private Type expect(Type actualType, UnionType expectedType, Expression expectedVal) {
+        if (expectedType.getTypes().contains(actualType)) {
+            return actualType;
+        }
+        String string = MessageFormat.format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
+                printer.visit(expectedType),
+                expectedType.getTypes().stream().map(printer::visit).collect(Collectors.joining(" | ")),
+                actualType,
+                printer.visit(expectedVal));
+        throw new TypeError(string);
     }
 
     private Type expect(Type actualType, Type expectedType, Statement actualVal, Statement expectedVal) {
@@ -636,7 +657,11 @@ public final class TypeChecker implements Visitor<Type> {
         if (typeIdentifier != null) { // val type name
             var explicitType = visit(typeIdentifier);
             handleArrayType(implicitType, explicitType);
-            expect(implicitType, explicitType, expression);
+            if (explicitType instanceof UnionType unionType) {
+                expect(implicitType, unionType, expression);
+            } else {
+                expect(implicitType, explicitType, expression);
+            }
             if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
                 // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once

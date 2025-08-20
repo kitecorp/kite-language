@@ -1,11 +1,15 @@
 package io.kite.TypeChecker.Types;
 
+import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.TypeChecker.TypeEnvironment;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @ToString(callSuper = true)
@@ -15,20 +19,16 @@ public final class UnionType extends ReferenceType {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Getter
-    private final TypeEnvironment types;
+    @Setter
+    private Set<Expression> types;
 
     public UnionType(String typeName, @Nullable TypeEnvironment env) {
-        super(SystemType.SCHEMA, typeName, new TypeEnvironment(env));
-        this.types = new TypeEnvironment();
+        this(typeName, env, new HashSet<>());
     }
 
-    public Type addInstance(@NotNull String fieldName, ResourceType type) {
-        return types.init(fieldName, type);
+    public UnionType(String typeName, @Nullable TypeEnvironment env, Set<Expression> types) {
+        super(SystemType.UNION_TYPE, typeName, env);
+        this.types = types;
     }
-
-    public Type getInstance(@NotNull String fieldName) {
-        return types.lookup(fieldName);
-    }
-
 
 }
