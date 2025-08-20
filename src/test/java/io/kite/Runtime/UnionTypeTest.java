@@ -81,6 +81,17 @@ public class UnionTypeTest extends RuntimeTest {
     }
 
     @Test
+    void typeUnionMixedTypes() {
+        var res = eval("""
+                type zero = 0
+                type INT = 1 | 'hello' | true | { env: 'dev' } | zero 
+                """);
+        Assertions.assertTrue(global.hasVar("INT"));
+        assertEquals(List.of(1, "hello", true, Map.of("env", "dev"), List.of(0)), res);
+        log.info(res);
+    }
+
+    @Test
     void typeUnionNum() {
         var res = eval("type num = 1 | 2 | 5");
         Assertions.assertTrue(global.hasVar("num"));
