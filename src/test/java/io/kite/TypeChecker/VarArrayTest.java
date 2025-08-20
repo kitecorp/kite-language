@@ -146,7 +146,7 @@ public class VarArrayTest extends CheckerTest {
                 var object[] x = [{env: "prod"}, {env: "dev"}]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ReferenceType.Object);
+        assertEquals(varType.getType(), ObjectType.INSTANCE);
     }
 
 

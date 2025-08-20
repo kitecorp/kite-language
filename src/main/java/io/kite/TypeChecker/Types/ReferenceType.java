@@ -7,9 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 public sealed class ReferenceType extends Type permits ArrayType, ObjectType, ResourceType, SchemaType, UnionType {
     public static final ReferenceType Resource = new ReferenceType(SystemType.RESOURCE);
-    public static final ReferenceType Object = new ReferenceType(SystemType.OBJECT);
-    public static final ReferenceType Union = new ReferenceType(SystemType.UNION_TYPE);
-    public static final ReferenceType Schema = new ReferenceType(SystemType.SCHEMA);
 
     @Getter
     protected TypeEnvironment environment;
@@ -42,7 +39,7 @@ public sealed class ReferenceType extends Type permits ArrayType, ObjectType, Re
     }
 
     public static ReferenceType[] values() {
-        return new ReferenceType[]{Object};
+        return new ReferenceType[]{ObjectType.INSTANCE};
     }
 
     @Override
@@ -68,4 +65,5 @@ public sealed class ReferenceType extends Type permits ArrayType, ObjectType, Re
     public Type setProperty(@NotNull String fieldName, Type type) {
         return environment.init(fieldName, type);
     }
+
 }

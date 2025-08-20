@@ -659,7 +659,7 @@ public final class TypeChecker implements Visitor<Type> {
             } else {
                 expect(implicitType, explicitType, expression);
             }
-            if (StringUtils.equals(implicitType.getValue(), ReferenceType.Object.getValue())) {
+            if (StringUtils.equals(implicitType.getValue(), ObjectType.INSTANCE.getValue())) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
                 // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
                 return env.init(var, implicitType);
@@ -788,7 +788,7 @@ public final class TypeChecker implements Visitor<Type> {
         boolean isImmutable = lookup instanceof ObjectType objectType && objectType.isImmutable();
         if (isImmutable || vals.contains(identifier)) {
             Type visit = visit(right);
-            if (Objects.equals(ObjectType.Object.getValue(), visit.getValue())) {
+            if (Objects.equals(ObjectType.INSTANCE.getValue(), visit.getValue())) {
                 if (visit == lookup) {
                     throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
                 } else if (vals.contains(identifier)) {
