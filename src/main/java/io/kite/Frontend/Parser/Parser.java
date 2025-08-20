@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
-import static io.kite.Frontend.Parse.Literals.Identifier.id;
 import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
@@ -1146,10 +1145,11 @@ public class Parser {
         var params = new ArrayList<Expression>();
         while (!IsLookAhead(lineTerminator) && !IsLookAhead(EOF)) {
             var param = switch (lookAhead().type()) {
-                case String, Number, Object, True, False -> {
-                    var eaten = eat(lookAhead().type());
+                case String, Number, Object, True, False, Null -> {
+                    eat(lookAhead().type());
                     yield Literal();
                 }
+                case OpenBraces -> ObjectDeclaration();
                 case Identifier -> Identifier();
                 default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
             };
@@ -1313,7 +1313,7 @@ public class Parser {
             case Null -> NullLiteral.nullLiteral();
             case Number -> NumberLiteral.number(value);
             case String -> new StringLiteral(value);
-            case Object -> new ObjectLiteral(id(value.toString()), Literal());
+            case Object -> new ObjectLiteral(StringLiteral.string(value.toString()), Literal());
 //            default -> new ErrorExpression(current.value());
             default -> NullLiteral.nullLiteral();
         };
