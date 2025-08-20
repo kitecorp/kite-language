@@ -65,5 +65,13 @@ public class TypeTest extends ParserTest {
         log.info(res);
     }
 
+    @Test
+    void typeDeclarationEmptyObject() {
+        var res = parse("type hey = { }");
+        var expected = program(TypeExpression.type("hey", objectExpression()));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
 
 }
