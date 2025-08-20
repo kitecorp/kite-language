@@ -1144,18 +1144,30 @@ public class Parser {
     private ArrayList<Expression> TypeParams() {
         var params = new ArrayList<Expression>();
         while (!IsLookAhead(lineTerminator) && !IsLookAhead(EOF)) {
-            var param = switch (lookAhead().type()) {
-                case String, Number, Object, True, False, Null -> {
-                    eat(lookAhead().type());
-                    yield Literal();
-                }
-                case OpenBraces -> ObjectDeclaration();
-                case Identifier -> Identifier();
-                default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
-            };
+            var param = ParseUnionType();
+            if (params.contains(param)) {
+                Token current = iterator.getCurrent();
+                throw ParserErrors.error("Duplicate type parameter: ", current, current.type());
+            }
             params.add(param);
+            if (IsLookAhead(UnionType)) {
+                eat(UnionType);
+            }
         }
         return params;
+    }
+
+    private Expression ParseUnionType() {
+        var param = switch (lookAhead().type()) {
+            case String, Number, Object, True, False, Null -> {
+                eat(lookAhead().type());
+                yield Literal();
+            }
+            case OpenBraces -> ObjectDeclaration();
+            case Identifier -> Identifier();
+            default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
+        };
+        return param;
     }
 
 

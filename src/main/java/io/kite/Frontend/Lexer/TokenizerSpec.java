@@ -56,6 +56,7 @@ class TokenizerSpec {
 // --------------------------------- Logical Operators: <,>, <=, >= --------------------------------------------------------
             new Entry("^&&", TokenType.Logical_And),
             new Entry("^\\|\\|", TokenType.Logical_Or),
+            new Entry("^\\|", TokenType.UnionType),
             new Entry("^!", TokenType.Logical_Not),
             new Entry("^@", TokenType.AT),
 
