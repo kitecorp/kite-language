@@ -34,6 +34,7 @@ public enum TokenType {
     /***********   Keywords   ******************/
     Logical_And("&&"),
     Logical_Or("||"),
+    UnionType("|"),
     Logical_Not("!"),
     Schema("schema"),
     Return("return"),

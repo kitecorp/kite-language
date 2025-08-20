@@ -2,8 +2,9 @@ package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.BooleanLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
-import io.kite.Frontend.Parser.Expressions.TypeExpression;
+import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -71,6 +72,15 @@ public class TypeTest extends ParserTest {
         var res = parse("type hey = { }");
         var expected = program(type("hey", objectExpression()));
         assertEquals(expected, res);
+        log.info(res);
+    }
+
+
+
+    @Test
+    void typeDeclarationUnionNumberError() {
+        var res = parse("type int = 1 | 1");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
         log.info(res);
     }
 
