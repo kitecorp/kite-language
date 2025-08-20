@@ -63,6 +63,7 @@ public sealed interface Visitor<R>
             case VarStatement varStatement -> visit(varStatement);
             case ValStatement valStatement -> visit(valStatement);
             case WhileStatement whileStatement -> visit(whileStatement);
+            case UnionTypeStatement unionTypeStatement -> visit(unionTypeStatement);
             default -> throw new IllegalStateException("Unexpected value: " + statement);
         };
     }
@@ -87,6 +88,8 @@ public sealed interface Visitor<R>
     R visit(GroupExpression expression);
 
     R visit(BinaryExpression expression);
+
+    R visit(UnionTypeStatement expression);
 
     R visit(CallExpression<Expression> expression);
 

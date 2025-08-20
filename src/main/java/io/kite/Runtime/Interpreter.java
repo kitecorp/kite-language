@@ -375,6 +375,15 @@ public final class Interpreter implements Visitor<Object> {
         throw new RuntimeException("Invalid number: %s %s".formatted(left, right));
     }
 
+    @Override
+    public Object visit(UnionTypeStatement expression) {
+        List<Expression> expressions = expression.getExpressions();
+        List<Object> values = new ArrayList<>(expressions.size());
+        expressions.stream().map(it -> executeBlock(it, env)).forEach(values::add);
+        var res = getEnv().init(expression.getName(), values);
+        return res;
+    }
+
     private void expectOperatorType(Object type, List<Class> allowedTypes, BinaryExpression expression) {
         if (!allowedTypes.contains(type.getClass())) {
             throw new TypeError("Unexpected type `" + type.getClass() + "` in expression: " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
