@@ -266,4 +266,58 @@ public class ForResource extends RuntimeTest {
         assertEquals("test", arrays.get("""
                 main["test"]""").get("name"));
     }
+
+    @Test
+    @DisplayName("resource naming by string array ")
+    void testResourceNamingByStringArray() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                for i in ['prod','test'] {
+                    resource vm main {
+                      name     = i
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+
+        var arrays = schema.getInstances();
+        assertEquals(2, arrays.size());
+        assertEquals("prod", arrays.get("""
+                prod
+                """).get("name"));
+        assertEquals("test", arrays.get("""
+                test
+                """).get("name"));
+    }
+
+    @Test
+    @DisplayName("resource naming by for loop")
+    void testForNameResource() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                var configs = [
+                     { name: "photos", location: "eu-west1" },
+                     { name: "videos", location: "us-east1" }
+                ]
+                
+                for cfg in configs {
+                    resource vm cfg.name {
+                        name = cfg.location
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource = schema.getInstances().get("main[0]");
+
+        assertInstanceOf(ResourceValue.class, resource);
+        assertEquals(resource, res);
+    }
 }
