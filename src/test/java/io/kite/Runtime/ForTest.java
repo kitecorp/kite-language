@@ -135,8 +135,8 @@ public class ForTest extends RuntimeTest {
                     res += index + " " + item.client
                 }
                 """);
-        assertEquals(List.of("client dev", "client prod"), res);
-        assertEquals(List.of("client dev", "client prod"), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of("0 dev", "1 prod"), res);
+        assertEquals(List.of("0 dev", "1 prod"), interpreter.getEnv().lookup("res"));
     }
 
     @Test
