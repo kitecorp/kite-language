@@ -7,13 +7,13 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 public final class UnionTypeStatement extends Statement {
     @Nullable
     private Identifier name;
-    private List<Expression> expressions;
+    private Set<Expression> expressions;
 
     private UnionTypeStatement() {
         this.name = new SymbolIdentifier();
@@ -22,25 +22,25 @@ public final class UnionTypeStatement extends Statement {
     private UnionTypeStatement(Identifier name, Expression expressions) {
         this();
         this.name = name;
-        this.expressions = List.of(expressions);
+        this.expressions = Set.of(expressions);
     }
 
     private UnionTypeStatement(String name, Expression expressions) {
         this(Identifier.id(name), expressions);
     }
 
-    private UnionTypeStatement(Identifier name, List<Expression> expressions) {
+    private UnionTypeStatement(Identifier name, Set<Expression> expressions) {
         this();
         this.name = name;
         this.expressions = expressions;
     }
 
     private UnionTypeStatement(Identifier name, Expression... expressions) {
-        this(name, List.of(expressions));
+        this(name, Set.of(expressions));
     }
 
     private UnionTypeStatement(String name, Expression... expressions) {
-        this(Identifier.symbol(name), List.of(expressions));
+        this(Identifier.symbol(name), Set.of(expressions));
     }
 
     public static Statement type() {
@@ -51,7 +51,7 @@ public final class UnionTypeStatement extends Statement {
         return new UnionTypeStatement(name, block);
     }
 
-    public static Statement type(Identifier name, List<Expression> block) {
+    public static Statement type(Identifier name, Set<Expression> block) {
         return new UnionTypeStatement(name, block);
     }
 
