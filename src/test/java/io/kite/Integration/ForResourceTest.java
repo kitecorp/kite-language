@@ -40,6 +40,37 @@ public class ForResourceTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Test multiple resources")
+    void multipleResources() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                for i in 0..2 {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = name
+                    }
+                    resource vm second {
+                      name     = name
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource0 = schema.getInstances().get("main[0]");
+        var resource1 = schema.getInstances().get("main[1]");
+        assertInstanceOf(ResourceValue.class, resource0);
+        assertInstanceOf(ResourceValue.class, resource1);
+
+        var second0 = schema.getInstances().get("second[0]");
+        var second1 = schema.getInstances().get("second[1]");
+        assertInstanceOf(ResourceValue.class, second0);
+        assertInstanceOf(ResourceValue.class, second1);
+    }
+
+    @Test
     void rangeSingleIteration() {
         eval("""
                       schema vm {
@@ -153,8 +184,13 @@ public class ForResourceTest extends RuntimeTest {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                   schema vm { var string name }
                   for i in 0..1 {
-                    resource vm a { name = vm.b.name }  // a -> b
-                    resource vm b { name = vm.a.name }  // b -> a
+                    resource vm a { 
+                        name = vm.b.name 
+                    }  // a -> b
+                
+                    resource vm b { 
+                        name = vm.a.name
+                    }  // b -> a
                   }
                 """));
     }
