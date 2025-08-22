@@ -618,12 +618,10 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ResourceExpression resource) {
-        if (resource.getName() == null) {
-            throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
-        }
-        if (contextStacks.contains(ContextStack.FUNCTION)) {
-            throw new InvalidInitException("Resource cannot be declared inside a function: " + printer.visit(resource));
-        }
+        validate(resource);
+//        if (callstack.peekLast() instanceof ForStatement) {
+//            resource = ResourceExpression.resource(resource);
+//        }
 
         context = SchemaContext.RESOURCE;
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
@@ -636,10 +634,20 @@ public final class Interpreter implements Visitor<Object> {
                 // notifying an existing resource that it's dependencies were satisfied else create a new resource
                 return detectCycle(resource, resource.getValue());
             } else {
-                return detectCycle(resource, initResource(resource, installedSchema, typeEnvironment));
+                ResourceValue instance = initResource(resource, installedSchema, typeEnvironment);
+                return detectCycle(resource, instance);
             }
         } finally {
             context = null;
+        }
+    }
+
+    private void validate(ResourceExpression resource) {
+        if (resource.getName() == null) {
+            throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
+        }
+        if (contextStacks.contains(ContextStack.FUNCTION)) {
+            throw new InvalidInitException("Resource cannot be declared inside a function: " + printer.visit(resource));
         }
     }
 
