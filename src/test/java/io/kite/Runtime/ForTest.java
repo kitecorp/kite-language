@@ -126,6 +126,7 @@ public class ForTest extends RuntimeTest {
         assertEquals(List.of("dev", "prod"), res);
         assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
     }
+
     @Test
     @DisplayName("Key Value access")
     void testKeyValue() {
@@ -169,6 +170,24 @@ public class ForTest extends RuntimeTest {
 
         assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
         assertEquals(List.of("env1", "env2"), interpreter.getEnv().lookup("values"));
+    }
+
+    @Test
+    @DisplayName("Allow nested loops")
+    void nestedLoops() {
+        var res = eval("""
+                var indices = []
+                var values = []
+                for index, value in ["env1","env2"] {
+                    indices += index
+                    values += value
+                    for index, value in ["client1","client2"] {
+                        indices += index
+                        values += value
+                    }
+                }
+                """);
+        assertEquals(List.of("env1", "client1", "client2", "env2", "client1", "client2"), interpreter.getEnv().lookup("values"));
     }
 
     @Test
