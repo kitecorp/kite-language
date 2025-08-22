@@ -734,7 +734,10 @@ public class Parser {
         if (IsLookAhead(CloseBraces)) return Collections.emptyList();
 
         var params = new ArrayList<SchemaProperty>();
-        while (IsLookAhead(lineTerminator) && eat(lineTerminator) != null && !IsLookAhead(CloseBraces)) {
+        while (!IsLookAhead(CloseBraces)) {
+            if (IsLookAhead(lineTerminator) && eat(lineTerminator) != null) {
+                continue;
+            }
             if (IsLookAhead(lineTerminator)) {
                 continue;
             }
