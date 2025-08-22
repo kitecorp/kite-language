@@ -4,6 +4,7 @@ import io.kite.Base.RuntimeTest;
 import io.kite.Runtime.CycleException;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -78,6 +79,150 @@ public class ForResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
         assertEquals("dev", schema.getInstances().get("main[0]").get("name"));
         assertEquals("prod", schema.getInstances().get("main[1]").get("name"));
+    }
+
+    @Test
+    void stringKeyNamingFromArray() {
+        eval("""
+                  schema vm { var string name }
+                  for i in ["prod","test"] {
+                    resource vm main { name = i }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("prod", schema.getInstances().get("main[\"prod\"]").get("name"));
+        assertEquals("test", schema.getInstances().get("main[\"test\"]").get("name"));
+    }
+
+    @Test
+    void duplicateStringKeys_conflict() {
+        // Expect either last-write-wins OR a specific exception; assert accordingly.
+        Assertions.assertThrows(DeclarationExistsException.class, () -> eval("""
+                  schema vm { var string name }
+                  var items = ["dup","dup"]
+                  for i in items {
+                    resource vm main { name = i }
+                  }
+                """));
+    }
+
+    @Test
+    void loopVarShadowsOuterVar() {
+        eval("""
+                  schema vm { var string name }
+                  var name = "outer"
+                  for i in 0..1 {
+                    var name = "inner"
+                    resource vm main { name = name }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("inner", schema.getInstances().get("main[0]").get("name"));
+    }
+
+    @Test
+    void itemVarDoesNotCollideWithSchemaProps() {
+        eval("""
+                  schema vm { var string name }
+                  var items = [{name:"x"}, {name:"y"}]
+                  for i, item in items {
+                    resource vm main { name = item.name }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("x", schema.getInstances().get("main[0]").get("name"));
+        assertEquals("y", schema.getInstances().get("main[1]").get("name"));
+    }
+
+    @Test
+    void forwardReferenceAcrossOrderInLoop() {
+        eval("""
+                  schema vm { var string name }
+                  for i in 0..2 {
+                    resource vm cidr { name = vm.vpc.name }
+                    resource vm vpc  { name = 'vpc-$i' }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("vpc-0", schema.getInstances().get("cidr[0]").get("name"));
+        assertEquals("vpc-1", schema.getInstances().get("cidr[1]").get("name"));
+    }
+
+    @Test
+    void indirectCycleDetection() {
+        Assertions.assertThrows(CycleException.class, () -> eval("""
+                  schema vm { var string name }
+                  for i in 0..1 {
+                    resource vm a { name = vm.b.name }  // a -> b
+                    resource vm b { name = vm.a.name }  // b -> a
+                  }
+                """));
+    }
+
+    @Test
+    void collectInstancesToArrayVar() {
+        eval("""
+                  schema vm { var string name }
+                  var vm[] col = []
+                  for i in ["prod","test"] {
+                    resource vm main { name = i }
+                    col += vm.main
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("prod", schema.getInstances().get("main[\"prod\"]").get("name"));
+        // Optionally assert col’s contents if your runtime exposes it
+    }
+
+    @Test
+    void loopVarOutOfScope_error() {
+        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+                  schema vm { var string name }
+                  for i in 0..1 { resource vm main { name = 'ok' } }
+                  resource vm late { name = i } // i not in scope
+                """));
+    }
+
+    @Test
+    void crossLoopIndexSpace_error() {
+        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+                  schema vm { var string name }
+                  for i in 0..2 { resource vm a { name = '$i' } }
+                  for j in 0..2 { resource vm b { name = vm.a[j].name } } // if bracket-indexing unsupported
+                """));
+    }
+
+    @Test
+    @Disabled("not implemented right now. We will support it later")
+    void nestedLoops_captureBothIndices() {
+        eval("""
+                  schema vm { var string name }
+                  for i in 0..2 {
+                    for j in 0..2 {
+                      resource vm main { name = '$i-$j' }
+                    }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("0-0", schema.getInstances().get("main[0]").get("name"));
+        assertEquals("0-1", schema.getInstances().get("main[1]").get("name"));
+    }
+
+
+    @Test
+    void nestedLoopScopeRules() {
+        eval("""
+                  schema vm { var string name }
+                  var outer = "X"
+                  for i in 0..1 {
+                    var mid = "M"
+                    for j in 0..1 {
+                      resource vm main { name = '$outer-$mid-$j' }
+                    }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("X-M-0", schema.getInstances().get("main[0]").get("name"));
     }
 
     @Test
