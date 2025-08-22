@@ -653,7 +653,7 @@ public final class Interpreter implements Visitor<Object> {
 
     private void setResourceName(ResourceExpression resource) {
         if (ExecutionContext(ForStatement.class) instanceof ForStatement forStatement) {
-            Object visit = visit(forStatement.getItem();
+            Object visit = visit(forStatement.getItem());
             switch (visit) {
                 case String s -> resource.setIndex("\"%s\"".formatted(s));
                 case Number number -> resource.setIndex(number);
