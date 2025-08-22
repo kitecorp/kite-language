@@ -377,9 +377,16 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(UnionTypeStatement expression) {
-        List<Expression> expressions = expression.getExpressions();
-        List<Object> values = new ArrayList<>(expressions.size());
-        expressions.stream().map(it -> executeBlock(it, env)).forEach(values::add);
+        var expressions = expression.getExpressions();
+        var values = new HashSet<>(expressions.size());
+        for (Expression it : expressions) {
+            Object o = executeBlock(it, env);
+            if (o instanceof Set<?> list) {
+                values.addAll(list);
+            } else {
+                values.add(o);
+            }
+        }
         var res = getEnv().init(expression.getName(), values);
         return res;
     }

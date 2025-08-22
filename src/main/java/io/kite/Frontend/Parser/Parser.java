@@ -1141,8 +1141,8 @@ public class Parser {
      * | (Literal '|')*
      * | (TypeIdentifier '|')*
      */
-    private ArrayList<Expression> TypeParams() {
-        var params = new ArrayList<Expression>();
+    private HashSet<Expression> TypeParams() {
+        var params = new HashSet<Expression>();
         while (!IsLookAhead(lineTerminator) && !IsLookAhead(EOF)) {
             var param = ParseUnionType();
             if (params.contains(param)) {
