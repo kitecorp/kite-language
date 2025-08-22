@@ -39,6 +39,32 @@ public class ForResourceTest extends RuntimeTest {
     }
 
     @Test
+    void rangeSingleIteration() {
+        eval("""
+                      schema vm {
+                        var string name
+                      }
+                      for i in 5..6 {
+                        resource vm main { name = '$i' }
+                      }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("5", schema.getInstances().get("main[5]").get("name"));
+    }
+
+    @Test
+    void rangeEmpty_noInstances() {
+        eval("""
+                  schema vm { var string name }
+                  for i in 2..2 {
+                    resource vm main { name = '$i' }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals(0, schema.getInstances().size());
+    }
+
+    @Test
     @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
     void testForReturnsRsdesourceNestedVar() {
         var res = eval("""
