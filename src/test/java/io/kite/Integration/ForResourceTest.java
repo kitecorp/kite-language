@@ -65,6 +65,22 @@ public class ForResourceTest extends RuntimeTest {
     }
 
     @Test
+    void arrayOfObjects_nestedProps() {
+        eval("""
+                  schema vm { var string name }
+                  var cfgs = [{meta: {client: "dev"}}, {meta: {client: "prod"}}]
+                  for i, item in cfgs {
+                    resource vm main { 
+                        name = item.meta.client 
+                    }
+                  }
+                """);
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("dev", schema.getInstances().get("main[0]").get("name"));
+        assertEquals("prod", schema.getInstances().get("main[1]").get("name"));
+    }
+
+    @Test
     @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
     void testForReturnsRsdesourceNestedVar() {
         var res = eval("""
