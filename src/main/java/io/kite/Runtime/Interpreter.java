@@ -657,7 +657,7 @@ public final class Interpreter implements Visitor<Object> {
             switch (visit) {
                 case String s -> resource.setIndex("\"%s\"".formatted(s));
                 case Number number -> resource.setIndex(number);
-                case Map<?, ?> map -> resource.setIndex((forStatement.getIndex()));
+                case Map<?,?> map -> resource.setIndex(visit(forStatement.getIndex()));
                 default -> throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
             }
         }
