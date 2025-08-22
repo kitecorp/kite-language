@@ -5,11 +5,13 @@ import io.kite.Runtime.CycleException;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("For loop resources")
 public class ForResource extends RuntimeTest {
     @Test
     @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
@@ -287,15 +289,19 @@ public class ForResource extends RuntimeTest {
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
         assertEquals("prod", arrays.get("""
-                prod
-                """).get("name"));
+                main["prod"]
+                """.trim()).get("name"));
+        assertEquals("main[\"prod\"]", arrays.get("""
+                main["prod"]
+                """.trim()).getName());
         assertEquals("test", arrays.get("""
-                test
-                """).get("name"));
+                main["test"]
+                """.trim()).get("name"));
     }
 
     @Test
     @DisplayName("resource naming by for loop")
+    @Disabled("doesn't make sense to implement this because it's difficult to reference the resource later. vm.cfg.name? vm.photos? it's not even defined in code so how does it make sense?")
     void testForNameResource() {
         var res = eval("""
                 schema vm {

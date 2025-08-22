@@ -33,6 +33,18 @@ public final class ResourceExpression extends Statement implements DeferredObser
     public static Statement resource(String type, String name, BlockExpression operator) {
         return resource(TypeIdentifier.type(type), Identifier.id(name), operator);
     }
+    public static ResourceExpression resource(ResourceExpression expression) {
+        var copy = new ResourceExpression();
+        copy.type = expression.getType();
+        copy.name = expression.getName();
+        copy.block = expression.getBlock();
+        copy.existing = expression.existing;
+        copy.index = expression.index;
+        copy.value = expression.value;
+        copy.isEvaluated = expression.isEvaluated;
+        copy.isEvaluating = expression.isEvaluating;
+        return copy;
+    }
 
     public static Statement resource(boolean existing, String type, String name, BlockExpression operator) {
         return resource(existing, TypeIdentifier.type(type), Identifier.id(name), operator);
@@ -89,14 +101,14 @@ public final class ResourceExpression extends Statement implements DeferredObser
     public String name() {
         if (index != null) {
             String formatted = "%s[%s]".formatted(name.string(), index);
-            if (value != null) {
-                value.setName(formatted);
-            }
+//            if (value != null) {
+//                value.setName(formatted);
+//            }
             return formatted;
         }
-        if (value != null) {
-            value.setName(name.string());
-        }
+//        if (value != null) {
+//            value.setName(name.string());
+//        }
         return name.string();
     }
 

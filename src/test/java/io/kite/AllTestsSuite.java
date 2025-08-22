@@ -8,6 +8,7 @@ import org.junit.platform.suite.api.Suite;
         "io.kite.Frontend.Parse",
         "io.kite.TypeChecker",
         "io.kite.Runtime",
+        "io.kite.Integration",
         "io.kite.Frontend.Token",
         "io.kite.Frontend.Parser",
         "io.kite.Frontend.Lexical"
