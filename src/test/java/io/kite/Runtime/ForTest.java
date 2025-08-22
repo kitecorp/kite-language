@@ -76,6 +76,20 @@ public class ForTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Adding elements to array works in with += operator mixed")
+    void testForInListMixed() {
+        var res = eval("""
+                var envs = ["dev",1]
+                var res = []
+                for env in envs {
+                    res += env
+                }
+                """);
+        assertEquals(List.of("dev", 1), res);
+        assertEquals(List.of("dev", 1), interpreter.getEnv().lookup("res"));
+    }
+
+    @Test
     @DisplayName("Inline string array")
     void testInlineStringArray() {
         var res = eval("""
@@ -170,6 +184,22 @@ public class ForTest extends RuntimeTest {
 
         assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
         assertEquals(List.of("env1", "env2"), interpreter.getEnv().lookup("values"));
+    }
+
+    @Test
+    @DisplayName("Allow both index and value in for loop mixed")
+    void testBothIndexAndValueStringMixed() {
+        var res = eval("""
+                var indices = []
+                var values = []
+                for index, value in ["env1", 1] {
+                    indices += index
+                    values += value
+                }
+                """);
+
+        assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
+        assertEquals(List.of("env1", 1), interpreter.getEnv().lookup("values"));
     }
 
     @Test
