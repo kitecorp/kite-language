@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,6 +110,18 @@ public class UnionTypeTest extends RuntimeTest {
         Assertions.assertTrue(global.hasVar("num"));
         assertNull(global.get("x"));
         assertEquals(Set.of(1, 2, 5), res);
+        log.info(res);
+    }
+
+    @Test
+    void arrayOfType() {
+        var res = eval("""
+                type customNumbers = 1 | 2 | 5
+                var customNumbers[] numbers = [1, 2, 5]
+                """);
+        Assertions.assertTrue(global.hasVar("customNumbers"));
+        assertNull(global.get("x"));
+        assertEquals(List.of(1, 2, 5), res);
         log.info(res);
     }
 
