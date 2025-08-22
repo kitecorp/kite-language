@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 @Log4j2
-public class FunResource extends RuntimeTest {
+public class FunResourceTest extends RuntimeTest {
 
     @Test
     void funDeclaration() {
