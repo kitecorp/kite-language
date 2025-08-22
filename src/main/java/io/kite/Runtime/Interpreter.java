@@ -653,11 +653,11 @@ public final class Interpreter implements Visitor<Object> {
 
     private void setResourceName(ResourceExpression resource) {
         if (ExecutionContext(ForStatement.class) instanceof ForStatement forStatement) {
-            Object visit = visit(forStatement.getItem());
+            Object visit = forStatement.getItem() != null ? visit(forStatement.getItem()) : visit(forStatement.getIndex());
             switch (visit) {
                 case String s -> resource.setIndex("\"%s\"".formatted(s));
                 case Number number -> resource.setIndex(number);
-                case Map<?,?> map -> resource.setIndex(visit(forStatement.getIndex()));
+                case Map<?, ?> map -> resource.setIndex(visit(forStatement.getIndex()));
                 default -> throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
             }
         }
