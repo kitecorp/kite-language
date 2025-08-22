@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("For loop resources")
-public class ForResource extends RuntimeTest {
+public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
     void testForReturnsResourceNestedVar() {
@@ -30,10 +30,37 @@ public class ForResource extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main[0]");
+        var resource0 = schema.getInstances().get("main[0]");
+        var resource1 = schema.getInstances().get("main[1]");
 
-        assertInstanceOf(ResourceValue.class, resource);
-        assertEquals(resource, res);
+        assertInstanceOf(ResourceValue.class, resource0);
+        assertInstanceOf(ResourceValue.class, resource1);
+        assertEquals(resource1, res);
+    }
+
+    @Test
+    @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
+    void testForReturnsRsdesourceNestedVar() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                for i in 0..2 {
+                    var name = 'prod'
+                    resource vm main {
+                      name     = name
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var resource0 = schema.getInstances().get("main[0]");
+        var resource1 = schema.getInstances().get("main[1]");
+
+        assertInstanceOf(ResourceValue.class, resource0);
+        assertInstanceOf(ResourceValue.class, resource1);
+        assertEquals(resource1, res);
     }
 
 

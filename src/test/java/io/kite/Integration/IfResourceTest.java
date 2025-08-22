@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-public class IfResource extends RuntimeTest {
+public class IfResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Resolve var name using single quotes string interpolation inside if statement")
     void testIfConditionReturnsResourceNestedVarStringInterpolation() {
