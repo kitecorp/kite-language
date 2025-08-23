@@ -49,6 +49,10 @@ public class TypeParser {
         return switch (lookahead().type()) {
             case OpenParenthesis -> FunctionType();
             case Identifier -> TypeIdentifier();
+            case Any -> {
+                var token = (Token) eat(Any);
+                yield TypeIdentifier.type(token.type().toString());
+            }
             case Object -> {
                 var token = (Token) eat(Object);
                 yield TypeIdentifier.type(token.type().toString());
