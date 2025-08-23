@@ -11,6 +11,7 @@ public enum TokenType {
     Number("number"),
     Identifier("symbol"),
     Object("object"),
+    Any("any"),
     String("string"),
     //    Type("type"),
     WhiteSpace("whitespace"),

@@ -1,7 +1,10 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.ArrayType;
+import io.kite.TypeChecker.Types.ObjectType;
+import io.kite.TypeChecker.Types.StringType;
+import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -98,6 +101,15 @@ public class VarArrayTest extends CheckerTest {
     void testDeclareTypeStringInit() {
         eval("""
                 var string[] x = ["hi",'hello']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testTypeAny() {
+        eval("""
+                var x = ["hi", 1, true]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
         assertEquals(varType.getType(), ValueType.String);
