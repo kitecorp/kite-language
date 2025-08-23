@@ -28,7 +28,7 @@ public class VarArrayTest extends CheckerTest {
                 var x = [1, 2]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.Number);
+        assertEquals(ValueType.Number, varType.getType());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class VarArrayTest extends CheckerTest {
                 var x = [1.1, 2.2]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.Number);
+        assertEquals(ValueType.Number, varType.getType());
     }
 
     @Test
@@ -46,7 +46,7 @@ public class VarArrayTest extends CheckerTest {
                 var x = [true,false]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.Boolean);
+        assertEquals(ValueType.Boolean, varType.getType());
     }
 
     @Test
@@ -55,7 +55,7 @@ public class VarArrayTest extends CheckerTest {
                 var x = [{env: "prod"}, {env: "dev"}]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), new ObjectType(new TypeEnvironment(Map.of("env", StringType.String))));
+        assertEquals(new ObjectType(new TypeEnvironment(Map.of("env", StringType.String))), varType.getType());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class VarArrayTest extends CheckerTest {
                 var number[] x = []
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.Number);
+        assertEquals(ValueType.Number, varType.getType());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class VarArrayTest extends CheckerTest {
                 var string[] x = []
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.String);
+        assertEquals(ValueType.String, varType.getType());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class VarArrayTest extends CheckerTest {
                 var boolean[] x = []
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.Boolean);
+        assertEquals(ValueType.Boolean, varType.getType());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class VarArrayTest extends CheckerTest {
                 var number[] x = [1,2,3]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.Number);
+        assertEquals(ValueType.Number, varType.getType());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class VarArrayTest extends CheckerTest {
                 var string[] x = ["hi",'hello']
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.String);
+        assertEquals(ValueType.String, varType.getType());
     }
 
     /**
@@ -112,7 +112,28 @@ public class VarArrayTest extends CheckerTest {
                 var x = ["hi", 1, true]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), AnyType.ANY_TYPE);
+        assertEquals(AnyType.ANY_TYPE, varType.getType());
+    }
+
+    @Test
+    void testTypeArrayAny() {
+        eval("""
+                var x = ["hi", 1, true]
+                x += [2]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.ANY_TYPE, varType.getType());
+    }
+
+    @Test
+    void testTypeArrayAnyString() {
+        eval("""
+                var x = ["hi", 1, true]
+                x += [2]
+                x += "world"
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.ANY_TYPE, varType.getType());
     }
 
     @Test
