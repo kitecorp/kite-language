@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.AssignmentExpression;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.VarStatement;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +16,7 @@ import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.kite.Frontend.Parser.Statements.VarStatement.statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -100,6 +102,23 @@ public class VarDeclarationTest extends ParserTest {
         var expected = program(
                 statement(var("x", 3)),
                 statement(var("y", 2))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    /**
+     * Works during parsing. Type checker should throw exception
+     */
+    @Test
+    void reassignWithInvalidValue() {
+        var res = parse("""
+                var x=3;
+                x="hello"
+                """);
+        var expected = program(
+                statement(var("x", 3)),
+                expressionStatement(AssignmentExpression.assign("x", "hello"))
         );
         assertEquals(expected, res);
         log.info((res));
