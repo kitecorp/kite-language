@@ -82,6 +82,7 @@ class TokenizerSpec {
             new Entry("^\\bschema\\b", TokenType.Schema),
             new Entry("^\\bmodule\\b", TokenType.Module),
             new Entry("^\\bobject\\b", TokenType.Object),
+            new Entry("^\\bany\\b", TokenType.Object),
             new Entry("^\\w+", TokenType.Identifier)
     );
 
