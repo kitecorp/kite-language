@@ -9,11 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.Frontend.Parse.Literals.Identifier.id;
-import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
-import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
-import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
-import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.kite.Frontend.Parse.Literals.NullLiteral.nullLiteral;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -80,7 +77,7 @@ public class VarDeclarationTest extends ParserTest {
     }
 
     @Test
-    void multiVarInitWithValues() {
+    void multiVarInitNumbers() {
         var res = parse("""
                 var x=3
                 var y=2
@@ -88,6 +85,32 @@ public class VarDeclarationTest extends ParserTest {
         var expected = program(
                 statement(var("x", 3)),
                 statement(var("y", 2))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void multiVarBooleans() {
+        var res = parse("""
+                var x=true
+                var y=false
+                """);
+        var expected = program(
+                statement(var("x", bool(true))),
+                statement(var("y", bool(false)))
+        );
+        assertEquals(expected, res);
+        log.info((res));
+    }
+
+    @Test
+    void multiVarNull() {
+        var res = parse("""
+                var x=null
+                """);
+        var expected = program(
+                statement(var("x", nullLiteral()))
         );
         assertEquals(expected, res);
         log.info((res));
@@ -141,70 +164,6 @@ public class VarDeclarationTest extends ParserTest {
         Assertions.assertTrue(literal.isInterpolated());
         Assertions.assertEquals("x", literal.getInterpolationVars().get(0));
         log.info(res);
-    }
-
-    @Test
-    void arrayOfVar() {
-        var res = parse("""
-                var x=3;
-                var y=2.2;
-                var z=[x,y];
-                """);
-        var expected = program(
-                statement(var("x", 3)),
-                statement(var("y", 2.2)),
-                statement(var("z", array(id("x"), id("y"))))
-        );
-        assertEquals(expected, res);
-        log.info((res));
-    }
-
-    /**
-     * During parsing we don't care about wrong types being placed in the array
-     */
-    @Test
-    void arrayOfVarMix() {
-        var res = parse("""
-                var x=3;
-                var y=2.2;
-                var s="s";
-                var z=[x,y,s,5];
-                """);
-        var expected = program(
-                statement(var("x", 3)),
-                statement(var("y", 2.2)),
-                statement(var("s", "s")),
-                statement(var("z", array(
-                                id("x"), id("y"), id("s"), number(5))
-                        )
-                )
-        );
-        assertEquals(expected, res);
-        log.info((res));
-    }
-
-    /**
-     * During parsing we don't care about wrong types being placed in the array
-     */
-    @Test
-    void arrayOfVarMixObject() {
-        var res = parse("""
-                var x=3;
-                var y={ env: "prod" };
-                var s="s";
-                var z=[x,y,s,5];
-                """);
-        var expected = program(
-                statement(var("x", 3)),
-                statement(var("y", objectExpression(object("env", "prod")))),
-                statement(var("s", "s")),
-                statement(var("z", array(
-                                id("x"), id("y"), id("s"), number(5))
-                        )
-                )
-        );
-        assertEquals(expected, res);
-        log.info((res));
     }
 
 

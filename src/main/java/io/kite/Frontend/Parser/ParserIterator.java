@@ -70,7 +70,7 @@ public class ParserIterator {
         return false;
     }
 
-    boolean IsLookAheadAfter(TokenType after, TokenType endToken,  TokenType... type) {
+    boolean IsLookAheadAfter(TokenType after, TokenType endToken, TokenType... type) {
         int index = this.iterator.previousIndex() + 1;
         var iterator = this.tokens.listIterator(index);
         while (iterator.hasNext()) {
@@ -175,7 +175,7 @@ public class ParserIterator {
         }
         return switch (token.type()) {
             case Identifier -> isComplexType(iterator);
-            case Object -> true;
+            case Object, Any -> true;
             default -> false;
         };
 

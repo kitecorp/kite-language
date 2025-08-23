@@ -18,7 +18,7 @@ public final class ArrayTypeIdentifier extends TypeIdentifier {
 
     @Override
     public String string() {
-        StringBuilder res= new StringBuilder(super.string());
+        var res = new StringBuilder(super.string());
         for (Literal item : items) {
             res.append(item.getVal().toString());
             res.append(",");
