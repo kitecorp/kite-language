@@ -714,7 +714,9 @@ public final class TypeChecker implements Visitor<Type> {
         for (Expression item : expression.getItems()) {
             var itemType = visit(item);
             if (!Objects.equals(itemType, firstType)) {
-                throw new TypeError("Array items must be of the same type: %s != %s".formatted(itemType, firstType));
+//                throw new TypeError("Array items must be of the same type: %s != %s".formatted(itemType, firstType));
+                // if the first item is not the same as the rest of the items then we return any type
+                return new ArrayType(env, AnyType.ANY_TYPE);
             }
         }
         return new ArrayType(env, firstType);
