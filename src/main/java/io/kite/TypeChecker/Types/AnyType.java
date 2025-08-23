@@ -18,7 +18,7 @@ public final class AnyType extends ReferenceType {
     private Object any;
 
     public AnyType(@Nullable TypeEnvironment env) {
-        super("any", env);
+        super(SystemType.ANY_TYPE, env);
     }
 
 }

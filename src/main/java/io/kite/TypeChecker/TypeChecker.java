@@ -16,9 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class TypeChecker implements Visitor<Type> {
@@ -220,10 +221,19 @@ public final class TypeChecker implements Visitor<Type> {
         }
         if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue())) {
             // only evaluate printing if we need to
-            String string = "Expected type `" + expectedType + "` but got `" + actualType + "` in expression: " + printer.visit(expectedVal);
+            String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                    expectedType, actualType, printer.visit(expectedVal));
             throw new TypeError(string);
         }
+        return expectArray(actualType, expectedType, expectedVal);
+    }
+
+    private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
         if (actualType instanceof ArrayType actualArray && expectedType instanceof ArrayType expectedArrayType) {
+            if (expectedArrayType.isType(AnyType.ANY_TYPE)) {
+                return expectedArrayType; // skip type checking for any type
+            }
+
             if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
                 return expectedArrayType;
             } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
@@ -231,7 +241,8 @@ public final class TypeChecker implements Visitor<Type> {
                 // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
                 return actualType;
             } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
-                String string = "Expected type `" + expectedArrayType.getType() + "` but got `" + actualArray.getType() + "` in expression: " + printer.visit(expectedVal);
+                String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                        expectedArrayType.getType(), actualArray.getType(), printer.visit(expectedVal));
                 throw new TypeError(string);
             }
         }
@@ -242,7 +253,7 @@ public final class TypeChecker implements Visitor<Type> {
         if (expectedType.getTypes().contains(actualType)) {
             return expectedType;
         }
-        String string = MessageFormat.format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
+        String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                 printer.visit(expectedType),
                 expectedType.getTypes().stream().map(printer::visit).collect(Collectors.joining(" | ")),
                 actualType,
@@ -755,13 +766,17 @@ public final class TypeChecker implements Visitor<Type> {
         var varType = visit(expression.getLeft());
         var valueType = visit(expression.getRight());
         var expected = expect(valueType, varType, expression);
-        if (expression.getLeft() instanceof SymbolIdentifier symbolIdentifier) {
-            assign(expression, symbolIdentifier.string(), expression.getRight(), expected);
-        } else if (expression.getLeft() instanceof MemberExpression memberExpression) {
-            SymbolIdentifier symbolIdentifier = getSymbolIdentifier(memberExpression);
-            if (symbolIdentifier != null) {
-                // if trying to override a val object's property, we should forbid it
-                assign(expression, symbolIdentifier.string(), expression.getRight(), expected);
+        switch (expression.getLeft()) {
+            case SymbolIdentifier symbolIdentifier ->
+                    assign(expression, symbolIdentifier.string(), expression.getRight(), expected);
+            case MemberExpression memberExpression -> {
+                var identifier = getSymbolIdentifier(memberExpression);
+                if (identifier != null) {
+                    // if trying to override a val object's property, we should forbid it
+                    assign(expression, identifier.string(), expression.getRight(), expected);
+                }
+            }
+            case null, default -> {
             }
         }
         return expected;
