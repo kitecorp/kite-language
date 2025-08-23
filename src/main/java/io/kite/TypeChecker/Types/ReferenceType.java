@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public sealed class ReferenceType extends Type permits ArrayType, ObjectType, ResourceType, SchemaType, UnionType {
+public sealed class ReferenceType extends Type permits AnyType, ArrayType, ObjectType, ResourceType, SchemaType, UnionType {
     public static final ReferenceType Resource = new ReferenceType(SystemType.RESOURCE);
 
     @Getter

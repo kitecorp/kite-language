@@ -1,10 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.TypeChecker.Types.ArrayType;
-import io.kite.TypeChecker.Types.ObjectType;
-import io.kite.TypeChecker.Types.StringType;
-import io.kite.TypeChecker.Types.ValueType;
+import io.kite.TypeChecker.Types.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -106,13 +103,16 @@ public class VarArrayTest extends CheckerTest {
         assertEquals(varType.getType(), ValueType.String);
     }
 
+    /**
+     * If any of the elements in the array is different than the first element then the type is of the array is ANY.
+     */
     @Test
     void testTypeAny() {
         eval("""
                 var x = ["hi", 1, true]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(varType.getType(), ValueType.String);
+        assertEquals(varType.getType(), AnyType.ANY_TYPE);
     }
 
     @Test
