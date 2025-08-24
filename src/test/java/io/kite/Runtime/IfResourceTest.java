@@ -1,4 +1,4 @@
-package io.kite.Integration;
+package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
 import io.kite.Runtime.Values.ResourceValue;
