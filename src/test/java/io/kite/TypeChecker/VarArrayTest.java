@@ -473,6 +473,16 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
+    void testAppendAnyObject() {
+        eval("""
+                var any[] x = []
+                x += { env: "prod" }
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
     void testAppendAnyNumberArray() {
         eval("""
                 var any[] x = []
