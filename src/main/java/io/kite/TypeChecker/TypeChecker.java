@@ -219,11 +219,17 @@ public final class TypeChecker implements Visitor<Type> {
         if (expectedType == ValueType.Null) {
             return actualType;
         }
-        if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue()) && expectedType.getKind() != SystemType.ARRAY) {
-            // only evaluate printing if we need to
-            String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                    expectedType, actualType, printer.visit(expectedVal));
-            throw new TypeError(string);
+        if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue())) {
+            return switch (expectedType.getKind()) {
+                case ARRAY -> expectArray(actualType, expectedType, expectedVal);
+                case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
+                case null, default -> {
+                    // only evaluate printing if we need to
+                    String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                            expectedType, actualType, printer.visit(expectedVal));
+                    throw new TypeError(string);
+                }
+            };
         }
         return expectArray(actualType, expectedType, expectedVal);
     }
@@ -243,7 +249,7 @@ public final class TypeChecker implements Visitor<Type> {
             // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
             return actualType;
         } else if (expectedArrayType.getType() instanceof UnionType union) {
-            if (union.getTypes().contains(actualArray.getType())){
+            if (union.getTypes().contains(actualArray.getType())) {
                 return expectedArrayType;
             }
             String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
