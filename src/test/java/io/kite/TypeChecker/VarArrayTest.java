@@ -112,6 +112,42 @@ public class VarArrayTest extends CheckerTest {
         assertEquals(ValueType.String, varType.getType());
     }
 
+    @Test
+    void testAnyString() {
+        eval("""
+                var any[] x = ["hi",'hello']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAnyNumbers() {
+        eval("""
+                var any[] x = [1,2,3]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAnyBoolean() {
+        eval("""
+                var any[] x = [true]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAnyNull() {
+        eval("""
+                var any[] x = ['str', null]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
     /**
      * If any of the elements in the array is different than the first element then the type is of the array is ANY.
      */
