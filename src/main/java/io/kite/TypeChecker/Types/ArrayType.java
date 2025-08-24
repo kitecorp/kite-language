@@ -1,10 +1,8 @@
 package io.kite.TypeChecker.Types;
 
 import io.kite.TypeChecker.TypeEnvironment;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -17,6 +15,7 @@ public final class ArrayType extends ReferenceType {
      */
     @Getter
     @Setter
+    @NotNull
     private Type type;
     @Setter
     @Getter
