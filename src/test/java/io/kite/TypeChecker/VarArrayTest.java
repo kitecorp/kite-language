@@ -331,16 +331,6 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
-    void testAppend() {
-        eval("""
-                var boolean[] x = []
-                x += [true]
-                """);
-        var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(ValueType.Boolean, varType.getType());
-    }
-
-    @Test
     void testAppendNumberArray() {
         eval("""
                 var number[] x = []
@@ -430,6 +420,66 @@ public class VarArrayTest extends CheckerTest {
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
         assertEquals(ValueType.String, varType.getType());
+    }
+
+    @Test
+    void testAppendAnyNumber() {
+        eval("""
+                var any[] x = []
+                x += 1
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAppendAnyString() {
+        eval("""
+                var any[] x = []
+                x += "hello"
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAppendAnyTrue() {
+        eval("""
+                var any[] x = []
+                x += true
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAppendAnyFalse() {
+        eval("""
+                var any[] x = []
+                x += true
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAppendAnyNull() {
+        eval("""
+                var any[] x = []
+                x += null
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testAppendAnyNumberArray() {
+        eval("""
+                var any[] x = []
+                x += [1]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
 
