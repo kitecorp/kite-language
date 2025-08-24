@@ -116,27 +116,6 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
-    void testTypeArrayAny() {
-        eval("""
-                var x = ["hi", 1, true]
-                x += [2]
-                """);
-        var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(AnyType.ANY_TYPE, varType.getType());
-    }
-
-    @Test
-    void testTypeArrayAnyString() {
-        eval("""
-                var x = ["hi", 1, true]
-                x += [2]
-                x += "world"
-                """);
-        var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(AnyType.ANY_TYPE, varType.getType());
-    }
-
-    @Test
     void testDeclareTypeStringInitWrong() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 var string[] x = [1]
@@ -214,10 +193,20 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
-    void testAppendNumber() {
+    void testAppendNumberArray() {
         eval("""
                 var number[] x = []
                 x += [1]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testAppendNumber() {
+        eval("""
+                var number[] x = []
+                x += 1
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
         assertEquals(varType.getType(), ValueType.Number);
@@ -230,5 +219,27 @@ public class VarArrayTest extends CheckerTest {
                 x += [true]
                 """));
     }
+
+    @Test
+    void appendNumberArray() {
+        eval("""
+                var x = ["hi", 1, true]
+                x += [2]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.ANY_TYPE, varType.getType());
+    }
+
+    @Test
+    void appendStringArray() {
+        eval("""
+                var x = ["hi", 1, true]
+                x += [2]
+                x += ["world"]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.ANY_TYPE, varType.getType());
+    }
+
 
 }
