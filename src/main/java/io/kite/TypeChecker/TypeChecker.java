@@ -219,7 +219,7 @@ public final class TypeChecker implements Visitor<Type> {
         if (expectedType == ValueType.Null) {
             return actualType;
         }
-        if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue())) {
+        if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue()) && expectedType.getKind() != SystemType.ARRAY) {
             // only evaluate printing if we need to
             String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
                     expectedType, actualType, printer.visit(expectedVal));
@@ -246,7 +246,7 @@ public final class TypeChecker implements Visitor<Type> {
                 throw new TypeError(string);
             }
         }
-        return actualType;
+        return expectedType;
     }
 
     private Type expect(Type actualType, UnionType expectedType, Expression expectedVal) {
