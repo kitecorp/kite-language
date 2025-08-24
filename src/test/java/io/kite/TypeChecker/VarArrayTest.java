@@ -91,7 +91,7 @@ public class VarArrayTest extends CheckerTest {
                 var any[] x = []
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(AnyType.ANY_TYPE, varType.getType());
+        assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class VarArrayTest extends CheckerTest {
                 var x = ["hi", 1, true]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(AnyType.ANY_TYPE, varType.getType());
+        assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
     @Test
@@ -323,7 +323,7 @@ public class VarArrayTest extends CheckerTest {
                 x += [2]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(AnyType.ANY_TYPE, varType.getType());
+        assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
     @Test
@@ -334,7 +334,7 @@ public class VarArrayTest extends CheckerTest {
                 x += ["world"]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(AnyType.ANY_TYPE, varType.getType());
+        assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
 
