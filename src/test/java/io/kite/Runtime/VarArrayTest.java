@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -104,4 +105,76 @@ public class VarArrayTest extends RuntimeTest {
         Assertions.assertInstanceOf(List.class, x);
     }
 
+    @Test
+    void testDeclareTypeNumberInit() {
+        eval("""
+                var number[] x = [1,2,3]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(1, 2, 3), varType);
+    }
+
+    @Test
+    void testDeclareTypeStringInit() {
+        eval("""
+                var string[] x = ["hi",'hello']
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of("hi", "hello"), varType);
+    }
+
+    @Test
+    void testAnyString() {
+        eval("""
+                var any[] x = ["hi",'hello']
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of("hi", "hello"), varType);
+    }
+
+    @Test
+    void testAnyNumbers() {
+        eval("""
+                var any[] x = [1,2,3]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(1, 2, 3), varType);
+    }
+
+    @Test
+    void testAnyBoolean() {
+        eval("""
+                var any[] x = [true]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(true), varType);
+    }
+
+    @Test
+    void testAnyNull() {
+        eval("""
+                var any[] x = ['str', null]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        ArrayList<Object> expected = new ArrayList<>();
+        expected.add("str");
+        expected.add(null);
+        assertEquals(expected, varType);
+    }
+
+    @Test
+    void testAnyObject() {
+        eval("""
+                var any[] x = [{env: "prod"}, {env: "dev"}]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev")), varType);
+    }
 }
