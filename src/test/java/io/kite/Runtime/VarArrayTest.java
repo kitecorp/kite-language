@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,6 +41,27 @@ public class VarArrayTest extends RuntimeTest {
         var varType = (List) global.lookup("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(1.1, 2.2), varType);
+    }
+
+    @Test
+    void testBoolean() {
+        eval("""
+                var x = [true,false]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(true, false), varType);
+    }
+
+
+    @Test
+    void testObject() {
+        eval("""
+                var x = [{env: "prod"}, {env: "dev"}]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev")), varType);
     }
 
 
