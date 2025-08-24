@@ -213,6 +213,57 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
+    void testAppendTrue() {
+        eval("""
+                var boolean[] x = []
+                x += true
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testAppendFalse() {
+        eval("""
+                var boolean[] x = []
+                x += true
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testAppendString() {
+        eval("""
+                var string[] x = []
+                x += "hello"
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testAppendStringSingleQuote() {
+        eval("""
+                var string[] x = []
+                x += 'hello'
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+    @Test
+    void testAppendNull() {
+        eval("""
+                var string[] x = []
+                x += null
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.String);
+    }
+
+
+    @Test
     void testAppendWrongType() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 var number[] x = []
