@@ -925,16 +925,20 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private void expect(VarDeclaration expression, Object value) {
-        if (expression.hasType()) {
-            var type = visit(expression.getType());
-            if (type instanceof Set<?> set) {
-                if (value instanceof Collection<?> collection) {
-                    if (!set.containsAll(collection)) {
-                        throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
-                    }
-                } else if (!set.contains(value)) {
+        if (!expression.hasType()) {
+            return;
+        }
+        if (expression.getInit() instanceof ArrayExpression arrayExpression && !(expression.getType() instanceof ArrayTypeIdentifier)) {
+            throw new IllegalArgumentException("Invalid type for array: %s".formatted(expression.getId().string()));
+        }
+        var type = visit(expression.getType());
+        if (type instanceof Set<?> set) {
+            if (value instanceof Collection<?> collection) {
+                if (!set.containsAll(collection)) {
                     throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
                 }
+            } else if (!set.contains(value)) {
+                throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
             }
         }
     }
