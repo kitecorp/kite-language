@@ -273,11 +273,11 @@ public class VarArrayTest extends CheckerTest {
     @Test
     void testReassignObject() {
         eval("""
-                var object[] x = ["hi"]
-                x=["hello"]
+                var object[] x = [{env: 'prod'}]
+                x=[{env: 'dev'}]
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
-        assertEquals(ValueType.String, varType.getType());
+        assertEquals(ObjectType.INSTANCE, varType.getType());
     }
 
     @Test
