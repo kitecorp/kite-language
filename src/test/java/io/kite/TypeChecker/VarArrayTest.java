@@ -492,6 +492,16 @@ public class VarArrayTest extends CheckerTest {
         assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
+    @Test
+    void testAppendAnyStringArray() {
+        eval("""
+                var any[] x = []
+                x += ['hello']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
 
     @Test
     void testAppendWrongType() {
