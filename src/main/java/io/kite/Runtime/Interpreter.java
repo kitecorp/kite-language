@@ -11,10 +11,7 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.ParserErrors;
 import io.kite.Runtime.Environment.ActivationEnvironment;
 import io.kite.Runtime.Environment.Environment;
-import io.kite.Runtime.Functions.Cast.BooleanCastFunction;
-import io.kite.Runtime.Functions.Cast.DecimalCastFunction;
-import io.kite.Runtime.Functions.Cast.IntCastFunction;
-import io.kite.Runtime.Functions.Cast.StringCastFunction;
+import io.kite.Runtime.Functions.Cast.*;
 import io.kite.Runtime.Functions.DateFunction;
 import io.kite.Runtime.Functions.Numeric.*;
 import io.kite.Runtime.Functions.PrintFunction;
@@ -69,9 +66,11 @@ public final class Interpreter implements Visitor<Object> {
 
         // casting
         this.env.init("int", new IntCastFunction());
+        this.env.init("number", new NumberCastFunction());
         this.env.init("decimal", new DecimalCastFunction());
         this.env.init("string", new StringCastFunction());
         this.env.init("boolean", new BooleanCastFunction());
+        this.env.init("any", new AnyCastFunction());
 
         // number
         this.env.init("pow", new PowFunction());
@@ -929,7 +928,11 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.hasType()) {
             var type = visit(expression.getType());
             if (type instanceof Set<?> set) {
-                if (!set.contains(value)) {
+                if (value instanceof Collection<?> collection) {
+                    if (!set.containsAll(collection)) {
+                        throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
+                    }
+                } else if (!set.contains(value)) {
                     throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
                 }
             }

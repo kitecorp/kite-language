@@ -256,7 +256,7 @@ public final class TypeChecker implements Visitor<Type> {
         String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                 printer.visit(expectedType),
                 expectedType.getTypes().stream().map(printer::visit).collect(Collectors.joining(" | ")),
-                actualType,
+                actualType.getValue(),
                 printer.visit(expectedVal));
         throw new TypeError(string);
     }

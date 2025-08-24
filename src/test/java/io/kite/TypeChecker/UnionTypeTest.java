@@ -104,5 +104,16 @@ public class UnionTypeTest extends CheckerTest {
         );
     }
 
+    @Test
+    @DisplayName("Should throw because we assign the wrong value type")
+    void unionTypeNumberArrayThrows() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        type alias = 1 | 2
+                        var alias x = [1,2]
+                        """)
+        );
+    }
+
 
 }
