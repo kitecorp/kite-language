@@ -177,4 +177,16 @@ public class VarArrayTest extends RuntimeTest {
         Assertions.assertNotNull(varType);
         assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev")), varType);
     }
+
+    @Test
+    void testTypeAny() {
+        eval("""
+                var x = ["hi", 1, true]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of("hi", 1, true), varType);
+    }
+
+
 }
