@@ -148,6 +148,15 @@ public class VarArrayTest extends CheckerTest {
         assertEquals(AnyType.INSTANCE, varType.getType());
     }
 
+    @Test
+    void testAnyObject() {
+        eval("""
+                var any[] x = [{env: "prod"}, {env: "dev"}]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
     /**
      * If any of the elements in the array is different than the first element then the type is of the array is ANY.
      */
