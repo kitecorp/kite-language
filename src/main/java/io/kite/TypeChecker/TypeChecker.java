@@ -229,22 +229,30 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
-        if (actualType instanceof ArrayType actualArray && expectedType instanceof ArrayType expectedArrayType) {
-            if (expectedArrayType.isType(AnyType.INSTANCE)) {
-                return expectedArrayType; // skip type checking for any type
-            }
+        if (!(actualType instanceof ArrayType actualArray) || !(expectedType instanceof ArrayType expectedArrayType)) {
+            return expectedType;
+        }
+        if (expectedArrayType.isType(AnyType.INSTANCE)) {
+            return expectedArrayType; // skip type checking for any type
+        }
 
-            if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
+        if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
+            return expectedArrayType;
+        } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
+            // when we pass expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
+            // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
+            return actualType;
+        } else if (expectedArrayType.getType() instanceof UnionType union) {
+            if (union.getTypes().contains(actualArray.getType())){
                 return expectedArrayType;
-            } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
-                // when we pass expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
-                // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
-                return actualType;
-            } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
-                String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                        expectedArrayType.getType().getValue(), actualArray.getType(), printer.visit(expectedVal));
-                throw new TypeError(string);
             }
+            String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                    printer.visit(expectedArrayType), printer.visit(actualArray), printer.visit(expectedVal));
+            throw new TypeError(string);
+        } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
+            String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                    expectedArrayType.getType().getValue(), actualArray.getType(), printer.visit(expectedVal));
+            throw new TypeError(string);
         }
         return expectedType;
     }

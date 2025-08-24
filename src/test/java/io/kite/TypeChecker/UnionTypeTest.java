@@ -1,6 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.UnionType;
 import io.kite.TypeChecker.Types.ValueType;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Var")
 public class UnionTypeTest extends CheckerTest {
@@ -113,6 +115,65 @@ public class UnionTypeTest extends CheckerTest {
                         var alias x = [1,2]
                         """)
         );
+    }
+
+    @Test
+    @DisplayName("Should not throw because we assign the correct array type")
+    void unionTypeArrayOfNumbersShouldNotThrowWhenAssigningCorrectArrayType() {
+        eval("""
+                type alias = 1 | 2
+                var alias[] x = [1, 2]
+                """);
+    }
+
+    @Test
+    @DisplayName("Should throw because we assign the incorrect array type")
+    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayType() {
+        assertThrows(TypeError.class, () -> eval("""
+                type alias = 1 | 2
+                var alias[] x = ['hello']
+                """)
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw because we assign the incorrect array type")
+    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeTrue() {
+        assertThrows(TypeError.class, () -> eval("""
+                type alias = 1 | 2
+                var alias[] x = [true]
+                """)
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw because we assign the incorrect array type")
+    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeFalse() {
+        assertThrows(TypeError.class, () -> eval("""
+                type alias = 1 | 2
+                var alias[] x = [false]
+                """)
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw because we assign the incorrect array type")
+    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeObject() {
+        assertThrows(TypeError.class, () -> eval("""
+                type alias = 1 | 2
+                var alias[] x = [{env: 'dev'}]
+                """)
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw because we assign the incorrect array type")
+    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeInt() {
+        var res = eval("""
+                type alias = 1 | 2
+                var alias[] x = [3]
+                """);
+        assertEquals(new ArrayType(checker.getEnv(), new UnionType("alias", checker.getEnv(), ValueType.Number)), res);
     }
 
 

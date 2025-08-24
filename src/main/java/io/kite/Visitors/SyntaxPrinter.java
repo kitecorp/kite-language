@@ -4,7 +4,9 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.TypeChecker.Types.UnionType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -82,7 +84,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(VarDeclaration expression) {
         var var = new StringBuilder("var ");
         if (expression.hasType()) {
-            var.append(expression.getType().getType().getValue()).append(" ");
+            var.append(visit(expression.getType())).append(" ");
         }
         var.append(expression.getId().string());
         if (expression.hasInit()) {
@@ -191,7 +193,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(Type type) {
-        return type.getValue();
+        return switch (type) {
+            case ArrayType arrayType -> visit(arrayType.getType()) + "[]";
+            case UnionType unionType -> unionType.getTypes().stream().map(this::visit).collect(Collectors.joining(" | "));
+            default -> type.getValue();
+        };
     }
 
     @Override
@@ -301,6 +307,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(Identifier expression) {
         return switch (expression) {
             case ParameterIdentifier parameterIdentifier -> formatParameter(parameterIdentifier);
+            case ArrayTypeIdentifier arrayTypeIdentifier -> visit(arrayTypeIdentifier.getType()) + "[]";
             default -> expression.string();
         };
     }
