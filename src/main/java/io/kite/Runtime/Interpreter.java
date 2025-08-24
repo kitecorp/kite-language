@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
 import static io.kite.Utils.BoolUtils.isTruthy;
+import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
@@ -917,10 +918,22 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.hasInit()) {
             value = executeBlock(expression.getInit(), env);
         }
+        expect(expression, value);
         if (value instanceof Dependency dependency) { // a dependency access on another resource
             return env.init(symbol, dependency.value());
         }
         return env.init(symbol, value);
+    }
+
+    private void expect(VarDeclaration expression, Object value) {
+        if (expression.hasType()) {
+            var type = visit(expression.getType());
+            if (type instanceof Set<?> set) {
+                if (!set.contains(value)) {
+                    throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
+                }
+            }
+        }
     }
 
     @Override

@@ -3,14 +3,14 @@ package io.kite.Runtime;
 import io.kite.Base.RuntimeTest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
 public class UnionTypeTest extends RuntimeTest {
@@ -123,6 +123,28 @@ public class UnionTypeTest extends RuntimeTest {
         assertNull(global.get("x"));
         assertEquals(List.of(1, 2, 5), res);
         log.info(res);
+    }
+
+    @Test
+    @DisplayName("Should throw error if array contains incompatible types")
+    void ShouldThrow() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eval("""
+                    type customNumbers = 1 | 2 | 5
+                    var customNumbers numbers = 3
+                    """);
+        });
+    }
+
+    @Test
+    @DisplayName("Should throw error if array contains incompatible types")
+    void arrayOfTypeShouldThrow() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eval("""
+                    type customNumbers = 1 | 2 | 5
+                    var customNumbers[] numbers = [3]
+                    """);
+        });
     }
 
     @Test
