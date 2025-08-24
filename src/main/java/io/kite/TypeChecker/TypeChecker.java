@@ -230,7 +230,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
         if (actualType instanceof ArrayType actualArray && expectedType instanceof ArrayType expectedArrayType) {
-            if (expectedArrayType.isType(AnyType.ANY_TYPE)) {
+            if (expectedArrayType.isType(AnyType.INSTANCE)) {
                 return expectedArrayType; // skip type checking for any type
             }
 
@@ -727,7 +727,7 @@ public final class TypeChecker implements Visitor<Type> {
             if (!Objects.equals(itemType, firstType)) {
 //                throw new TypeError("Array items must be of the same type: %s != %s".formatted(itemType, firstType));
                 // if the first item is not the same as the rest of the items then we return any type
-                return new ArrayType(env, AnyType.ANY_TYPE);
+                return new ArrayType(env, AnyType.INSTANCE);
             }
         }
         return new ArrayType(env, firstType);

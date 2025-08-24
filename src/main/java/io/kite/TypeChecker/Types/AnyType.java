@@ -11,14 +11,14 @@ import org.jetbrains.annotations.Nullable;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class AnyType extends ReferenceType {
-    public static final AnyType ANY_TYPE = new AnyType(null);
+    public static final AnyType INSTANCE = new AnyType(null);
 
     @Getter
     @Setter
     private Object any;
 
     public AnyType(@Nullable TypeEnvironment env) {
-        super(SystemType.ANY_TYPE, env);
+        super(SystemType.ANY, env);
     }
 
 }

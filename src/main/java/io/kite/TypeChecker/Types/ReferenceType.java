@@ -39,7 +39,7 @@ public sealed class ReferenceType extends Type permits AnyType, ArrayType, Objec
     }
 
     public static ReferenceType[] values() {
-        return new ReferenceType[]{ObjectType.INSTANCE};
+        return new ReferenceType[]{ObjectType.INSTANCE, AnyType.INSTANCE};
     }
 
     @Override
