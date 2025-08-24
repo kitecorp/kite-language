@@ -64,5 +64,44 @@ public class VarArrayTest extends RuntimeTest {
         assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev")), varType);
     }
 
+    @Test
+    void testDeclareTypeNumber() {
+        eval("""
+                var number[] x = []
+                """);
+        Assertions.assertTrue(global.hasVar("x"));
+        var x = global.lookup("x");
+        Assertions.assertInstanceOf(List.class, x);
+    }
+
+    @Test
+    void testDeclareTypeString() {
+        eval("""
+                var string[] x = []
+                """);
+        Assertions.assertTrue(global.hasVar("x"));
+        var x = global.lookup("x");
+        Assertions.assertInstanceOf(List.class, x);
+    }
+
+    @Test
+    void testDeclareTypeBoolean() {
+        eval("""
+                var boolean[] x = []
+                """);
+        Assertions.assertTrue(global.hasVar("x"));
+        var x = global.lookup("x");
+        Assertions.assertInstanceOf(List.class, x);
+    }
+
+    @Test
+    void testDeclareTypeAny() {
+        eval("""
+                var any[] x = []
+                """);
+        Assertions.assertTrue(global.hasVar("x"));
+        var x = global.lookup("x");
+        Assertions.assertInstanceOf(List.class, x);
+    }
 
 }
