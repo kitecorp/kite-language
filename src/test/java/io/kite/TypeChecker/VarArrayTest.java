@@ -123,6 +123,20 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
+    void testDeclareTypeStringInitWrongEmptyObject() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var string[] x = [{}]
+                """));
+    }
+
+    @Test
+    void testDeclareTypeStringInitWrongObject() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                var string[] x = [{env: "prod"}]
+                """));
+    }
+
+    @Test
     void testDeclareTypeStringInitWrongbool() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 var string[] x = [true]
