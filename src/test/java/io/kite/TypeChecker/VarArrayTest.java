@@ -281,6 +281,56 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
+    void testReassignAny() {
+        eval("""
+                var any[] x = [1,2,3]
+                x=[3]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testReassignAnyString() {
+        eval("""
+                var any[] x = ['hello']
+                x=['world']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testReassignAnyBoolean() {
+        eval("""
+                var any[] x = [true]
+                x=[false]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testReassignAnyEmpty() {
+        eval("""
+                var any[] x = [true]
+                x=[]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
+    void testReassignNumberToString() {
+        eval("""
+                var any[] x = [1]
+                x=['hello']
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
     void testAppend() {
         eval("""
                 var boolean[] x = []
