@@ -36,6 +36,16 @@ public class UnionTypeTest extends CheckerTest {
     }
 
     @Test
+    void allowReassigningANumberToAUnionType() {
+        var res = eval("""
+                type alias = 1 | 2
+                var alias x = 2;
+                x = 3
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+    }
+
+    @Test
     void allowAssigningANumberToAUnionTypeMixedTypes() {
         var res = eval("""
                 type alias = 1 | 2 | "hello" | true | null
