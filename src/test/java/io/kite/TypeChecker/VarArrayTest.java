@@ -86,6 +86,15 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
+    void testDeclareTypeAny() {
+        eval("""
+                var any[] x = []
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(AnyType.ANY_TYPE, varType.getType());
+    }
+
+    @Test
     void testDeclareTypeNumberInit() {
         eval("""
                 var number[] x = [1,2,3]
@@ -211,6 +220,28 @@ public class VarArrayTest extends CheckerTest {
         eval("""
                 var number[] x = []
                 x += [1]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Number);
+    }
+
+    @Test
+    void testAppendAnotherArray() {
+        eval("""
+                var boolean[] x = []
+                var boolean[] y = [false]
+                x += y
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        assertEquals(varType.getType(), ValueType.Boolean);
+    }
+
+    @Test
+    void testAppendAnotherNumberArray() {
+        eval("""
+                var number[] x = []
+                var number[] y = [1]
+                x += y
                 """);
         var varType = (ArrayType) checker.getEnv().lookup("x");
         assertEquals(varType.getType(), ValueType.Number);
