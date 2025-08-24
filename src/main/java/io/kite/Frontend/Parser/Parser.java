@@ -657,7 +657,7 @@ public class Parser {
             case Identifier -> SymbolIdentifier(); // Identifier() also checks for types
             case OpenBraces -> ObjectExpression();
             default -> {
-                eat(Number, String, True, False, Object);
+                eat(Number, String, True, False, Object, Null);
                 yield Literal();
             }
         };
