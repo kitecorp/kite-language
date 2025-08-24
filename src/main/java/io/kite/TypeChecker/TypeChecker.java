@@ -249,12 +249,7 @@ public final class TypeChecker implements Visitor<Type> {
             // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
             return actualType;
         } else if (expectedArrayType.getType() instanceof UnionType union) {
-            if (union.getTypes().contains(actualArray.getType())) {
-                return expectedArrayType;
-            }
-            String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                    printer.visit(expectedArrayType), printer.visit(actualArray), printer.visit(expectedVal));
-            throw new TypeError(string);
+            return expect(actualArray.getType(), union, expectedVal);
         } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
             String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
                     expectedArrayType.getType().getValue(), actualArray.getType(), printer.visit(expectedVal));
