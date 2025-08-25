@@ -154,6 +154,7 @@ public class Parser {
                 case Schema -> SchemaDeclaration();
                 case Existing, Resource -> ResourceDeclaration();
                 case Component -> ComponentDeclaration();
+                case Input -> InputDeclaration();
                 case Var -> VarDeclarations();
 //                case Val -> ValDeclarations();
                 default -> Statement();
@@ -1188,6 +1189,14 @@ public class Parser {
         var body = BlockExpression("Expect '{' after module name.", "Expect '}' after module body.");
 
         return ComponentExpression.component(moduleType, name, (BlockExpression) body);
+    }
+
+    private Statement InputDeclaration() {
+        eat(Input);
+        var type = TypeIdentifier();
+        var name = Identifier();
+        var body = IsLookAhead(lineTerminator, EOF) ? null : VarInitializer();
+        return InputDeclaration.input(name, type, body);
     }
 
     private Expression LeftHandSideExpression() {

@@ -36,7 +36,7 @@ public non-sealed class BlockExpression extends Expression {
     public BlockExpression() {
     }
 
-    public static Expression block(Expression expression) {
+    public static BlockExpression block(Expression expression) {
         return new BlockExpression(expression);
     }
 
@@ -61,7 +61,7 @@ public non-sealed class BlockExpression extends Expression {
         return new BlockExpression(NumberLiteral.of(value));
     }
 
-    public static Expression block() {
+    public static BlockExpression block() {
         return new BlockExpression(Collections.emptyList());
     }
 

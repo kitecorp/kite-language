@@ -1,9 +1,6 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Callstack;
-import io.kite.Frontend.Parser.Expressions.ComponentExpression;
-import io.kite.Frontend.Parser.Expressions.ResourceExpression;
-import io.kite.Frontend.Parser.Expressions.UnionTypeStatement;
+import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import lombok.Data;
 
@@ -26,9 +23,6 @@ import lombok.Data;
  */
 @Data
 public abstract sealed class Statement implements Callstack
-        permits ComponentExpression, ResourceExpression, UnionTypeStatement,
-        Program, EmptyStatement, ExpressionStatement, ForStatement,
-        FunctionDeclaration, IfStatement, InitStatement, ReturnStatement,
-        SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
+        permits ComponentExpression, InputDeclaration, ResourceExpression, UnionTypeStatement, Program, EmptyStatement, ExpressionStatement, ForStatement, FunctionDeclaration, IfStatement, InitStatement, ReturnStatement, SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
 
 }

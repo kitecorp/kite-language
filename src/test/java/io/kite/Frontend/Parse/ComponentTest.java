@@ -1,12 +1,15 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AssignmentExpression;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parser.Expressions.ComponentExpression.component;
-import static io.kite.Frontend.Parser.Factory.*;
+import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
+import static io.kite.Frontend.Parser.Factory.program;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -88,10 +91,27 @@ public class ComponentTest extends ParserTest {
                     name = "bucket-prod"
                 }
                 """);
-        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
-                block(AssignmentExpression.assign("name", "bucket-prod"))));
+        var expected = program(
+                component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
+                        block(AssignmentExpression.assign("name", "bucket-prod"))));
         assertEquals(expected, res);
         log.info((res));
+    }
+
+    @Test
+    void componentInputs() {
+        var res = parse("""
+                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                    input string name
+                    input string size
+                }
+                """);
+        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
+                block(
+                        input("name", TypeIdentifier.type("string")),
+                        input("size", TypeIdentifier.type("string"))
+                )));
+        assertEquals(expected, res);
     }
 
 
