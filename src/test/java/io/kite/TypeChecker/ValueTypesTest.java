@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.id;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
-import static io.kite.Frontend.Parser.Factory.number;
 import static io.kite.Frontend.Parser.Factory.program;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;

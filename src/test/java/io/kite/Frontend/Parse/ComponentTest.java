@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.kite.Frontend.Parser.Expressions.ComponentStatement.component;
@@ -112,6 +114,22 @@ public class ComponentTest extends ParserTest {
                 block(
                         input("name", type("string")),
                         input("size", type("string"))
+                )));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void componentInputsDefaults() {
+        var res = parse("""
+                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                    input string name = 'bucket-prod'
+                    input number size = 10
+                }
+                """);
+        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
+                block(
+                        input("name", type("string"), string("bucket-prod")),
+                        input("size", type("number"), number(10))
                 )));
         assertEquals(expected, res);
     }
