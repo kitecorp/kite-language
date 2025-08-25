@@ -667,55 +667,49 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private Object ForWithRange(ForStatement statement) {
+        var range = statement.getRange();
+        int min = range.getMinimum();
+        int max = range.getMaximum();
+
+        // Seed loop env with the item var (as before)
+        var forEnv = new Environment<>(env, Map.of(statement.getItem().string(), min));
+
+        // Block-style: execute body each iteration, return last result
         if (statement.isBodyBlock()) {
-            var range = statement.getRange();
-            int minimum = range.getMinimum();
-            int maximum = range.getMaximum();
-
-            // env to hold init variable
-            var forEnv = new Environment<>(env, Map.of(statement.getItem().string(), minimum));
-
-            Object result = null;
+            Object last = null;
             var body = statement.discardBlock();
-            for (int i = minimum; i < maximum; i++) {
-                forInit(forEnv, statement.getIndex(), i);
-                forInit(forEnv, statement.getItem(), i);
-
-                var environment = new Environment<>(forEnv);
-                result = executeBlock(body, environment);
+            for (int i = min; i < max; i++) {
+                initIteration(forEnv, statement, i);
+                last = executeBlock(body, new Environment<>(forEnv));
             }
-            return result;
-        } else if (statement.getBody() != null) {
-            var range = statement.getRange();
-            int minimum = range.getMinimum();
-            int maximum = range.getMaximum();
+            return last;
+        }
 
-            String index = statement.getItem().string();
-            var forEnv = new Environment<>(env, Map.of(index, minimum));
+        // Expr-style: build a list from body results (with If support)
+        if (statement.getBody() != null) {
+            List<Object> out = new ArrayList<>(Math.max(0, max - min));
+            for (int i = min; i < max; i++) {
+                initIteration(forEnv, statement, i);
 
-            List<Object> result = new ArrayList<>(maximum);
-            for (int i = minimum; i < maximum; i++) {
-                forInit(forEnv, statement.getIndex(), i);
-                forInit(forEnv, statement.getItem(), i);
-
-                if (statement.getBody() instanceof IfStatement ifStatement) {
-                    var test = (Boolean) executeBlock(ifStatement.getTest(), forEnv);
-                    if (test) {
-                        result.add(executeBlock(ifStatement.getConsequent(), forEnv));
-                    } else {
-                        var alternate = ifStatement.getAlternate();
-                        if (alternate != null) {
-                            result.add(executeBlock(alternate, forEnv));
-                        }
+                var body = statement.getBody();
+                if (body instanceof IfStatement iff) {
+                    var result = executeBlock(iff, new Environment<>(forEnv));
+                    if (result != null) {
+                        out.add(result);
                     }
                 } else {
-                    Object e = executeBlock(statement.getBody(), forEnv);
-                    result.add(e);
+                    out.add(executeBlock(body, forEnv));
                 }
             }
-            return result;
+            return out;
         }
+
         throw new OperationNotImplementedException("For statement operation not implemented");
+    }
+
+    private void initIteration(Environment<Object> env, ForStatement st, int i) {
+        forInit(env, st.getIndex(), i);
+        forInit(env, st.getItem(), i);
     }
 
     @Override
