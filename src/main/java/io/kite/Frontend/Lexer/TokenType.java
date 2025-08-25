@@ -58,7 +58,7 @@ public enum TokenType {
     /******   IAC   *****/
     Resource("resource"),
     Existing("existing"),
-    Module("module"),
+    Component("component"),
 
     /******   Visibility *****/
      /* all properties are private by default. This means that:
@@ -193,7 +193,7 @@ public enum TokenType {
             case "public" -> Public;
             case "private" -> Private;
             case "secure" -> Secure;
-            case "module" -> Module;
+            case "module" -> Component;
             case "null" -> Null;
             case "and" -> Logical_And;
             case "or" -> Logical_Or;
