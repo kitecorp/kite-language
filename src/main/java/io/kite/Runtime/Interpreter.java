@@ -671,6 +671,12 @@ public final class Interpreter implements Visitor<Object> {
         int min = range.getMinimum();
         int max = range.getMaximum();
 
+        // No iterations? Fast exits keep intent obvious.
+        if (min >= max) {
+            if (statement.isBodyBlock()) return null; // same "last" semantics
+            if (statement.getBody() != null) return List.of();
+            throw new OperationNotImplementedException("For statement operation not implemented");
+        }
         // Seed loop env with the item var (as before)
         var forEnv = new Environment<>(env, Map.of(statement.getItem().string(), min));
 
@@ -687,18 +693,17 @@ public final class Interpreter implements Visitor<Object> {
 
         // Expr-style: build a list from body results (with If support)
         if (statement.getBody() != null) {
-            List<Object> out = new ArrayList<>(Math.max(0, max - min));
+            var body = statement.getBody();
+            var out = new ArrayList<>(max - min);
             for (int i = min; i < max; i++) {
                 initIteration(forEnv, statement, i);
+                var iterEnv = new Environment<>(forEnv);
 
-                var body = statement.getBody();
                 if (body instanceof IfStatement iff) {
-                    var result = executeBlock(iff, new Environment<>(forEnv));
-                    if (result != null) {
-                        out.add(result);
-                    }
+                    var result = executeBlock(iff, iterEnv);
+                    if (result != null) out.add(result);
                 } else {
-                    out.add(executeBlock(body, forEnv));
+                    out.add(executeBlock(body, iterEnv));
                 }
             }
             return out;
