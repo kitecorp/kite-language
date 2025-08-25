@@ -153,7 +153,7 @@ public class Parser {
                 case Type -> TypeDeclaration();
                 case Schema -> SchemaDeclaration();
                 case Existing, Resource -> ResourceDeclaration();
-                case Component -> ModuleDeclaration();
+                case Component -> ComponentDeclaration();
                 case Var -> VarDeclarations();
 //                case Val -> ValDeclarations();
                 default -> Statement();
@@ -1181,7 +1181,7 @@ public class Parser {
      * : '}'
      * ;
      */
-    private Statement ModuleDeclaration() {
+    private Statement ComponentDeclaration() {
         eat(Component);
         var moduleType = PluginIdentifier();
         var name = Identifier();
