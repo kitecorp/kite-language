@@ -656,13 +656,6 @@ public final class Interpreter implements Visitor<Object> {
                 return result;
             }
         }
-        //        List<Statement> statements = statement.discardBlock();
-//        statements.add(ExpressionStatement.expressionStatement(statement.getUpdate()));
-//        var whileStatement = WhileStatement.of(statement.getTest(), BlockExpression.block(statements));
-//        if (statement.getItem() == null) {
-//            return executeBlock(whileStatement, env);
-//        }
-//        return executeBlock(BlockExpression.block(statement.getItem(), whileStatement), env);
         throw new OperationNotImplementedException("For statement not implemented");
     }
 
@@ -728,28 +721,10 @@ public final class Interpreter implements Visitor<Object> {
                 case BlockExpression blockExpression -> executeBlock(blockExpression.getExpression(), environment);
                 case null, default -> environment.init(declaration.getId().string(), visit(declaration.getInit()));
             }
-//            if (property.defaultValue() instanceof BlockExpression blockExpression) {
-//                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
-//            } else {
-//                environment.init(property.name().string(), visit(property.defaultValue()));
-//            }
         }
         context = null;
         var name = expression.getName();
         return env.init(name.string(), SchemaValue.of(name, environment)); // install the type into the global env
-//        switch (expression.getProperties()) {
-//            case ExpressionStatement statement when statement.getStatement() instanceof BlockExpression blockExpression -> {
-//                var environment = new Environment<>(env);
-//                context = SchemaContext.SCHEMA;
-//                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
-//                context = null;
-//                var name = expression.getName();
-//                return env.init(name.string(), SchemaValue.of(name, environment)); // install the type into the global env
-//            }
-//            case null, default -> {
-//            }
-//        }
-//        throw new RuntimeException("Invalid declaration: " + printer.visit(expression));
     }
 
     @Override
