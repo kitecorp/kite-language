@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 
 
@@ -55,6 +56,20 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(ErrorExpression expression) {
         return null;
+    }
+
+    @Override
+    public String visit(ComponentStatement expression) {
+        throw new UnsupportedOperationException("ComponentStatement is not supported in SyntaxPrinter");
+    }
+
+    @Override
+    public String visit(InputDeclaration expression) {
+        if (expression.hasInit()) {
+            return format("input {0} {1} = {2}", visit(expression.getType()), visit(expression.getId()), visit(expression.getInit()));
+        } else {
+            return format("input {0} {1}", visit(expression.getType()), visit(expression.getId()));
+        }
     }
 
     @Override

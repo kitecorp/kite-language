@@ -33,6 +33,7 @@ import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionS
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
+import static java.text.MessageFormat.format;
 
 
 /**
@@ -1186,9 +1187,22 @@ public class Parser {
         eat(Component);
         var moduleType = PluginIdentifier();
         var name = Identifier();
-        var body = BlockExpression("Expect '{' after module name.", "Expect '}' after module body.");
+        var body = (BlockExpression) BlockExpression("Expect '{' after module name.", "Expect '}' after module body.");
 
-        return ComponentExpression.component(moduleType, name, (BlockExpression) body);
+        validateInputs(name, body);
+
+        return ComponentStatement.component(moduleType, name, body);
+    }
+
+    private void validateInputs(Identifier componentName, BlockExpression body) {
+        var set = new HashSet<String>();
+        for (var statement : body.getExpression()) {
+            if (statement instanceof InputDeclaration inputDeclaration) {
+                if (!set.add(inputDeclaration.name())) {
+                    throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
+                }
+            }
+        }
     }
 
     private Statement InputDeclaration() {

@@ -504,6 +504,16 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     @Override
+    public Object visit(ComponentStatement expression) {
+        throw new RuntimeException("Invalid component statement");
+    }
+
+    @Override
+    public Object visit(InputDeclaration expression) {
+        throw new RuntimeException("Invalid input declaration");
+    }
+
+    @Override
     public Object visit(LogicalExpression expression) {
         var left = visit(expression.getLeft());
         var right = visit(expression.getRight());

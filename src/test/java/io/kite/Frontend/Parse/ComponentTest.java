@@ -1,12 +1,14 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.kite.Frontend.Parser.Expressions.ComponentExpression.component;
+import static io.kite.Frontend.Parser.Expressions.ComponentStatement.component;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Factory.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
@@ -112,6 +114,17 @@ public class ComponentTest extends ParserTest {
                         input("size", type("string"))
                 )));
         assertEquals(expected, res);
+    }
+
+    @Test
+    void componentInputsThrowIfSameNameIsDuplicated() {
+        parse("""
+                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                    input string name
+                    input string name
+                }
+                """);
+        Assertions.assertTrue(ParserErrors.hadErrors());
     }
 
 

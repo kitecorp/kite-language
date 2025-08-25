@@ -306,6 +306,16 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     @Override
+    public Type visit(ComponentStatement expression) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public Type visit(InputDeclaration expression) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
     public Type visit(LogicalExpression expression) {
         Type left = visit(expression.getLeft());
         Type right = visit(expression.getRight());

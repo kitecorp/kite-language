@@ -12,16 +12,16 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class ComponentExpression extends Statement {
+public final class ComponentStatement extends Statement {
     private PluginIdentifier type;
     @Nullable
     private Identifier name;
     private BlockExpression block;
 
-    private ComponentExpression() {
+    private ComponentStatement() {
     }
 
-    private ComponentExpression(PluginIdentifier type, Identifier name, BlockExpression block) {
+    private ComponentStatement(PluginIdentifier type, Identifier name, BlockExpression block) {
         this();
         this.type = type;
         this.name = name;
@@ -29,11 +29,11 @@ public final class ComponentExpression extends Statement {
     }
 
     public static Statement component(PluginIdentifier type, Identifier name, BlockExpression block) {
-        return new ComponentExpression(type, name, block);
+        return new ComponentStatement(type, name, block);
     }
 
     public static Statement component() {
-        return new ComponentExpression();
+        return new ComponentStatement();
     }
 
     public static Statement component(String type, String name, BlockExpression operator) {

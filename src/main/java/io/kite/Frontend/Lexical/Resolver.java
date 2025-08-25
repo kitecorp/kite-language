@@ -139,6 +139,16 @@ public final class Resolver implements Visitor<Void> {
     }
 
     @Override
+    public Void visit(ComponentStatement expression) {
+     throw new RuntimeException("oops: ComponentStatement is not an expression statement: " + expression.toString());
+    }
+
+    @Override
+    public Void visit(InputDeclaration expression) {
+        throw new RuntimeException("oops: InputDeclaration is not an expression statement: " + expression.toString());
+    }
+
+    @Override
     public Void visit(LogicalExpression expression) {
         resolve(expression.getLeft());
         resolve(expression.getRight());
