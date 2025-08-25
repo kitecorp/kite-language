@@ -724,10 +724,9 @@ public final class Interpreter implements Visitor<Object> {
 
         for (var property : expression.getProperties()) {
             var declaration = property.declaration();
-            if (declaration.hasInit() && declaration.getInit() instanceof BlockExpression blockExpression) {
-                executeBlock(blockExpression.getExpression(), environment);
-            } else {
-                environment.init(declaration.getId().string(), visit(declaration.getInit()));
+            switch (declaration.getInit()) {
+                case BlockExpression blockExpression -> executeBlock(blockExpression.getExpression(), environment);
+                case null, default -> environment.init(declaration.getId().string(), visit(declaration.getInit()));
             }
 //            if (property.defaultValue() instanceof BlockExpression blockExpression) {
 //                executeBlock(blockExpression.getExpression(), environment); // install properties/methods of a type into the environment
