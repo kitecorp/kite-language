@@ -64,14 +64,6 @@ public class ComponentTest extends ParserTest {
         log.info((res));
     }
 
-    /*
-     * import S3 from 'Aws.Storage'
-     *
-     * resource S3.Bucket prod {
-     *
-     * }
-     *
-     * */
     @Test
     void componentProviderWithResourceNamespaced() {
         var res = parse("component 'Aws.Storage/S3.Bucket' api {}");
