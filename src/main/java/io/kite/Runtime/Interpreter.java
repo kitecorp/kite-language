@@ -167,6 +167,13 @@ public final class Interpreter implements Visitor<Object> {
         };
     }
 
+    private static @NotNull Object compare(String op, String l, Number r) {
+        return switch (op) {
+            case "+" -> l + r;
+            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+        };
+    }
+
     private static @NotNull Object compare(String op, Number l, String r) {
         return switch (op) {
             case "+" -> l + r;
@@ -355,10 +362,10 @@ public final class Interpreter implements Visitor<Object> {
         var op = expression.getOperator();
         return switch (leftBlock) {
             case Number left when rightBlock instanceof Number right -> compare(op, left, right);
-            case String left when rightBlock instanceof String right -> compare(op, left, right);
-            case String left when rightBlock instanceof Number right -> compare(op, left, right.toString());
-            case Boolean left when rightBlock instanceof Boolean right -> compare(op, left, right);
             case Number left when rightBlock instanceof String right -> compare(op, left, right);
+            case String left when rightBlock instanceof String right -> compare(op, left, right);
+            case String left when rightBlock instanceof Number right -> compare(op, left, right);
+            case Boolean left when rightBlock instanceof Boolean right -> compare(op, left, right);
             case HashMap left when rightBlock instanceof HashMap right -> switch (op) {
                 case "==" -> Objects.equals(left, right);
                 case "!=" -> !Objects.equals(left, right);
@@ -661,7 +668,7 @@ public final class Interpreter implements Visitor<Object> {
             switch (visit) {
                 case String s -> resource.setIndex("\"%s\"".formatted(s));
                 case Number number -> resource.setIndex(number);
-                case Map<?,?> map -> resource.setIndex(visit(forStatement.getIndex()));
+                case Map<?, ?> map -> resource.setIndex(visit(forStatement.getIndex()));
                 default -> throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
             }
         }
