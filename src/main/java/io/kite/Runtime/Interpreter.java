@@ -356,6 +356,7 @@ public final class Interpreter implements Visitor<Object> {
         return switch (leftBlock) {
             case Number left when rightBlock instanceof Number right -> compare(op, left, right);
             case String left when rightBlock instanceof String right -> compare(op, left, right);
+            case String left when rightBlock instanceof Number right -> compare(op, left, right.toString());
             case Boolean left when rightBlock instanceof Boolean right -> compare(op, left, right);
             case Number left when rightBlock instanceof String right -> compare(op, left, right);
             case HashMap left when rightBlock instanceof HashMap right -> switch (op) {

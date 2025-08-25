@@ -20,7 +20,6 @@ public class AssignmentTest extends RuntimeTest {
 
         var res = eval("VERSION");
         assertEquals(2, res);
-        log.warn((res));
     }
 
     @Test
@@ -29,7 +28,6 @@ public class AssignmentTest extends RuntimeTest {
 
         var res = (Boolean) eval("VERSION");
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -38,7 +36,6 @@ public class AssignmentTest extends RuntimeTest {
 
         var res = (Boolean) eval("VERSION");
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -47,7 +44,6 @@ public class AssignmentTest extends RuntimeTest {
 
         var res = eval("VERSION");
         assertEquals(1.1, res);
-        log.warn((res));
     }
 
 
@@ -58,7 +54,6 @@ public class AssignmentTest extends RuntimeTest {
         var res = eval("VERSION");
         var expected = new NullValue();
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -68,7 +63,6 @@ public class AssignmentTest extends RuntimeTest {
         var res = eval("VERSION=2");
         var expected = 2;
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -78,7 +72,6 @@ public class AssignmentTest extends RuntimeTest {
         var res = eval("VERSION=1");
         var expected = 1;
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -87,7 +80,6 @@ public class AssignmentTest extends RuntimeTest {
 
         var res = (Boolean) eval("VERSION=true");
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -96,7 +88,6 @@ public class AssignmentTest extends RuntimeTest {
 
         var res = (Boolean) eval("VERSION=false");
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -106,7 +97,6 @@ public class AssignmentTest extends RuntimeTest {
         var res = eval("VERSION=1.1");
         var expected = 1.1;
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -116,7 +106,6 @@ public class AssignmentTest extends RuntimeTest {
         var res = eval("VERSION=1.2");
         var expected = 1.2;
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -127,7 +116,46 @@ public class AssignmentTest extends RuntimeTest {
                 """);
         var expected = 1.1 + 2.2;
         assertEquals(expected, res);
-        log.warn((res));
+    }
+
+    @Test
+    void stringConcat() {
+        var res = eval("""
+                "hello " + "world"
+                """);
+        assertEquals("hello world", res);
+    }
+
+    @Test
+    void stringConcatEmptySpace() {
+        var res = eval("""
+                "hello" +" "+ "world"
+                """);
+        assertEquals("hello world", res);
+    }
+
+    @Test
+    void stringConcatNumber() {
+        var res = eval("""
+                "hello" +" "+ 2
+                """);
+        assertEquals("hello 2", res);
+    }
+
+    @Test
+    void stringConcatNumberStrings() {
+        var res = eval("""
+                "hello" +" "+ 2+2
+                """);
+        assertEquals("hello 22", res);
+    }
+
+    @Test
+    void stringConcatNumberAddition() {
+        var res = eval("""
+                "hello" +" "+ (2+2)
+                """);
+        assertEquals("hello 4", res);
     }
 
     @Test
@@ -138,7 +166,6 @@ public class AssignmentTest extends RuntimeTest {
                 """);
         var expected = 1.1 * 2.2;
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -149,7 +176,6 @@ public class AssignmentTest extends RuntimeTest {
                 """);
         var expected = 2.1 / 2.2;
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -159,7 +185,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 1==2
                 """);
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -169,7 +194,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 1==1
                 """);
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -179,7 +203,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 3 < 2
                 """);
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -189,7 +212,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 3 < 3.1
                 """);
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -199,7 +221,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 3.2 < 3.1
                 """);
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -209,7 +230,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 3 > 2
                 """);
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -219,7 +239,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 3 >= 2
                 """);
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -229,7 +248,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 2 >= 2
                 """);
         assertTrue(res);
-        log.warn((res));
     }
 
     @Test
@@ -239,7 +257,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 1 >= 2
                 """);
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -249,7 +266,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 3 <= 2
                 """);
         assertFalse(res);
-        log.warn((res));
     }
 
     @Test
@@ -259,8 +275,8 @@ public class AssignmentTest extends RuntimeTest {
                 x = 2 <= 2
                 """);
         assertTrue(res);
-        log.warn((res));
     }
+
     @Test
     void AssignLessPlusAssignment() {
         var res = (Number) eval("""
@@ -268,7 +284,6 @@ public class AssignmentTest extends RuntimeTest {
                 x += 2
                 """);
         assertEquals(3, res);
-        log.warn((res));
     }
 
     @Test
