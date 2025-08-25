@@ -18,6 +18,7 @@ import io.kite.Runtime.Functions.PrintFunction;
 import io.kite.Runtime.Functions.PrintlnFunction;
 import io.kite.Runtime.Values.*;
 import io.kite.Runtime.exceptions.*;
+import io.kite.Runtime.interpreter.OperatorComparator;
 import io.kite.SchemaContext;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.Type;
@@ -25,7 +26,6 @@ import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
+import static io.kite.Runtime.interpreter.OperatorComparator.compare;
 import static io.kite.Utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
 
@@ -98,89 +99,6 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    private static @NotNull Object compare(String op, Number ln, Number rn) {
-        // if both were ints, do int math → preserve integer result
-        if (ln instanceof Integer a && rn instanceof Integer b) {
-            return compare(op, a, b);
-        }
-        // otherwise treat both as doubles
-        double a = ln.doubleValue(), b = rn.doubleValue();
-        return compare(op, a, b);
-    }
-
-    private static @NotNull Object compare(String op, Integer a, Integer b) {
-        return switch (op) {
-            case "+" -> a + b;
-            case "-" -> a - b;
-            case "*" -> a * b;
-            case "/" -> a / b;
-            case "%" -> a % b;
-            case "==" -> a.equals(b);
-            case "!=" -> !a.equals(b);
-            case "<" -> a < b;
-            case "<=" -> a <= b;
-            case ">" -> a > b;
-            case ">=" -> a >= b;
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
-    }
-
-    private static @NotNull Object compare(String op, double a, double b) {
-        return switch (op) {
-            case "+" -> a + b;
-            case "-" -> a - b;
-            case "*" -> a * b;
-            case "/" -> a / b;
-            case "%" -> a % b;
-            case "==" -> a == b;
-            case "!=" -> a != b;
-            case "<" -> a < b;
-            case "<=" -> a <= b;
-            case ">" -> a > b;
-            case ">=" -> a >= b;
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
-    }
-
-    private static @NotNull Object compare(String op, Boolean l, Boolean r) {
-        return switch (op) {
-            case "==" -> l.equals(r);
-            case "!=" -> !l.equals(r);
-            case "<" -> l.compareTo(r) < 0;
-            case "<=" -> l.compareTo(r) <= 0;
-            case ">" -> l.compareTo(r) > 0;
-            case ">=" -> l.compareTo(r) >= 0;
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
-    }
-
-    private static @NotNull Object compare(String op, String l, String r) {
-        return switch (op) {
-            case "+" -> l + r;
-            case "==" -> StringUtils.equals(l, r);
-            case "!=" -> !StringUtils.equals(l, r);
-            case "<" -> StringUtils.compare(l, r) < 0;
-            case "<=" -> StringUtils.compare(l, r) <= 0;
-            case ">" -> StringUtils.compare(l, r) > 0;
-            case ">=" -> StringUtils.compare(l, r) >= 0;
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
-    }
-
-    private static @NotNull Object compare(String op, String l, Number r) {
-        return switch (op) {
-            case "+" -> l + r;
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
-    }
-
-    private static @NotNull Object compare(String op, Number l, String r) {
-        return switch (op) {
-            case "+" -> l + r;
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
-    }
-
     private static void forInit(Environment<Object> forEnv, Identifier statement, Object i) {
         if (statement != null) {
             forEnv.initOrAssign(statement.string(), i);
@@ -198,9 +116,7 @@ public final class Interpreter implements Visitor<Object> {
 
     @Nullable
     private Callstack ExecutionContext(Class<?> forStatementClass) {
-        var iterator = callstack.iterator();
-        while (iterator.hasNext()) {
-            Callstack next = iterator.next();
+        for (Callstack next : callstack) {
             if (next.getClass().equals(forStatementClass)) {
                 return next;
             }
@@ -355,7 +271,7 @@ public final class Interpreter implements Visitor<Object> {
         Object leftBlock = executeBlock(expression.getLeft(), env);
         Object rightBlock = executeBlock(expression.getRight(), env);
 
-        var allowedTypes = allowTypes(expression.getOperator());
+        var allowedTypes = OperatorComparator.allowTypes(expression.getOperator());
         expectOperatorType(expression.getLeft(), allowedTypes, expression);
         expectOperatorType(expression.getRight(), allowedTypes, expression);
 
@@ -382,10 +298,9 @@ public final class Interpreter implements Visitor<Object> {
         var values = new HashSet<>(expressions.size());
         for (Expression it : expressions) {
             Object o = executeBlock(it, env);
-            if (o instanceof Set<?> list) {
-                values.addAll(list);
-            } else {
-                values.add(o);
+            switch (o) {
+                case Set<?> list -> values.addAll(list);
+                case null, default -> values.add(o);
             }
         }
         var res = getEnv().init(expression.getName(), values);
@@ -396,40 +311,6 @@ public final class Interpreter implements Visitor<Object> {
         if (!allowedTypes.contains(type.getClass())) {
             throw new TypeError("Unexpected type `" + type.getClass() + "` in expression: " + printer.visit(expression) + ". Allowed types: " + allowedTypes);
         }
-    }
-
-    private List<Class> allowTypes(String op) {
-        return switch (op) {
-            case "+" -> List.of(
-                    NumberLiteral.class,
-                    StringLiteral.class,
-                    SymbolIdentifier.class,
-                    CallExpression.class,
-                    BinaryExpression.class,
-                    MemberExpression.class
-            );
-            // allow addition for numbers and string
-            case "-", "/", "*", "%" -> List.of(
-                    NumberLiteral.class,
-                    CallExpression.class,
-                    SymbolIdentifier.class,
-                    BinaryExpression.class);
-            case "==", "!=" -> List.of(
-                    StringLiteral.class,
-                    CallExpression.class,
-                    SymbolIdentifier.class,
-                    NumberLiteral.class,
-                    BinaryExpression.class,
-                    BooleanLiteral.class,
-                    ObjectLiteral.class);
-            case "<=", "<", ">", ">=" -> List.of(BinaryExpression.class,
-                    NumberLiteral.class,
-                    CallExpression.class,
-                    BooleanLiteral.class,
-                    StringLiteral.class,
-                    SymbolIdentifier.class);
-            default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-        };
     }
 
     @Override
@@ -478,16 +359,15 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private Object executeDiscardBlock(FunValue declared, ActivationEnvironment environment) {
-        Statement statement = declared.getBody();
-        if (statement instanceof ExpressionStatement expressionStatement) {
-            Expression expression = expressionStatement.getStatement();
-            if (expression instanceof BlockExpression blockExpression) {
-                return executeBlock(blockExpression.getExpression(), environment);
-            } else { // lambdas without a block could simply be an expression: ((x) -> x*x)
-                return executeBlock(expression, environment);
-            }
+        if (!(declared.getBody() instanceof ExpressionStatement expressionStatement)) {
+            throw new RuntimeException("Invalid function body");
         }
-        throw new RuntimeException("Invalid function body");
+        Expression expression = expressionStatement.getStatement();
+        if (expression instanceof BlockExpression blockExpression) {
+            return executeBlock(blockExpression.getExpression(), environment);
+        } else { // lambdas without a block could simply be an expression: ((x) -> x*x)
+            return executeBlock(expression, environment);
+        }
     }
 
     @Override
