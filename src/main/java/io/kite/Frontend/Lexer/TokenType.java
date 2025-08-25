@@ -51,7 +51,7 @@ public enum TokenType {
     Type("type"),
 //    Val("val"),
     Var("var"),
-    Param("param"),
+    Input("input"),
     This("this"),
 
 
@@ -186,7 +186,7 @@ public enum TokenType {
     public static TokenType toKeyword(String keyword) {
         return switch (keyword) {
             case "var" -> Var;
-            case "param" -> Param;
+            case "input" -> Input;
             case "this" -> This;
             case "existing" -> Existing;
             case "resource" -> Resource;

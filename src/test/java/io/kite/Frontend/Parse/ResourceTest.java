@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.kite.Frontend.Parser.Expressions.ResourceExpression.resource;
 import static io.kite.Frontend.Parser.Factory.*;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

@@ -57,24 +57,8 @@ public class Factory {
         return MemberExpression.member(false, Identifier.id(type), Identifier.id(right));
     }
 
-    public static BlockExpression block(Expression operator) {
-        return (BlockExpression) BlockExpression.block(operator);
-    }
-
-    public static BlockExpression block(String operator) {
-        return (BlockExpression) BlockExpression.block(operator);
-    }
-
     public static VarStatement var(Identifier id, TypeIdentifier type) {
         return (VarStatement) VarStatement.varStatement(VarDeclaration.of(id, type));
-    }
-
-    public static BlockExpression block(Statement operator) {
-        return BlockExpression.block(operator);
-    }
-
-    public static BlockExpression block() {
-        return (BlockExpression) BlockExpression.block();
     }
 
     public static Statement empty() {
