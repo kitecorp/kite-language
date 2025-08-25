@@ -177,7 +177,7 @@ public class AssignmentTest extends RuntimeTest {
     @Test
     void stringConcatNumberAddition() {
         var res = eval("""
-               (2+2) + " hello" +" "+ (2+2)
+                (2+2) + " hello" +" "+ (2+2)
                 """);
         assertEquals("4 hello 4", res);
     }
@@ -185,7 +185,7 @@ public class AssignmentTest extends RuntimeTest {
     @Test
     void stringConcatDecimal() {
         var res = eval("""
-               2.1 + " hello" +" "+ 2.1
+                2.1 + " hello" +" "+ 2.1
                 """);
         assertEquals("2.1 hello 2.1", res);
     }
@@ -193,15 +193,15 @@ public class AssignmentTest extends RuntimeTest {
     @Test
     void stringConcatDecimalStrings() {
         var res = eval("""
-               2.1+2.1+ " hello" +" "+ 2.1+2.1
-               """);
+                2.1+2.1+ " hello" +" "+ 2.1+2.1
+                """);
         assertEquals("4.2 hello 2.12.1", res);
     }
 
     @Test
     void stringConcatDecimalAddition() {
         var res = eval("""
-               (2.1+2.1) + " hello" +" "+ (2.1+2.1)
+                (2.1+2.1) + " hello" +" "+ (2.1+2.1)
                 """);
         assertEquals("4.2 hello 4.2", res);
     }
