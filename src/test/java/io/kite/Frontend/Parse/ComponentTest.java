@@ -1,11 +1,11 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parse.Literals.TypeIdentifier;
-import io.kite.Frontend.Parser.Expressions.AssignmentExpression;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.kite.Frontend.Parser.Expressions.ComponentExpression.component;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Factory.program;
@@ -93,7 +93,7 @@ public class ComponentTest extends ParserTest {
                 """);
         var expected = program(
                 component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
-                        block(AssignmentExpression.assign("name", "bucket-prod"))));
+                        block(assign("name", "bucket-prod"))));
         assertEquals(expected, res);
         log.info((res));
     }
@@ -108,8 +108,8 @@ public class ComponentTest extends ParserTest {
                 """);
         var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
                 block(
-                        input("name", TypeIdentifier.type("string")),
-                        input("size", TypeIdentifier.type("string"))
+                        input("name", type("string")),
+                        input("size", type("string"))
                 )));
         assertEquals(expected, res);
     }
