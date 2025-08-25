@@ -347,7 +347,7 @@ public class TokenizerTest {
     @Test
     void testKeywordModule() {
         var result = tokenizer.tokenizeLiteral("module");
-        Assertions.assertEquals(TokenType.Module, result.type());
+        Assertions.assertEquals(TokenType.Component, result.type());
         Assertions.assertEquals("module", result.value());
         log.info(result);
     }

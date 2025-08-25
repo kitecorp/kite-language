@@ -153,7 +153,7 @@ public class Parser {
                 case Type -> TypeDeclaration();
                 case Schema -> SchemaDeclaration();
                 case Existing, Resource -> ResourceDeclaration();
-                case Module -> ModuleDeclaration();
+                case Component -> ModuleDeclaration();
                 case Var -> VarDeclarations();
 //                case Val -> ValDeclarations();
                 default -> Statement();
@@ -1182,12 +1182,12 @@ public class Parser {
      * ;
      */
     private Statement ModuleDeclaration() {
-        eat(Module);
+        eat(Component);
         var moduleType = PluginIdentifier();
         var name = Identifier();
         var body = BlockExpression("Expect '{' after module name.", "Expect '}' after module body.");
 
-        return ModuleExpression.of(moduleType, name, (BlockExpression) body);
+        return ComponentExpression.component(moduleType, name, (BlockExpression) body);
     }
 
     private Expression LeftHandSideExpression() {

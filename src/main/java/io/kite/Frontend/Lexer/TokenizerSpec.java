@@ -80,7 +80,7 @@ class TokenizerSpec {
             new Entry("^\\bexisting\\b", TokenType.Existing),
             new Entry("^\\bresource\\b", TokenType.Resource),
             new Entry("^\\bschema\\b", TokenType.Schema),
-            new Entry("^\\bmodule\\b", TokenType.Module),
+            new Entry("^\\bcomponent\\b", TokenType.Component),
             new Entry("^\\bobject\\b", TokenType.Object),
             new Entry("^\\bany\\b", TokenType.Any),
             new Entry("^\\w+", TokenType.Identifier)
