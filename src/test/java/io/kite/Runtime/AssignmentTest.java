@@ -161,49 +161,49 @@ public class AssignmentTest extends RuntimeTest {
     @Test
     void stringConcatNumber() {
         var res = eval("""
-                "hello" +" "+ 2
+                2 + " hello" +" "+ 2
                 """);
-        assertEquals("hello 2", res);
+        assertEquals("2 hello 2", res);
     }
 
     @Test
     void stringConcatNumberStrings() {
         var res = eval("""
-                "hello" +" "+ 2+2
+                2+2 + " hello" +" "+ 2+2
                 """);
-        assertEquals("hello 22", res);
+        assertEquals("4 hello 22", res);
     }
 
     @Test
     void stringConcatNumberAddition() {
         var res = eval("""
-                "hello" +" "+ (2+2)
+               (2+2) + " hello" +" "+ (2+2)
                 """);
-        assertEquals("hello 4", res);
+        assertEquals("4 hello 4", res);
     }
 
     @Test
     void stringConcatDecimal() {
         var res = eval("""
-                "hello" +" "+ 2.1
+               2.1 + " hello" +" "+ 2.1
                 """);
-        assertEquals("hello 2.1", res);
+        assertEquals("2.1 hello 2.1", res);
     }
 
     @Test
     void stringConcatDecimalStrings() {
         var res = eval("""
-                "hello" +" "+ 2.1+2.1
-                """);
-        assertEquals("hello 2.12.1", res);
+               2.1+2.1+ " hello" +" "+ 2.1+2.1
+               """);
+        assertEquals("4.2 hello 2.12.1", res);
     }
 
     @Test
     void stringConcatDecimalAddition() {
         var res = eval("""
-                "hello" +" "+ (2.1+2.1)
+               (2.1+2.1) + " hello" +" "+ (2.1+2.1)
                 """);
-        assertEquals("hello 4.2", res);
+        assertEquals("4.2 hello 4.2", res);
     }
 
     @Test
