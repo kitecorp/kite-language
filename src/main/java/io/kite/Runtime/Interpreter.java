@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,6 @@ import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
-    public static final String INDEX = "index";
     private static boolean hadRuntimeError;
     private final Deque<Callstack> callstack = new ArrayDeque<>();
 
@@ -345,34 +345,27 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(BinaryExpression expression) {
-        Object left = executeBlock(expression.getLeft(), env);
-        Object right = executeBlock(expression.getRight(), env);
+        Object leftBlock = executeBlock(expression.getLeft(), env);
+        Object rightBlock = executeBlock(expression.getRight(), env);
 
         var allowedTypes = allowTypes(expression.getOperator());
         expectOperatorType(expression.getLeft(), allowedTypes, expression);
         expectOperatorType(expression.getRight(), allowedTypes, expression);
 
-        if (expression.getOperator() instanceof String op) {
-            if (left instanceof Number ln && right instanceof Number rn) {
-                return compare(op, ln, rn);
-            } else if (left instanceof String l && right instanceof String r) {
-                return compare(op, l, r);
-            } else if (left instanceof Boolean l && right instanceof Boolean r) {
-                return compare(op, l, r);
-            } else if (left instanceof Number l && right instanceof String string) {
-                return compare(op, l, string);
-            } else if (left instanceof HashMap l && right instanceof HashMap r) {
-                return switch (op) {
-                    case "==" -> Objects.equals(l, r);
-                    case "!=" -> !Objects.equals(l, r);
-                    default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
-                };
-
-            }
-
-            throw new IllegalArgumentException("%s cannot be compared with %s".formatted(left, right));
-        }
-        throw new RuntimeException("Invalid number: %s %s".formatted(left, right));
+        var op = expression.getOperator();
+        return switch (leftBlock) {
+            case Number left when rightBlock instanceof Number right -> compare(op, left, right);
+            case String left when rightBlock instanceof String right -> compare(op, left, right);
+            case Boolean left when rightBlock instanceof Boolean right -> compare(op, left, right);
+            case Number left when rightBlock instanceof String right -> compare(op, left, right);
+            case HashMap left when rightBlock instanceof HashMap right -> switch (op) {
+                case "==" -> Objects.equals(left, right);
+                case "!=" -> !Objects.equals(left, right);
+                default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
+            };
+            case null, default ->
+                    throw new IllegalArgumentException(MessageFormat.format("{0} cannot be compared with {1}", printer.visit(expression.getLeft()), printer.visit(expression.getRight())));
+        };
     }
 
     @Override

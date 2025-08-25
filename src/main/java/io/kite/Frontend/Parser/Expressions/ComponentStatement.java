@@ -10,6 +10,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * A component is a collection of resources, inputs and outputs.
+ * A component can be just a declaration or a initialization (like a class/object). If the component doesn't have a name
+ * then it's a declaration.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class ComponentStatement extends Statement {
@@ -47,6 +52,13 @@ public final class ComponentStatement extends Statement {
 
     public String name() {
         return name.string();
+    }
+
+    /**
+     * If the name is missing then the component is a declaration. Else it's an initialization and should be initialized in interpreter
+     */
+    public boolean shouldInitialize() {
+        return name != null;
     }
 
 }
