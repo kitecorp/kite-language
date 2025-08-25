@@ -439,32 +439,39 @@ public final class Interpreter implements Visitor<Object> {
                 }
             }
             case SymbolIdentifier identifier -> {
-                Object right = executeBlock(expression.getRight(), env);
-                if (Objects.equals(expression.getOperator(), TokenType.Equal_Complex.getField())) {
-                    var existing = env.lookup(identifier.string());
-                    if (existing instanceof Integer left && right instanceof Integer numberLiteralRight) {
-                        return env.assign(identifier.string(), left + numberLiteralRight);
-                    } else if (existing instanceof Float left && right instanceof Float numberLiteralRight) {
-                        return env.assign(identifier.string(), left + numberLiteralRight);
-                    } else if (existing instanceof Double left && right instanceof Double numberLiteralRight) {
-                        return env.assign(identifier.string(), left + numberLiteralRight);
-                    } else if (existing instanceof String str && right instanceof Number number) {
-                        return env.assign(identifier.string(), str + number);
-                    } else if (existing instanceof List list) { // var x = []; x+=1; x==[1]
-                        list.add(right);
-                        return list;
-                    }
-                } else if (right instanceof Dependency dependency) {
-                    var res = env.assign(identifier.string(), dependency.value());
-                    return dependency;
-                } else {
-                    return env.assign(identifier.string(), right);
-                }
+                return assignmentSymbol(expression, identifier);
             }
             case null, default -> {
             }
         }
         throw new RuntimeException("Invalid assignment");
+    }
+
+    private @Nullable Object assignmentSymbol(AssignmentExpression expression, SymbolIdentifier identifier) {
+        Object right = executeBlock(expression.getRight(), env);
+        if (Objects.equals(expression.getOperator(), TokenType.Equal_Complex.getField())) {
+            return equalComplexAssignment(identifier, right);
+        } else if (right instanceof Dependency dependency) {
+            var res = env.assign(identifier.string(), dependency.value());
+            return dependency;
+        } else {
+            return env.assign(identifier.string(), right);
+        }
+    }
+
+    private @Nullable Object equalComplexAssignment(SymbolIdentifier identifier, Object right) {
+        var existing = env.lookup(identifier.string());
+        return switch (existing) {
+            case Integer left when right instanceof Integer integer -> env.assign(identifier.string(), left + integer);
+            case Float left when right instanceof Float aFloat -> env.assign(identifier.string(), left + aFloat);
+            case Double left when right instanceof Double aDouble -> env.assign(identifier.string(), left + aDouble);
+            case String str when right instanceof Number number -> env.assign(identifier.string(), str + number);
+            case List list -> {
+                list.add(right);
+                yield list;
+            }
+            case null, default -> null;
+        };
     }
 
     @Override
