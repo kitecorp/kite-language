@@ -135,6 +135,30 @@ public class AssignmentTest extends RuntimeTest {
     }
 
     @Test
+    void stringConcatEmptySpaceFront() {
+        var res = eval("""
+                "  " + "hello " + "world"
+                """);
+        assertEquals("  hello world", res);
+    }
+
+    @Test
+    void stringConcatTabFront() {
+        var res = eval("""
+                "\t" + "hello " + "world"
+                """);
+        assertEquals("\thello world", res);
+    }
+
+    @Test
+    void stringConcatNewLineFront() {
+        var res = eval("""
+                "\n" + "hello " + "world"
+                """);
+        assertEquals("\nhello world", res);
+    }
+
+    @Test
     void stringConcatNumber() {
         var res = eval("""
                 "hello" +" "+ 2
