@@ -23,6 +23,6 @@ import lombok.Data;
  */
 @Data
 public abstract sealed class Statement implements Callstack
-        permits ComponentExpression, InputDeclaration, ResourceExpression, UnionTypeStatement, Program, EmptyStatement, ExpressionStatement, ForStatement, FunctionDeclaration, IfStatement, InitStatement, ReturnStatement, SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
+        permits ComponentStatement, InputDeclaration, ResourceExpression, UnionTypeStatement, Program, EmptyStatement, ExpressionStatement, ForStatement, FunctionDeclaration, IfStatement, InitStatement, ReturnStatement, SchemaDeclaration, ValStatement, VarStatement, WhileStatement {
 
 }

@@ -6,6 +6,8 @@ import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.TypeChecker.Types.Type;
 
+import java.text.MessageFormat;
+
 public final class AstPrinter implements Visitor<String> {
 
     public String print(Expression expr) {
@@ -35,6 +37,20 @@ public final class AstPrinter implements Visitor<String> {
     @Override
     public String visit(ErrorExpression expression) {
         return null;
+    }
+
+    @Override
+    public String visit(ComponentStatement expression) {
+        return "component";
+    }
+
+    @Override
+    public String visit(InputDeclaration expression) {
+        if (expression.hasInit()) {
+            return MessageFormat.format("input {0} {1} = {2}", visit(expression.getType()), visit(expression.getId()), visit(expression.getInit()));
+        } else {
+            return MessageFormat.format("input {0} {1}", visit(expression.getType()), visit(expression.getId()));
+        }
     }
 
     @Override
