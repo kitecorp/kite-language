@@ -29,10 +29,6 @@ public class Factory {
         return UnaryExpression.of(operator, Identifier.id(left));
     }
 
-    public static Expression number(int number) {
-        return NumberLiteral.number(number);
-    }
-
     public static Expression binary(String operator, Expression left, Expression right) {
         return BinaryExpression.binary(operator, left, right);
     }
