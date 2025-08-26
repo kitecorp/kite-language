@@ -540,6 +540,10 @@ public class Parser {
         if (IsLookAhead(Equal, Equal_Complex)) {
             eat(Equal, Equal_Complex);
         }
+        return Initialize();
+    }
+
+    private Expression Initialize() {
         if (IsLookAhead(OpenBraces)) {
             blockContext = BlockContext.OBJECT;
         }
@@ -558,12 +562,7 @@ public class Parser {
         } else { // when no init
             return null;
         }
-        if (IsLookAhead(OpenBraces)) {
-            blockContext = BlockContext.OBJECT;
-        }
-        var res = Expression();
-        blockContext = null;
-        return res;
+        return Initialize();
     }
 
     private Expression Expression() {
@@ -1216,7 +1215,11 @@ public class Parser {
         eat(Input);
         var type = TypeIdentifier();
         var name = Identifier();
-        var body = IsLookAhead(lineTerminator, EOF) ? null : VarInitializer();
+        Expression body = null;
+        if (IsLookAhead(Equal)) {
+            eat(Equal);
+            body = Initialize();
+        }
         return InputDeclaration.input(name, type, body);
     }
 
