@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Factory.program;
@@ -41,7 +42,33 @@ public class InputTest extends ParserTest {
         assertEquals(expected, res);
     }
 
+    @Test
+    void inputStringArray() {
+        var res = parse("input string[] something");
+        var expected = program(input("something", arrayType("string")));
+        assertEquals(expected, res);
+    }
 
+    @Test
+    void inputNumberArray() {
+        var res = parse("input number[] something");
+        var expected = program(input("something", arrayType("number")));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputBooleanArray() {
+        var res = parse("input boolean[] something");
+        var expected = program(input("something", arrayType("boolean")));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputObjectArray() {
+        var res = parse("input object[] something");
+        var expected = program(input("something", arrayType("object")));
+        assertEquals(expected, res);
+    }
 
 
 }

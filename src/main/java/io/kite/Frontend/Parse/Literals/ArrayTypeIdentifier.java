@@ -16,6 +16,14 @@ public final class ArrayTypeIdentifier extends TypeIdentifier {
         this.items = new ArrayList<>();
     }
 
+    public static ArrayTypeIdentifier arrayType(TypeIdentifier type) {
+        return new ArrayTypeIdentifier(type);
+    }
+
+    public static ArrayTypeIdentifier arrayType(String type) {
+        return new ArrayTypeIdentifier(type(type));
+    }
+
     @Override
     public String string() {
         var res = new StringBuilder(super.string());
@@ -25,7 +33,6 @@ public final class ArrayTypeIdentifier extends TypeIdentifier {
         }
         return res.toString();
     }
-
 
     public void add(Literal literal) {
         this.items.add(literal);
