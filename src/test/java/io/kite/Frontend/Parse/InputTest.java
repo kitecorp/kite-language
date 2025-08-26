@@ -5,8 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Factory.program;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,6 +41,41 @@ public class InputTest extends ParserTest {
     void inputObject() {
         var res = parse("input object something");
         var expected = program(input("something", type("object")));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputStringInit() {
+        var res = parse("input string something = 'something'");
+        var expected = program(input("something", type("string"), "something"));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputNumberInit() {
+        var res = parse("input number something = 10 ");
+        var expected = program(input("something", type("number"), 10));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputBooleanInit() {
+        var res = parse("input boolean something = true");
+        var expected = program(input("something", type("boolean"), true));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputObjectInitEmpty() {
+        var res = parse("input object something = {}");
+        var expected = program(input("something", type("object"), objectExpression()));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputObjectInit() {
+        var res = parse("input object something = {env : 'dev'}");
+        var expected = program(input("something", type("object"), objectExpression(object("env", "dev"))));
         assertEquals(expected, res);
     }
 
