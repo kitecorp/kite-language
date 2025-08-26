@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.TypeChecker.Types.ArrayType.arrayType;
 import static io.kite.TypeChecker.Types.UnionType.unionType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Input")
 public class InputTest extends CheckerTest {
@@ -83,6 +84,39 @@ public class InputTest extends CheckerTest {
                 input custom something = 10
                 """);
         assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
+    }
+
+    @Test
+    void inputStringInitError() {
+        assertThrows(TypeError.class, () -> eval("input string something = 10"));
+    }
+
+    @Test
+    void inputNumberInitError() {
+        assertThrows(TypeError.class, () -> eval("input number something = 'hello' "));
+    }
+
+    @Test
+    void inputBooleanInitError() {
+        assertThrows(TypeError.class, () -> eval("input boolean something = 123"));
+    }
+
+    @Test
+    void inputObjectInitEmptyError() {
+        assertThrows(TypeError.class, () -> eval("input object something = true"));
+    }
+
+    @Test
+    void inputObjectInitError() {
+        assertThrows(TypeError.class, () -> eval("input object something = 'hello'"));
+    }
+
+    @Test
+    void inputUnionInitError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string | number
+                input custom something = true
+                """));
     }
 
     @Test
