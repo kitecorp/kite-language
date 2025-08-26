@@ -33,4 +33,8 @@ public final class ArrayType extends ReferenceType {
     public boolean isType(Type anyType) {
         return type == anyType;
     }
+
+    public static ArrayType arrayType(Type type) {
+        return new ArrayType(null, type);
+    }
 }

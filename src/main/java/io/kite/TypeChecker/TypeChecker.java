@@ -312,7 +312,12 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(InputDeclaration expression) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        var t1 = visit(expression.getType());
+        if (expression.hasInit()) {
+            var t2 = visit(expression.getInit());
+            expect(t2, t1, expression.getInit());
+        }
+        return t1;
     }
 
     @Override

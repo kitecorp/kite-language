@@ -38,4 +38,8 @@ public final class UnionType extends ReferenceType {
         this.types = Set.of(types);
     }
 
+    public static UnionType unionType(String typeName, Expression... types) {
+        return new UnionType(typeName, null, types);
+    }
+
 }
