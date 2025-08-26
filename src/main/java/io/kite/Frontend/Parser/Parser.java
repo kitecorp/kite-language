@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
+import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
 import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
@@ -602,10 +603,10 @@ public class Parser {
 
     private ArrayTypeIdentifier OptArrayDeclaration(TypeIdentifier type) {
         if (IsLookAhead(CloseBrackets)) {
-            return new ArrayTypeIdentifier(type);
+            return arrayType(type);
         } else if (IsLookAhead(Number)) {
             eat(Number);
-            var array = new ArrayTypeIdentifier(type);
+            var array = arrayType(type);
             array.add(Literal());
             return array;
         } else if (IsLookAhead(For)) {
