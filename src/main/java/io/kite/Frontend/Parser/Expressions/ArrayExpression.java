@@ -47,6 +47,7 @@ public final class ArrayExpression extends Expression {
         expression.items = List.of(id);
         return expression;
     }
+
     public static ArrayExpression array(ForStatement statement) {
         var expression = new ArrayExpression();
         expression.setForStatement(statement);
@@ -91,6 +92,14 @@ public final class ArrayExpression extends Expression {
 
     public static ArrayExpression array(String... id) {
         var expression = new ArrayExpression();
+        for (var i : id) {
+            expression.add(string(i));
+        }
+        return expression;
+    }
+
+    public static ArrayExpression array(ArrayTypeIdentifier type, String... id) {
+        var expression = new ArrayExpression(type);
         for (var i : id) {
             expression.add(string(i));
         }
