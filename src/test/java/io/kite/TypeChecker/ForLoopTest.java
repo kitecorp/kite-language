@@ -94,4 +94,30 @@ public class ForLoopTest extends CheckerTest {
         assertEquals(objectType, varType.getType());
     }
 
+    @Test
+    void testIndexInListNumbers() {
+        var res = eval("""
+                var list = [1,2,3,4,5]
+                var x = [for index in list: { name: 'item-$index'}]
+                """);
+        assertInstanceOf(ArrayType.class, res);
+
+        var varType = (ArrayType) res;
+        var objectType = new ObjectType(new TypeEnvironment(varType.getEnvironment().getParent(), Map.of("name", ValueType.String)));
+        assertEquals(objectType, varType.getType());
+    }
+
+    @Test
+    void testIndexInListStrings() {
+        var res = eval("""
+                var list = ['hello','world','!']
+                var x = [for index in list: { name: 'item-$index'}]
+                """);
+        assertInstanceOf(ArrayType.class, res);
+
+        var varType = (ArrayType) res;
+        var objectType = new ObjectType(new TypeEnvironment(varType.getEnvironment().getParent(), Map.of("name", ValueType.String)));
+        assertEquals(objectType, varType.getType());
+    }
+
 }
