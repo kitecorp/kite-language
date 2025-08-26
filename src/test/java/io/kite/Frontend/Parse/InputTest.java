@@ -5,11 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
+import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
+import static io.kite.Frontend.Parser.Expressions.UnionTypeStatement.union;
 import static io.kite.Frontend.Parser.Factory.program;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,6 +44,18 @@ public class InputTest extends ParserTest {
     void inputObject() {
         var res = parse("input object something");
         var expected = program(input("something", type("object")));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputUnion() {
+        var res = parse("""
+                type custom = string | number
+                input custom something""");
+        var expected = program(
+                union("custom", symbol("string"), symbol("number")),
+                input("something", type("custom"))
+        );
         assertEquals(expected, res);
     }
 
@@ -81,6 +95,19 @@ public class InputTest extends ParserTest {
     }
 
     @Test
+    void inputUnionInit() {
+        var res = parse("""
+                type custom = string | number
+                input custom something = 10
+                """);
+        var expected = program(
+                union("custom", symbol("string"), symbol("number")),
+                input("something", type("custom"), 10)
+        );
+        assertEquals(expected, res);
+    }
+
+    @Test
     void inputStringArray() {
         var res = parse("input string[] something");
         var expected = program(input("something", arrayType("string")));
@@ -105,6 +132,19 @@ public class InputTest extends ParserTest {
     void inputObjectArray() {
         var res = parse("input object[] something");
         var expected = program(input("something", arrayType("object")));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void inputUnionArray() {
+        var res = parse("""
+                type custom = string | number
+                input custom[] something
+                """);
+        var expected = program(
+                union("custom", symbol("string"), symbol("number")),
+                input("something", arrayType("custom")
+                ));
         assertEquals(expected, res);
     }
 
@@ -137,4 +177,16 @@ public class InputTest extends ParserTest {
     }
 
 
+    @Test
+    void inputUnionArrayInit() {
+        var res = parse("""
+                type custom = string | number
+                input custom[] something = [10]
+                """);
+        var expected = program(
+                union("custom", symbol("string"), symbol("number")),
+                input("something", arrayType("custom"), array(10)
+                ));
+        assertEquals(expected, res);
+    }
 }
