@@ -1177,27 +1177,33 @@ public class Parser {
 
 
     /**
-     * ModuleDeclaration
-     * : module TypeIdentifier name '{'
+     * ComponentDeclaration
+     * : component TypeIdentifier name '{'
      * :    Inputs
      * : '}'
      * ;
      */
     private Statement ComponentDeclaration() {
         eat(Component);
-        var moduleType = PluginIdentifier();
-        var name = Identifier();
-        var body = (BlockExpression) BlockExpression("Expect '{' after module name.", "Expect '}' after module body.");
+        var componentType = PluginIdentifier();
+        Identifier name = null;
+        if (IsLookAhead(Identifier)) { // present when component is initialised. Absent when component is declared
+            name = Identifier();
+        }
+        var body = (BlockExpression) BlockExpression("Expect '{' after component name.", "Expect '}' after component body.");
 
         validateInputs(name, body);
 
-        return ComponentStatement.component(moduleType, name, body);
+        return ComponentStatement.component(componentType, name, body);
     }
 
     private void validateInputs(Identifier componentName, BlockExpression body) {
         var set = new HashSet<String>();
         for (var statement : body.getExpression()) {
             if (statement instanceof InputDeclaration inputDeclaration) {
+                if (componentName != null) {
+                    throw ParserErrors.error("Component declaration should not have inputs");
+                }
                 if (!set.add(inputDeclaration.name())) {
                     throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
                 }
