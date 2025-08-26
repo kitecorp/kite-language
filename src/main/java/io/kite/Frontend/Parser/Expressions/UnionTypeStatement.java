@@ -43,27 +43,27 @@ public final class UnionTypeStatement extends Statement {
         this(Identifier.symbol(name), Set.of(expressions));
     }
 
-    public static Statement type() {
+    public static Statement union() {
         return new UnionTypeStatement();
     }
 
-    public static Statement type(Identifier name, Expression block) {
+    public static Statement union(Identifier name, Expression block) {
         return new UnionTypeStatement(name, block);
     }
 
-    public static Statement type(Identifier name, Set<Expression> block) {
+    public static Statement union(Identifier name, Set<Expression> block) {
         return new UnionTypeStatement(name, block);
     }
 
-    public static Statement type(String name, Expression... block) {
+    public static Statement union(String name, Expression... block) {
         return new UnionTypeStatement(name, block);
     }
 
-    public static Statement type(String name, BlockExpression block) {
+    public static Statement union(String name, BlockExpression block) {
         return new UnionTypeStatement(Identifier.id(name), block);
     }
 
-    public static Statement type(String name, Expression block) {
+    public static Statement union(String name, Expression block) {
         return new UnionTypeStatement(Identifier.id(name), block);
     }
 
