@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
@@ -91,6 +92,14 @@ public final class InputDeclaration extends Statement {
 
     public static InputDeclaration input(String id, TypeIdentifier type, int init) {
         return InputDeclaration.input(Identifier.id(id), type, number(init));
+    }
+
+    public static InputDeclaration input(String id, TypeIdentifier type, String init) {
+        return InputDeclaration.input(Identifier.id(id), type, string(init));
+    }
+
+    public static InputDeclaration input(String id, TypeIdentifier type, boolean init) {
+        return InputDeclaration.input(Identifier.id(id), type, bool(init));
     }
 
     public String name() {
