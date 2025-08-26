@@ -17,7 +17,7 @@ import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-@DisplayName("Parser Module")
+@DisplayName("Parser Component")
 public class ComponentTest extends ParserTest {
 
     @Test
