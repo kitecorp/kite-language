@@ -187,4 +187,33 @@ public class InputTest extends CheckerTest {
         assertEquals(arrayType(unionType("custom", ValueType.String, ValueType.Number)), res);
     }
 
+    @Test
+    void inputStringArrayInitError() {
+        assertThrows(TypeError.class, () -> eval("input string[] something=[1,2,3]"));
+    }
+
+    @Test
+    void inputNumberArrayInitError() {
+        assertThrows(TypeError.class, () -> eval("input number[] something=['hi']"));
+    }
+
+    @Test
+    void inputBooleanArrayInitError() {
+        assertThrows(TypeError.class, () -> eval("input boolean[] something=[1]"));
+    }
+
+    @Test
+    void inputObjectArrayInitError() {
+        assertThrows(TypeError.class, () -> eval("input object[] something=[1]"));
+    }
+
+
+    @Test
+    void inputUnionArrayInitError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string | number
+                input custom[] something = [true]
+                """));
+    }
+
 }
