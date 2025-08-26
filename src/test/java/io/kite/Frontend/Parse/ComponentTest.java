@@ -97,12 +97,12 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentInputs() {
         var res = parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                component 'Aws.Storage/S3.Bucket@2022-01-20' {
                     input string name
                     input string size
                 }
                 """);
-        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
+        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'",
                 block(
                         input("name", type("string")),
                         input("size", type("string"))
@@ -113,12 +113,12 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentInputsDefaults() {
         var res = parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                component 'Aws.Storage/S3.Bucket@2022-01-20' {
                     input string name = 'bucket-prod'
                     input number size = 10
                 }
                 """);
-        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
+        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'",
                 block(
                         input("name", type("string"), string("bucket-prod")),
                         input("size", type("number"), number(10))
@@ -131,6 +131,16 @@ public class ComponentTest extends ParserTest {
         parse("""
                 component 'Aws.Storage/S3.Bucket@2022-01-20' api {
                     input string name
+                    input string name
+                }
+                """);
+        Assertions.assertTrue(ParserErrors.hadErrors());
+    }
+
+    @Test
+    void componentDeclarationShouldNotAllowInputs() {
+        parse("""
+                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
                     input string name
                 }
                 """);

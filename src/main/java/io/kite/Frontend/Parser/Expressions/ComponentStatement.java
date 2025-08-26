@@ -19,6 +19,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public final class ComponentStatement extends Statement {
     private PluginIdentifier type;
+    /**
+     * When missing it will be a component declaration. When present it will be an initialization
+     */
     @Nullable
     private Identifier name;
     private BlockExpression block;
@@ -26,7 +29,7 @@ public final class ComponentStatement extends Statement {
     private ComponentStatement() {
     }
 
-    private ComponentStatement(PluginIdentifier type, Identifier name, BlockExpression block) {
+    private ComponentStatement(PluginIdentifier type, @Nullable Identifier name, BlockExpression block) {
         this();
         this.type = type;
         this.name = name;
@@ -44,6 +47,11 @@ public final class ComponentStatement extends Statement {
     public static Statement component(String type, String name, BlockExpression operator) {
         var build = PluginIdentifier.fromString(type);
         return component(build, Identifier.id(name), operator);
+    }
+
+    public static Statement component(String type, BlockExpression operator) {
+        var build = PluginIdentifier.fromString(type);
+        return new ComponentStatement(build, null, operator);
     }
 
     public List<Statement> getArguments() {
