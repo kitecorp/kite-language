@@ -1,4 +1,4 @@
-package io.kite;
+package io.kite.Frontend.Parser;
 
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;

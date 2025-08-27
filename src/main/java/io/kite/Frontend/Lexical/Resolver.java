@@ -4,7 +4,7 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.Visitor;

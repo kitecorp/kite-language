@@ -1,4 +1,4 @@
-package io.kite;
+package io.kite.Frontend.Parser;
 
 public enum BlockContext {
     BLOCK,

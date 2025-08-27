@@ -1,6 +1,6 @@
 package io.kite.TypeChecker;
 
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parse.ParserTest;
 import io.kite.Frontend.Parser.Factory;
 import lombok.extern.log4j.Log4j2;

@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.NotFoundException;

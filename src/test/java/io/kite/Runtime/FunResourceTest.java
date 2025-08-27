@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.ResourceType;

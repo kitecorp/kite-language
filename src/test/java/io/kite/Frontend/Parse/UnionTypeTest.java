@@ -2,7 +2,7 @@ package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.NullLiteral;
 import io.kite.Frontend.Parser.Expressions.UnionTypeStatement;
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

@@ -1,6 +1,6 @@
 package io.kite.Base;
 
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.Resolver;
 import io.kite.Frontend.Parser.Parser;

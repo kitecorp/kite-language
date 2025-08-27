@@ -2,7 +2,6 @@ package io.kite.Frontend.Parser;
 
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
-import io.kite.ParserErrors;
 import io.kite.Visitors.AstPrinter;
 import lombok.Getter;
 import lombok.Setter;
