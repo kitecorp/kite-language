@@ -1,6 +1,6 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parser.errors.ParseError;
 import lombok.extern.log4j.Log4j2;

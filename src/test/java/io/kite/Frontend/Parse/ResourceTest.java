@@ -1,6 +1,6 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

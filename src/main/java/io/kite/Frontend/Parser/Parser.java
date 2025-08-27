@@ -1,6 +1,5 @@
 package io.kite.Frontend.Parser;
 
-import io.kite.BlockContext;
 import io.kite.ContextStack;
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
@@ -9,7 +8,6 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
 import io.kite.Frontend.Parser.errors.ParseError;
-import io.kite.ParserErrors;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.SchemaContext;
 import io.kite.TypeChecker.Types.TypeParser;

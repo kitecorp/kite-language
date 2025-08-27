@@ -8,7 +8,7 @@ import io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.ParserErrors;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.Environment.ActivationEnvironment;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Functions.Cast.*;
