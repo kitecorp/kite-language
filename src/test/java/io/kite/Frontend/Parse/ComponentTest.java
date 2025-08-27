@@ -3,6 +3,7 @@ package io.kite.Frontend.Parse;
 import io.kite.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +30,7 @@ public class ComponentTest extends ParserTest {
     }
 
     @Test
+    @Disabled("Component type should not be a string. Use an import statement")
     void componentQuoted() {
         var res = parse("component 'Backend' api {}");
         var expected = program(component("'Backend'", "api", block()));
@@ -37,6 +39,7 @@ public class ComponentTest extends ParserTest {
     }
 
     @Test
+    @Disabled("Component type should not be a string. Use an import statement")
     void componentQuotedDouble() {
         var res = parse("""
                 component "Backend" api {}
@@ -49,11 +52,11 @@ public class ComponentTest extends ParserTest {
     }
 
     @Test
+    @Disabled("Component type should not be a string. Use an import statement")
     void componentProviderNamespacedQuoted() {
         var res = parse("component 'Aws.Storage' api {}");
         var expected = program(component("'Aws.Storage'", "api", block()));
         assertEquals(expected, res);
-        log.info((res));
     }
 
     @Test
@@ -64,6 +67,7 @@ public class ComponentTest extends ParserTest {
         log.info((res));
     }
 
+    @Disabled("Component type should not be a string. Use an import statement")
     @Test
     void componentProviderWithResourceNamespaced() {
         var res = parse("component 'Aws.Storage/S3.Bucket' api {}");
@@ -73,6 +77,7 @@ public class ComponentTest extends ParserTest {
     }
 
     @Test
+    @Disabled("Component type should not be a string. Use an import statement")
     void componentProviderResourceNamespacedWithDate() {
         var res = parse("component 'Aws.Storage/S3.Bucket@2022-01-20' api {}");
         var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api", block()));
@@ -83,12 +88,12 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentWithBody() {
         var res = parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                component Aws.Storage.S3.Bucket api {
                     name = "bucket-prod"
                 }
                 """);
         var expected = program(
-                component("'Aws.Storage/S3.Bucket@2022-01-20'", "api",
+                component("Aws.Storage.S3.Bucket", "api",
                         block(assign("name", "bucket-prod"))));
         assertEquals(expected, res);
         log.info((res));
@@ -97,12 +102,12 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentInputs() {
         var res = parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' {
+                component Aws.Storage.S3.Bucket {
                     input string name
                     input string size
                 }
                 """);
-        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'",
+        var expected = program(component("Aws.Storage.S3.Bucket",
                 block(
                         input("name", type("string")),
                         input("size", type("string"))
@@ -113,12 +118,12 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentInputsDefaults() {
         var res = parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' {
+                component Aws.Storage.S3.Bucket {
                     input string name = 'bucket-prod'
                     input number size = 10
                 }
                 """);
-        var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'",
+        var expected = program(component("Aws.Storage.S3.Bucket",
                 block(
                         input("name", type("string"), string("bucket-prod")),
                         input("size", type("number"), number(10))
@@ -129,7 +134,7 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentInputsThrowIfSameNameIsDuplicated() {
         parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                component Aws.Storage.S3.Bucket api {
                     input string name
                     input string name
                 }
@@ -140,7 +145,7 @@ public class ComponentTest extends ParserTest {
     @Test
     void componentDeclarationShouldNotAllowInputs() {
         parse("""
-                component 'Aws.Storage/S3.Bucket@2022-01-20' api {
+                component Aws.Storage.S3.Bucket api {
                     input string name
                 }
                 """);

@@ -165,7 +165,7 @@ public class Parser {
             if (error instanceof ParseError parseError && parseError.getActual() != null) {
                 String message = error.getMessage() + parseError.getActual().raw();
                 ParserErrors.error(message);
-                log.error(message);
+//                log.error(message);
             } else {
                 ParserErrors.error(error.getMessage());
                 log.error(error.getMessage());
@@ -1185,7 +1185,7 @@ public class Parser {
      */
     private Statement ComponentDeclaration() {
         eat(Component);
-        var componentType = PluginIdentifier();
+        var componentType = ComponentType();
         Identifier name = null;
         if (IsLookAhead(Identifier)) { // present when component is initialised. Absent when component is declared
             name = Identifier();
@@ -1295,11 +1295,12 @@ public class Parser {
         return Identifier();
     }
 
-    private PluginIdentifier PluginIdentifier() {
+    private PluginIdentifier ComponentType() {
         switch (lookAhead().type()) {
             case String -> {
-                var token = eat(String);
-                return PluginIdentifier.fromString(token.value().toString());
+                throw ParserErrors.error("Component type can't be a string ", lookAhead(), lookAhead().type());
+//                var token = eat(String);
+//                return PluginIdentifier.fromString(token.value().toString());
             }
             case Identifier -> {
                 TypeIdentifier type = typeParser.TypeIdentifier();
