@@ -258,13 +258,24 @@ public final class TypeChecker implements Visitor<Type> {
         return expectedType;
     }
 
-    private Type expect(Type actualType, UnionType expectedType, Expression expectedVal) {
-        if (expectedType.getTypes().contains(actualType)) {
-            return expectedType;
+    private Type expect(Type actualType, UnionType declaredType, Expression expectedVal) {
+        if (declaredType.getTypes().contains(actualType)) {
+            if (actualType instanceof ObjectType properties) {
+                // iterate over init object properties to make sure all declarations match the allowed properties in the union type declaration
+                for (var entry : properties.getEnvironment().getVariables().entrySet()) {
+                    for (Expression type : declaredType.getTypes()) {
+                        if (type instanceof ObjectType objectType) {
+                            var declared = objectType.lookup(entry.getKey()); // make sure the property exists in the declared type
+                            expect(entry.getValue(), declared, declared);
+                        }
+                    }
+                }
+            }
+            return declaredType;
         }
         String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
-                printer.visit(expectedType),
-                expectedType.getTypes().stream().map(printer::visit).collect(Collectors.joining(" | ")),
+                printer.visit(declaredType),
+                declaredType.getTypes().stream().map(printer::visit).collect(Collectors.joining(" | ")),
                 actualType.getValue(),
                 printer.visit(expectedVal));
         throw new TypeError(string);

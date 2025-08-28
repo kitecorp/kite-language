@@ -447,8 +447,8 @@ public class Parser {
      * : ':' ObjectExpression
      */
     private Expression ObjectInitializer() {
-        if (IsLookAhead(Equal, Equal_Complex, Colon)) {
-            eat(Equal, Equal_Complex, Colon);
+        if (IsLookAhead(Colon)) {
+            eat(Colon);
         }
         return Expression();
     }
