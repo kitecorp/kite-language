@@ -7,6 +7,7 @@ import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.UnionType;
 import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -93,6 +94,16 @@ public class UnionTypeTest extends CheckerTest {
         var res = eval("""
                 type alias  = { env: number}
                 var alias x = { env: 2 } // ok since we assign a object
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+    }
+
+    @Test
+    @Disabled("type alias of object assign a specific object")
+    void unionTypeAliasNestedSpecificObject() {
+        var res = eval("""
+                type someType  = { env: number | 10 } // this should be supported
+                var someType x = { env: 'hello' } // ok since we assign a object
                 """);
         assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
     }
