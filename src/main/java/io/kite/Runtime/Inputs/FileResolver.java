@@ -1,5 +1,6 @@
 package io.kite.Runtime.Inputs;
 
+import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Runtime.Environment.Environment;
 
 import java.io.File;
@@ -24,8 +25,8 @@ public class FileResolver extends InputResolver {
     }
 
     @Override
-    public Object resolve(String key) {
-        return getInputs().get(key);
+    public Object resolve(InputDeclaration input) {
+        return getInputs().get(input.name());
     }
 
 }

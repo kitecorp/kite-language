@@ -1,6 +1,11 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
+import io.kite.Frontend.Lexer.Tokenizer;
+import io.kite.Frontend.Lexical.Resolver;
+import io.kite.Frontend.Parser.Parser;
+import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.ValueType;
@@ -21,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class InputTest extends RuntimeTest {
 
     private InputStream sysInBackup = System.in;
+    private ChainResolver chainResolver;
 
     @AfterEach
     void cleanup() {
@@ -45,6 +51,24 @@ public class InputTest extends RuntimeTest {
 
     private void setInput(Float input) {
         setInput(input.toString());
+    }
+
+    @Override
+    protected void init() {
+        this.global = new Environment<>();
+        this.global.setName("global");
+        this.parser = new Parser();
+        this.chainResolver = new ChainResolver(global, parser);
+        this.interpreter = new Interpreter(global);
+        this.tokenizer = new Tokenizer();
+        this.resolver = new Resolver(interpreter);
+    }
+
+    protected Object eval(String source) {
+        program = src(source);
+        resolver.resolve(program);
+        chainResolver.visit(program);
+        return interpreter.visit(program);
     }
 
     @Test
