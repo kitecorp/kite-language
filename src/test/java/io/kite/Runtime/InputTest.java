@@ -34,6 +34,18 @@ public class InputTest extends RuntimeTest {
         setInput(input.toString());
     }
 
+    private void setInput(Boolean input) {
+        setInput(input.toString());
+    }
+
+    private void setInput(Double input) {
+        setInput(input.toString());
+    }
+
+    private void setInput(Float input) {
+        setInput(input.toString());
+    }
+
     @Test
     void inputString() {
         setInput("hello");
@@ -50,8 +62,9 @@ public class InputTest extends RuntimeTest {
 
     @Test
     void inputBoolean() {
+        setInput(true);
         var res = eval("input boolean region");
-        assertEquals(ValueType.Boolean, res);
+        assertEquals(true, res);
     }
 
     @Test
