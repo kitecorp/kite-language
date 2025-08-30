@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Map;
 
 import static io.kite.TypeChecker.Types.ArrayType.arrayType;
 import static io.kite.TypeChecker.Types.UnionType.unionType;
@@ -69,8 +70,9 @@ public class InputTest extends RuntimeTest {
 
     @Test
     void inputObject() {
+        setInput("{ env : 'dev', region : 'us-east-1' }");
         var res = eval("input object region");
-        assertEquals(ObjectType.INSTANCE, res);
+        assertEquals(Map.of("env", "dev", "region", "us-east-1"), res);
     }
 
     @Test
