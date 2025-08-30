@@ -9,4 +9,5 @@ module kite.io {
     requires jdk.jdi;
     requires java.desktop;
     requires jdk.compiler;
+    requires org.fusesource.jansi;
 }
