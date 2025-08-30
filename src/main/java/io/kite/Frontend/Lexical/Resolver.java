@@ -145,9 +145,14 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(InputDeclaration expression) {
-
-        var res = visit(expression.getInit());
-        throw new RuntimeException("oops: InputDeclaration is not an expression statement: " + expression.toString());
+        visit(expression.getId());
+        if (expression.hasType()) {
+            visit(expression.getType());
+        }
+        if (expression.hasInit()){
+            visit(expression.getInit());
+        }
+        return null;
     }
 
     @Override
