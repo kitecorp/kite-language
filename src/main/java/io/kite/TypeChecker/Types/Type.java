@@ -20,6 +20,7 @@ public sealed abstract class Type extends Expression
     public Type(String value) {
         this();
         this.value = value;
+        this.kind = SystemType.ANY; // might be the wrong type, but we don't know yet. Correct kind will be set later in type checker
     }
 
     public Type(SystemType kind) {

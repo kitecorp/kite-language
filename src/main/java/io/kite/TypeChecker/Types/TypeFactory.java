@@ -33,6 +33,6 @@ public class TypeFactory {
                 return value;
             }
         }
-        throw new IllegalArgumentException("Invalid type: " + string);
+        return new ReferenceType(string);
     }
 }

@@ -2,10 +2,9 @@ package io.kite.Frontend.Lexical;
 
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.Frontend.Parser.ParserErrors;
-import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.Visitor;
 import org.jetbrains.annotations.NotNull;
@@ -15,14 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-public final class Resolver implements Visitor<Void> {
-    private final Interpreter interpreter;
+public final class ScopeResolver implements Visitor<Void> {
     /**
      * Tracks how many scopes are we nested within source code. Based on this we know how to properly handle variable declarations/resolution
      * boolean = false => variable declared but not ready to be used
      * boolean = true => variable declared and ready to be used
      */
-    private final Stack<Map<Identifier, Boolean>> scopes = new Stack<>();
+    private final Stack<Map<Identifier, Boolean>> scopes;
     /**
      * Tracks weather we're in a function or not. Based on this we show a syntax
      * error for example when using a return statement outside a function
@@ -30,8 +28,8 @@ public final class Resolver implements Visitor<Void> {
     private FunctionType currentFunction = FunctionType.NONE;
 
 
-    public Resolver(Interpreter interpreter) {
-        this.interpreter = interpreter;
+    public ScopeResolver() {
+        scopes = new Stack<>();
     }
 
     void resolve(List<Statement> statements) {
@@ -72,8 +70,10 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(/* VariableExpression*/ Identifier identifier) {
-        if (!scopes.isEmpty() && scopes.peek().get(identifier.string()) == Boolean.FALSE) {
-            throw ParserErrors.error("Can't read local variable in its own initializer: " + identifier.string());
+        if (!scopes.isEmpty()) {
+            if (scopes.peek().get(identifier.string()) == Boolean.FALSE) {
+                throw ParserErrors.error("Can't read local variable in its own initializer: " + identifier.string());
+            }
         }
 
         resolveLocal(identifier);
@@ -121,6 +121,17 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(UnionTypeStatement expression) {
+        declare(expression.getName());
+        define(expression.getName());
+        visit(expression.getName());
+
+        for (Expression expressionExpression : expression.getExpressions()) {
+            if (expressionExpression instanceof Identifier identifier) {
+                declare(identifier);
+                define(identifier);
+                visit(expressionExpression);
+            }
+        }
         return null;
     }
 
@@ -140,7 +151,7 @@ public final class Resolver implements Visitor<Void> {
 
     @Override
     public Void visit(ComponentStatement expression) {
-     throw new RuntimeException("oops: ComponentStatement is not an expression statement: " + expression.toString());
+        throw new RuntimeException("oops: ComponentStatement is not an expression statement: " + expression.toString());
     }
 
     @Override
@@ -149,7 +160,7 @@ public final class Resolver implements Visitor<Void> {
         if (expression.hasType()) {
             visit(expression.getType());
         }
-        if (expression.hasInit()){
+        if (expression.hasInit()) {
             visit(expression.getInit());
         }
         return null;

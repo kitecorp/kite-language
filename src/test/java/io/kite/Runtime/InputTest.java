@@ -2,10 +2,11 @@ package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Lexer.Tokenizer;
-import io.kite.Frontend.Lexical.Resolver;
+import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.ValueType;
@@ -27,6 +28,7 @@ public class InputTest extends RuntimeTest {
 
     private InputStream sysInBackup = System.in;
     private ChainResolver chainResolver;
+    private TypeChecker typeChecker;
 
     @AfterEach
     void cleanup() {
@@ -59,14 +61,18 @@ public class InputTest extends RuntimeTest {
         this.global.setName("global");
         this.parser = new Parser();
         this.tokenizer = new Tokenizer();
+        this.typeChecker = new TypeChecker();
+        Environment<Object> inputs = new Environment<>(global);
+        inputs.setName("inputs");
         this.chainResolver = new ChainResolver(global);
+        this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(global);
-        this.resolver = new Resolver(interpreter);
     }
 
     protected Object eval(String source) {
         program = src(source);
-        resolver.resolve(program);
+        scopeResolver.resolve(program);
+        typeChecker.visit(program);
         chainResolver.visit(program);
         return interpreter.visit(program);
     }
@@ -101,11 +107,12 @@ public class InputTest extends RuntimeTest {
 
     @Test
     void inputUnion() {
+        setInput("hello");
         var res = eval("""
                 type custom = string | number
                 input custom region
                 """);
-        assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
+        assertEquals("hello", res);
     }
 
     @Test

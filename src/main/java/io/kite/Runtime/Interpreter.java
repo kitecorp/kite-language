@@ -57,7 +57,7 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     public Interpreter(Environment<Object> environment) {
-        this.env = new Environment<>(environment);
+        this.env = environment;
         this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
         this.env.init("true", true);
