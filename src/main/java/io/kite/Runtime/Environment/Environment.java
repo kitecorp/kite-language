@@ -1,8 +1,8 @@
 package io.kite.Runtime.Environment;
 
 import io.kite.Runtime.Values.ResourceValue;
-import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
+import io.kite.Runtime.exceptions.NotFoundException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,10 +36,6 @@ public class Environment<T> implements IEnvironment<T> {
         this.variables.putAll(variables);
     }
 
-    public static <T> Environment<T> copyOfVariables(Environment<T> environment) {
-        return new Environment<>(environment, environment.variables);
-    }
-
     public Environment(@Nullable Environment<T> parent, ResourceValue variables) {
         this(parent);
         for (Field field : variables.getClass().getDeclaredFields()) {
@@ -59,6 +55,10 @@ public class Environment<T> implements IEnvironment<T> {
 
     public Environment() {
         this(new HashMap<>());
+    }
+
+    public static <T> Environment<T> copyOfVariables(Environment<T> environment) {
+        return new Environment<>(environment, environment.variables);
     }
 
     /**
@@ -138,6 +138,20 @@ public class Environment<T> implements IEnvironment<T> {
     @Nullable
     public T get(String key) {
         return this.variables.get(key);
+    }
+
+    public boolean containsKey(String key) {
+        return variables.containsKey(key);
+    }
+
+    public boolean lookupKey(String key) {
+        if (containsKey(key)) {
+            return true;
+        }
+        if (parent == null) {
+            return false;
+        }
+        return parent.lookupKey(key);
     }
 
     @Nullable
