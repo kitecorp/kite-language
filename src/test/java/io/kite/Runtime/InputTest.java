@@ -58,9 +58,9 @@ public class InputTest extends RuntimeTest {
         this.global = new Environment<>();
         this.global.setName("global");
         this.parser = new Parser();
-        this.chainResolver = new ChainResolver(global, parser);
-        this.interpreter = new Interpreter(global);
         this.tokenizer = new Tokenizer();
+        this.chainResolver = new ChainResolver(global);
+        this.interpreter = new Interpreter(global);
         this.resolver = new Resolver(interpreter);
     }
 
