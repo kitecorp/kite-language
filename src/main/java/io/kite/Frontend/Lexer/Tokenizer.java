@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.String;
 import java.nio.CharBuffer;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -22,7 +21,7 @@ import java.util.regex.Pattern;
 @Log4j2
 public class Tokenizer {
     @Getter
-    private final List<Token> tokens = new ArrayList<>();
+    private List<Token> tokens;
     private StringCharacterIterator iterator;
     private int line = 1;
     /**
@@ -32,6 +31,7 @@ public class Tokenizer {
 
 
     public List<Token> tokenize(String source) {
+        this.tokens = new ArrayList<>();
         this.iterator = new StringCharacterIterator(source);
         this.source = CharBuffer.wrap(source);
 

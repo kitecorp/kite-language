@@ -2,7 +2,6 @@ package io.kite.Runtime.Inputs;
 
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
-import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Environment.Environment;
@@ -16,16 +15,14 @@ import java.util.List;
 
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Void> {
     private List<InputResolver> resolvers;
-    private Parser parser;
 
-    public ChainResolver(Environment<Object> environment, Parser parser) {
+    public ChainResolver(Environment<Object> environment) {
         super(environment);
         this.resolvers = List.of(
                 new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
                 new EnvResolver(environment),
                 new CliResolver(environment)
         );
-        this.parser = parser;
     }
 
     @Override
@@ -57,7 +54,8 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<V
                     }
                 }
                 case BOOLEAN -> Boolean.parseBoolean(string);
-//                case OBJECT ->
+                case OBJECT -> InputParser.parseObject(string);
+//                case ARRAY -> InputParser.parseArray(string);
                 default -> throw new IllegalStateException("Unexpected value: " + inputDeclaration.getType().getType());
             };
             getInputs().initOrAssign(inputDeclaration.name(), res);
@@ -218,7 +216,6 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<V
         }
         return null;
     }
-
 
 
     @Override
