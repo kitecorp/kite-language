@@ -46,11 +46,11 @@ public sealed class TypeIdentifier extends Identifier permits ArrayTypeIdentifie
     }
 
     private TypeIdentifier(String path, String type) {
-        this(path, TypeFactory.of(type));
+        this(path, TypeFactory.from(type));
     }
 
     private TypeIdentifier(String path) {
-        this(path, TypeFactory.of(path));
+        this(path, TypeFactory.from(path));
     }
 
     private TypeIdentifier(Type type) {

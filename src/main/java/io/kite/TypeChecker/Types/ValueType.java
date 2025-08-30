@@ -23,7 +23,7 @@ public non-sealed class ValueType extends Type {
         super(value);
     }
 
-    public static ValueType of(String value) {
+    public static ValueType from(String value) {
         return switch (value) {
             case "boolean" -> Boolean;
             case "string" -> String;

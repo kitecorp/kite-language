@@ -1,5 +1,7 @@
 package io.kite.TypeChecker.Types;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class TypeFactory {
     private final static FunStore funStore = FunStore.getInstance();
 
@@ -13,7 +15,7 @@ public class TypeFactory {
                 return funStore.getFun(symbol);
             }
         }
-        return ValueType.of(symbol);
+        return ValueType.from(symbol);
         //        throw new IllegalArgumentException("Invalid symbol: " + symbol);
     }
 
@@ -21,11 +23,16 @@ public class TypeFactory {
         return symbol.startsWith("(");
     }
 
-    public static Type of(String string) {
-        var res = ValueType.of(string);
-        if (res == null) {
-            return ReferenceType.of(string);
+    public static Type from(String string) {
+        var res = ValueType.from(string);
+        if (res != null) {
+            return res;
         }
-        return res;
+        for (ReferenceType value : ReferenceType.values()) {
+            if (StringUtils.equals(value.getValue(), string)) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Invalid type: " + string);
     }
 }

@@ -34,10 +34,6 @@ public sealed class ReferenceType extends Type permits AnyType, ArrayType, Objec
         this.environment = environment;
     }
 
-    public static ReferenceType of(String typeName) {
-        return new ReferenceType(typeName);
-    }
-
     public static ReferenceType[] values() {
         return new ReferenceType[]{ObjectType.INSTANCE, AnyType.INSTANCE};
     }

@@ -51,7 +51,7 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
-    private final ChainResolver chainResolver;
+    private final ChainResolver inputResolver;
     private final Deque<ContextStack> contextStacks = new ArrayDeque<>();
     @Getter
     private Environment<Object> env;
@@ -87,7 +87,7 @@ public final class Interpreter implements Visitor<Object> {
         this.env.init("abs", new AbsFunction());
         this.env.init("date", new DateFunction());
         Environment<Object> inputEnv = new Environment<>(environment);
-        this.chainResolver = new ChainResolver(inputEnv, List.of(
+        this.inputResolver = new ChainResolver(inputEnv, List.of(
                 new FileResolver(inputEnv, FileHelpers.loadInputDefaultsFiles()),
                 new EnvResolver(inputEnv),
                 new CliResolver(inputEnv)
@@ -402,7 +402,7 @@ public final class Interpreter implements Visitor<Object> {
 //        if (getInputs().get(expression.getId().string()) == null) {
 //
 //        }
-        var input = chainResolver.resolve(expression.getId().string());
+        var input = inputResolver.resolve(expression.getId().string());
         if (input == null) {
             throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
         }
@@ -420,6 +420,7 @@ public final class Interpreter implements Visitor<Object> {
                     }
                 }
                 case BOOLEAN -> Boolean.parseBoolean(string);
+//                case OBJECT ->
                 default -> throw new IllegalStateException("Unexpected value: " + expression.getType().getType());
             };
         }
