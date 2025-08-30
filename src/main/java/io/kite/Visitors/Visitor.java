@@ -1,6 +1,6 @@
 package io.kite.Visitors;
 
-import io.kite.Frontend.Lexical.Resolver;
+import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
@@ -11,7 +11,7 @@ import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
 
 public sealed interface Visitor<R>
-        permits Resolver, io.kite.Runtime.Inputs.ChainResolver, Interpreter, TypeChecker, AstPrinter, SyntaxPrinter {
+        permits ScopeResolver, io.kite.Runtime.Inputs.ChainResolver, Interpreter, TypeChecker, AstPrinter, SyntaxPrinter {
 
     default R visit(@Nullable Expression expr) {
         return switch (expr) {

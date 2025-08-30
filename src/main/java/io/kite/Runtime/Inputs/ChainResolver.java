@@ -56,6 +56,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<V
                 case BOOLEAN -> Boolean.parseBoolean(string);
                 case OBJECT -> InputParser.parseObject(string);
 //                case ARRAY -> InputParser.parseArray(string);
+                case UNION_TYPE -> string;
                 default -> throw new IllegalStateException("Unexpected value: " + inputDeclaration.getType().getType());
             };
             getInputs().initOrAssign(inputDeclaration.name(), res);

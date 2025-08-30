@@ -5,7 +5,7 @@ import io.kite.Base.RuntimeTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class ResolverTest extends RuntimeTest {
+class ScopeResolverTest extends RuntimeTest {
 
     @Test
     void varNameCollision() {

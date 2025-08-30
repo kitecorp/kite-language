@@ -28,7 +28,7 @@ public class CliResolver extends InputResolver {
             ansi.fgMagenta()
                     .a("input ")
                     .fgBlue()
-                    .a(inputDeclaration.getType().getType().getKind().name().toLowerCase())
+                    .a(inputDeclaration.getType().getType().getValue().toLowerCase())
                     .a(' ')
                     .reset()
                     .a(inputDeclaration.name())
