@@ -6,9 +6,9 @@ import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
 import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.Environment.ActivationEnvironment;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Functions.Cast.*;
@@ -16,12 +16,17 @@ import io.kite.Runtime.Functions.DateFunction;
 import io.kite.Runtime.Functions.Numeric.*;
 import io.kite.Runtime.Functions.PrintFunction;
 import io.kite.Runtime.Functions.PrintlnFunction;
+import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.Runtime.Inputs.CliResolver;
+import io.kite.Runtime.Inputs.EnvResolver;
+import io.kite.Runtime.Inputs.FileResolver;
 import io.kite.Runtime.Values.*;
 import io.kite.Runtime.exceptions.*;
 import io.kite.Runtime.interpreter.OperatorComparator;
 import io.kite.SchemaContext;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.Utils.FileHelpers;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
@@ -30,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,10 +51,11 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
+    private final ChainResolver chainResolver;
+    private final Deque<ContextStack> contextStacks = new ArrayDeque<>();
     @Getter
     private Environment<Object> env;
     private SchemaContext context;
-    private Deque<ContextStack> contextStacks = new ArrayDeque<>();
 
 
     public Interpreter() {
@@ -81,7 +86,12 @@ public final class Interpreter implements Visitor<Object> {
         this.env.init("floor", new FloorFunction());
         this.env.init("abs", new AbsFunction());
         this.env.init("date", new DateFunction());
-
+        Environment<Object> inputEnv = new Environment<>(environment);
+        this.chainResolver = new ChainResolver(inputEnv, List.of(
+                new FileResolver(inputEnv, FileHelpers.loadInputDefaultsFiles()),
+                new EnvResolver(inputEnv),
+                new CliResolver(inputEnv)
+        ));
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
     }
 
@@ -201,10 +211,8 @@ public final class Interpreter implements Visitor<Object> {
             return new ObjectLiteralPair();
         }
         var res = switch (expression.getKey()) {
-            case SymbolIdentifier symbolIdentifier ->
-                    new ObjectLiteralPair(symbolIdentifier.string(), visit(expression.getValue()));
-            case StringLiteral stringLiteral ->
-                    new ObjectLiteralPair((String) visit(stringLiteral), visit(expression.getValue()));
+            case SymbolIdentifier id -> new ObjectLiteralPair(id.string(), visit(expression.getValue()));
+            case StringLiteral literal -> new ObjectLiteralPair((String) visit(literal), visit(expression.getValue()));
             default -> throw new IllegalArgumentException("Invalid object literal key: " + expression.getKey());
         };
         return res;
@@ -288,7 +296,7 @@ public final class Interpreter implements Visitor<Object> {
                 default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
             };
             case null, default ->
-                    throw new IllegalArgumentException(MessageFormat.format("{0} cannot be compared with {1}", printer.visit(expression.getLeft()), printer.visit(expression.getRight())));
+                    throw new IllegalArgumentException(format("{0} cannot be compared with {1}", printer.visit(expression.getLeft()), printer.visit(expression.getRight())));
         };
     }
 
@@ -391,7 +399,30 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(InputDeclaration expression) {
-        throw new RuntimeException("Invalid input declaration");
+//        if (getInputs().get(expression.getId().string()) == null) {
+//
+//        }
+        var input = chainResolver.resolve(expression.getId().string());
+        if (input == null) {
+            throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
+        }
+        if (input instanceof String string) {
+            if (string.trim().isEmpty()) {
+                throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
+            }
+            return switch (expression.getType().getType().getKind()) {
+                case STRING -> string;
+                case NUMBER -> {
+                    if (string.contains(".")) {
+                        yield Double.parseDouble(string);
+                    } else {
+                        yield Integer.parseInt(string);
+                    }
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + expression.getType().getType());
+            };
+        }
+        throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
     }
 
     @Override
