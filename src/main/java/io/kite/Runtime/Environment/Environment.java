@@ -22,9 +22,10 @@ public class Environment<T> implements IEnvironment<T> {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final Environment<T> parent;
-
     @Getter
     private final Map<String, T> variables;
+
+    private String name;
 
     public Environment(@Nullable Environment<T> parent) {
         this.parent = parent;

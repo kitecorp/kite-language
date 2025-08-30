@@ -16,17 +16,12 @@ import io.kite.Runtime.Functions.DateFunction;
 import io.kite.Runtime.Functions.Numeric.*;
 import io.kite.Runtime.Functions.PrintFunction;
 import io.kite.Runtime.Functions.PrintlnFunction;
-import io.kite.Runtime.Inputs.ChainResolver;
-import io.kite.Runtime.Inputs.CliResolver;
-import io.kite.Runtime.Inputs.EnvResolver;
-import io.kite.Runtime.Inputs.FileResolver;
 import io.kite.Runtime.Values.*;
 import io.kite.Runtime.exceptions.*;
 import io.kite.Runtime.interpreter.OperatorComparator;
 import io.kite.SchemaContext;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.Type;
-import io.kite.Utils.FileHelpers;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
@@ -51,7 +46,6 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final DeferredObservable deferredObservable = new DeferredObservable();
-    private final ChainResolver inputResolver;
     private final Deque<ContextStack> contextStacks = new ArrayDeque<>();
     @Getter
     private Environment<Object> env;
@@ -63,7 +57,8 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     public Interpreter(Environment<Object> environment) {
-        this.env = environment;
+        this.env = new Environment<>(environment);
+        this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
         this.env.init("true", true);
         this.env.init("false", false);
@@ -86,12 +81,6 @@ public final class Interpreter implements Visitor<Object> {
         this.env.init("floor", new FloorFunction());
         this.env.init("abs", new AbsFunction());
         this.env.init("date", new DateFunction());
-        Environment<Object> inputEnv = new Environment<>(environment);
-        this.inputResolver = new ChainResolver(inputEnv, List.of(
-                new FileResolver(inputEnv, FileHelpers.loadInputDefaultsFiles()),
-                new EnvResolver(inputEnv),
-                new CliResolver(inputEnv)
-        ));
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
     }
 
@@ -398,33 +387,8 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     @Override
-    public Object visit(InputDeclaration expression) {
-//        if (getInputs().get(expression.getId().string()) == null) {
-//
-//        }
-        var input = inputResolver.resolve(expression.getId().string());
-        if (input == null) {
-            throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
-        }
-        if (input instanceof String string) {
-            if (string.trim().isEmpty()) {
-                throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
-            }
-            return switch (expression.getType().getType().getKind()) {
-                case STRING -> string;
-                case NUMBER -> {
-                    if (string.contains(".")) {
-                        yield Double.parseDouble(string);
-                    } else {
-                        yield Integer.parseInt(string);
-                    }
-                }
-                case BOOLEAN -> Boolean.parseBoolean(string);
-//                case OBJECT ->
-                default -> throw new IllegalStateException("Unexpected value: " + expression.getType().getType());
-            };
-        }
-        throw new InvalidInitException("Missing input %s".formatted(expression.getId().string()));
+    public Object visit(InputDeclaration input) {
+        return env.lookup(input.name());
     }
 
     @Override

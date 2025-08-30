@@ -15,19 +15,24 @@ public class RuntimeTest {
     protected Interpreter interpreter;
     protected Parser parser;
     protected Tokenizer tokenizer;
-    protected Environment global;
+    protected Environment<Object> global;
     protected Resolver resolver;
     protected Program program;
     protected SyntaxPrinter printer = new SyntaxPrinter();
 
     @BeforeEach
     void reset() {
-        this.global = new Environment();
+        init();
+        ParserErrors.clear();
+    }
+
+    protected void init() {
+        this.global = new Environment<>();
+        this.global.setName("global");
         this.interpreter = new Interpreter(global);
         this.parser = new Parser();
         this.tokenizer = new Tokenizer();
         this.resolver = new Resolver(interpreter);
-        ParserErrors.clear();
     }
 
     @AfterEach

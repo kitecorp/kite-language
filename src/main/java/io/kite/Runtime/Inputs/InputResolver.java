@@ -1,5 +1,6 @@
 package io.kite.Runtime.Inputs;
 
+import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Runtime.Environment.Environment;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +12,7 @@ public abstract class InputResolver {
     }
 
     @Nullable
-    public abstract Object resolve(String key);
+    public abstract Object resolve(InputDeclaration key);
 
     public Environment<Object> getInputs() {
         return inputs;
