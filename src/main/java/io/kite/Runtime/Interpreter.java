@@ -419,6 +419,7 @@ public final class Interpreter implements Visitor<Object> {
                         yield Integer.parseInt(string);
                     }
                 }
+                case BOOLEAN -> Boolean.parseBoolean(string);
                 default -> throw new IllegalStateException("Unexpected value: " + expression.getType().getType());
             };
         }
