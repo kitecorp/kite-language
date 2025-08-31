@@ -523,35 +523,8 @@ public abstract class InputTest extends RuntimeTest {
     }
 
     /*
-     * input string alias with invalid values
+     * input number alias with invalid values
      * */
-    @Test
-    void inputNumberAliasInitWithNumberError() {
-        setInput(10);
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number
-                input custom region
-                """));
-    }
-
-    @Test
-    void inputNumberAliasInitWithDecimalError() {
-        setInput(10.1);
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number
-                input custom region
-                """));
-    }
-
-    @Test
-    void inputNumberAliasInitWithDecimalDotError() {
-        setInput(0.1);
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number
-                input custom region
-                """));
-    }
-
     @Test
     void inputNumberAliasInitWithBooleanError() {
         setInput(true);
