@@ -59,20 +59,23 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         if (input == null) {
             throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
         }
-        if (input instanceof String string) {
-            if (StringUtils.isBlank(string.trim())) {
-                throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
-            }
-            if (NumberUtils.isCreatable(string)) {
-            } else if (BooleanUtils.toBoolean(string)) {
-            } else {
-                string = "\"%s\"".formatted(string);
-            }
-            var ast = parser.produceAST(tokenizer.tokenize(string));
-            ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
-            inputDeclaration.setInit(expressionStatement.getStatement());
-
+        if (!(input instanceof String string)) {
+            return null;
         }
+
+        if (StringUtils.isBlank(string.trim())) {
+            throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
+        }
+        boolean keepOriginal = (NumberUtils.isCreatable(string) ||
+                     BooleanUtils.toBoolean(string)) ||
+                    StringUtils.startsWith(string, "{");
+        if (!keepOriginal) {
+            string = "\"%s\"".formatted(string);
+        }
+        var ast = parser.produceAST(tokenizer.tokenize(string));
+        ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
+        inputDeclaration.setInit(expressionStatement.getStatement());
+
         return null;
 //        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
     }
