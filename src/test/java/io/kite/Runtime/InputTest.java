@@ -300,6 +300,10 @@ public class InputTest extends RuntimeTest {
         assertEquals(List.of(10), res);
     }
 
+    /***************
+     * ERROR CASES *
+     * *************/
+
     @Test
     void inputStringInitWithNumberError() {
         setInput(10);
