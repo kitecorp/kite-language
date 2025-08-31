@@ -6,12 +6,12 @@ import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
-import io.kite.Runtime.Inputs.CliResolver;
-import io.kite.Runtime.Inputs.EnvResolver;
+import io.kite.Runtime.Inputs.InputResolver;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -66,13 +66,13 @@ public class InputTest extends RuntimeTest {
         this.typeChecker = new TypeChecker();
         Environment<Object> inputs = new Environment<>(global);
         inputs.setName("inputs");
-        this.chainResolver = new ChainResolver(global, List.of(
-//                new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
-                new EnvResolver(global),
-                new CliResolver(global)
-        ));
+        this.chainResolver = new ChainResolver(global, getResolvers());
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(global);
+    }
+
+    protected @NotNull List<InputResolver> getResolvers() {
+        return List.of();
     }
 
     protected Object eval(String source) {
