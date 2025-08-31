@@ -1,10 +1,13 @@
 package io.kite.Runtime.Inputs;
 
+import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Utils.FileHelpers;
@@ -12,9 +15,13 @@ import io.kite.Visitors.Visitor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
     private List<InputResolver> resolvers;
+    private final Tokenizer tokenizer;
+    private final Parser parser;
+    private final Interpreter interpreter;
 
     public ChainResolver(Environment<Object> environment) {
         super(environment);
@@ -23,6 +30,9 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
                 new EnvResolver(environment),
                 new CliResolver(environment)
         );
+        this.tokenizer = new Tokenizer();
+        this.parser = new Parser();
+        this.interpreter = new Interpreter();
     }
 
     @Override
@@ -38,32 +48,46 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     public Object visit(InputDeclaration inputDeclaration) {
         if (inputDeclaration.hasInit()) {
             var defaultValue = visit(inputDeclaration.getInit());
-            return getInputs().initOrAssign((String) visit(inputDeclaration.getId()), defaultValue);
+//            inputDeclaration.setInit(defaultValue);
+//            return getInputs().initOrAssign((String) visit(inputDeclaration.getId()), defaultValue);
+            return null;
         }
         var input = resolve(inputDeclaration);
         if (input == null) {
             throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
         }
         if (input instanceof String string) {
+
             if (string.trim().isEmpty()) {
                 throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
             }
             Object res = switch (inputDeclaration.getType().getType().getKind()) {
-                case STRING -> string;
-                case NUMBER -> {
-                    if (string.contains(".")) {
-                        yield Double.parseDouble(string);
-                    } else {
-                        yield Integer.parseInt(string);
-                    }
+//                case STRING -> string;
+//                case NUMBER -> {
+//                    if (string.contains(".")) {
+//                        yield Double.parseDouble(string);
+//                    } else {
+//                        yield Integer.parseInt(string);
+//                    }
+//                }
+//                case BOOLEAN -> Boolean.parseBoolean(string);
+//                case OBJECT -> InputParser.parseObject(string);
+////                case ARRAY -> InputParser.parseArray(string);
+//                case UNION_TYPE -> string;
+                case STRING -> {
+                    var ast = parser.produceAST(tokenizer.tokenize("\"%s\"".formatted(string)));
+                    ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
+                    inputDeclaration.setInit(expressionStatement.getStatement());
+                    yield null;
                 }
-                case BOOLEAN -> Boolean.parseBoolean(string);
-                case OBJECT -> InputParser.parseObject(string);
-//                case ARRAY -> InputParser.parseArray(string);
-                case UNION_TYPE -> string;
-                default -> throw new IllegalStateException("Unexpected value: " + inputDeclaration.getType().getType());
+                default -> {
+                    var ast = parser.produceAST(tokenizer.tokenize("%s".formatted(string)));
+                    ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
+                    inputDeclaration.setInit(expressionStatement.getStatement());
+                    yield null;
+                }
             };
-            getInputs().initOrAssign(inputDeclaration.name(), res);
+//            getInputs().initOrAssign(inputDeclaration.name(), res);
         }
         return null;
 //        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
@@ -71,12 +95,12 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     @Override
     public Object visit(NumberLiteral expression) {
-        return null;
+        return expression.getValue();
     }
 
     @Override
     public Object visit(BooleanLiteral expression) {
-        return null;
+        return expression.getVal();
     }
 
     @Override
@@ -91,7 +115,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     @Override
     public Object visit(ObjectLiteral expression) {
-        return null;
+        return Map.of(visit(expression.getKey()), visit(expression.getValue()));
     }
 
     @Override

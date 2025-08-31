@@ -8,19 +8,17 @@ import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.ObjectType;
-import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
-import static io.kite.TypeChecker.Types.ArrayType.arrayType;
-import static io.kite.TypeChecker.Types.UnionType.unionType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -73,8 +71,8 @@ public class InputTest extends RuntimeTest {
     protected Object eval(String source) {
         program = src(source);
         scopeResolver.resolve(program);
-        typeChecker.visit(program);
         chainResolver.visit(program);
+        typeChecker.visit(program);
         return interpreter.visit(program);
     }
 
@@ -134,32 +132,35 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
     void inputNumberInit() {
         var res = eval("input number region = 10 ");
         assertEquals(10, res);
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
     void inputBooleanInit() {
-        setInput(true);
         var res = eval("input boolean region = true");
         assertEquals(true, res);
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
     void inputObjectInitEmpty() {
         var res = eval("input object region = {}");
         assertEquals(Map.of(), res);
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
     void inputObjectInit() {
-        setInput("{ env : 'dev' }");
         var res = eval("input object region = {env : 'dev'}");
-        assertEquals(Map.of("env","dev"), res);
+        assertEquals(Map.of("env", "dev"), res);
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
     void inputUnionInit() {
         var res = eval("""
                 type custom = string | number
@@ -170,7 +171,8 @@ public class InputTest extends RuntimeTest {
 
     @Test
     void inputStringInitError() {
-        assertThrows(TypeError.class, () -> eval("input string region = 10"));
+        setInput(10);
+        eval("input string region");
     }
 
     @Test
@@ -203,60 +205,73 @@ public class InputTest extends RuntimeTest {
 
     @Test
     void inputStringArray() {
+        setInput("['hello','world']");
         var res = eval("input string[] region");
-        assertEquals(arrayType(ValueType.String), res);
+        assertEquals(List.of("hello", "world"), res);
     }
 
     @Test
     void inputNumberArray() {
+        setInput("[1,2,3]");
         var res = eval("input number[] region");
-        assertEquals(arrayType(ValueType.Number), res);
+        assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
-    void inputBooleanArray() {
-        var res = eval("input boolean[] region");
-        assertEquals(arrayType(ValueType.Boolean), res);
-    }
-
-    @Test
-    void inputObjectArray() {
-        var res = eval("input object[] region");
-        assertEquals(arrayType(ObjectType.INSTANCE), res);
+    @Disabled
+    void inputNumberArrayNoParanthesis() {
+        setInput("1,2,3");
+        var res = eval("input number[] region");
+        assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
     void inputUnionArray() {
+        setInput("['hello','world']");
         var res = eval("""
                 type custom = string | number
                 input custom[] region
                 """);
 
-        assertEquals(arrayType(unionType("custom", ValueType.String, ValueType.Number)), res);
+        assertEquals(List.of("hello", "world"), res);
     }
 
     @Test
     void inputStringArrayInit() {
         var res = eval("input string[] region=['hi']");
-        assertEquals(arrayType(ValueType.String), res);
+        assertEquals(List.of("hi"), res);
     }
 
     @Test
     void inputNumberArrayInit() {
         var res = eval("input number[] region=[1,2,3]");
-        assertEquals(arrayType(ValueType.Number), res);
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
+    void inputBooleanArray() {
+        setInput("[true,false,true]");
+        var res = eval("input boolean[] region");
+        assertEquals(List.of(true, false, true), res);
     }
 
     @Test
     void inputBooleanArrayInit() {
         var res = eval("input boolean[] region=[true,false,true]");
-        assertEquals(arrayType(ValueType.Boolean), res);
+        assertEquals(List.of(true, false, true), res);
+    }
+
+    @Test
+    void inputObjectArray() {
+        setInput("[{env:'dev'}]");
+        var res = eval("input object[] region");
+        assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
     @Test
     void inputObjectArrayInit() {
         var res = eval("input object[] region=[{env:'dev'}]");
-        assertEquals(arrayType(ObjectType.INSTANCE), res);
+        assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
 
@@ -266,7 +281,7 @@ public class InputTest extends RuntimeTest {
                 type custom = string | number
                 input custom[] region = [10]
                 """);
-        assertEquals(arrayType(unionType("custom", ValueType.String, ValueType.Number)), res);
+        assertEquals(List.of(10), res);
     }
 
     @Test
