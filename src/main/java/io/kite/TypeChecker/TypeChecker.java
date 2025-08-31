@@ -324,13 +324,13 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(InputDeclaration expression) {
         var t1 = visit(expression.getType());
-        if (expression.hasInit()) {
-            var t2 = visit(expression.getInit());
-            expect(t2, t1, expression.getInit());
-        }
         // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
         if (expression.getType().getType().getKind() != t1.getKind()) {
             expression.getType().setType(t1);
+        }
+        if (expression.hasInit()) {
+            var t2 = visit(expression.getInit());
+            expect(t2, t1, expression.getInit());
         }
         return t1;
     }
