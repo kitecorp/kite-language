@@ -219,6 +219,7 @@ public class InputTest extends RuntimeTest {
                 """);
         assertEquals("hello", res);
     }
+
     @Test
     void inputStringArray() {
         setInput("['hello','world']");
@@ -300,10 +301,13 @@ public class InputTest extends RuntimeTest {
         assertEquals(List.of(10), res);
     }
 
-    /***************
-     * ERROR CASES *
-     * *************/
-
+    /************************************************************
+     * ERROR CASES                                             **
+     * Each error case will also be followed up by its alias   **
+     * **********************************************************/
+    /*
+     * String input with invalid values
+     * */
     @Test
     void inputStringInitWithNumberError() {
         setInput(10);
@@ -368,6 +372,105 @@ public class InputTest extends RuntimeTest {
     void inputStringInitWithObjectArrayError() {
         setInput("[{ env : 'dev' }]");
         assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringAliasInitWithNumberError() {
+        setInput(10);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithDecimalError() {
+        setInput(10.1);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithDecimalDotError() {
+        setInput(0.1);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithBooleanError() {
+        setInput(true);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputStringAliasInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                input custom region
+                """));
     }
 
     @Test
@@ -561,16 +664,6 @@ public class InputTest extends RuntimeTest {
     void inputObjectInitWithObjectArrayError() {
         setInput("[{ env : 'dev' }]");
         assertThrows(TypeError.class, () -> eval("input object region "));
-    }
-
-
-    @Test
-    void inputUnionInitWithBooleanError() {
-        setInput(true);
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom region 
-                """));
     }
 
 
