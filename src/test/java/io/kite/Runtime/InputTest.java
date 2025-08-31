@@ -12,6 +12,7 @@ import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -126,15 +127,14 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
     void inputStringInit() {
-        setInput("hello");
         var res = eval("input string region = 'hello'");
         assertEquals("hello", res);
     }
 
     @Test
     void inputNumberInit() {
-        setInput(10);
         var res = eval("input number region = 10 ");
         assertEquals(10, res);
     }

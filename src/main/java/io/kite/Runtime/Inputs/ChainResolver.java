@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public non-sealed class ChainResolver extends InputResolver implements Visitor<Void> {
+public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
     private List<InputResolver> resolvers;
 
     public ChainResolver(Environment<Object> environment) {
@@ -35,7 +35,11 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<V
     }
 
     @Override
-    public Void visit(InputDeclaration inputDeclaration) {
+    public Object visit(InputDeclaration inputDeclaration) {
+        if (inputDeclaration.hasInit()) {
+            var defaultValue = visit(inputDeclaration.getInit());
+            return getInputs().initOrAssign((String) visit(inputDeclaration.getId()), defaultValue);
+        }
         var input = resolve(inputDeclaration);
         if (input == null) {
             throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
@@ -66,152 +70,152 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<V
     }
 
     @Override
-    public Void visit(NumberLiteral expression) {
+    public Object visit(NumberLiteral expression) {
         return null;
     }
 
     @Override
-    public Void visit(BooleanLiteral expression) {
+    public Object visit(BooleanLiteral expression) {
         return null;
     }
 
     @Override
-    public Void visit(Identifier expression) {
+    public Object visit(Identifier expression) {
+        return expression.string();
+    }
+
+    @Override
+    public Object visit(NullLiteral expression) {
         return null;
     }
 
     @Override
-    public Void visit(NullLiteral expression) {
+    public Object visit(ObjectLiteral expression) {
         return null;
     }
 
     @Override
-    public Void visit(ObjectLiteral expression) {
+    public Object visit(StringLiteral expression) {
+        return expression.getValue();
+    }
+
+    @Override
+    public Object visit(LambdaExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(StringLiteral expression) {
+    public Object visit(BlockExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(LambdaExpression expression) {
+    public Object visit(GroupExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(BlockExpression expression) {
+    public Object visit(BinaryExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(GroupExpression expression) {
+    public Object visit(UnionTypeStatement expression) {
         return null;
     }
 
     @Override
-    public Void visit(BinaryExpression expression) {
+    public Object visit(CallExpression<Expression> expression) {
         return null;
     }
 
     @Override
-    public Void visit(UnionTypeStatement expression) {
+    public Object visit(ErrorExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(CallExpression<Expression> expression) {
+    public Object visit(ComponentStatement expression) {
         return null;
     }
 
     @Override
-    public Void visit(ErrorExpression expression) {
+    public Object visit(LogicalExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(ComponentStatement expression) {
+    public Object visit(MemberExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(LogicalExpression expression) {
+    public Object visit(ThisExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(MemberExpression expression) {
+    public Object visit(UnaryExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(ThisExpression expression) {
+    public Object visit(VarDeclaration expression) {
         return null;
     }
 
     @Override
-    public Void visit(UnaryExpression expression) {
+    public Object visit(ValDeclaration expression) {
         return null;
     }
 
     @Override
-    public Void visit(VarDeclaration expression) {
+    public Object visit(ObjectExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(ValDeclaration expression) {
+    public Object visit(ArrayExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(ObjectExpression expression) {
+    public Object visit(AnnotationDeclaration expression) {
         return null;
     }
 
     @Override
-    public Void visit(ArrayExpression expression) {
+    public Object visit(AssignmentExpression expression) {
         return null;
     }
 
     @Override
-    public Void visit(AnnotationDeclaration expression) {
+    public Object visit(float expression) {
         return null;
     }
 
     @Override
-    public Void visit(AssignmentExpression expression) {
+    public Object visit(double expression) {
         return null;
     }
 
     @Override
-    public Void visit(float expression) {
+    public Object visit(int expression) {
         return null;
     }
 
     @Override
-    public Void visit(double expression) {
+    public Object visit(boolean expression) {
         return null;
     }
 
     @Override
-    public Void visit(int expression) {
+    public Object visit(String expression) {
         return null;
     }
 
     @Override
-    public Void visit(boolean expression) {
-        return null;
-    }
-
-    @Override
-    public Void visit(String expression) {
-        return null;
-    }
-
-    @Override
-    public Void visit(Program program) {
+    public Object visit(Program program) {
         for (Statement statement : program.getBody()) {
             visit(statement);
         }
@@ -220,62 +224,62 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<V
 
 
     @Override
-    public Void visit(Type type) {
+    public Object visit(Type type) {
         return null;
     }
 
     @Override
-    public Void visit(InitStatement statement) {
+    public Object visit(InitStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(FunctionDeclaration statement) {
+    public Object visit(FunctionDeclaration statement) {
         return null;
     }
 
     @Override
-    public Void visit(ExpressionStatement statement) {
+    public Object visit(ExpressionStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(VarStatement statement) {
+    public Object visit(VarStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(ValStatement statement) {
+    public Object visit(ValStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(IfStatement statement) {
+    public Object visit(IfStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(WhileStatement statement) {
+    public Object visit(WhileStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(ForStatement statement) {
+    public Object visit(ForStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(SchemaDeclaration statement) {
+    public Object visit(SchemaDeclaration statement) {
         return null;
     }
 
     @Override
-    public Void visit(ReturnStatement statement) {
+    public Object visit(ReturnStatement statement) {
         return null;
     }
 
     @Override
-    public Void visit(ResourceExpression expression) {
+    public Object visit(ResourceExpression expression) {
         return null;
     }
 }
