@@ -68,7 +68,9 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         }
         boolean keepOriginal = (NumberUtils.isCreatable(string) ||
                      BooleanUtils.toBoolean(string)) ||
-                    StringUtils.startsWith(string, "{");
+                    StringUtils.startsWith(string, "{") ||
+                    StringUtils.startsWith(string, "[")
+                ;
         if (!keepOriginal) {
             string = "\"%s\"".formatted(string);
         }
