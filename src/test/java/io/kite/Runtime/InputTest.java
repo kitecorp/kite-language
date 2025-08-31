@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
-public class InputTest extends RuntimeTest {
+public abstract class InputTest extends RuntimeTest {
 
     private InputStream sysInBackup = System.in;
     private ChainResolver chainResolver;
@@ -71,9 +71,7 @@ public class InputTest extends RuntimeTest {
         this.interpreter = new Interpreter(global);
     }
 
-    protected @NotNull List<InputResolver> getResolvers() {
-        return List.of();
-    }
+    protected abstract @NotNull List<InputResolver> getResolvers();
 
     protected Object eval(String source) {
         program = src(source);
