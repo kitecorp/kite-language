@@ -12,16 +12,19 @@ import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Utils.FileHelpers;
 import io.kite.Visitors.Visitor;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
-    private List<InputResolver> resolvers;
     private final Tokenizer tokenizer;
     private final Parser parser;
     private final Interpreter interpreter;
+    private List<InputResolver> resolvers;
 
     public ChainResolver(Environment<Object> environment) {
         super(environment);
@@ -57,37 +60,18 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
             throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
         }
         if (input instanceof String string) {
-
-            if (string.trim().isEmpty()) {
+            if (StringUtils.isBlank(string.trim())) {
                 throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
             }
-            Object res = switch (inputDeclaration.getType().getType().getKind()) {
-//                case STRING -> string;
-//                case NUMBER -> {
-//                    if (string.contains(".")) {
-//                        yield Double.parseDouble(string);
-//                    } else {
-//                        yield Integer.parseInt(string);
-//                    }
-//                }
-//                case BOOLEAN -> Boolean.parseBoolean(string);
-//                case OBJECT -> InputParser.parseObject(string);
-////                case ARRAY -> InputParser.parseArray(string);
-//                case UNION_TYPE -> string;
-                case STRING -> {
-                    var ast = parser.produceAST(tokenizer.tokenize("\"%s\"".formatted(string)));
-                    ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
-                    inputDeclaration.setInit(expressionStatement.getStatement());
-                    yield null;
-                }
-                default -> {
-                    var ast = parser.produceAST(tokenizer.tokenize("%s".formatted(string)));
-                    ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
-                    inputDeclaration.setInit(expressionStatement.getStatement());
-                    yield null;
-                }
-            };
-//            getInputs().initOrAssign(inputDeclaration.name(), res);
+            if (NumberUtils.isCreatable(string)) {
+            } else if (BooleanUtils.toBoolean(string)) {
+            } else {
+                string = "\"%s\"".formatted(string);
+            }
+            var ast = parser.produceAST(tokenizer.tokenize(string));
+            ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
+            inputDeclaration.setInit(expressionStatement.getStatement());
+
         }
         return null;
 //        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
