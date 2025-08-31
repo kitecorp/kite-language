@@ -522,6 +522,108 @@ public abstract class InputTest extends RuntimeTest {
         assertThrows(TypeError.class, () -> eval("input number region "));
     }
 
+    /*
+     * input string alias with invalid values
+     * */
+    @Test
+    void inputNumberAliasInitWithNumberError() {
+        setInput(10);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithDecimalError() {
+        setInput(10.1);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithDecimalDotError() {
+        setInput(0.1);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithBooleanError() {
+        setInput(true);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputNumberAliasInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
     @Test
     void inputBooleanInitWithNumberError() {
         setInput(123);
