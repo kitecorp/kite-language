@@ -406,6 +406,43 @@ public class InputTest extends RuntimeTest {
         assertThrows(TypeError.class, () -> eval("input boolean region "));
     }
 
+
+    @Test
+    void inputObjectInitWithNumberError() {
+        setInput(123);
+        assertThrows(TypeError.class, () -> eval("input object region"));
+    }
+
+    @Test
+    void inputObjectInitWithDecimalError() {
+        setInput(1.2);
+        assertThrows(TypeError.class, () -> eval("input object region"));
+    }
+
+    @Test
+    void inputObjectInitWithDecimalDotError() {
+        setInput(0.2);
+        assertThrows(TypeError.class, () -> eval("input object region"));
+    }
+
+    @Test
+    void inputObjectInitWithStringError() {
+        setInput("hello");
+        assertThrows(TypeError.class, () -> eval("input object region "));
+    }
+
+    @Test
+    void inputObjectInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("input object region"));
+    }
+
+    @Test
+    void inputObjectInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("input object region"));
+    }
+
     @Test
     void inputObjectInitWithBooleanError() {
         setInput(true);
@@ -413,10 +450,35 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
-    void inputObjectInitWithStringError() {
-        setInput("hello");
-        assertThrows(TypeError.class, () -> eval("input object region = 'hello'"));
+    void inputObjectInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("input object region "));
     }
+
+    @Test
+    void inputObjectInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("input object region "));
+    }
+
+    @Test
+    void inputObjectInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("input object region ")); // throw because it's not declared as array
+    }
+
+    @Test
+    void inputObjectInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("input object region "));
+    }
+
+    @Test
+    void inputObjectInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("input object region "));
+    }
+
 
     @Test
     void inputUnionInitWithBooleanError() {
