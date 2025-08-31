@@ -1,9 +1,9 @@
 package io.kite.Base;
 
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
@@ -18,6 +18,7 @@ public class RuntimeTest {
     protected ScopeResolver scopeResolver;
     protected Program program;
     protected SyntaxPrinter printer = new SyntaxPrinter();
+    protected Environment<Object> global = new Environment<>();
 
     @BeforeEach
     void reset() {
@@ -25,7 +26,6 @@ public class RuntimeTest {
         ParserErrors.clear();
     }
 
-        protected Environment<Object> global = new Environment<>();
     protected void init() {
         global.setName("global");
         this.tokenizer = new Tokenizer();

@@ -7,10 +7,8 @@ import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Environment.Environment;
-import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.Types.Type;
-import io.kite.Utils.FileHelpers;
 import io.kite.Visitors.Visitor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,19 +22,24 @@ import java.util.NoSuchElementException;
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
     private final Tokenizer tokenizer;
     private final Parser parser;
-    private final Interpreter interpreter;
     private List<InputResolver> resolvers;
 
     public ChainResolver(Environment<Object> environment) {
         super(environment);
         this.resolvers = List.of(
-                new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
+//                new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
                 new EnvResolver(environment),
                 new CliResolver(environment)
         );
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();
-        this.interpreter = new Interpreter();
+    }
+
+    public ChainResolver(Environment<Object> environment, List<InputResolver> resolvers) {
+        super(environment);
+        this.resolvers = resolvers;
+        this.tokenizer = new Tokenizer();
+        this.parser = new Parser();
     }
 
     @Override
@@ -63,8 +66,8 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
                 throw new MissingInputException("Invalid input %s".formatted(inputDeclaration.getId().string()));
             }
 
-            boolean keepOriginal = (NumberUtils.isCreatable(string) ||
-                                    BooleanUtils.toBoolean(string)) ||
+            boolean keepOriginal = NumberUtils.isCreatable(string) ||
+                                   BooleanUtils.toBoolean(string) ||
                                    StringUtils.startsWith(string, "{") ||
                                    StringUtils.startsWith(string, "[");
             if (!keepOriginal) {

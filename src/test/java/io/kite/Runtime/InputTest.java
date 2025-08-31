@@ -6,6 +6,8 @@ import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.Runtime.Inputs.CliResolver;
+import io.kite.Runtime.Inputs.EnvResolver;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
@@ -64,7 +66,11 @@ public class InputTest extends RuntimeTest {
         this.typeChecker = new TypeChecker();
         Environment<Object> inputs = new Environment<>(global);
         inputs.setName("inputs");
-        this.chainResolver = new ChainResolver(global);
+        this.chainResolver = new ChainResolver(global, List.of(
+//                new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
+                new EnvResolver(global),
+                new CliResolver(global)
+        ));
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(global);
     }
@@ -227,6 +233,12 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
+    void inputStringInitWithDecimalDotError() {
+        setInput(0.1);
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
     void inputStringInitWithBooleanError() {
         setInput(true);
         assertThrows(TypeError.class, () -> eval("input string region"));
@@ -329,9 +341,69 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
-    void inputBooleanInitError() {
+    void inputBooleanInitWithNumberError() {
         setInput(123);
         assertThrows(TypeError.class, () -> eval("input boolean region"));
+    }
+
+    @Test
+    void inputBooleanInitWithDecimalError() {
+        setInput(1.2);
+        assertThrows(TypeError.class, () -> eval("input boolean region"));
+    }
+
+    @Test
+    void inputBooleanInitWithDecimalDotError() {
+        setInput(0.2);
+        assertThrows(TypeError.class, () -> eval("input boolean region"));
+    }
+
+    @Test
+    void inputBooleanInitWithStringError() {
+        setInput("hello");
+        assertThrows(TypeError.class, () -> eval("input boolean region "));
+    }
+
+    @Test
+    void inputBooleanInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("input boolean region"));
+    }
+
+    @Test
+    void inputBooleanInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("input boolean region"));
+    }
+
+    @Test
+    void inputBooleanInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("input boolean region "));
+    }
+
+    @Test
+    void inputBooleanInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("input boolean region "));
+    }
+
+    @Test
+    void inputBooleanInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("input boolean region ")); // throw because it's not declared as array
+    }
+
+    @Test
+    void inputBooleanInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("input boolean region "));
+    }
+
+    @Test
+    void inputBooleanInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("input boolean region "));
     }
 
     @Test
