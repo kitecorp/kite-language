@@ -12,13 +12,10 @@ import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -27,19 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
 public abstract class InputTest extends RuntimeTest {
-
-    private InputStream sysInBackup = System.in;
     private ChainResolver chainResolver;
     private TypeChecker typeChecker;
 
-    @AfterEach
-    void cleanup() {
-        System.setIn(sysInBackup);
-    }
-
-    private void setInput(String input) {
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
-    }
+    protected abstract void setInput(String input);
 
     private void setInput(Integer input) {
         setInput(input.toString());
@@ -373,8 +361,8 @@ public abstract class InputTest extends RuntimeTest {
     }
 
     /*
-    * input string alias with invalid values
-    * */
+     * input string alias with invalid values
+     * */
     @Test
     void inputStringAliasInitWithNumberError() {
         setInput(10);
