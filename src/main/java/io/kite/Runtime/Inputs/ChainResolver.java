@@ -8,7 +8,7 @@ import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
-import io.kite.Runtime.exceptions.InvalidInitException;
+import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Utils.FileHelpers;
 import io.kite.Visitors.Visitor;
@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
     private final Tokenizer tokenizer;
@@ -55,30 +56,28 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 //            return getInputs().initOrAssign((String) visit(inputDeclaration.getId()), defaultValue);
             return null;
         }
-        var input = resolve(inputDeclaration);
-        if (input == null) {
-            throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
-        }
-        if (!(input instanceof String string)) {
+        try {
+
+            var input = resolve(inputDeclaration);
+            if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
+                throw new MissingInputException("Invalid input %s".formatted(inputDeclaration.getId().string()));
+            }
+
+            boolean keepOriginal = (NumberUtils.isCreatable(string) ||
+                                    BooleanUtils.toBoolean(string)) ||
+                                   StringUtils.startsWith(string, "{") ||
+                                   StringUtils.startsWith(string, "[");
+            if (!keepOriginal) {
+                string = "\"%s\"".formatted(string);
+            }
+            var ast = parser.produceAST(tokenizer.tokenize(string));
+            ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
+            inputDeclaration.setInit(expressionStatement.getStatement());
+
             return null;
+        } catch (NoSuchElementException exception) {
+            throw new MissingInputException("Missing input %s".formatted(inputDeclaration.getId().string()));
         }
-
-        if (StringUtils.isBlank(string.trim())) {
-            throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
-        }
-        boolean keepOriginal = (NumberUtils.isCreatable(string) ||
-                     BooleanUtils.toBoolean(string)) ||
-                    StringUtils.startsWith(string, "{") ||
-                    StringUtils.startsWith(string, "[")
-                ;
-        if (!keepOriginal) {
-            string = "\"%s\"".formatted(string);
-        }
-        var ast = parser.produceAST(tokenizer.tokenize(string));
-        ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
-        inputDeclaration.setInit(expressionStatement.getStatement());
-
-        return null;
 //        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
     }
 
