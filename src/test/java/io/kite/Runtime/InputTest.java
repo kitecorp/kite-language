@@ -21,6 +21,14 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Each subclass provides a different input type from a different source.
+ * Valid sources:
+ * 1. CLI
+ * 2. File
+ * 3. Environment variable
+ * All tests will be run on the input type provided by the subclass.
+ */
 @Log4j2
 public abstract class InputTest extends RuntimeTest {
     private ChainResolver chainResolver;
