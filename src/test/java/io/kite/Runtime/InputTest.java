@@ -78,8 +78,8 @@ public class InputTest extends RuntimeTest {
     }
 
     /**************
-    * HAPPY CASES *
-    * *************/
+     * HAPPY CASES *
+     * *************/
     @Test
     void inputString() {
         setInput("hello");
@@ -92,6 +92,20 @@ public class InputTest extends RuntimeTest {
         setInput(10);
         var res = eval("input number region");
         assertEquals(10, res);
+    }
+
+    @Test
+    void inputDecimal() {
+        setInput(10.2);
+        var res = eval("input number region");
+        assertEquals(10.2, res);
+    }
+
+    @Test
+    void inputDecimalHalf() {
+        setInput(0.2);
+        var res = eval("input number region");
+        assertEquals(0.2, res);
     }
 
     @Test
@@ -127,6 +141,7 @@ public class InputTest extends RuntimeTest {
                 """);
         assertEquals(10, res);
     }
+
     /********************************
      * HAPPY CASES - default values *
      * ******************************/
@@ -142,6 +157,20 @@ public class InputTest extends RuntimeTest {
     void inputNumberInit() {
         var res = eval("input number region = 10 ");
         assertEquals(10, res);
+    }
+
+    @Test
+    @DisplayName("Should not prompt for input when default value is provided")
+    void inputDecimalInit() {
+        var res = eval("input number region = 10.2 ");
+        assertEquals(10.2, res);
+    }
+
+    @Test
+    @DisplayName("Should not prompt for input when default value is provided")
+    void inputDecimalHalfInit() {
+        var res = eval("input number region = 0.2 ");
+        assertEquals(0.2, res);
     }
 
     @Test
@@ -248,6 +277,54 @@ public class InputTest extends RuntimeTest {
     @Test
     void inputNumberInitWithStringError() {
         setInput("hello");
+        assertThrows(TypeError.class, () -> eval("input number region "));
+    }
+
+    @Test
+    void inputNumberInitWithBooleanError() {
+        setInput(true);
+        assertThrows(TypeError.class, () -> eval("input number region "));
+    }
+
+    @Test
+    void inputNumberInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("input number region"));
+    }
+
+    @Test
+    void inputNumberInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("input number region"));
+    }
+
+    @Test
+    void inputNumberInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("input number region "));
+    }
+
+    @Test
+    void inputNumberInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("input number region "));
+    }
+
+    @Test
+    void inputNumberInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("input number region ")); // throw because it's not declared as array
+    }
+
+    @Test
+    void inputNumberInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("input number region "));
+    }
+
+    @Test
+    void inputNumberInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
         assertThrows(TypeError.class, () -> eval("input number region "));
     }
 
