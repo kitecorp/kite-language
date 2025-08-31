@@ -6,6 +6,7 @@ import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
@@ -170,36 +171,93 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
-    void inputStringInitError() {
+    void inputStringInitWithNumberError() {
         setInput(10);
-        eval("input string region");
+        assertThrows(TypeError.class, () -> eval("input string region"));
     }
 
     @Test
-    void inputNumberInitError() {
-        assertThrows(TypeError.class, () -> eval("input number region = 'hello' "));
+    void inputStringInitWithDecimalError() {
+        setInput(10.1);
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringInitWithBooleanError() {
+        setInput(true);
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+    @Test
+    void inputStringInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+    @Test
+    void inputStringInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputStringInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("input string region"));
+    }
+
+    @Test
+    void inputNumberInitWithStringError() {
+        setInput("hello");
+        assertThrows(TypeError.class, () -> eval("input number region "));
     }
 
     @Test
     void inputBooleanInitError() {
-        assertThrows(TypeError.class, () -> eval("input boolean region = 123"));
+        setInput(123);
+        assertThrows(TypeError.class, () -> eval("input boolean region"));
     }
 
     @Test
-    void inputObjectInitEmptyError() {
-        assertThrows(TypeError.class, () -> eval("input object region = true"));
+    void inputObjectInitWithBooleanError() {
+        setInput(true);
+        assertThrows(TypeError.class, () -> eval("input object region"));
     }
 
     @Test
-    void inputObjectInitError() {
+    void inputObjectInitWithStringError() {
+        setInput("hello");
         assertThrows(TypeError.class, () -> eval("input object region = 'hello'"));
     }
 
     @Test
-    void inputUnionInitError() {
+    void inputUnionInitWithBooleanError() {
+        setInput(true);
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom region = true
+                input custom region 
                 """));
     }
 
