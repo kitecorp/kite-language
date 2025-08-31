@@ -77,6 +77,9 @@ public class InputTest extends RuntimeTest {
         return interpreter.visit(program);
     }
 
+    /**************
+    * HAPPY CASES *
+    * *************/
     @Test
     void inputString() {
         setInput("hello");
@@ -124,7 +127,9 @@ public class InputTest extends RuntimeTest {
                 """);
         assertEquals(10, res);
     }
-
+    /********************************
+     * HAPPY CASES - default values *
+     * ******************************/
     @Test
     @DisplayName("Should not prompt for input when default value is provided")
     void inputStringInit() {
@@ -171,6 +176,16 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Should not prompt for input when default value is provided")
+    void inputUnionInitString() {
+        var res = eval("""
+                type custom = string | number
+                input custom region = "hello"
+                """);
+        assertEquals("hello", res);
+    }
+
+    @Test
     void inputStringInitWithNumberError() {
         setInput(10);
         assertThrows(TypeError.class, () -> eval("input string region"));
@@ -211,11 +226,13 @@ public class InputTest extends RuntimeTest {
         setInput("['hello','world']");
         assertThrows(TypeError.class, () -> eval("input string region"));
     }
+
     @Test
     void inputStringInitWithIntArrayError() {
         setInput("[1,2,3]");
         assertThrows(TypeError.class, () -> eval("input string region"));
     }
+
     @Test
     void inputStringInitWithBooleanArrayError() {
         setInput("[true, false]");
