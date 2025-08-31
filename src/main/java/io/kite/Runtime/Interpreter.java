@@ -388,6 +388,9 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(InputDeclaration input) {
+        if (input.hasInit() && env.get(input.name())==null) {
+            return env.initOrAssign((String) input.getId().string(), visit(input.getInit()));
+        }
         return env.lookup(input.name());
     }
 
