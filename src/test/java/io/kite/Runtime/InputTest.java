@@ -219,6 +219,86 @@ public class InputTest extends RuntimeTest {
                 """);
         assertEquals("hello", res);
     }
+    @Test
+    void inputStringArray() {
+        setInput("['hello','world']");
+        var res = eval("input string[] region");
+        assertEquals(List.of("hello", "world"), res);
+    }
+
+    @Test
+    void inputNumberArray() {
+        setInput("[1,2,3]");
+        var res = eval("input number[] region");
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
+    @Disabled
+    void inputNumberArrayNoParanthesis() {
+        setInput("1,2,3");
+        var res = eval("input number[] region");
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
+    void inputUnionArray() {
+        setInput("['hello','world']");
+        var res = eval("""
+                type custom = string | number
+                input custom[] region
+                """);
+
+        assertEquals(List.of("hello", "world"), res);
+    }
+
+    @Test
+    void inputStringArrayInit() {
+        var res = eval("input string[] region=['hi']");
+        assertEquals(List.of("hi"), res);
+    }
+
+    @Test
+    void inputNumberArrayInit() {
+        var res = eval("input number[] region=[1,2,3]");
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
+    void inputBooleanArray() {
+        setInput("[true,false,true]");
+        var res = eval("input boolean[] region");
+        assertEquals(List.of(true, false, true), res);
+    }
+
+    @Test
+    void inputBooleanArrayInit() {
+        var res = eval("input boolean[] region=[true,false,true]");
+        assertEquals(List.of(true, false, true), res);
+    }
+
+    @Test
+    void inputObjectArray() {
+        setInput("[{env:'dev'}]");
+        var res = eval("input object[] region");
+        assertEquals(List.of(Map.of("env", "dev")), res);
+    }
+
+    @Test
+    void inputObjectArrayInit() {
+        var res = eval("input object[] region=[{env:'dev'}]");
+        assertEquals(List.of(Map.of("env", "dev")), res);
+    }
+
+
+    @Test
+    void inputUnionArrayInit() {
+        var res = eval("""
+                type custom = string | number
+                input custom[] region = [10]
+                """);
+        assertEquals(List.of(10), res);
+    }
 
     @Test
     void inputStringInitWithNumberError() {
@@ -489,86 +569,6 @@ public class InputTest extends RuntimeTest {
                 """));
     }
 
-    @Test
-    void inputStringArray() {
-        setInput("['hello','world']");
-        var res = eval("input string[] region");
-        assertEquals(List.of("hello", "world"), res);
-    }
-
-    @Test
-    void inputNumberArray() {
-        setInput("[1,2,3]");
-        var res = eval("input number[] region");
-        assertEquals(List.of(1, 2, 3), res);
-    }
-
-    @Test
-    @Disabled
-    void inputNumberArrayNoParanthesis() {
-        setInput("1,2,3");
-        var res = eval("input number[] region");
-        assertEquals(List.of(1, 2, 3), res);
-    }
-
-    @Test
-    void inputUnionArray() {
-        setInput("['hello','world']");
-        var res = eval("""
-                type custom = string | number
-                input custom[] region
-                """);
-
-        assertEquals(List.of("hello", "world"), res);
-    }
-
-    @Test
-    void inputStringArrayInit() {
-        var res = eval("input string[] region=['hi']");
-        assertEquals(List.of("hi"), res);
-    }
-
-    @Test
-    void inputNumberArrayInit() {
-        var res = eval("input number[] region=[1,2,3]");
-        assertEquals(List.of(1, 2, 3), res);
-    }
-
-    @Test
-    void inputBooleanArray() {
-        setInput("[true,false,true]");
-        var res = eval("input boolean[] region");
-        assertEquals(List.of(true, false, true), res);
-    }
-
-    @Test
-    void inputBooleanArrayInit() {
-        var res = eval("input boolean[] region=[true,false,true]");
-        assertEquals(List.of(true, false, true), res);
-    }
-
-    @Test
-    void inputObjectArray() {
-        setInput("[{env:'dev'}]");
-        var res = eval("input object[] region");
-        assertEquals(List.of(Map.of("env", "dev")), res);
-    }
-
-    @Test
-    void inputObjectArrayInit() {
-        var res = eval("input object[] region=[{env:'dev'}]");
-        assertEquals(List.of(Map.of("env", "dev")), res);
-    }
-
-
-    @Test
-    void inputUnionArrayInit() {
-        var res = eval("""
-                type custom = string | number
-                input custom[] region = [10]
-                """);
-        assertEquals(List.of(10), res);
-    }
 
     @Test
     void inputStringArrayInitError() {
