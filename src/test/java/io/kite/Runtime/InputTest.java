@@ -116,33 +116,47 @@ public class InputTest extends RuntimeTest {
     }
 
     @Test
+    void inputUnionNumber() {
+        setInput(10);
+        var res = eval("""
+                type custom = string | number
+                input custom region
+                """);
+        assertEquals(10, res);
+    }
+
+    @Test
     void inputStringInit() {
-        var res = eval("input string region = 'region'");
-        assertEquals(ValueType.String, res);
+        setInput("hello");
+        var res = eval("input string region = 'hello'");
+        assertEquals("hello", res);
     }
 
     @Test
     void inputNumberInit() {
+        setInput(10);
         var res = eval("input number region = 10 ");
-        assertEquals(ValueType.Number, res);
+        assertEquals(10, res);
     }
 
     @Test
     void inputBooleanInit() {
+        setInput(true);
         var res = eval("input boolean region = true");
-        assertEquals(ValueType.Boolean, res);
+        assertEquals(true, res);
     }
 
     @Test
     void inputObjectInitEmpty() {
         var res = eval("input object region = {}");
-        assertEquals(ObjectType.INSTANCE, res);
+        assertEquals(Map.of(), res);
     }
 
     @Test
     void inputObjectInit() {
+        setInput("{ env : 'dev' }");
         var res = eval("input object region = {env : 'dev'}");
-        assertEquals(ObjectType.INSTANCE, res);
+        assertEquals(Map.of("env","dev"), res);
     }
 
     @Test
@@ -151,7 +165,7 @@ public class InputTest extends RuntimeTest {
                 type custom = string | number
                 input custom region = 10
                 """);
-        assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
+        assertEquals(10, res);
     }
 
     @Test

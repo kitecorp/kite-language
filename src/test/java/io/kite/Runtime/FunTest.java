@@ -88,7 +88,6 @@ public class FunTest extends RuntimeTest {
                     
                 }
                 """);
-        log.warn((res));
         assertEquals("global", res);
     }
 
