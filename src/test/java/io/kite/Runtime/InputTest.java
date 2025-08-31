@@ -374,6 +374,9 @@ public class InputTest extends RuntimeTest {
         assertThrows(TypeError.class, () -> eval("input string region"));
     }
 
+    /*
+    * input string alias with invalid values
+    * */
     @Test
     void inputStringAliasInitWithNumberError() {
         setInput(10);
