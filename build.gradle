@@ -36,6 +36,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+//    maxParallelForks = Runtime.runtime.availableProcessors() // commented as it doesn't improve performance right now
+//    testLogging { events "started", "passed", "skipped", "failed" }
 }
 extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
