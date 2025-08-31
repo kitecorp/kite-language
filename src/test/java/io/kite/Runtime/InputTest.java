@@ -12,7 +12,6 @@ import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -221,7 +220,6 @@ public abstract class InputTest extends RuntimeTest {
     }
 
     @Test
-    @Disabled
     void inputNumberArrayNoParanthesis() {
         setInput("1,2,3");
         var res = eval("input number[] region");

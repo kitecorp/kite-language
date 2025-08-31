@@ -2,6 +2,7 @@ package io.kite.Runtime.Inputs;
 
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Runtime.Environment.Environment;
+import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +38,12 @@ public class CliResolver extends InputResolver {
             System.out.println(ansi.toString());
 
             String value = scan.nextLine();
+            if (value.contains(",") &&
+                !StringUtils.startsWithAny(value, "[", "{") &&
+                !StringUtils.endsWithAny(value, "]", "}")
+            ) {
+                value = "[" + value + "]";
+            }
             return value;
         }
     }
