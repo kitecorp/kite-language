@@ -163,7 +163,7 @@ public class Parser {
             if (error instanceof ParseError parseError && parseError.getActual() != null) {
                 String message = error.getMessage() + parseError.getActual().raw();
                 ParserErrors.error(message);
-//                log.error(message);
+                log.error(message);
             } else {
                 ParserErrors.error(error.getMessage());
                 log.error(error.getMessage());
@@ -415,7 +415,7 @@ public class Parser {
             eat(OpenBraces, "Object must start with { but it is: " + getIterator().getCurrent());
         }
         Expression res;
-        if (IsLookAhead(CloseBraces, EOF, CloseParenthesis)) {
+        if (IsLookAhead(CloseBraces, EOF, CloseParenthesis, UnionType)) {
             res = ObjectExpression.objectExpression();
         } else {
             res = ObjectExpression.objectExpression(ObjectPropertyList());
@@ -1170,8 +1170,7 @@ public class Parser {
         while (!IsLookAhead(lineTerminator) && !IsLookAhead(EOF)) {
             var param = ParseUnionType();
             if (params.contains(param)) {
-                Token current = iterator.getCurrent();
-                throw ParserErrors.error("Duplicate type parameter: ", current, current.type());
+                throw ParserErrors.error("Duplicate type parameter: " + printer.visit(param));
             }
             params.add(param);
             if (IsLookAhead(UnionType)) {

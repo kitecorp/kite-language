@@ -7,7 +7,6 @@ import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.UnionType;
 import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -99,11 +98,10 @@ public class UnionTypeTest extends CheckerTest {
     }
 
     @Test
-    @Disabled("type alias of object assign a specific object")
     void unionTypeAliasNestedSpecificObject() {
         var res = eval("""
                 type someType  = { env: number | 10 } // this should be supported
-                var someType x = { env: 'hello' } // ok since we assign a object
+                var someType x = { env: 'hello' } // should throw 
                 """);
         assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
     }
@@ -125,6 +123,56 @@ public class UnionTypeTest extends CheckerTest {
         Assertions.assertThrows(TypeError.class, () ->
                 eval("""
                         type alias  = { env: number }
+                        var alias x = { env: 'hello' } // throws because env is of wrong type in alias object
+                        """)
+        );
+    }
+    @Test
+    @DisplayName("type alias of object assign any object")
+    void unionTypeAliasObjectKeyword() {
+        var res = eval("""
+                type alias  = object({ env: number})
+                var alias x = { env: 2 } // ok since we assign a object
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+    }
+
+    @Test
+    @DisplayName("type alias of object assign a specific object")
+    void unionTypeAliasSpecificObjectKeyword() {
+        var res = eval("""
+                type alias  = object({ env: number})
+                var alias x = { env: 2 } // ok since we assign a object
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+    }
+
+    @Test
+    void unionTypeAliasNestedSpecificObjectKeyword() {
+        var res = eval("""
+                type someType  = object({ env: number | 10 }) // this should be supported
+                var someType x = { env: 'hello' } // should throw 
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+    }
+
+    @Test
+    @DisplayName("throw because variable was not declared inside the object")
+    void throwSinceVariableWasNotDeclaredInsideTheObjectKeyword() {
+        Assertions.assertThrows(NotFoundException.class, () ->
+                eval("""
+                        type alias = object({ env: number })
+                        var alias x = { count: 2 } // throws because count was not declared in alias object
+                        """)
+        );
+    }
+
+    @Test
+    @DisplayName("throw because variable was declared with a different type in the object")
+    void throwSinceVariableWasDeclaredWithADifferentTypeInsideTheObjectKeyword() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        type alias  = object({ env: number })
                         var alias x = { env: 'hello' } // throws because env is of wrong type in alias object
                         """)
         );

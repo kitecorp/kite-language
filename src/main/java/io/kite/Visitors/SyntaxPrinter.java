@@ -125,13 +125,13 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(ObjectExpression expression) {
-        var builder = new StringBuilder("{ ");
-        for (var literal : expression.getProperties()) {
-            builder.append(visit(literal));
-            builder.append("\n");
+        if (expression.getProperties().isEmpty()) {
+            return "{ }";
         }
-        builder.append(" }");
-        return builder.toString();
+        String builder = expression.getProperties().stream()
+                .map(this::visit)
+                .collect(Collectors.joining(",\n", "\n{\n ", " \n}"));
+        return builder;
     }
 
     @Override
