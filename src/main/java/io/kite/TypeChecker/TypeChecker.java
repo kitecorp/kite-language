@@ -264,6 +264,9 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     private Type expect(Type actualType, UnionType declaredType, Expression expectedVal) {
+        if (Objects.equals(actualType, declaredType)) {
+            return declaredType;
+        }
         if (declaredType.getTypes().contains(actualType)) {
             if (actualType instanceof ObjectType properties) {
                 // iterate over init object properties to make sure all declarations match the allowed properties in the union type declaration
@@ -276,9 +279,6 @@ public final class TypeChecker implements Visitor<Type> {
                     }
                 }
             }
-            return declaredType;
-        } else if (actualType instanceof ArrayType arrayType &&
-                   arrayType.getType() == null) { // implicit type is [] ?
             return declaredType;
         }
         String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
