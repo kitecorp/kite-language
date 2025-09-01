@@ -66,6 +66,50 @@ public class UnionTypeErrorsTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("Should throw error if assigning a object to a union type of numbers")
+    void shouldThrowIfAssignEmptyObjectToNumberUnionType() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eval("""
+                    type customNumbers = 1 | 2 | 5
+                    var customNumbers numbers = { }
+                    """);
+        });
+    }
+
+    @Test
+    @DisplayName("Should throw error if assigning a object to a union type of numbers")
+    void shouldThrowIfAssignKeywordObjectToNumberUnionType() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eval("""
+                    type customNumbers = 1 | 2 | 5
+                    var customNumbers numbers = object
+                    """);
+        });
+    }
+
+    @Test
+    @DisplayName("Should throw error if assigning a object to a union type of numbers")
+    void shouldThrowIfAssignEmptyKeywordObjectToNumberUnionType() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eval("""
+                    type customNumbers = 1 | 2 | 5
+                    var customNumbers numbers = object()
+                    """);
+        });
+    }
+
+    @Test
+    @DisplayName("Should throw error if assigning a object to a union type of numbers")
+    void shouldThrowIfAssignEmptyKeywordEmptyObjectToNumberUnionType() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            eval("""
+                    type customNumbers = 1 | 2 | 5
+                    var customNumbers numbers = object({})
+                    """);
+        });
+    }
+
+    @Test
     @DisplayName("Should throw error if assigning a array of string to a union type of numbers")
     void shouldThrowIfAssignArrayToNumberUnionType() {
         assertThrows(IllegalArgumentException.class, () -> {
