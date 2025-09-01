@@ -830,7 +830,80 @@ public abstract class InputTest extends RuntimeTest {
         setInput("[{ env : 'dev' }]");
         assertThrows(TypeError.class, () -> eval("input object region "));
     }
+    /*
+     * input array alias with invalid values
+     * */
+    @Test
+    void inputMixedAliasInitWithNumberError() {
+        setInput(true);
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
 
+    @Test
+    void inputMixedAliasInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputMixedAliasInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputMixedAliasInitWithEmptyArrayError() {
+        setInput("[]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputMixedAliasInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputMixedAliasInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputMixedAliasInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
+
+    @Test
+    void inputMixedAliasInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string 
+                input custom region
+                """));
+    }
 
     @Test
     void inputStringArrayInitError() {
