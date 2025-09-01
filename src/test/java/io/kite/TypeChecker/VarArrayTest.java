@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker var array")
 public class VarArrayTest extends CheckerTest {
@@ -448,13 +449,10 @@ public class VarArrayTest extends CheckerTest {
 
     @Test
     void testAppendNull() {
-        eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 var string[] x = []
                 x += null
-                """);
-        var varType = (ArrayType) checker.getEnv().lookup("x");
-        Assertions.assertNotNull(varType);
-        assertEquals(ValueType.String, varType.getType());
+                """));
     }
 
     @Test

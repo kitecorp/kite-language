@@ -257,7 +257,8 @@ public final class TypeChecker implements Visitor<Type> {
             }
             return expectedType;
         } else if (expectedType instanceof ArrayType expectedArrayType) {
-            return expect(actualType, expectedArrayType.getType(), expectedVal);
+            expect(actualType, expectedArrayType.getType(), expectedVal);
+            return expectedArrayType;
         }
         return expectedType;
     }
