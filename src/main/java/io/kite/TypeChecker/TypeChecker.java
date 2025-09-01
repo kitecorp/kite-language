@@ -277,6 +277,9 @@ public final class TypeChecker implements Visitor<Type> {
                 }
             }
             return declaredType;
+        } else if (actualType instanceof ArrayType arrayType &&
+                   arrayType.getType() == null) { // implicit type is [] ?
+            return declaredType;
         }
         String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                 printer.visit(declaredType),

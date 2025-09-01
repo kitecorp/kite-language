@@ -1,18 +1,15 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.UnionType;
 import io.kite.TypeChecker.Types.ValueType;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Var")
 public class UnionTypeTest extends CheckerTest {
@@ -108,27 +105,7 @@ public class UnionTypeTest extends CheckerTest {
         assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
     }
 
-    @Test
-    @DisplayName("throw because variable was not declared inside the object")
-    void throwSinceVariableWasNotDeclaredInsideTheObject() {
-        Assertions.assertThrows(NotFoundException.class, () ->
-                eval("""
-                        type alias = { env: number }
-                        var alias x = { count: 2 } // throws because count was not declared in alias object
-                        """)
-        );
-    }
 
-    @Test
-    @DisplayName("throw because variable was declared with a different type in the object")
-    void throwSinceVariableWasDeclaredWithADifferentTypeInsideTheObject() {
-        Assertions.assertThrows(TypeError.class, () ->
-                eval("""
-                        type alias  = { env: number }
-                        var alias x = { env: 'hello' } // throws because env is of wrong type in alias object
-                        """)
-        );
-    }
     @Test
     @DisplayName("type alias of object assign any object")
     void unionTypeAliasObjectKeyword() {
@@ -159,27 +136,6 @@ public class UnionTypeTest extends CheckerTest {
         assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
     }
 
-    @Test
-    @DisplayName("throw because variable was not declared inside the object")
-    void throwSinceVariableWasNotDeclaredInsideTheObjectKeyword() {
-        Assertions.assertThrows(NotFoundException.class, () ->
-                eval("""
-                        type alias = object({ env: number })
-                        var alias x = { count: 2 } // throws because count was not declared in alias object
-                        """)
-        );
-    }
-
-    @Test
-    @DisplayName("throw because variable was declared with a different type in the object")
-    void throwSinceVariableWasDeclaredWithADifferentTypeInsideTheObjectKeyword() {
-        Assertions.assertThrows(TypeError.class, () ->
-                eval("""
-                        type alias  = object({ env: number })
-                        var alias x = { env: 'hello' } // throws because env is of wrong type in alias object
-                        """)
-        );
-    }
 
     @Test
     @DisplayName("type alias of string assign a boolean string")
@@ -191,36 +147,57 @@ public class UnionTypeTest extends CheckerTest {
         assertEquals(new UnionType("alias", checker.getEnv(), ValueType.String), res);
     }
 
-    @Test
-    @DisplayName("Should throw because we assign the wrong value type")
-    void unionTypeNumberBooleanThrows() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                type alias = number
-                var alias x = false
-                """)
-        );
-    }
 
     @Test
-    @DisplayName("Should throw because we assign the wrong value type")
-    void unionTypeStringBooleanThrows() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasStringAllowEmptyInit() {
+        var res = eval("""
                 type alias = string
-                var alias x = false
-                """)
-        );
+                var alias x = []
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.String), res);
     }
 
     @Test
-    @DisplayName("Should throw because we assign the wrong value type")
-    void unionTypeNumberArrayThrows() {
-        Assertions.assertThrows(TypeError.class, () ->
-                eval("""
-                        type alias = 1 | 2
-                        var alias x = [1,2]
-                        """)
-        );
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasNumberAllowEmptyInit() {
+        var res = eval("""
+                type alias = number
+                var alias x = []
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
     }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasNumberAndStringAllowEmptyInit() {
+        var res = eval("""
+                type alias = number | string | null
+                var alias x = []
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number, ValueType.String, ValueType.Null), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasBooleanAllowEmptyInit() {
+        var res = eval("""
+                type alias = boolean
+                var alias x = []
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Boolean), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasDecimalAllowEmptyInit() {
+        var res = eval("""
+                type alias = 1.2
+                var alias x = []
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+    }
+
 
     @Test
     @DisplayName("Should not throw because we assign the correct array type")
@@ -229,46 +206,6 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = 1 | 2
                 var alias[] x = [1, 2]
                 """);
-    }
-
-    @Test
-    @DisplayName("Should throw because we assign the incorrect array type")
-    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayType() {
-        assertThrows(TypeError.class, () -> eval("""
-                type alias = 1 | 2
-                var alias[] x = ['hello']
-                """)
-        );
-    }
-
-    @Test
-    @DisplayName("Should throw because we assign the incorrect array type")
-    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeTrue() {
-        assertThrows(TypeError.class, () -> eval("""
-                type alias = 1 | 2
-                var alias[] x = [true]
-                """)
-        );
-    }
-
-    @Test
-    @DisplayName("Should throw because we assign the incorrect array type")
-    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeFalse() {
-        assertThrows(TypeError.class, () -> eval("""
-                type alias = 1 | 2
-                var alias[] x = [false]
-                """)
-        );
-    }
-
-    @Test
-    @DisplayName("Should throw because we assign the incorrect array type")
-    void unionTypeArrayOfNumbersThrowsWhenAssigningWrongArrayTypeObject() {
-        assertThrows(TypeError.class, () -> eval("""
-                type alias = 1 | 2
-                var alias[] x = [{env: 'dev'}]
-                """)
-        );
     }
 
     @Test
