@@ -214,7 +214,7 @@ public class UnionTypeTest extends CheckerTest {
 
     @Test
     @DisplayName("Should not throw because we assign the correct array type")
-    void unionTypeArrayOfNumbersShouldNotThrowWhenAssigningCorrectArrayType() {
+    void unionTypeArrayOfNumbersShouldAllowAssigningCorrectArrayType() {
         eval("""
                 type alias = 1 | 2
                 var alias[] x = [1, 2]
