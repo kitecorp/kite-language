@@ -338,134 +338,105 @@ public class InputArraysTest extends CheckerTest {
     void inputUnionInitNullError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = null"""));
+                input custom[] something = null"""));
     }
 
     @Test
     void inputUnionInitBooleanError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = true"""));
-    }
-
-    @Test
-    void inputUnionInitIntError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom something = [1,2,3]"""));
-    }
-
-    @Test
-    void inputUnionInitDecimalError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom something = [1.2,2.3,3.4]"""));
+                input custom[] something = true"""));
     }
 
     @Test
     void inputUnionInitObjectEmptyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = {}"""));
+                input custom[] something = {}"""));
     }
 
     @Test
     void inputUnionInitObjectEmptyKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object"""));
+                input custom[] something = object"""));
     }
 
     @Test
     void inputUnionInitObjectEmptyKeywordNoBodyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object()"""));
+                input custom[] something = object()"""));
     }
 
     @Test
     void inputUnionInitObjectEmptyKeywordEmptyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object({})"""));
+                input custom[] something = object({})"""));
     }
 
     @Test
     void inputUnionInitObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object({ env: 'dev'})"""));
+                input custom[] something = object({ env: 'dev'})"""));
     }
 
     @Test
     void inputUnionInitObjectError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = { env: 'dev' }"""));
-    }
-
-
-    @Test
-    void inputUnionInitArrayStringError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom something = ['hello']"""));
-    }
-
-    @Test
-    void inputUnionInitArrayNumberError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom something = [1,2,3]"""));
+                input custom[] something = { env: 'dev' }"""));
     }
 
     @Test
     void inputUnionInitArrayBooleanError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [true,false]"""));
+                input custom[] something = [true,false]"""));
     }
 
     @Test
     void inputUnionInitArrayNullError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [true,false]"""));
+                input custom[] something = [null]"""));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [{}, {}]"""));
+                input custom[] something = [{}, {}]"""));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectBodyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [object(), object()]"""));
+                input custom[] something = [object(), object()]"""));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectBodyEmptyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [object({}), object({})]"""));
+                input custom[] something = [object({}), object({})]"""));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [object, object]"""));
+                input custom[] something = [object, object]"""));
     }
 
     @Test
     void inputUnionInitArrayObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [{env: 'dev'}, {env: 'dev'}]"""));
+                input custom[] something = [{env: 'dev'}, {env: 'dev'}]"""));
     }
 
 
