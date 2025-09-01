@@ -127,6 +127,13 @@ public class UnionTypeErrorsTest extends CheckerTest {
         );
     }
 
-
+    @Test
+    @DisplayName("Should throw because we init array to a non array type")
+    void unionTypeAliasNumberAndStringAllowEmptyInit() {
+        assertThrows(TypeError.class, () -> eval("""
+                type alias = number | string | null
+                var alias x = []
+                """));
+    }
 
 }

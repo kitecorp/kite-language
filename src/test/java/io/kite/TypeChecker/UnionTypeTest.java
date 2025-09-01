@@ -142,7 +142,7 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasStringBooleanString() {
         var res = eval("""
                 type alias = string
-                var alias x = 'true'; // ok since we assign a string
+                var alias x = 'hello'; // ok since we assign a string
                 """);
         assertEquals(new UnionType("alias", checker.getEnv(), ValueType.String), res);
     }
@@ -153,9 +153,9 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasStringAllowEmptyInit() {
         var res = eval("""
                 type alias = string
-                var alias x = []
+                var alias[] x = []
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.String), res);
+        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.String)), res);
     }
 
     @Test
@@ -163,9 +163,9 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasNumberAllowEmptyInit() {
         var res = eval("""
                 type alias = number
-                var alias x = []
+                var alias[] x = []
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number)), res);
     }
 
     @Test
@@ -173,9 +173,9 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasNumberAndStringAllowEmptyInit() {
         var res = eval("""
                 type alias = number | string | null
-                var alias x = []
+                var alias[] x = []
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number, ValueType.String, ValueType.Null), res);
+        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
     }
 
     @Test
@@ -183,12 +183,12 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasAllowAddition() {
         var res = eval("""
                 type alias = number | string | null
-                var alias x = []
+                var alias[] x = []
                 x+=10
                 x+=null
                 x+="hello"
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number, ValueType.String, ValueType.Null), res);
+        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
     }
 
     @Test
@@ -196,9 +196,9 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasBooleanAllowEmptyInit() {
         var res = eval("""
                 type alias = boolean
-                var alias x = []
+                var alias[] x = []
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Boolean), res);
+        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Boolean)), res);
     }
 
     @Test
@@ -206,9 +206,9 @@ public class UnionTypeTest extends CheckerTest {
     void unionTypeAliasDecimalAllowEmptyInit() {
         var res = eval("""
                 type alias = 1.2
-                var alias x = []
+                var alias[] x = []
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number)), res);
     }
 
 
