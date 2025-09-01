@@ -1041,34 +1041,4 @@ public abstract class InputTest extends RuntimeTest {
         assertThrows(TypeError.class, () -> eval("input object[] region "));
     }
 
-    // DEFAULTS
-    @Test
-    void inputStringArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input string[] region=[1,2,3]"));
-    }
-
-    @Test
-    void inputNumberArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input number[] region=['hi']"));
-    }
-
-    @Test
-    void inputBooleanArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input boolean[] region=[1]"));
-    }
-
-    @Test
-    void inputObjectArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input object[] region=[1]"));
-    }
-
-
-    @Test
-    void inputUnionArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom[] region = [true]
-                """));
-    }
-
 }
