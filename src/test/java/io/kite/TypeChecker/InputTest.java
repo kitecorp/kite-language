@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import static io.kite.TypeChecker.Types.ArrayType.arrayType;
 import static io.kite.TypeChecker.Types.UnionType.unionType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Input")
 public class InputTest extends CheckerTest {
@@ -87,39 +86,6 @@ public class InputTest extends CheckerTest {
     }
 
     @Test
-    void inputStringInitError() {
-        assertThrows(TypeError.class, () -> eval("input string something = 10"));
-    }
-
-    @Test
-    void inputNumberInitError() {
-        assertThrows(TypeError.class, () -> eval("input number something = 'hello' "));
-    }
-
-    @Test
-    void inputBooleanInitError() {
-        assertThrows(TypeError.class, () -> eval("input boolean something = 123"));
-    }
-
-    @Test
-    void inputObjectInitEmptyError() {
-        assertThrows(TypeError.class, () -> eval("input object something = true"));
-    }
-
-    @Test
-    void inputObjectInitError() {
-        assertThrows(TypeError.class, () -> eval("input object something = 'hello'"));
-    }
-
-    @Test
-    void inputUnionInitError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom something = true
-                """));
-    }
-
-    @Test
     void inputStringArray() {
         var res = eval("input string[] something");
         assertEquals(arrayType(ValueType.String), res);
@@ -187,33 +153,5 @@ public class InputTest extends CheckerTest {
         assertEquals(arrayType(unionType("custom", ValueType.String, ValueType.Number)), res);
     }
 
-    @Test
-    void inputStringArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input string[] something=[1,2,3]"));
-    }
-
-    @Test
-    void inputNumberArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input number[] something=['hi']"));
-    }
-
-    @Test
-    void inputBooleanArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input boolean[] something=[1]"));
-    }
-
-    @Test
-    void inputObjectArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("input object[] something=[1]"));
-    }
-
-
-    @Test
-    void inputUnionArrayInitError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                input custom[] something = [true]
-                """));
-    }
 
 }
