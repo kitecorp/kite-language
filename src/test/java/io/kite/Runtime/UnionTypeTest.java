@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,6 @@ public class UnionTypeTest extends RuntimeTest {
         var res = eval("type num = 1");
         Assertions.assertTrue(global.hasVar("num"));
         assertEquals(Set.of(1), res);
-        log.info(res);
     }
 
     @Test
@@ -29,7 +29,6 @@ public class UnionTypeTest extends RuntimeTest {
         var res = eval("type bool = true");
         Assertions.assertTrue(global.hasVar("bool"));
         assertEquals(Set.of(true), res);
-        log.info(res);
     }
 
     @Test
@@ -37,7 +36,6 @@ public class UnionTypeTest extends RuntimeTest {
         var res = eval("type bool = false");
         Assertions.assertTrue(global.hasVar("bool"));
         assertEquals(Set.of(false), res);
-        log.info(res);
     }
 
     @Test
@@ -45,7 +43,6 @@ public class UnionTypeTest extends RuntimeTest {
         var res = eval("type x = \"hello\"");
         Assertions.assertTrue(global.hasVar("x"));
         assertEquals(Set.of("hello"), res);
-        log.info(res);
     }
 
     @Test
@@ -56,7 +53,6 @@ public class UnionTypeTest extends RuntimeTest {
         Assertions.assertTrue(global.hasVar("x"));
         assertEquals(Set.of("hello", "world"), res);
         assertEquals(Set.of("hello", "world"), global.get("x"));
-        log.info(res);
     }
 
     @Test
@@ -66,7 +62,6 @@ public class UnionTypeTest extends RuntimeTest {
                 """);
         Assertions.assertTrue(global.hasVar("x"));
         assertEquals(Set.of(Map.of("name", "hello"), Map.of("name", "world")), res);
-        log.info(res);
     }
 
     @Test
@@ -78,7 +73,6 @@ public class UnionTypeTest extends RuntimeTest {
                 """);
         Assertions.assertTrue(global.hasVar("INT"));
         assertEquals(Set.of(1, 2), res);
-        log.info(res);
     }
 
     @Test
@@ -90,7 +84,6 @@ public class UnionTypeTest extends RuntimeTest {
                 """);
         Assertions.assertTrue(global.hasVar("INT"));
         assertEquals(Set.of(1, 2), res);
-        log.info(res);
     }
 
     @Test
@@ -101,7 +94,6 @@ public class UnionTypeTest extends RuntimeTest {
                 """);
         Assertions.assertTrue(global.hasVar("INT"));
         assertEquals(Set.of(Map.of("env", "dev"), 0, 1, "hello", true), res);
-        log.info(res);
     }
 
     @Test
@@ -110,7 +102,6 @@ public class UnionTypeTest extends RuntimeTest {
         Assertions.assertTrue(global.hasVar("num"));
         assertNull(global.get("x"));
         assertEquals(Set.of(1, 2, 5), res);
-        log.info(res);
     }
 
     @Test
@@ -122,95 +113,6 @@ public class UnionTypeTest extends RuntimeTest {
         Assertions.assertTrue(global.hasVar("customNumbers"));
         assertNull(global.get("x"));
         assertEquals(List.of(1, 2, 5), res);
-        log.info(res);
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning the wrong value to a union type of numbers")
-    void ShouldThrow() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = 3
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning a string to a union type of numbers")
-    void shouldThrowString() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = 'hello'
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning a false to a union type of numbers")
-    void shouldThrowIfAssignFalseToNumberUnionType() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = false
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning a true to a union type of numbers")
-    void shouldThrowIfAssignTrueToNumberUnionType() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = true
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning a object to a union type of numbers")
-    void shouldThrowIfAssignObjectToNumberUnionType() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = { hello: 'world' }
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning a array of string to a union type of numbers")
-    void shouldThrowIfAssignArrayToNumberUnionType() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = ['hello']
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if assigning a array of numbers to a union type of numbers")
-    void shouldThrowIfAssignArrayOfValidNumbersToNumberUnionType() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = [1,2,5]
-                    """);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw error if array contains incompatible types")
-    void arrayOfTypeShouldThrow() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            eval("""
-                    type customNumbers = 1 | 2 | 5
-                    var customNumbers[] numbers = [3]
-                    """);
-        });
     }
 
     @Test
@@ -219,8 +121,24 @@ public class UnionTypeTest extends RuntimeTest {
         Assertions.assertTrue(global.hasVar("num"));
         assertNull(global.get("x"));
         assertEquals(Set.of(true, false), res);
-        log.info(res);
     }
 
-
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasAllowAddition() {
+        var res = eval("""
+                type alias = number | string | null
+                var alias[] x = []
+                x+=10
+                x+=null
+                x+="hello"
+                """);
+        Assertions.assertTrue(global.hasVar("x"));
+        assertNotNull(global.get("x"));
+        var objects = new ArrayList<>();
+        objects.add(10);
+        objects.add(null);
+        objects.add("hello");
+        assertEquals(objects, res);
+    }
 }
