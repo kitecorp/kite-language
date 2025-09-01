@@ -1,7 +1,6 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.UnionType;
 import io.kite.TypeChecker.Types.ValueType;
@@ -9,6 +8,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.TypeChecker.Types.ArrayType.arrayType;
+import static io.kite.TypeChecker.Types.UnionType.unionType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TypeChecker Var")
@@ -21,7 +22,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = 1 | 2
                 """);
         var tb = checker.getEnv().lookup("alias");
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), tb);
+        assertEquals(UnionType.unionType("alias", ValueType.Number), tb);
     }
 
 
@@ -31,7 +32,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = 1 | 2
                 var alias x = 3; // ok since we assign a number. Actual value validation is checked in interpreter
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+        assertEquals(UnionType.unionType("alias", ValueType.Number), res);
     }
 
     @Test
@@ -41,7 +42,7 @@ public class UnionTypeTest extends CheckerTest {
                 var alias x = 2;
                 x = 3
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+        assertEquals(UnionType.unionType("alias", ValueType.Number), res);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class UnionTypeTest extends CheckerTest {
                 var alias z = true
                 var alias d = null
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number, ValueType.String, ValueType.Null, ValueType.Boolean), res);
+        assertEquals(UnionType.unionType("alias", ValueType.Number, ValueType.String, ValueType.Null, ValueType.Boolean), res);
     }
 
     @Test
@@ -62,7 +63,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = number
                 var alias x = 3; // ok since we assign a number. Actual value validation is checked in interpreter
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number), res);
+        assertEquals(UnionType.unionType("alias", ValueType.Number), res);
     }
 
     @Test
@@ -72,7 +73,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = string
                 var alias x = 'hello'; // ok since we assign a string
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.String), res);
+        assertEquals(UnionType.unionType("alias", ValueType.String), res);
     }
 
     @Test
@@ -82,7 +83,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias  = { env: number}
                 var alias x = { env: 2 } // ok since we assign a object
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+        assertEquals(UnionType.unionType("alias", new ObjectType(checker.getEnv())), res);
     }
 
     @Test
@@ -92,7 +93,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias  = { env: number}
                 var alias x = { env: 2 } // ok since we assign a object
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+        assertEquals(UnionType.unionType("alias", new ObjectType(checker.getEnv())), res);
     }
 
     @Test
@@ -102,7 +103,7 @@ public class UnionTypeTest extends CheckerTest {
                 type someType  = { env: number | 10 } // this should be supported
                 var someType x = { env: 'hello' } // should throw 
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+        assertEquals(UnionType.unionType("alias", new ObjectType(checker.getEnv())), res);
     }
 
 
@@ -113,7 +114,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias  = object({ env: number})
                 var alias x = { env: 2 } // ok since we assign a object
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+        assertEquals(UnionType.unionType("alias", new ObjectType(checker.getEnv())), res);
     }
 
     @Test
@@ -123,7 +124,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias  = object({ env: number})
                 var alias x = { env: 2 } // ok since we assign a object
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+        assertEquals(UnionType.unionType("alias", new ObjectType(checker.getEnv())), res);
     }
 
     @Test
@@ -133,7 +134,7 @@ public class UnionTypeTest extends CheckerTest {
                 type someType  = object({ env: number | 10 }) // this should be supported
                 var someType x = { env: 'hello' } // should throw 
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), new ObjectType(checker.getEnv())), res);
+        assertEquals(unionType("alias", new ObjectType(checker.getEnv())), res);
     }
 
 
@@ -144,7 +145,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = string
                 var alias x = 'hello'; // ok since we assign a string
                 """);
-        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.String), res);
+        assertEquals(unionType("alias", ValueType.String), res);
     }
 
 
@@ -155,7 +156,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = string
                 var alias[] x = []
                 """);
-        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.String)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.String)), res);
     }
 
     @Test
@@ -165,7 +166,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = number
                 var alias[] x = []
                 """);
-        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.Number)), res);
     }
 
     @Test
@@ -175,7 +176,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = number | string | null
                 var alias[] x = []
                 """);
-        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
     }
 
     @Test
@@ -188,7 +189,7 @@ public class UnionTypeTest extends CheckerTest {
                 x+=null
                 x+="hello"
                 """);
-        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
     }
 
     @Test
@@ -198,7 +199,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = boolean
                 var alias[] x = []
                 """);
-        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Boolean)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.Boolean)), res);
     }
 
     @Test
@@ -208,7 +209,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = 1.2
                 var alias[] x = []
                 """);
-        assertEquals(ArrayType.arrayType(UnionType.unionType("alias", ValueType.Number)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.Number)), res);
     }
 
 
@@ -228,7 +229,7 @@ public class UnionTypeTest extends CheckerTest {
                 type alias = 1 | 2
                 var alias[] x = [3]
                 """);
-        assertEquals(new ArrayType(checker.getEnv(), new UnionType("alias", checker.getEnv(), ValueType.Number)), res);
+        assertEquals(arrayType(unionType("alias", ValueType.Number)), res);
     }
 
 
