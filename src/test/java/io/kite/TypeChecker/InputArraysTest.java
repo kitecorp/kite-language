@@ -278,68 +278,59 @@ public class InputArraysTest extends CheckerTest {
     /// OBJECT
     @Test
     void inputObjectInitNullError() {
-        assertThrows(TypeError.class, () -> eval("input object something = null"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = null"));
     }
 
     @Test
     void inputObjectInitBooleanError() {
-        assertThrows(TypeError.class, () -> eval("input object something = null"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = true"));
     }
 
     @Test
-    void inputObjectInitIntError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [1,2,3]"));
+    void inputObjectInitNumberError() {
+        assertThrows(TypeError.class, () -> eval("input object[] something = 10"));
     }
 
     @Test
     void inputObjectInitDecimalError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [1.2,2.3,3.4]"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = 0.1"));
+    }
+
+    @Test
+    void inputObjectInitStringError() {
+        assertThrows(TypeError.class, () -> eval("input object[] something = 'hello'"));
+    }
+
+    @Test
+    void inputObjectInitIntError() {
+        assertThrows(TypeError.class, () -> eval("input object[] something = [1,2,3]"));
+    }
+
+    @Test
+    void inputObjectInitDecimalArrayError() {
+        assertThrows(TypeError.class, () -> eval("input object[] something = [1.2,2.3,3.4]"));
     }
 
     @Test
     void inputObjectInitArrayStringError() {
-        assertThrows(TypeError.class, () -> eval("input object something = ['hello']"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = ['hello']"));
     }
 
     @Test
     void inputObjectInitArrayNumberError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [1,2,3]"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = [1,2,3]"));
     }
 
     @Test
     void inputObjectInitArrayBooleanError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [true,false]"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = [true,false]"));
     }
 
     @Test
     void inputObjectInitArrayNullError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [true,false]"));
+        assertThrows(TypeError.class, () -> eval("input object[] something = [null]"));
     }
 
-    @Test
-    void inputObjectInitArrayEmptyObjectError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [{}, {}]"));
-    }
-
-    @Test
-    void inputObjectInitArrayEmptyObjectBodyError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [object(), object()]"));
-    }
-
-    @Test
-    void inputObjectInitArrayEmptyObjectBodyEmptyError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [object({}), object({})]"));
-    }
-
-    @Test
-    void inputObjectInitArrayEmptyObjectKeywordError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [object, object]"));
-    }
-
-    @Test
-    void inputObjectInitArrayObjectKeywordError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [{env: 'dev'}, {env: 'dev'}]"));
-    }
 
     /// UNION
 
