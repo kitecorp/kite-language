@@ -903,6 +903,7 @@ public abstract class InputTest extends RuntimeTest {
         setInput("[{ env : 'dev' }]");
         eval("input any region ");
     }
+
     /*
      * Mixed Type alias with invalid values
      * */
@@ -984,25 +985,25 @@ public abstract class InputTest extends RuntimeTest {
     @Test
     void inputArrayInitWithNumberError() {
         setInput(123);
-        eval("input object[] region");// ok because user can --input=123 or --input=123,456
+        assertThrows(TypeError.class, () ->eval("input object[] region"));
     }
 
     @Test
     void inputArrayInitWithDecimalError() {
         setInput(1.2);
-        eval("input object[] region"); // ok because user can --input=1.2 or --input=1.2,1.3,1.4
+        assertThrows(TypeError.class, () -> eval("input object[] region"));
     }
 
     @Test
     void inputArrayInitWithDecimalDotError() {
         setInput(0.2);
-        eval("input object[] region"); // ok because user can --input=0.2 or --input=0.2,0.3,0.4
+        assertThrows(TypeError.class, () -> eval("input object[] region"));
     }
 
     @Test
     void inputArrayInitWithStringError() {
         setInput("hello");
-        eval("input object[] region ");// ok because user can --input="hello" or --input="hello","world""
+        assertThrows(TypeError.class, () -> eval("input object[] region "));
     }
 
     @Test
@@ -1020,7 +1021,7 @@ public abstract class InputTest extends RuntimeTest {
     @Test
     void inputArrayInitWithBooleanError() {
         setInput(true);
-        eval("input object[] region");// ok because user can --input=true or --input=true,false
+        assertThrows(TypeError.class, () ->eval("input object[] region"));
     }
 
     @Test
