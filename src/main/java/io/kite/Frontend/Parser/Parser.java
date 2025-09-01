@@ -415,7 +415,7 @@ public class Parser {
             eat(OpenBraces, "Object must start with { but it is: " + getIterator().getCurrent());
         }
         Expression res;
-        if (IsLookAhead(CloseBraces, EOF, CloseParenthesis, UnionType)) {
+        if (IsLookAhead(CloseBraces, EOF, CloseParenthesis, UnionType, Comma, CloseBrackets)) {
             res = ObjectExpression.objectExpression();
         } else {
             res = ObjectExpression.objectExpression(ObjectPropertyList());
