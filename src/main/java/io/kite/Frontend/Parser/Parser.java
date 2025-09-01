@@ -457,7 +457,7 @@ public class Parser {
      */
     private ObjectLiteral ObjectLiteral() {
         if (IsLookAhead(NewLine, Comma)) {
-            eat();
+            eatWhitespace();
             if (IsLookAhead(EOF)) {
                 return null;
             }

@@ -429,6 +429,14 @@ public class InputErrorsTest extends CheckerTest {
                 input custom something = object
                 """));
     }
+    @Test
+    void inputUnionInitObjectEmptyKeywordExtraSpaceError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string | number
+                input custom something = object
+                
+                """));
+    }
 
     @Test
     void inputUnionInitObjectEmptyKeywordNoBodyError() {
