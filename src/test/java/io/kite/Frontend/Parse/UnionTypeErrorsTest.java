@@ -77,5 +77,48 @@ public class UnionTypeErrorsTest extends ParserTest {
         Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
     }
 
+    @Test
+    void typeRepeatingArrayIntsError() {
+        parse("type custom = [1,2,3] | [1,2,3] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayDecimalsError() {
+        parse("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+
+    @Test
+    void typeRepeatingArrayBooleanError() {
+        parse("type custom = [true] | [true] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayStringsError() {
+        parse("type custom = ['hello'] | ['hello'] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayObjectEmptyError() {
+        parse("type custom = [{}] | [{}] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayObjectEmptyKeywordError() {
+        parse("type custom = [{}] | [object] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayObjectKeywordError() {
+        parse("type custom = [object] | [object] ");
+        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
 
 }
