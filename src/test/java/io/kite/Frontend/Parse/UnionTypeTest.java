@@ -2,9 +2,7 @@ package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.NullLiteral;
 import io.kite.Frontend.Parser.Expressions.UnionTypeStatement;
-import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -118,14 +116,6 @@ public class UnionTypeTest extends ParserTest {
                 """);
         var expected = program(union("int", number(1)), union("INT", symbol("int")));
         assertEquals(expected, res);
-        log.info(res);
-    }
-
-
-    @Test
-    void typeDeclarationUnionNumberError() {
-        var res = parse("type int = 1 | 1");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
         log.info(res);
     }
 

@@ -6,13 +6,11 @@ import io.kite.Frontend.Parser.errors.ErrorList;
 import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Log4j2
 public class ParserErrors {
     private static boolean hadRuntimeError = false;
     @Getter
@@ -24,11 +22,6 @@ public class ParserErrors {
     }
 
     public static ParseError error(String message, Token token, TokenType type) {
-        if (token.is(TokenType.EOF)) {
-            log.error("error on line: {} at end. {}", token.line(), message);
-        } else {
-            log.error("error on line {} at `{}` : {}", token.line(), token.raw(), message);
-        }
         ParseError parseError = ParseError.builder()
                 .actual(token)
                 .message(message)
