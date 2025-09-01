@@ -223,7 +223,8 @@ public final class TypeChecker implements Visitor<Type> {
             return switch (expectedType.getKind()) {
                 case ARRAY -> expectArray(actualType, expectedType, expectedVal);
                 case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
-                case ANY -> actualType; // just return the type of the actual value since we don't care what is declared in code
+                case ANY ->
+                        actualType; // just return the type of the actual value since we don't care what is declared in code
                 case null, default -> {
                     // only evaluate printing if we need to
                     String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
@@ -236,25 +237,27 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
-        if (!(actualType instanceof ArrayType actualArray) || !(expectedType instanceof ArrayType expectedArrayType)) {
-            return expectedType;
-        }
-        if (expectedArrayType.isType(AnyType.INSTANCE)) {
-            return expectedArrayType; // skip type checking for any type
-        }
+        if (actualType instanceof ArrayType actualArray && expectedType instanceof ArrayType expectedArrayType) {
+            if (expectedArrayType.isType(AnyType.INSTANCE)) {
+                return expectedArrayType; // skip type checking for any type
+            }
 
-        if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
-            return expectedArrayType;
-        } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
-            // when we pass expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
-            // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
-            return actualType;
-        } else if (expectedArrayType.getType() instanceof UnionType union) {
-            return expect(actualArray.getType(), union, expectedVal);
-        } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
-            String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                    expectedArrayType.getType().getValue(), actualArray.getType(), printer.visit(expectedVal));
-            throw new TypeError(string);
+            if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
+                return expectedArrayType;
+            } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
+                // when we pass expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
+                // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
+                return actualType;
+            } else if (expectedArrayType.getType() instanceof UnionType union) {
+                return expect(actualArray.getType(), union, expectedVal);
+            } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
+                String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                        expectedArrayType.getType().getValue(), actualArray.getType(), printer.visit(expectedVal));
+                throw new TypeError(string);
+            }
+            return expectedType;
+        } else if (expectedType instanceof ArrayType expectedArrayType) {
+            return expect(actualType, expectedArrayType.getType(), expectedVal);
         }
         return expectedType;
     }
@@ -326,12 +329,12 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(InputDeclaration expression) {
         var t1 = visit(expression.getType());
         // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
-        if (expression.getType().getType().getKind() != t1.getKind()) {
-            expression.getType().setType(t1);
-        }
         if (expression.hasInit()) {
             var t2 = visit(expression.getInit());
             expect(t2, t1, expression.getInit());
+        }
+        if (expression.getType().getType().getKind() != t1.getKind()) {
+            expression.getType().setType(t1);
         }
         return t1;
     }
