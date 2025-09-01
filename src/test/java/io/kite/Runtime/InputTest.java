@@ -831,6 +831,78 @@ public abstract class InputTest extends RuntimeTest {
         assertThrows(TypeError.class, () -> eval("input object region "));
     }
 
+    // ANY
+    @Test
+    void inputAnyInitWithNumberError() {
+        setInput(123);
+        eval("input any region");
+    }
+
+    @Test
+    void inputAnyInitWithDecimalError() {
+        setInput(1.2);
+        eval("input any region");
+    }
+
+    @Test
+    void inputAnyInitWithDecimalDotError() {
+        setInput(0.2);
+        eval("input any region");
+    }
+
+    @Test
+    void inputAnyInitWithStringError() {
+        setInput("hello");
+        eval("input any region ");
+    }
+
+    @Test
+    void inputAnyInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("input any region"));
+    }
+
+    @Test
+    void inputAnyInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("input any region"));
+    }
+
+    @Test
+    void inputAnyInitWithBooleanError() {
+        setInput(true);
+        eval("input any region");
+    }
+
+    @Test
+    void inputAnyInitWithEmptyArrayError() {
+        setInput("[]");
+        eval("input any region ");
+    }
+
+    @Test
+    void inputAnyInitWithStringArrayError() {
+        setInput("['hello','world']");
+        eval("input any region ");
+    }
+
+    @Test
+    void inputAnyInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        eval("input any region "); // throw because it's not declared as arry
+    }
+
+    @Test
+    void inputAnyInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        eval("input any region ");
+    }
+
+    @Test
+    void inputAnyInitWithObjectArrayError() {
+        setInput("[{ env : 'dev' }]");
+        eval("input any region ");
+    }
     /*
      * Mixed Type alias with invalid values
      * */
