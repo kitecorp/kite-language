@@ -95,6 +95,22 @@ public class UnionTypeTest extends ParserTest {
     }
 
     @Test
+    void typeDeclarationAnyObjectEmpty() {
+        var res = parse("type hey = object()");
+        var expected = program(union("hey", objectExpression()));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void typeDeclarationAnyObjectCurlyEmpty() {
+        var res = parse("type hey = object({})");
+        var expected = program(union("hey", objectExpression()));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
     void typeDeclarationAnotherType() {
         var res = parse("""
                 type int = 1
