@@ -563,7 +563,7 @@ public class Parser {
     }
 
     private Expression Initialize() {
-        if (IsLookAhead(OpenBraces)) {
+        if (IsLookAhead(OpenBraces, Object)) {
             blockContext = BlockContext.OBJECT;
         }
         var res = Expression();
@@ -586,7 +586,7 @@ public class Parser {
 
     private Expression Expression() {
         return switch (lookAhead().type()) {
-            case OpenBraces -> ObjectExpression();
+            case OpenBraces, Object -> ObjectExpression();
             case OpenBrackets -> ArrayExpression();
             default -> AssignmentExpression();
         };
