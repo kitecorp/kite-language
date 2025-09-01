@@ -223,7 +223,7 @@ public final class TypeChecker implements Visitor<Type> {
             return switch (expectedType.getKind()) {
                 case ARRAY -> expectArray(actualType, expectedType, expectedVal);
                 case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
-                case ANY -> actualType;
+                case ANY -> actualType; // just return the type of the actual value since we don't care what is declared in code
                 case null, default -> {
                     // only evaluate printing if we need to
                     String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
