@@ -180,6 +180,19 @@ public class UnionTypeTest extends CheckerTest {
 
     @Test
     @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasAllowAddition() {
+        var res = eval("""
+                type alias = number | string | null
+                var alias x = []
+                x+=10
+                x+=null
+                x+="hello"
+                """);
+        assertEquals(new UnionType("alias", checker.getEnv(), ValueType.Number, ValueType.String, ValueType.Null), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
     void unionTypeAliasBooleanAllowEmptyInit() {
         var res = eval("""
                 type alias = boolean
