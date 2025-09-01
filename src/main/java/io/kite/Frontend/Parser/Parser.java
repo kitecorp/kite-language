@@ -676,7 +676,10 @@ public class Parser {
     private Expression ArrayItem() {
         return switch (lookAhead().type()) {
             case Identifier -> SymbolIdentifier(); // Identifier() also checks for types
-            case OpenBraces -> ObjectExpression();
+            case OpenBraces, Object -> {
+                blockContext = BlockContext.OBJECT;
+                yield ObjectExpression();
+            }
             default -> {
                 eat(Number, String, True, False, Object, Null);
                 yield Literal();
@@ -1187,6 +1190,7 @@ public class Parser {
                 yield Literal();
             }
             case OpenBraces, Object -> ObjectDeclaration();
+            case OpenBrackets -> ArrayExpression();
             case Identifier -> Identifier();
             default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
         };
