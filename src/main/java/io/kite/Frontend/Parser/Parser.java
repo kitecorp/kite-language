@@ -440,8 +440,12 @@ public class Parser {
     private List<ObjectLiteral> ObjectPropertyList() {
         var declarations = new ArrayList<ObjectLiteral>();
         do {
-            eatWhitespace();
-            declarations.add(ObjectLiteral());
+
+            var e = ObjectLiteral();
+            if (e == null) {
+                break;
+            }
+            declarations.add(e);
         } while (IsLookAhead(Comma, NewLine) && eat(Comma, NewLine) != null && !IsLookAhead(CloseBraces, EOF));
         return declarations;
     }
@@ -452,6 +456,12 @@ public class Parser {
      * ;
      */
     private ObjectLiteral ObjectLiteral() {
+        if (IsLookAhead(NewLine, Comma)) {
+            eat();
+            if (IsLookAhead(EOF)) {
+                return null;
+            }
+        }
         var id = ObjectKeyIdentifier();
         var init = IsLookAhead(lineTerminator, Comma, EOF) ? null : ObjectInitializer();
         return ObjectLiteral.object(id, init);

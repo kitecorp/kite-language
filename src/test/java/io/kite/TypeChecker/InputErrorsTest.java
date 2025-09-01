@@ -76,7 +76,7 @@ public class InputErrorsTest extends CheckerTest {
 
     @Test
     void inputStringInitArrayNullError() {
-        assertThrows(TypeError.class, () -> eval("input string something = [true,false]"));
+        assertThrows(TypeError.class, () -> eval("input string something = [null]"));
     }
 
     @Test
@@ -109,6 +109,11 @@ public class InputErrorsTest extends CheckerTest {
     @Test
     void inputNumberInitBooleanError() {
         assertThrows(TypeError.class, () -> eval("input number something = true"));
+    }
+
+    @Test
+    void inputNumberInitStringError() {
+        assertThrows(TypeError.class, () -> eval("input number something = 'hello'"));
     }
 
     @Test
@@ -164,7 +169,7 @@ public class InputErrorsTest extends CheckerTest {
 
     @Test
     void inputNumberInitArrayNullError() {
-        assertThrows(TypeError.class, () -> eval("input number something = [true,false]"));
+        assertThrows(TypeError.class, () -> eval("input number something = [null]"));
     }
 
     @Test
@@ -200,13 +205,28 @@ public class InputErrorsTest extends CheckerTest {
     }
 
     @Test
-    void inputBooleanInitIntError() {
-        assertThrows(TypeError.class, () -> eval("input boolean something = [1,2,3]"));
+    void inputBooleanInitStringError() {
+        assertThrows(TypeError.class, () -> eval("input boolean something = 'hello'"));
+    }
+
+    @Test
+    void inputBooleanInitNumberError() {
+        assertThrows(TypeError.class, () -> eval("input boolean something = 10"));
     }
 
     @Test
     void inputBooleanInitDecimalError() {
-        assertThrows(TypeError.class, () -> eval("input boolean something = [1.2,2.3,3.4]"));
+        assertThrows(TypeError.class, () -> eval("input boolean something = 0.1"));
+    }
+
+    @Test
+    void inputBooleanInitIntError() {
+        assertThrows(TypeError.class, () -> eval("input boolean something = [1, 2, 3]"));
+    }
+
+    @Test
+    void inputBooleanInitDecimalArrayError() {
+        assertThrows(TypeError.class, () -> eval("input boolean something = [1.2, 2.3, 3.4]"));
     }
 
     @Test
@@ -247,7 +267,7 @@ public class InputErrorsTest extends CheckerTest {
 
     @Test
     void inputBooleanInitArrayNumberError() {
-        assertThrows(TypeError.class, () -> eval("input boolean something = [1,2,3]"));
+        assertThrows(TypeError.class, () -> eval("input boolean something = [1, 2, 3]"));
     }
 
     @Test
@@ -257,7 +277,7 @@ public class InputErrorsTest extends CheckerTest {
 
     @Test
     void inputBooleanInitArrayNullError() {
-        assertThrows(TypeError.class, () -> eval("input boolean something = [true,false]"));
+        assertThrows(TypeError.class, () -> eval("input boolean something = [null]"));
     }
 
     @Test
@@ -290,18 +310,34 @@ public class InputErrorsTest extends CheckerTest {
     void inputObjectInitNullError() {
         assertThrows(TypeError.class, () -> eval("input object something = null"));
     }
+
     @Test
     void inputObjectInitBooleanError() {
-        assertThrows(TypeError.class, () -> eval("input object something = null"));
+        assertThrows(TypeError.class, () -> eval("input object something = true"));
     }
 
     @Test
-    void inputObjectInitIntError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [1,2,3]"));
+    void inputObjectInitStringError() {
+        assertThrows(TypeError.class, () -> eval("input object something = 'hello'"));
+    }
+
+    @Test
+    void inputObjectInitNumberError() {
+        assertThrows(TypeError.class, () -> eval("input object something = 10"));
     }
 
     @Test
     void inputObjectInitDecimalError() {
+        assertThrows(TypeError.class, () -> eval("input object something = 0.1"));
+    }
+
+    @Test
+    void inputObjectInitArrayNumberError() {
+        assertThrows(TypeError.class, () -> eval("input object something = [1,2,3]"));
+    }
+
+    @Test
+    void inputObjectInitDecimalArrayError() {
         assertThrows(TypeError.class, () -> eval("input object something = [1.2,2.3,3.4]"));
     }
 
@@ -311,18 +347,13 @@ public class InputErrorsTest extends CheckerTest {
     }
 
     @Test
-    void inputObjectInitArrayNumberError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [1,2,3]"));
-    }
-
-    @Test
     void inputObjectInitArrayBooleanError() {
         assertThrows(TypeError.class, () -> eval("input object something = [true,false]"));
     }
 
     @Test
     void inputObjectInitArrayNullError() {
-        assertThrows(TypeError.class, () -> eval("input object something = [true,false]"));
+        assertThrows(TypeError.class, () -> eval("input object something = [null]"));
     }
 
     @Test
@@ -351,74 +382,84 @@ public class InputErrorsTest extends CheckerTest {
     }
 
     /// UNION
-
     @Test
     void inputUnionInitNullError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = null"""));
+                input custom something = null
+                """));
     }
+
     @Test
     void inputUnionInitBooleanError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = true"""));
+                input custom something = true
+                """));
     }
 
     @Test
     void inputUnionInitIntError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [1,2,3]"""));
+                input custom something = [1,2,3]
+                """));
     }
 
     @Test
     void inputUnionInitDecimalError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [1.2,2.3,3.4]"""));
+                input custom something = [1.2,2.3,3.4]
+                """));
     }
 
     @Test
     void inputUnionInitObjectEmptyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = {}"""));
+                input custom something = {}
+                """));
     }
 
     @Test
     void inputUnionInitObjectEmptyKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object"""));
+                input custom something = object
+                """));
     }
 
     @Test
     void inputUnionInitObjectEmptyKeywordNoBodyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object()"""));
+                input custom something = object()
+                """));
     }
 
     @Test
     void inputUnionInitObjectEmptyKeywordEmptyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object({})"""));
+                input custom something = object({})
+                """));
     }
 
     @Test
     void inputUnionInitObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = object({ env: 'dev'})"""));
+                input custom something = object({ env: 'dev'})
+                """));
     }
 
     @Test
     void inputUnionInitObjectError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = { env: 'dev' }"""));
+                input custom something = { env: 'dev' }
+                """));
     }
 
 
@@ -426,63 +467,72 @@ public class InputErrorsTest extends CheckerTest {
     void inputUnionInitArrayStringError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = ['hello']"""));
+                input custom something = ['hello']
+                """));
     }
 
     @Test
     void inputUnionInitArrayNumberError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [1,2,3]"""));
+                input custom something = [1,2,3]
+                """));
     }
 
     @Test
     void inputUnionInitArrayBooleanError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [true,false]"""));
+                input custom something = [true,false]
+                """));
     }
 
     @Test
     void inputUnionInitArrayNullError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [true,false]"""));
+                input custom something = [null]
+                """));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [{}, {}]"""));
+                input custom something = [{}, {}]
+                """));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectBodyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [object(), object()]"""));
+                input custom something = [object(), object()]
+                """));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectBodyEmptyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [object({}), object({})]"""));
+                input custom something = [object({}), object({})]
+                """));
     }
 
     @Test
     void inputUnionInitArrayEmptyObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [object, object]"""));
+                input custom something = [object, object]
+                """));
     }
 
     @Test
     void inputUnionInitArrayObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
-                input custom something = [{env: 'dev'}, {env: 'dev'}]"""));
+                input custom something = [{env: 'dev'}, {env: 'dev'}]
+                """));
     }
 
 
