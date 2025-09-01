@@ -293,7 +293,6 @@ public class Parser {
         };
     }
 
-    @Nullable
     private Range<Integer> RangeDeclaration() {
         eat(Number);
         if (Literal() instanceof NumberLiteral minLiteral) {
@@ -391,13 +390,32 @@ public class Parser {
     }
 
     /**
-     * ObjectStatement
-     * : ObjectPropertyList
+     * ObjectDeclaration
+     * : object '(' ObjectPropertyList ')'
+     * ; '{' ObjectPropertyList? '}'
+     * ;
+     * ObjectPropertyList
+     * : ObjectProperty ( ',' ObjectProperty )*
+     * ;
+     * ObjectProperty
+     * : Identifier ':' ObjectInitializer?
+     * ;
+     * ObjectInitializer
+     * : ':' Expression
+     * |
      */
     private Expression ObjectDeclaration() {
-        eat(OpenBraces, "Object must start with { but it is: " + getIterator().getCurrent());
+        if (IsLookAhead(Object)) { // case object({})
+            eat(Object);
+        }
+        if (IsLookAhead(OpenParenthesis)) {
+            eat(OpenParenthesis);
+        }
+        if (IsLookAhead(OpenBraces)) { // { might be missing if the user just declares object (any general object)
+            eat(OpenBraces, "Object must start with { but it is: " + getIterator().getCurrent());
+        }
         Expression res;
-        if (IsLookAhead(CloseBraces)) {
+        if (IsLookAhead(CloseBraces, EOF)) {
             res = ObjectExpression.objectExpression();
         } else {
             res = ObjectExpression.objectExpression(ObjectPropertyList());
@@ -405,6 +423,9 @@ public class Parser {
         eatWhitespace();
         if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
             eat(CloseBraces, "Object must end with } but it is: " + getIterator().getCurrent());
+        }
+        if (IsLookAhead(CloseParenthesis)) {
+            eat(CloseParenthesis);
         }
 
         return res;
@@ -421,7 +442,7 @@ public class Parser {
         do {
             eatWhitespace();
             declarations.add(ObjectLiteral());
-        } while (IsLookAhead(Comma, NewLine) && eat(Comma, NewLine) != null && !IsLookAhead(CloseBraces));
+        } while (IsLookAhead(Comma, NewLine) && eat(Comma, NewLine) != null && !IsLookAhead(CloseBraces, EOF));
         return declarations;
     }
 
@@ -1162,11 +1183,11 @@ public class Parser {
 
     private Expression ParseUnionType() {
         var param = switch (lookAhead().type()) {
-            case String, Number, Object, True, False, Null -> {
+            case String, Number, True, False, Null -> {
                 eat(lookAhead().type());
                 yield Literal();
             }
-            case OpenBraces -> ObjectDeclaration();
+            case OpenBraces, Object -> ObjectDeclaration();
             case Identifier -> Identifier();
             default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
         };
@@ -1360,7 +1381,6 @@ public class Parser {
             case Null -> NullLiteral.nullLiteral();
             case Number -> NumberLiteral.number(value);
             case String -> new StringLiteral(value);
-            case Object -> new ObjectLiteral(StringLiteral.string(value.toString()), Literal());
 //            default -> new ErrorExpression(current.value());
             default -> NullLiteral.nullLiteral();
         };
