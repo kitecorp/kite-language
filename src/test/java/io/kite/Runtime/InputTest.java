@@ -830,8 +830,9 @@ public abstract class InputTest extends RuntimeTest {
         setInput("[{ env : 'dev' }]");
         assertThrows(TypeError.class, () -> eval("input object region "));
     }
+
     /*
-     * input array alias with invalid values
+     * Mixed Type alias with invalid values
      * */
     @Test
     void inputMixedAliasInitWithNumberError() {
@@ -905,6 +906,70 @@ public abstract class InputTest extends RuntimeTest {
                 """));
     }
 
+    /*
+     * OBJECT ARRAY
+     * */
+    @Test
+    void inputArrayInitWithNumberError() {
+        setInput(123);
+        eval("input object[] region");// ok because user can --input=123 or --input=123,456
+    }
+
+    @Test
+    void inputArrayInitWithDecimalError() {
+        setInput(1.2);
+        eval("input object[] region"); // ok because user can --input=1.2 or --input=1.2,1.3,1.4
+    }
+
+    @Test
+    void inputArrayInitWithDecimalDotError() {
+        setInput(0.2);
+        eval("input object[] region"); // ok because user can --input=0.2 or --input=0.2,0.3,0.4
+    }
+
+    @Test
+    void inputArrayInitWithStringError() {
+        setInput("hello");
+        eval("input object[] region ");// ok because user can --input="hello" or --input="hello","world""
+    }
+
+    @Test
+    void inputArrayInitWithNewLineError() {
+        setInput("\n");
+        assertThrows(MissingInputException.class, () -> eval("input object[] region"));
+    }
+
+    @Test
+    void inputArrayInitWithEmptyStringError() {
+        setInput("");
+        assertThrows(MissingInputException.class, () -> eval("input object[] region"));
+    }
+
+    @Test
+    void inputArrayInitWithBooleanError() {
+        setInput(true);
+        eval("input object[] region");// ok because user can --input=true or --input=true,false
+    }
+
+    @Test
+    void inputArrayInitWithStringArrayError() {
+        setInput("['hello','world']");
+        assertThrows(TypeError.class, () -> eval("input object[] region "));
+    }
+
+    @Test
+    void inputArrayInitWithIntArrayError() {
+        setInput("[1,2,3]");
+        assertThrows(TypeError.class, () -> eval("input object[] region ")); // throw because it's not declared as array
+    }
+
+    @Test
+    void inputArrayInitWithBooleanArrayError() {
+        setInput("[true, false]");
+        assertThrows(TypeError.class, () -> eval("input object[] region "));
+    }
+
+    // DEFAULTS
     @Test
     void inputStringArrayInitError() {
         assertThrows(TypeError.class, () -> eval("input string[] region=[1,2,3]"));
