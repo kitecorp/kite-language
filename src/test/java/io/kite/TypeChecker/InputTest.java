@@ -1,6 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.Types.AnyType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,104 @@ public class InputTest extends CheckerTest {
                 input custom something
                 """);
         assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
+    }
+
+
+    @Test
+    void inputAnyInitNull() {
+        var res = eval("input any something = null");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitObjectEmpty() {
+        var res = eval("input any something = {}");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitObjectEmptyKeyword() {
+        var res = eval("input any something = object");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitObjectEmptyKeywordNoBody() {
+        var res = eval("input any something = object()");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitObjectEmptyKeywordEmpty() {
+        var res = eval("input any something = object({})");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitObjectKeyword() {
+        var res = eval("input any something = object({ env: 'dev'})");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitObject() {
+        var res = eval("input any something = { env: 'dev' }");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+
+    @Test
+    void inputAnyInitArrayString() {
+        var res = eval("input any something = ['hello']");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayNumber() {
+        var res = eval("input any something = [1,2,3]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayBoolean() {
+        var res = eval("input any something = [true,false]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayNull() {
+        var res = eval("input any something = [true,false]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayEmptyObject() {
+        var res = eval("input any something = [{}, {}]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayEmptyObjectBody() {
+        var res = eval("input any something = [object(), object()]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayEmptyObjectBodyEmpty() {
+        var res = eval("input any something = [object({}), object({})]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayEmptyObjectKeyword() {
+        var res = eval("input any something = [object, object]");
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void inputAnyInitArrayObjectKeyword() {
+        var res = eval("input any something = [{env: 'dev'}, {env: 'dev'}]");
+        assertEquals(AnyType.INSTANCE, res);
     }
 
     @Test
