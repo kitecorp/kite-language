@@ -407,6 +407,9 @@ public class Parser {
     private Expression ObjectDeclaration() {
         if (IsLookAhead(Object)) { // case object({})
             eat(Object);
+            if (!IsLookAhead(OpenParenthesis)) {
+                return ObjectExpression.objectExpression();
+            }
         }
         if (IsLookAhead(OpenParenthesis)) {
             eat(OpenParenthesis);
@@ -457,7 +460,7 @@ public class Parser {
      */
     private ObjectLiteral ObjectLiteral() {
         if (IsLookAhead(NewLine, Comma)) {
-            eatWhitespace();
+//            eatWhitespace();
             if (IsLookAhead(EOF)) {
                 return null;
             }
@@ -1361,6 +1364,10 @@ public class Parser {
             case Identifier -> {
                 var id = eat(Identifier);
                 yield new StringLiteral(id.value().toString());
+            }
+            case NewLine, Comma -> {
+                eat();
+                yield ObjectKeyIdentifier();
             }
             default -> throw new RuntimeException("Unexpected token type: " + lookAhead().type());
         };

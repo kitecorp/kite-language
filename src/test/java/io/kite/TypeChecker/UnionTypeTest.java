@@ -208,8 +208,54 @@ public class UnionTypeTest extends CheckerTest {
         var res = eval("""
                 type alias = 1.2
                 var alias[] x = []
+                
                 """);
         assertEquals(arrayType(unionType("alias", ValueType.Number)), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasObjectAllowEmptyInit() {
+        var res = eval("""
+                type alias = object
+                
+                var alias[] x = []
+                
+                """);
+        assertEquals(arrayType(unionType("alias", ObjectType.INSTANCE)), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasObjectKeywordAllowEmptyInit() {
+        var res = eval("""
+                type alias = object()
+                var alias[] x = []
+                
+                """);
+        assertEquals(arrayType(unionType("alias", ObjectType.INSTANCE)), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasObjectKeywordEmptyAllowEmptyInit() {
+        var res = eval("""
+                type alias = object({})
+                var alias[] x = []
+                
+                """);
+        assertEquals(arrayType(unionType("alias", ObjectType.INSTANCE)), res);
+    }
+
+    @Test
+    @DisplayName("type alias of string array should allow empty init")
+    void unionTypeAliasObjectEmptyAllowEmptyInit() {
+        var res = eval("""
+                type alias = {}
+                var alias[] x = []
+                
+                """);
+        assertEquals(arrayType(unionType("alias", ObjectType.INSTANCE)), res);
     }
 
 
