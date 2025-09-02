@@ -25,8 +25,9 @@ public class FileResolver extends InputResolver {
     }
 
     @Override
-    public Object resolve(InputDeclaration input) {
-        return getInputs().get(input.name());
+    public String resolve(InputDeclaration input) {
+//        return getInputs().get(input.name());
+        return null;
     }
 
 }

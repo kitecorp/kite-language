@@ -13,6 +13,7 @@ import io.kite.Visitors.Visitor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -42,11 +43,37 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         this.parser = new Parser();
     }
 
+    /**
+     * An input must be resolved from the first resolver to the last resolver.
+     * If the input is not resolved, the next resolver is tried.
+     * If the input is resolved, the value is returned.
+     * If the input is not resolved by any resolver, null is returned.
+     * Oder of resolvers is important.
+     * Lowest → Highest
+     * 	1.	inputs.defaults.kite (baseline defaults)
+     * 	2.	inputs.env.kite (project/env file)
+     * 	3.	Environment variables (KITE_VAR_KEY=...)
+     * 	4.	CLI args (--var key=value)
+     *
+     * How to apply it
+     * 	•	If you merge into one map, load lowest → highest so later sources overwrite earlier ones:
+     * 	1.	defaults → 2. env file → 3. ENV → 4. CLI
+     */
     @Override
-    public @Nullable Object resolve(InputDeclaration key) {
-        Object value = null;
+    public @Nullable String resolve(InputDeclaration key) {
+        String value = null;
         for (InputResolver resolver : resolvers) {
-            value = resolver.resolve(key);
+            value = normalizeArrays(resolver.resolve(key));
+        }
+        return value;
+    }
+
+    protected static @NotNull String normalizeArrays(String value) {
+        if (value.contains(",") &&
+            !StringUtils.startsWithAny(value, "[", "{") &&
+            !StringUtils.endsWithAny(value, "]", "}")
+        ) {
+            value = "[" + value + "]";
         }
         return value;
     }

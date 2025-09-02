@@ -2,27 +2,22 @@ package io.kite.Runtime.Inputs;
 
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Runtime.Environment.Environment;
-import org.apache.commons.lang3.StringUtils;
-import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Scanner;
 
 public class CliResolver extends InputResolver {
-    private Ansi ansi = Ansi.ansi(50)
-            .reset()
-            .eraseScreen();
 
     public CliResolver(Environment<Object> inputs) {
         super(inputs);
     }
 
     @Override
-    public @Nullable Object resolve(InputDeclaration inputDeclaration) {
-        Object input = getInputs().get(inputDeclaration.getId().string());
-        if (input != null) {
-            return input;
-        }
+    public @Nullable String resolve(InputDeclaration inputDeclaration) {
+//        String input = getInputs().get(inputDeclaration.getId().string());
+//        if (input != null) {
+//            return input;
+//        }
 
         try (var scan = new Scanner(System.in)) {
             ansi.append("Enter value for inputs or CTRL-C to exit ").newline();
@@ -37,13 +32,7 @@ public class CliResolver extends InputResolver {
                     .reset();
             System.out.println(ansi.toString());
 
-            String value = scan.nextLine();
-            if (value.contains(",") &&
-                !StringUtils.startsWithAny(value, "[", "{") &&
-                !StringUtils.endsWithAny(value, "]", "}")
-            ) {
-                value = "[" + value + "]";
-            }
+            var value = scan.nextLine();
             return value;
         }
     }
