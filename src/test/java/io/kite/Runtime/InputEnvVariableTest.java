@@ -18,7 +18,7 @@ public class InputEnvVariableTest extends InputTest {
     @Override
     protected @NotNull List<InputResolver> getResolvers() {
         envVariables = new HashMap<>();
-        return List.of(new EnvResolver(global, envVariables));
+        return List.of(new EnvResolver(envVariables));
     }
 
 }

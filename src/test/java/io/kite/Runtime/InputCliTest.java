@@ -23,7 +23,7 @@ public class InputCliTest extends InputTest {
 
     @Override
     protected @NotNull List<InputResolver> getResolvers() {
-        return List.of(new CliResolver(global));
+        return List.of(new CliResolver());
     }
 
 }

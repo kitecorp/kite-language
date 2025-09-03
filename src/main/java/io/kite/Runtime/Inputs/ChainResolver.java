@@ -25,19 +25,17 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     private final Parser parser;
     private List<InputResolver> resolvers;
 
-    public ChainResolver(Environment<Object> environment) {
-        super(environment);
+    public ChainResolver() {
         this.resolvers = List.of(
 //                new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
-                new EnvResolver(environment),
-                new CliResolver(environment)
+                new EnvResolver(),
+                new CliResolver()
         );
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();
     }
 
-    public ChainResolver(Environment<Object> environment, List<InputResolver> resolvers) {
-        super(environment);
+    public ChainResolver(List<InputResolver> resolvers) {
         this.resolvers = resolvers;
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();

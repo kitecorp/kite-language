@@ -1,7 +1,6 @@
 package io.kite.Runtime.Inputs;
 
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
-import io.kite.Runtime.Environment.Environment;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -10,13 +9,11 @@ public class EnvResolver extends InputResolver {
     private static final String PREFIX = "kite_input_";
     private final Map<String, String> envVariables;
 
-    public EnvResolver(Environment<Object> inputs) {
-        super(inputs);
+    public EnvResolver() {
         this.envVariables = captureSystemEnv();
     }
 
-    public EnvResolver(Environment<Object> inputs, Map<String, String> overrides) {
-        super(inputs);
+    public EnvResolver(Map<String, String> overrides) {
         this.envVariables = overrides;
     }
 
