@@ -1,15 +1,14 @@
 package io.kite.Runtime.Inputs;
 
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
-import io.kite.Runtime.Environment.Environment;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Scanner;
 
 public class CliResolver extends InputResolver {
 
-    public CliResolver(Environment<Object> inputs) {
-        super(inputs);
+    public CliResolver() {
+        super();
     }
 
     @Override
