@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class EnvResolver extends InputResolver {
-    private static final String PREFIX = "kite_input_";
     private final Map<String, String> envVariables;
 
     public EnvResolver() {
@@ -21,7 +20,7 @@ public class EnvResolver extends InputResolver {
      * Convert ENV keys to your internal keys (e.g., REGION -> region, CFG__ENV -> cfg.env).
      */
     public static String normalizeKey(String envKey) {
-        String k = envKey.substring(PREFIX.length());
+        String k = envKey.substring(EnvVariablesConstants.PREFIX.length());
 
         k = k.toLowerCase(Locale.ROOT); // Windows env is case-insensitive; use ROOT to avoid Turkish-i issues
 
@@ -33,8 +32,9 @@ public class EnvResolver extends InputResolver {
     public static Map<String, String> captureSystemEnv() {
         Map<String, String> out = new HashMap<>();
         for (var e : System.getenv().entrySet()) {
-            if (e.getKey().startsWith(PREFIX) && e.getValue() != null) {
-                out.put(normalizeKey(e.getKey()), e.getValue());
+            var key=normalizeKey(e.getKey());
+            if (key.startsWith(EnvVariablesConstants.PREFIX) && e.getValue() != null) {
+                out.put(normalizeKey(key), e.getValue());
             }
         }
         return out;

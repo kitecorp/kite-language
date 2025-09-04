@@ -61,7 +61,7 @@ public abstract class InputTest extends RuntimeTest {
         this.typeChecker = new TypeChecker();
         Environment<Object> inputs = new Environment<>(global);
         inputs.setName("inputs");
-        this.chainResolver = new ChainResolver(global, getResolvers());
+        this.chainResolver = new ChainResolver(getResolvers());
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(global);
     }
