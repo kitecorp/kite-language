@@ -6,7 +6,6 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.Visitor;
@@ -99,8 +98,8 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
                 string = "\"%s\"".formatted(string);
             }
             var ast = parser.produceAST(tokenizer.tokenize(string));
-            ExpressionStatement expressionStatement = (ExpressionStatement) ast.getBody().get(0);
-            inputDeclaration.setInit(expressionStatement.getStatement());
+            var statement = (ExpressionStatement) ast.getBody().get(0);
+            inputDeclaration.setInit(statement.getStatement());
 
             return null;
         } catch (NoSuchElementException exception) {
