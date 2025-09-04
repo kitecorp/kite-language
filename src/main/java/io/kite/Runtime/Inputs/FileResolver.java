@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringUtils.remove;
-
 public class FileResolver extends InputResolver {
     public static final String INPUTS_DEFAULTS_KITE = "inputs.defaults.kite";
     static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.defaults.kite";
@@ -27,7 +25,7 @@ public class FileResolver extends InputResolver {
             stream.forEach(line -> {
                 var input = line.split("=");
                 if (input.length == 2) {
-                    inputs.put(input[0], remove(remove(input[1], '"'), "'"));
+                    inputs.put(input[0], input[1].replaceAll("^['\"]|['\"]$", ""));
                 }
             });
         } catch (IOException e) {
