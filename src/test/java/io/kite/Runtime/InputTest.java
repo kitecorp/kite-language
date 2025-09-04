@@ -512,6 +512,12 @@ public abstract class InputTest extends RuntimeTest {
     }
 
     @Test
+    void testInputNumberInitWithBlankArrayError() {
+        setInput("[      ]");
+        assertThrows(TypeError.class, () -> eval("input number region "));
+    }
+
+    @Test
     void testInputNumberInitWithStringArrayError() {
         setInput("['hello','world']");
         assertThrows(TypeError.class, () -> eval("input number region "));
