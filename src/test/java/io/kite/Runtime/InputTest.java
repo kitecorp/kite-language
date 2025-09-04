@@ -293,6 +293,16 @@ public abstract class InputTest extends RuntimeTest {
         assertEquals(List.of(10), res);
     }
 
+    @Test
+    void testInputUnionArrayInitString() {
+        var res = eval("""
+                type custom = string | number
+                input custom[] region = ['hello']
+                """);
+        assertEquals(List.of("hello"), res);
+    }
+
+
     /************************************************************
      * ERROR CASES                                             **
      * Each error case will also be followed up by its alias   **
@@ -994,6 +1004,23 @@ public abstract class InputTest extends RuntimeTest {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = number | string 
                 input custom region
+                """));
+    }
+
+    @Test
+    void testInputUnionArrayInitBooleanInput() {
+        setInput("[true]");
+        assertThrows(TypeError.class, () -> eval("""
+                    type custom = string | number
+                    input custom[] region
+                """));
+    }
+
+    @Test
+    void testInputUnionArrayInitBoolean() {
+        assertThrows(TypeError.class, () -> eval("""
+                    type custom = string | number
+                    input custom[] region = [true]
                 """));
     }
 
