@@ -494,6 +494,18 @@ public abstract class InputTest extends RuntimeTest {
     }
 
     @Test
+    void testInputNumberInitWithBlankStringError() {
+        setInput("  ");
+        assertThrows(MissingInputException.class, () -> eval("input number region"));
+    }
+
+    @Test
+    void testInputNumberInitWithTabStringError() {
+        setInput("\t");
+        assertThrows(MissingInputException.class, () -> eval("input number region"));
+    }
+
+    @Test
     void testInputNumberInitWithEmptyArrayError() {
         setInput("[]");
         assertThrows(TypeError.class, () -> eval("input number region "));
@@ -985,7 +997,7 @@ public abstract class InputTest extends RuntimeTest {
     @Test
     void testInputArrayInitWithNumberError() {
         setInput(123);
-        assertThrows(TypeError.class, () ->eval("input object[] region"));
+        assertThrows(TypeError.class, () -> eval("input object[] region"));
     }
 
     @Test
@@ -1021,7 +1033,7 @@ public abstract class InputTest extends RuntimeTest {
     @Test
     void testInputArrayInitWithBooleanError() {
         setInput(true);
-        assertThrows(TypeError.class, () ->eval("input object[] region"));
+        assertThrows(TypeError.class, () -> eval("input object[] region"));
     }
 
     @Test
