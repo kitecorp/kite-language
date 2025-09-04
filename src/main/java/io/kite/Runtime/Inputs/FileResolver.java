@@ -26,7 +26,9 @@ public class FileResolver extends InputResolver {
         try (var stream = Files.lines(file)) {
             stream.forEach(line -> {
                 var input = line.split("=");
-                inputs.put(input[0], remove(remove(input[1], '"'), "'"));
+                if (input.length == 2) {
+                    inputs.put(input[0], remove(remove(input[1], '"'), "'"));
+                }
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
