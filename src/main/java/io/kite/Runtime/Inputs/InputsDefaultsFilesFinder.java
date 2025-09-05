@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class InputsDefaultsFilesFinder extends InputResolver {
@@ -77,20 +79,17 @@ public class InputsDefaultsFilesFinder extends InputResolver {
         // Pattern-matching switch for common cases
         switch (v) {
             case CharSequence charSequence -> {
-                String s = charSequence.toString();
-                String trim = StringUtils.trim(s);
-                if (trim.isEmpty()) {
-                    if (!s.isEmpty()) {
-                        System.err.println("Warning: value looks like only whitespace/invisible characters; writing empty literal.");
-                    }
+                String string = charSequence.toString();
+                if (StringUtils.isBlank(charSequence)) {
                     return ""; // results in: key =
                 }
                 // If already looks like a structured value, return as-is
+                String trim = StringUtils.trim(string);
                 if ((trim.startsWith("[") && trim.endsWith("]"))
                     || (trim.startsWith("{") && trim.endsWith("}"))) {
-                    return s;
+                    return string;
                 }
-                return quote(s);
+                return quote(string);
             }
             case Character ch -> {
                 return quote(ch.toString());
@@ -110,47 +109,43 @@ public class InputsDefaultsFilesFinder extends InputResolver {
             case OptionalDouble opt -> {
                 return opt.isPresent() ? Double.toString(opt.getAsDouble()) : "null";
             }
-            default -> { /* fall through */ }
-        }
-
-        // UUID / Path / temporal -> string literal
-        if (v instanceof java.util.UUID || v instanceof java.nio.file.Path || v instanceof java.time.temporal.TemporalAccessor) {
-            return quote(v.toString());
-        }
-
-        // arrays (primitive/object)
-        if (v.getClass().isArray()) {
-            int n = java.lang.reflect.Array.getLength(v);
-            java.util.List<String> items = new java.util.ArrayList<>(n);
-            for (int i = 0; i < n; i++) {
-                items.add(toKiteLiteral(java.lang.reflect.Array.get(v, i)));
+            case Collection<?> c -> {
+                if (c instanceof Set<?>) {
+                    var list = c.stream()
+                            .map(InputsDefaultsFilesFinder::toKiteLiteral)
+                            .sorted()
+                            .collect(Collectors.toCollection(() -> new ArrayList<>(c.size())));
+                    return "[" + String.join(", ", list) + "]";
+                } else {
+                    return joinListlike(c);
+                }
             }
-            return "[" + String.join(", ", items) + "]";
+            case Map<?, ?> map -> {
+                return "{" + String.join(", ", map.entrySet().stream().map(e -> Map.entry(toKiteLiteral(e.getKey()), toKiteLiteral(e.getValue()))).sorted(Map.Entry.comparingByKey()).toList().stream().map(e -> e.getKey() + ": " + e.getValue()).toList()) + "}";
+            }
+            case Object a when a.getClass().isArray() -> {
+                int n = Array.getLength(a);
+                List<Object> tmp = new ArrayList<>(n);
+                for (int i = 0; i < n; i++) tmp.add(Array.get(a, i));
+                return joinListlike(tmp);
+            }
+            default -> { // fallback: quote to be safe
+                return quote(v.toString());
+            }
         }
+    }
 
-        // collections: keep List order; sort Set for determinism
-        if (v instanceof java.util.Collection<?> c) {
-            String items = c.stream()
-                    .map(InputsDefaultsFilesFinder::toKiteLiteral)
-                    .collect(java.util.stream.Collectors.joining(", "));
-            return "[" + items + "]";
+    private static String joinListlike(Iterable<?> it) {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append('[');
+        boolean first = true;
+        for (Object o : it) {
+            if (!first) sb.append(", ");
+            sb.append(toKiteLiteral(o));
+            first = false;
         }
-
-        // maps (stringify keys; bare if identifier-like, else quoted)
-        if (v instanceof java.util.Map<?, ?> m) {
-            var entries = m.entrySet().stream()
-                    .map(e -> Map.entry(String.valueOf(e.getKey()), e.getValue()))
-                    .sorted(Map.Entry.comparingByKey())
-                    .toList();
-
-            String inner = entries.stream()
-                    .map(e -> formatMapKey(e.getKey()) + ": " + toKiteLiteral(e.getValue()))
-                    .collect(java.util.stream.Collectors.joining(", "));
-            return "{ " + inner + " }";
-        }
-
-        // fallback: quote to be safe
-        return quote(v.toString());
+        sb.append(']');
+        return sb.toString();
     }
 
     private static String formatMapKey(String k) {
