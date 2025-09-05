@@ -34,7 +34,7 @@ public class FileResolver extends InputResolver {
     }
 
     @Override
-    public String resolve(InputDeclaration input) {
+    String resolve(InputDeclaration input) {
         // read default file
         if (!wasRead) {
             readFileProperty(Paths.get(INPUTS_DEFAULTS_KITE));

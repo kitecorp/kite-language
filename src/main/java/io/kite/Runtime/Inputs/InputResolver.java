@@ -14,6 +14,6 @@ public abstract class InputResolver {
     }
 
     @Nullable
-    public abstract String resolve(InputDeclaration key);
+    abstract String resolve(InputDeclaration key);
 
 }

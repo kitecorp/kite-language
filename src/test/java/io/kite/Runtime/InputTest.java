@@ -6,7 +6,6 @@ import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
-import io.kite.Runtime.Inputs.InputResolver;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
@@ -61,12 +60,12 @@ public abstract class InputTest extends RuntimeTest {
         this.typeChecker = new TypeChecker();
         Environment<Object> inputs = new Environment<>(global);
         inputs.setName("inputs");
-        this.chainResolver = new ChainResolver(getResolvers());
+        this.chainResolver = getChainResolver();
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(global);
     }
 
-    protected abstract @NotNull List<InputResolver> getResolvers();
+    protected abstract @NotNull ChainResolver getChainResolver();
 
     protected Object eval(String source) {
         program = src(source);

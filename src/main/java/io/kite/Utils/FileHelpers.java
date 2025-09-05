@@ -17,10 +17,6 @@ public class FileHelpers {
         return loadFiles("glob:**.ki");
     }
 
-    public static File[] loadInputDefaultsFiles() {
-        return loadFiles("glob:./defaults.ki");
-    }
-
     public static File[] loadFiles(String extensions)  {
         var matcher = FileSystems.getDefault().getPathMatcher(extensions);
         var ignore = FileSystems.getDefault().getPathMatcher("glob:./{build,gradle,.gradle,git,.git}**,./defaults.ki");
