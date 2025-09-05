@@ -38,6 +38,12 @@ public class InputsDefaultsFilesFinder extends InputResolver {
         }
     }
 
+    public static void deleteDefaults() {
+        try {
+            Files.deleteIfExists(Path.of(InputsDefaultsFilesFinder.INPUTS_DEFAULTS_KITE));
+        } catch (IOException e) {}
+    }
+
     private void readFileProperty(Path file) {
         try (var stream = Files.lines(file)) {
             stream.forEach(line -> {
