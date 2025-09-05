@@ -27,6 +27,7 @@ public class InputChainResolverTest extends RuntimeTest {
     void initChain() {
         envVariables = new HashMap<>();
         chainResolver = new ChainResolver(List.of(new EnvResolver(envVariables), new InputsDefaultsFilesFinder(), new CliResolver()));
+        InputsDefaultsFilesFinder.deleteDefaults();
     }
 
     @Test
@@ -38,16 +39,26 @@ public class InputChainResolverTest extends RuntimeTest {
     @Test
     @DisplayName("Test Env is present and rest are absent")
     void testEnvPresentFileAndCliAbsent() {
-        envVariables.put("client", "test");
+        envVariables.put("client", "env");
         var res = chainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
-        Assertions.assertEquals("test", res);
+        Assertions.assertEquals("env", res);
     }
 
     @Test
     @DisplayName("Test Env and File is present and Cli absent. File overrides env")
     void testEnvAndFilePresentButCliAbsent() {
-        envVariables.put("client", "test");
-        InputsDefaultsFilesFinder.writeToDefaults(Map.of("client","file"));
+        envVariables.put("client", "env");
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("client", "file"));
+
+        var res = chainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
+        Assertions.assertEquals("file", res);
+    }
+
+    @Test
+    @DisplayName("Test File is present and Env Cli absent. File overrides env")
+    void testFilePresentButEnvCliAbsent() {
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("client", "file"));
+
         var res = chainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
         Assertions.assertEquals("file", res);
     }
