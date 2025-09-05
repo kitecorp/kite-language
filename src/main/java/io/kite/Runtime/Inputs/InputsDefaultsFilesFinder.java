@@ -70,7 +70,7 @@ public class InputsDefaultsFilesFinder extends InputResolver {
         switch (v) {
             case CharSequence charSequence -> {
                 String s = charSequence.toString();
-                if (s.trim().isEmpty()) {
+                if (StringUtils.trim(s).isEmpty()) {
                     if (!s.isEmpty()) {
                         System.err.println("Warning: value looks like only whitespace/invisible characters; writing empty literal.");
                     }
