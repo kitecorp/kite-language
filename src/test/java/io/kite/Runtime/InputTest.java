@@ -617,6 +617,15 @@ public abstract class InputTest extends RuntimeTest {
                 """));
     }
 
+    @Test
+    void testInputNumberAliasInitWithObjectArrayKeyStringError() {
+        setInput("[{ 'env' : 'dev' }]");
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                input custom region
+                """));
+    }
+
     // BOOLEAN
     @Test
     void testInputBooleanInitWithNumberError() {
