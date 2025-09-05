@@ -23,31 +23,31 @@ public class VarTest extends CheckerTest {
     @Test
     void testGlobalVarEmptyString() {
         checker.getEnv().init("VERSION", ValueType.String);
-        var type = checker.visit(id("VERSION"));
-        assertEquals(type, ValueType.String);
+        var res = checker.visit(id("VERSION"));
+        assertEquals(res, ValueType.String);
     }
 
     @Test
     void testVarInt() {
-        var type = checker.visit(var("x", number(10)));
+        var res = checker.visit(var("x", number(10)));
         var accessType = checker.visit(id("x"));
-        assertEquals(type, ValueType.Number);
+        assertEquals(res, ValueType.Number);
         assertEquals(accessType, ValueType.Number);
     }
 
     @Test
     void testVarString() {
-        var type = checker.visit(var("x", string("hello")));
+        var res = checker.visit(var("x", string("hello")));
         var accessType = checker.visit(id("x"));
-        assertEquals(type, ValueType.String);
+        assertEquals(res, ValueType.String);
         assertEquals(accessType, ValueType.String);
     }
 
     @Test
     void testVarExplicitType() {
-        var type = checker.visit(var("x", type("string"), string("hello")));
+        var res = checker.visit(var("x", type("string"), string("hello")));
         var accessType = checker.visit(id("x"));
-        assertEquals(type, ValueType.String);
+        assertEquals(res, ValueType.String);
         assertEquals(accessType, ValueType.String);
     }
 
