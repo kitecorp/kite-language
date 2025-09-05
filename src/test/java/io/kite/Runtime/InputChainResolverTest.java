@@ -21,7 +21,7 @@ import java.util.Map;
 @Log4j2
 public class InputChainResolverTest extends RuntimeTest {
     private ChainResolver chainResolver;
-    private Map<String, String> envVariables;
+    private Map<String, Object> envVariables;
 
     @BeforeEach
     void initChain() {

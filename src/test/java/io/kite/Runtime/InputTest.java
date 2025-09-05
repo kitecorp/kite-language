@@ -35,21 +35,13 @@ public abstract class InputTest extends RuntimeTest {
 
     protected abstract void setInput(String input);
 
-    private void setInput(Integer input) {
-        setInput(input.toString());
-    }
+    protected abstract void setInput(Integer input);
 
-    private void setInput(Boolean input) {
-        setInput(input.toString());
-    }
+    protected abstract void setInput(Boolean input);
 
-    private void setInput(Double input) {
-        setInput(input.toString());
-    }
+    protected abstract void setInput(Double input);
 
-    private void setInput(Float input) {
-        setInput(input.toString());
-    }
+    protected abstract void setInput(Float input);
 
     @Override
     protected void init() {

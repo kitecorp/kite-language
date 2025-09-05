@@ -16,6 +16,26 @@ public class InputFileTest extends InputTest {
     }
 
     @Override
+    protected void setInput(Integer input) {
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("region", input));
+    }
+
+    @Override
+    protected void setInput(Boolean input) {
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("region", input));
+    }
+
+    @Override
+    protected void setInput(Double input) {
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("region", input));
+    }
+
+    @Override
+    protected void setInput(Float input) {
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("region", input));
+    }
+
+    @Override
     protected @NotNull ChainResolver getChainResolver() {
         return new ChainResolver(List.of(new InputsDefaultsFilesFinder()));
     }
