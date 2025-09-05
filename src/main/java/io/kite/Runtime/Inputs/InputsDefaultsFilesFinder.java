@@ -70,11 +70,17 @@ public class InputsDefaultsFilesFinder extends InputResolver {
         switch (v) {
             case CharSequence charSequence -> {
                 String s = charSequence.toString();
-                if (StringUtils.trim(s).isEmpty()) {
+                String trim = StringUtils.trim(s);
+                if (trim.isEmpty()) {
                     if (!s.isEmpty()) {
                         System.err.println("Warning: value looks like only whitespace/invisible characters; writing empty literal.");
                     }
                     return ""; // results in: key =
+                }
+                // If already looks like a structured value, return as-is
+                if ((trim.startsWith("[") && trim.endsWith("]"))
+                    || (trim.startsWith("{") && trim.endsWith("}"))) {
+                    return s;
                 }
                 return quote(s);
             }
