@@ -3,6 +3,7 @@ package io.kite.Runtime.Inputs;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -38,23 +39,26 @@ public class InputsDefaultsFilesFinder extends InputResolver {
                 StandardOpenOption.TRUNCATE_EXISTING)) {
 
             // choose order
-            Iterable<Map.Entry<String, Object>> it;
-            if (stableOrder) {
-                var list = new ArrayList<>(values.entrySet());
-                list.sort(Map.Entry.comparingByKey());
-                it = list;
-            } else {
-                it = values.entrySet();
-            }
+            var it = getEntryIterable(values, stableOrder);
 
-            for (var e : it) {
-                bw.write(e.getKey());
+            for (var entry : it) {
+                bw.write(entry.getKey());
                 bw.write(" = ");
-                bw.write(toKiteLiteral(e.getValue()));
+                bw.write(toKiteLiteral(entry.getValue()));
                 bw.write(System.lineSeparator());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static @NotNull Iterable<Map.Entry<String, Object>> getEntryIterable(Map<String, Object> values, boolean stableOrder) {
+        if (stableOrder) {
+            var list = new ArrayList<>(values.entrySet());
+            list.sort(Map.Entry.comparingByKey());
+            return list;
+        } else {
+            return values.entrySet();
         }
     }
 
