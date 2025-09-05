@@ -8,6 +8,7 @@ import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,10 +23,11 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     private final Tokenizer tokenizer;
     private final Parser parser;
     private List<InputResolver> resolvers;
+    private SyntaxPrinter printer = new SyntaxPrinter();
 
     public ChainResolver() {
         this.resolvers = List.of(
-                new FileResolver(),
+                new InputsDefaultsFilesFinder(),
                 new EnvResolver(),
                 new CliResolver()
         );
@@ -37,31 +39,6 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         this.resolvers = resolvers;
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();
-    }
-
-    /**
-     * An input must be resolved from the first resolver to the last resolver.
-     * If the input is not resolved, the next resolver is tried.
-     * If the input is resolved, the value is returned.
-     * If the input is not resolved by any resolver, null is returned.
-     * Oder of resolvers is important.
-     * Lowest → Highest
-     * 	1.	inputs.defaults.kite (baseline defaults)
-     * 	2.	inputs.env.kite (project/env file)
-     * 	3.	Environment variables (KITE_VAR_KEY=...)
-     * 	4.	CLI args (--var key=value)
-     *
-     * How to apply it
-     * 	•	If you merge into one map, load lowest → highest so later sources overwrite earlier ones:
-     * 	1.	defaults → 2. env file → 3. ENV → 4. CLI
-     */
-    @Override
-    @Nullable String resolve(InputDeclaration key) {
-        String value = null;
-        for (InputResolver resolver : resolvers) {
-            value = normalizeArrays(resolver.resolve(key));
-        }
-        return value;
     }
 
     protected static @Nullable String normalizeArrays(@Nullable String value) {
@@ -76,6 +53,34 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         return value;
     }
 
+    /**
+     * An input must be resolved from the first resolver to the last resolver.
+     * If the input is not resolved, the next resolver is tried.
+     * If the input is resolved, the value is returned.
+     * If the input is not resolved by any resolver, null is returned.
+     * Oder of resolvers is important.
+     * Lowest → Highest
+     * 1.	inputs.defaults.kite (baseline defaults)
+     * 2.	inputs.env.kite (project/env file)
+     * 3.	Environment variables (KITE_VAR_KEY=...)
+     * 4.	CLI args (--var key=value)
+     * <p>
+     * How to apply it
+     * •	If you merge into one map, load lowest → highest so later sources overwrite earlier ones:
+     * 1.	defaults → 2. env file → 3. ENV → 4. CLI
+     */
+    @Override
+    @Nullable String resolve(InputDeclaration key, String previousValue) {
+        for (InputResolver resolver : resolvers) {
+            var temp = normalizeArrays(resolver.resolve(key, previousValue));
+            if (temp != null) {
+                // if value is present in env and absent in file, we don't want to override existing value with null
+                previousValue = temp;
+            }
+        }
+        return previousValue;
+    }
+
     @Override
     public Object visit(InputDeclaration inputDeclaration) {
         if (inputDeclaration.hasInit()) {
@@ -86,7 +91,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         }
         try {
 
-            var input = resolve(inputDeclaration);
+            var input = resolve(inputDeclaration, null);
             if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
                 throw new MissingInputException("Invalid input %s".formatted(inputDeclaration.getId().string()));
             }
@@ -102,9 +107,9 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
             var statement = (ExpressionStatement) ast.getBody().get(0);
             inputDeclaration.setInit(statement.getStatement());
 
-            return null;
+            return visit(statement.getStatement());
         } catch (NoSuchElementException exception) {
-            throw new MissingInputException("Missing input %s".formatted(inputDeclaration.getId().string()));
+            throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
         }
 //        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
     }

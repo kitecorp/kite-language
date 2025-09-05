@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Runtime.Inputs.ChainResolver;
-import io.kite.Runtime.Inputs.FileResolver;
+import io.kite.Runtime.Inputs.InputsDefaultsFilesFinder;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,7 @@ public class InputFileTest extends InputTest {
     protected void setInput(String input) {
         try {
             String content = MessageFormat.format("region=\"{0}\"", input);
-            var path = Path.of(FileResolver.INPUTS_DEFAULTS_KITE);
+            var path = Path.of(InputsDefaultsFilesFinder.INPUTS_DEFAULTS_KITE);
             Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             log.info("Set input file to: {}", path.toAbsolutePath());
         } catch (IOException e) {
@@ -28,7 +28,7 @@ public class InputFileTest extends InputTest {
 
     @Override
     protected @NotNull ChainResolver getChainResolver() {
-        return new ChainResolver(List.of(new FileResolver()));
+        return new ChainResolver(List.of(new InputsDefaultsFilesFinder()));
     }
 
 }

@@ -55,7 +55,7 @@ public class EnvResolver extends InputResolver {
     }
 
     @Override
-    @Nullable String resolve(InputDeclaration key) {
+    @Nullable String resolve(InputDeclaration key, String previousValue) {
         return envVariables.get(key.name());
     }
 }

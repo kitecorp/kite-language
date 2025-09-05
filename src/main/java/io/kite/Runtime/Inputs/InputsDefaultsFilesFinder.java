@@ -1,6 +1,7 @@
 package io.kite.Runtime.Inputs;
 
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,13 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class FileResolver extends InputResolver {
-    public static final String INPUTS_DEFAULTS_KITE = "inputs.defaults.kite";
-    static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.defaults.kite";
+@Log4j2
+public class InputsDefaultsFilesFinder extends InputResolver {
+    public static final String INPUTS_DEFAULTS_KITE = "inputs.default.kite";
+    static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.kite";
     private Map<String, String> inputs;
     private boolean wasRead = false;
 
-    public FileResolver() {
+    public InputsDefaultsFilesFinder() {
         inputs = new HashMap<>();
     }
 
@@ -29,12 +31,12 @@ public class FileResolver extends InputResolver {
                 }
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.info("File not present file: {}", file.toAbsolutePath());
         }
     }
 
     @Override
-    String resolve(InputDeclaration input) {
+    String resolve(InputDeclaration input, String previousValue) {
         // read default file
         if (!wasRead) {
             readFileProperty(Paths.get(INPUTS_DEFAULTS_KITE));
