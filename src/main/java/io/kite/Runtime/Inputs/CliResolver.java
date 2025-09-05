@@ -12,11 +12,12 @@ public class CliResolver extends InputResolver {
     }
 
     @Override
-    @Nullable String resolve(InputDeclaration inputDeclaration) {
-//        String input = getInputs().get(inputDeclaration.getId().string());
-//        if (input != null) {
-//            return input;
-//        }
+    @Nullable String resolve(InputDeclaration inputDeclaration, String previousValue) {
+        if (previousValue != null) {
+            // if previous value is not null we don't need to as the user for input.
+            // in other words if the input was resolved, skip asking for input.
+            return null;
+        }
 
         try (var scan = new Scanner(System.in)) {
             ansi.append("Enter value for inputs or CTRL-C to exit ").newline();
