@@ -43,4 +43,13 @@ public class InputChainResolverTest extends RuntimeTest {
         Assertions.assertEquals("test", res);
     }
 
+    @Test
+    @DisplayName("Test Env and File is present and Cli absent. File overrides env")
+    void testEnvAndFilePresentButCliAbsent() {
+        envVariables.put("client", "test");
+        InputsDefaultsFilesFinder.writeToDefaults(Map.of("client","file"));
+        var res = chainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
+        Assertions.assertEquals("file", res);
+    }
+
 }
