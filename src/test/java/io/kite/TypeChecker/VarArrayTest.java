@@ -133,6 +133,16 @@ public class VarArrayTest extends CheckerTest {
     }
 
     @Test
+    void testAnyStringNumberBool() {
+        eval("""
+                var any[] x = ["hi",'hello', 123, true, {env: 'prod' }]
+                """);
+        var varType = (ArrayType) checker.getEnv().lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(AnyType.INSTANCE, varType.getType());
+    }
+
+    @Test
     void testAnyNumbers() {
         eval("""
                 var any[] x = [1,2,3]
