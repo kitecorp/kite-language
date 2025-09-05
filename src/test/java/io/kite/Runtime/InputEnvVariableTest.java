@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
+import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.Runtime.Inputs.EnvResolver;
-import io.kite.Runtime.Inputs.InputResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -16,9 +16,9 @@ public class InputEnvVariableTest extends InputTest {
     }
 
     @Override
-    protected @NotNull List<InputResolver> getResolvers() {
+    protected @NotNull ChainResolver getChainResolver() {
         envVariables = new HashMap<>();
-        return List.of(new EnvResolver(envVariables));
+        return new ChainResolver(List.of(new EnvResolver(envVariables)));
     }
 
 }

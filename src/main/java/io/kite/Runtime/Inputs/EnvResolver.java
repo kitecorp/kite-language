@@ -50,7 +50,7 @@ public class EnvResolver extends InputResolver {
     }
 
     @Override
-    public @Nullable String resolve(InputDeclaration key) {
+    @Nullable String resolve(InputDeclaration key) {
         return envVariables.get(key.name());
     }
 }

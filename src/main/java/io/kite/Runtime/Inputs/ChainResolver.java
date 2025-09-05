@@ -26,7 +26,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     public ChainResolver() {
         this.resolvers = List.of(
-//                new FileResolver(environment, FileHelpers.loadInputDefaultsFiles()),
+                new FileResolver(),
                 new EnvResolver(),
                 new CliResolver()
         );
@@ -57,7 +57,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
      * 	1.	defaults → 2. env file → 3. ENV → 4. CLI
      */
     @Override
-    public @Nullable String resolve(InputDeclaration key) {
+    @Nullable String resolve(InputDeclaration key) {
         String value = null;
         for (InputResolver resolver : resolvers) {
             value = normalizeArrays(resolver.resolve(key));

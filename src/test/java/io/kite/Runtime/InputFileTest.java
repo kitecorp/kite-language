@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
+import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.Runtime.Inputs.FileResolver;
-import io.kite.Runtime.Inputs.InputResolver;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +27,8 @@ public class InputFileTest extends InputTest {
     }
 
     @Override
-    protected @NotNull List<InputResolver> getResolvers() {
-        return List.of(new FileResolver());
+    protected @NotNull ChainResolver getChainResolver() {
+        return new ChainResolver(List.of(new FileResolver()));
     }
 
 }

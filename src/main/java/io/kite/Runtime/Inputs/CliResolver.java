@@ -12,7 +12,7 @@ public class CliResolver extends InputResolver {
     }
 
     @Override
-    public @Nullable String resolve(InputDeclaration inputDeclaration) {
+    @Nullable String resolve(InputDeclaration inputDeclaration) {
 //        String input = getInputs().get(inputDeclaration.getId().string());
 //        if (input != null) {
 //            return input;
