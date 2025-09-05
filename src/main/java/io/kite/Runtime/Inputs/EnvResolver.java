@@ -20,6 +20,9 @@ public class EnvResolver extends InputResolver {
      * Convert ENV keys to your internal keys (e.g., REGION -> region, CFG__ENV -> cfg.env).
      */
     public static String normalizeKey(String envKey) {
+        if (!envKey.startsWith(EnvVariablesConstants.PREFIX)) {
+            return envKey;
+        }
         String k = envKey.substring(EnvVariablesConstants.PREFIX.length());
 
         k = k.toLowerCase(Locale.ROOT); // Windows env is case-insensitive; use ROOT to avoid Turkish-i issues
