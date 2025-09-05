@@ -5,21 +5,20 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
 public class InputsDefaultsFilesFinder extends InputResolver {
     static final String INPUTS_DEFAULTS_KITE = "inputs.default.kite";
     static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.kite";
-    private Map<String, String> inputs;
+    private final Map<String, String> inputs;
     private boolean wasRead = false;
 
     public InputsDefaultsFilesFinder() {
@@ -61,7 +60,7 @@ public class InputsDefaultsFilesFinder extends InputResolver {
         if (v instanceof Boolean || v instanceof Byte || v instanceof Short
             || v instanceof Integer || v instanceof Long
             || v instanceof Float || v instanceof Double
-            || v instanceof java.math.BigInteger || v instanceof java.math.BigDecimal) {
+            || v instanceof BigInteger || v instanceof BigDecimal) {
             // If you don't want NaN/Infinity as bare tokens, quote them here.
             return v.toString();
         }
@@ -90,16 +89,16 @@ public class InputsDefaultsFilesFinder extends InputResolver {
             case Enum<?> en -> {
                 return quote(en.name());
             }
-            case java.util.Optional<?> opt -> {
+            case Optional<?> opt -> {
                 return opt.map(InputsDefaultsFilesFinder::toKiteLiteral).orElse("null");
             }
-            case java.util.OptionalInt opt -> {
+            case OptionalInt opt -> {
                 return opt.isPresent() ? Integer.toString(opt.getAsInt()) : "null";
             }
-            case java.util.OptionalLong opt -> {
+            case OptionalLong opt -> {
                 return opt.isPresent() ? Long.toString(opt.getAsLong()) : "null";
             }
-            case java.util.OptionalDouble opt -> {
+            case OptionalDouble opt -> {
                 return opt.isPresent() ? Double.toString(opt.getAsDouble()) : "null";
             }
             default -> { /* fall through */ }
@@ -122,10 +121,8 @@ public class InputsDefaultsFilesFinder extends InputResolver {
 
         // collections: keep List order; sort Set for determinism
         if (v instanceof java.util.Collection<?> c) {
-            java.util.stream.Stream<?> stream = (c instanceof java.util.Set<?>)
-                    ? c.stream().sorted(Comparator.comparing(Object::toString))
-                    : c.stream();
-            String items = stream.map(InputsDefaultsFilesFinder::toKiteLiteral)
+            String items = c.stream()
+                    .map(InputsDefaultsFilesFinder::toKiteLiteral)
                     .collect(java.util.stream.Collectors.joining(", "));
             return "[" + items + "]";
         }
