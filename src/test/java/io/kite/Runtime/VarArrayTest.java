@@ -179,6 +179,16 @@ public class VarArrayTest extends RuntimeTest {
     }
 
     @Test
+    void testAnyMix() {
+        eval("""
+                var any[] x = [{env: "prod"}, {env: "dev"}, 'hello', 123, true]
+                """);
+        var varType = (List) global.lookup("x");
+        Assertions.assertNotNull(varType);
+        assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev"), "hello", 123, true), varType);
+    }
+
+    @Test
     void testTypeAny() {
         eval("""
                 var x = ["hi", 1, true]
