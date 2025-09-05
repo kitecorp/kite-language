@@ -7,19 +7,35 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @Log4j2
 public class InputsDefaultsFilesFinder extends InputResolver {
-    public static final String INPUTS_DEFAULTS_KITE = "inputs.default.kite";
+    static final String INPUTS_DEFAULTS_KITE = "inputs.default.kite";
     static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.kite";
     private Map<String, String> inputs;
     private boolean wasRead = false;
 
     public InputsDefaultsFilesFinder() {
         inputs = new HashMap<>();
+    }
+
+    /**
+     * Used for testing.
+     */
+    public static void writeToDefaults(Map<String, String> values) {
+        try {
+            var content = values.entrySet().stream().map(it -> it.getKey() + "=\"" + it.getValue() + "\"").reduce((a, b) -> a + "\n" + b);
+
+            var path = Path.of(InputsDefaultsFilesFinder.INPUTS_DEFAULTS_KITE);
+            Files.writeString(path, content.get(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            log.info("Set input file to: {}", path.toAbsolutePath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void readFileProperty(Path file) {
