@@ -158,12 +158,30 @@ public class InputsDefaultsFilesFinder extends InputResolver {
     }
 
     private static String quote(String s) {
-        return "\"" + escape(s) + "\"";
+        String escaped = escapeIfNeeded(s);
+        return "\"" + escape(escaped) + "\"";
+    }
+
+    private static String escapeIfNeeded(String s) {
+        int len = s.length();
+        // First pass: detect if escaping is necessary
+        boolean needs = false;
+        for (int i = 0; i < len; i++) {
+            char ch = s.charAt(i);
+            if (ch == '\\' || ch == '"' || ch < 0x20) {
+                needs = true;
+                break;
+            }
+        }
+        if (!needs) return s;
+
+        // Second pass: build escaped
+        return escape(s);
     }
 
     // Minimal JSON-style escaping for safety
     private static String escape(String s) {
-        StringBuilder sb = new StringBuilder(s.length() + 8);
+        var sb = new StringBuilder(s.length() + 8);
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
             switch (ch) {
@@ -189,11 +207,8 @@ public class InputsDefaultsFilesFinder extends InputResolver {
                     sb.append("\\t");
                     break;
                 default:
-                    if (ch < 0x20) {
-                        sb.append(String.format("\\u%04x", (int) ch));
-                    } else {
-                        sb.append(ch);
-                    }
+                    if (ch < 0x20) sb.append(String.format("\\u%04x", (int) ch));
+                    else sb.append(ch);
             }
         }
         return sb.toString();
