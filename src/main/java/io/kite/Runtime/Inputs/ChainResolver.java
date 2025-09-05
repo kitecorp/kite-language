@@ -12,7 +12,6 @@ import io.kite.Visitors.Visitor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -65,7 +64,9 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         return value;
     }
 
-    protected static @NotNull String normalizeArrays(String value) {
+    protected static @Nullable String normalizeArrays(@Nullable String value) {
+        if (value == null) return null;
+
         if (value.contains(",") &&
             !StringUtils.startsWithAny(value, "[", "{") &&
             !StringUtils.endsWithAny(value, "]", "}")
