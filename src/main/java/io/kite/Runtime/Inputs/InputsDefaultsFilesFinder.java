@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Log4j2
 public class InputsDefaultsFilesFinder extends InputResolver {
@@ -29,25 +28,31 @@ public class InputsDefaultsFilesFinder extends InputResolver {
      * Used for testing.
      */
     public static void writeToDefaults(Map<String, Object> values) {
-        try {
-            Path path = Path.of(INPUTS_DEFAULTS_KITE);
+        writeToDefaults(values, false);
+    }
 
-            String content = values.entrySet().stream()
-                    .sorted(Map.Entry.comparingByKey()) // stable output
-                    .map(e -> e.getKey() + " = " + toKiteLiteral(e.getValue()))
-                    .collect(Collectors.joining(System.lineSeparator()));
+    public static void writeToDefaults(Map<String, Object> values, boolean stableOrder) {
+        Path path = Path.of(INPUTS_DEFAULTS_KITE);
+        try (var bw = Files.newBufferedWriter(path,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING)) {
 
-            // end with newline (nice for CLIs and diffs)
-            if (!content.isEmpty()) content += System.lineSeparator();
+            // choose order
+            Iterable<Map.Entry<String, Object>> it;
+            if (stableOrder) {
+                var list = new ArrayList<>(values.entrySet());
+                list.sort(Map.Entry.comparingByKey());
+                it = list;
+            } else {
+                it = values.entrySet();
+            }
 
-            Files.writeString(
-                    path,
-                    content,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-            );
-
-            System.out.println("Set input file to: " + path.toAbsolutePath());
+            for (var e : it) {
+                bw.write(e.getKey());
+                bw.write(" = ");
+                bw.write(toKiteLiteral(e.getValue()));
+                bw.write(System.lineSeparator());
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
