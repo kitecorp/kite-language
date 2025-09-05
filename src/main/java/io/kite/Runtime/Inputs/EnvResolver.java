@@ -6,13 +6,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class EnvResolver extends InputResolver {
-    private final Map<String, String> envVariables;
+    private final Map<String, Object> envVariables;
 
     public EnvResolver() {
         this.envVariables = captureSystemEnv();
     }
 
-    public EnvResolver(Map<String, String> overrides) {
+    public EnvResolver(Map<String, Object> overrides) {
         this.envVariables = overrides;
     }
 
@@ -29,8 +29,8 @@ public class EnvResolver extends InputResolver {
         return k;
     }
 
-    public static Map<String, String> captureSystemEnv() {
-        Map<String, String> out = new HashMap<>();
+    public static Map<String, Object> captureSystemEnv() {
+        Map<String, Object> out = new HashMap<>();
         for (var e : System.getenv().entrySet()) {
             var key = e.getKey();
             if (!key.startsWith(EnvVariablesConstants.PREFIX)) {
@@ -56,6 +56,9 @@ public class EnvResolver extends InputResolver {
 
     @Override
     @Nullable String resolve(InputDeclaration key, String previousValue) {
-        return envVariables.get(key.name());
+        Object o = envVariables.get(key.name());
+        if (o == null) return null;
+
+        return o.toString();
     }
 }

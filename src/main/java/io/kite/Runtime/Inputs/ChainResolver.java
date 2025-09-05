@@ -93,7 +93,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
             var input = resolve(inputDeclaration, null);
             if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
-                throw new MissingInputException("Invalid input %s".formatted(inputDeclaration.getId().string()));
+                throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
             }
 
             boolean keepOriginal = NumberUtils.isCreatable(string) ||

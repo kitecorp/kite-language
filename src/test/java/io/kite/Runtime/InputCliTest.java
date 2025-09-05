@@ -22,6 +22,26 @@ public class InputCliTest extends InputTest {
     }
 
     @Override
+    protected void setInput(Integer input) {
+        setInput(input.toString());
+    }
+
+    @Override
+    protected void setInput(Boolean input) {
+        setInput(input.toString());
+    }
+
+    @Override
+    protected void setInput(Double input) {
+        setInput(input.toString());
+    }
+
+    @Override
+    protected void setInput(Float input) {
+        setInput(input.toString());
+    }
+
+    @Override
     protected @NotNull ChainResolver getChainResolver() {
         return new ChainResolver(List.of(new CliResolver()));
     }

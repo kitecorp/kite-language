@@ -9,9 +9,29 @@ import java.util.List;
 import java.util.Map;
 
 public class InputEnvVariableTest extends InputTest {
-    private Map<String, String> envVariables;
+    private Map<String, Object> envVariables;
 
     protected void setInput(String input) {
+        envVariables.put("region", input);
+    }
+
+    @Override
+    protected void setInput(Integer input) {
+        envVariables.put("region", input);
+    }
+
+    @Override
+    protected void setInput(Boolean input) {
+        envVariables.put("region", input);
+    }
+
+    @Override
+    protected void setInput(Double input) {
+        envVariables.put("region", input);
+    }
+
+    @Override
+    protected void setInput(Float input) {
         envVariables.put("region", input);
     }
 
