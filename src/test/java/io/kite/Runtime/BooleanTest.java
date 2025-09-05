@@ -39,34 +39,34 @@ class BooleanTest extends RuntimeTest {
 
     @Test
     void testStringWithStringEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 "hello" == "hello"
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testStringWithStringEqFalse() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 "hello" == "Hello"
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
     void testStringWithStringNotEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 "hello" != "world"
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testStringWithStringNotEqFalse() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 "hello" != "hello"
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
@@ -151,66 +151,66 @@ class BooleanTest extends RuntimeTest {
 
     @Test
     void testTrueWithTrueEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 true == true
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testTrueWithFalseEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 true == false
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
     void testFalseWithFalseEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 false == false
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testFalseWithTrueEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 false == true
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
     void testFalseWithTrueLess() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 false < true
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testFalseWithTrueLessEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 false <= true
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testFalseWithTrueGreater() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 false > true
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
     void testFalseWithTrueGreaterEq() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 false >= true
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
@@ -377,89 +377,89 @@ class BooleanTest extends RuntimeTest {
     @Test
     @Disabled
     void testObjectEqual() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 val x = { "env": "prod" }
                 val y = { "env": "prod" }
                 x == y
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     @Disabled
     void testObjectNotEqual() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 val x = { "env": "prod" }
                 val y = { "env": "prod" }
                 x != y
                 """);
-        assertFalse(type);
+        assertFalse(res);
     }
 
     @Test
     @Disabled
     void testObjectNotEqualTrue() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 val x = { "env": "dev" }
                 val y = { "env": "prod" }
                 x != y
                 """);
-        assertTrue(type);
+        assertTrue(res);
     }
 
     @Test
     void testVarObjectNotEqual() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { "env": "prod" }
                 var y = { "env": "prod" }
                 x != y
                 """);
-        Assertions.assertFalse(type);
+        Assertions.assertFalse(res);
     }
 
     @Test
     void testVarObjectEqual() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { "env": "prod" }
                 var y = { "env": "prod" }
                 x == y
                 """);
-        Assertions.assertTrue(type);
+        Assertions.assertTrue(res);
     }
 
     @Test
     void testVarObjectEqualMoreProperties() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { "env": "prod" }
                 var y = { "env": "prod", size: 1 }
                 x == y
                 """);
-        Assertions.assertFalse(type);
+        Assertions.assertFalse(res);
     }
 
     @Test
     void testVarObjectEqualOrder() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { size: 1, "env": "prod" }
                 var y = { "env": "prod", size: 1 }
                 x == y
                 """);
-        Assertions.assertTrue(type);
+        Assertions.assertTrue(res);
     }
 
     @Test
     void testVarObjectEqualDifferentType() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { size: true, "env": "prod" }
                 var y = { "env": "prod", size: 1 }
                 x == y
                 """);
-        Assertions.assertFalse(type);
+        Assertions.assertFalse(res);
     }
 
     @Test
     void testVarObjectEqualNested() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { 
                     env: "prod", 
                     size: {
@@ -474,12 +474,12 @@ class BooleanTest extends RuntimeTest {
                 }
                 x == y
                 """);
-        Assertions.assertTrue(type);
+        Assertions.assertTrue(res);
     }
 
     @Test
     void testVarObjectEqualNestedDifferentKey() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { 
                     env: "prod", 
                     size: {
@@ -494,12 +494,12 @@ class BooleanTest extends RuntimeTest {
                 }
                 x == y
                 """);
-        Assertions.assertFalse(type);
+        Assertions.assertFalse(res);
     }
 
     @Test
     void testVarObjectEqualNestedDifferentValue() {
-        var type = (boolean) eval("""
+        var res = (boolean) eval("""
                 var x = { 
                     env: "prod", 
                     size: {
@@ -514,7 +514,7 @@ class BooleanTest extends RuntimeTest {
                 }
                 x == y
                 """);
-        Assertions.assertFalse(type);
+        Assertions.assertFalse(res);
     }
 
 

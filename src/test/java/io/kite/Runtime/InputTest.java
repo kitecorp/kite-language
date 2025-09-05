@@ -293,6 +293,15 @@ public abstract class InputTest extends RuntimeTest {
         assertEquals(List.of("hello"), res);
     }
 
+    @Test
+    void testInputUnionArrayInitStringNumber() {
+        var res = eval("""
+                type custom = string | number
+                input custom[] region = ['hello', 10]
+                """);
+        assertEquals(List.of("hello", 10), res);
+    }
+
 
     /************************************************************
      * ERROR CASES                                             **
