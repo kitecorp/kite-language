@@ -9,7 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-public class InputCliTest extends InputTest {
+public class InputCliTests extends InputTests {
     private InputStream sysInBackup = System.in;
 
     @AfterEach

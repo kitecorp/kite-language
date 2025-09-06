@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-public class InputFileTest extends InputTest {
+public class InputFileTests extends InputTests {
 
     protected void setInput(String input) {
         InputsDefaultsFilesFinder.writeToDefaults(Map.of("region", input));

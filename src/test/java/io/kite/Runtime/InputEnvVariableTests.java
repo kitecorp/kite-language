@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InputEnvVariableTest extends InputTest {
+public class InputEnvVariableTests extends InputTests {
     private Map<String, Object> envVariables;
 
     protected void setInput(String input) {

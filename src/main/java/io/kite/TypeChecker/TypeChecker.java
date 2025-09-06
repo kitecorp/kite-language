@@ -283,7 +283,7 @@ public final class TypeChecker implements Visitor<Type> {
         }
         String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                 printer.visit(declaredType),
-                declaredType.getTypes().stream().map(printer::visit).collect(Collectors.joining(" | ")),
+                printer.visit(declaredType),
                 actualType.getValue(),
                 printer.visit(expectedVal));
         throw new TypeError(string);
@@ -333,9 +333,21 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(InputDeclaration expression) {
         var t1 = visit(expression.getType());
         // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
-        if (expression.hasInit()) {
-            var t2 = visit(expression.getInit());
-            expect(t2, t1, expression.getInit());
+        switch (expression.getInit()) {
+            case ArrayExpression arrayExpression -> {
+                if (expression.getType() instanceof ArrayTypeIdentifier arrayTypeIdentifier) {
+                    arrayExpression.setType(arrayTypeIdentifier);
+                }
+                var t2 = visit(arrayExpression);
+                expect(t2, t1, expression.getInit());
+            }
+            case null -> {
+
+            }
+            default -> {
+                var t2 = visit(expression.getInit());
+                expect(t2, t1, expression.getInit());
+            }
         }
         if (expression.getType().getType().getKind() != t1.getKind()) {
             expression.getType().setType(t1);
@@ -768,16 +780,30 @@ public final class TypeChecker implements Visitor<Type> {
         if (expression.isEmpty()) {
             return new ArrayType(env);
         }
-        var firstType = visit(expression.getItems().get(0));
-        for (Expression item : expression.getItems()) {
+        if (expression.getType() != null) {
+            var explicitType = visit(expression.getType());
+            if (explicitType instanceof ArrayType arrayType) {
+                if (arrayType.getType() instanceof UnionType unionType) {
+                    var set = unionType.getTypes().stream().map(this::visit).collect(Collectors.toSet());
+                    var res = getArrayType(expression, set);
+                    return Optional.ofNullable(res).orElseGet(() -> new ArrayType(env, unionType));
+                }
+            }
+        }
+        var r = getArrayType(expression, Set.of(visit(expression.getItems().get(0))));
+        return Optional.ofNullable(r).orElseGet(() -> new ArrayType(env, visit(expression.getItems().get(0))));
+    }
+
+    private ArrayType getArrayType(ArrayExpression arrayExpression, Set<Type> expression) {
+        for (Expression item : arrayExpression.getItems()) {
             var itemType = visit(item);
-            if (!Objects.equals(itemType, firstType)) {
+            if (!expression.contains(itemType)) {
 //                throw new TypeError("Array items must be of the same type: %s != %s".formatted(itemType, firstType));
                 // if the first item is not the same as the rest of the items then we return any type
                 return new ArrayType(env, AnyType.INSTANCE);
             }
         }
-        return new ArrayType(env, firstType);
+        return null;
     }
 
     @Override
