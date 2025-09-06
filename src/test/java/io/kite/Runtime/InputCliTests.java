@@ -120,4 +120,24 @@ public class InputCliTests extends InputTests {
         assertEquals(20, res);
     }
 
+    @Test
+    void testInputStringArrayDefault() {
+        setInput("['hello','world']");
+        var res = eval("input string[] region= ['hi','kite'] ");
+        assertEquals(List.of("hi", "kite"), res);
+    }
+
+    @Test
+    void testInputNumberArrayDefault() {
+        setInput("[1,2,3]");
+        var res = eval("input number[] region = [4, 5, 6]");
+        assertEquals(List.of(4, 5, 6), res);
+    }
+
+    @Test
+    void testInputNumberArrayNoParanthesisDefaults() {
+        setInput("1,2,3");
+        var res = eval("input number[] region = [4, 5, 6]");
+        assertEquals(List.of(4, 5, 6), res);
+    }
 }
