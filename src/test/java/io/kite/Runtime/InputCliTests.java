@@ -164,4 +164,18 @@ public class InputCliTests extends InputTests {
         assertEquals(List.of(4, 5, 6), res);
     }
 
+    @Test
+    void testInputTrueArrayDefaults() {
+        setInput("[true]");
+        var res = eval("input boolean[] region = [false]");
+        assertEquals(List.of(false), res);
+    }
+
+    @Test
+    void testInputFalseArrayDefaults() {
+        setInput("[false]");
+        var res = eval("input boolean[] region = [true]");
+        assertEquals(List.of(true), res);
+    }
+
 }
