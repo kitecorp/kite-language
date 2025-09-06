@@ -16,9 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
     private final Tokenizer tokenizer;
@@ -92,8 +90,8 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
             return null;
         }
         try {
-
-            var input = resolve(inputDeclaration, null);
+            var init = visit(inputDeclaration.getInit());
+            var input = resolve(inputDeclaration, init);
             if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
                 throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
             }
@@ -230,12 +228,28 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     @Override
     public Object visit(ObjectExpression expression) {
-        return null;
+        if (expression.isEmpty()) {
+            return Map.of();
+        }
+        var map = new HashMap<String, Object>();
+        for (var pair : expression.getProperties()) {
+            if (pair.getKey() instanceof StringLiteral literal) {
+                var key = (String) visit(literal);
+                var value = visit(pair.getValue());
+                map.put(key, value);
+            }
+        }
+        return map;
     }
 
     @Override
     public Object visit(ArrayExpression expression) {
-        return null;
+        var list = new ArrayList<>();
+        for (Expression item : expression.getItems()) {
+            var element = visit(item);
+            list.add(element);
+        }
+        return list;
     }
 
     @Override
