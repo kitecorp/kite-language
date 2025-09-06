@@ -161,10 +161,17 @@ public abstract class InputTests extends RuntimeTest {
     }
 
     @Test
-    void testInputBooleanDefault() {
+    void testInputTrueDefault() {
         setInput(true);
         var res = eval("input boolean region = false");
         assertEquals(true, res);
+    }
+
+    @Test
+    void testInputFalseDefault() {
+        setInput(false);
+        var res = eval("input boolean region = true");
+        assertEquals(false, res);
     }
 
     @Test
