@@ -80,10 +80,17 @@ public class InputCliTests extends InputTests {
     }
 
     @Test
-    void testInputBooleanDefault() {
+    void testInputTrueDefault() {
         setInput(true);
         var res = eval("input boolean region = false");
         assertEquals(false, res);
+    }
+
+    @Test
+    void testInputFalseDefault() {
+        setInput(false);
+        var res = eval("input boolean region = true");
+        assertEquals(true, res);
     }
 
     @Test
