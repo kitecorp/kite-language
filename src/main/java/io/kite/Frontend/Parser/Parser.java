@@ -610,8 +610,8 @@ public class Parser {
         if (IsLookAheadAfterUntil(Identifier, CloseBraces, Colon) || context == SchemaContext.SCHEMA) {
             blockContext = BlockContext.OBJECT;
         }
-        if (contextStack.peek() != ContextStack.If && IsLookAheadAfter(OpenBraces, CloseBraces)) {
-            blockContext = BlockContext.OBJECT;
+        if (contextStack.peek() != ContextStack.If && IsLookAhead(OpenBraces)) {
+            blockContext = BlockContext.OBJECT;// if (x) {} : should be block not object
         }
         Expression expression;
         if (blockContext == BlockContext.OBJECT) {

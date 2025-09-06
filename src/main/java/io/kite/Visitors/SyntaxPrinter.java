@@ -134,12 +134,12 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(ObjectExpression expression) {
-        if (expression.getProperties().isEmpty()) {
+        if (expression.isEmpty()) {
             return "{ }";
         }
         String builder = expression.getProperties().stream()
                 .map(this::visit)
-                .collect(Collectors.joining(",\n", "\n{\n ", " \n}"));
+                .collect(Collectors.joining(",\n", "{\n ", " \n}"));
         return builder;
     }
 

@@ -16,7 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
     private final Tokenizer tokenizer;
@@ -85,12 +87,13 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     public Object visit(InputDeclaration inputDeclaration) {
         if (inputDeclaration.hasInit()) {
             var defaultValue = visit(inputDeclaration.getInit());
-//            inputDeclaration.setInit(defaultValue);
-//            return getInputs().initOrAssign((String) visit(inputDeclaration.getId()), defaultValue);
-            return null;
+            return parseInput(inputDeclaration, defaultValue);
         }
+        return parseInput(inputDeclaration, null);
+    }
+
+    private Object parseInput(InputDeclaration inputDeclaration, Object init) {
         try {
-            var init = visit(inputDeclaration.getInit());
             var input = resolve(inputDeclaration, init);
             if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
                 throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
@@ -100,7 +103,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
                                    BooleanUtils.toBoolean(string) ||
                                    StringUtils.startsWith(string, "{") ||
                                    StringUtils.startsWith(string, "[");
-            if (!keepOriginal) {
+            if (!keepOriginal && !string.equals("false")) {
                 string = "\"%s\"".formatted(string);
             }
             var ast = parser.produceAST(tokenizer.tokenize(string));
@@ -111,7 +114,6 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         } catch (NoSuchElementException exception) {
             throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
         }
-//        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
     }
 
     @Override
@@ -228,28 +230,30 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     @Override
     public Object visit(ObjectExpression expression) {
-        if (expression.isEmpty()) {
-            return Map.of();
-        }
-        var map = new HashMap<String, Object>();
-        for (var pair : expression.getProperties()) {
-            if (pair.getKey() instanceof StringLiteral literal) {
-                var key = (String) visit(literal);
-                var value = visit(pair.getValue());
-                map.put(key, value);
-            }
-        }
-        return map;
+        return printer.visit(expression).trim();
+//        if (expression.isEmpty()) {
+//            return Map.of();
+//        }
+//        var map = new HashMap<String, Object>();
+//        for (var pair : expression.getProperties()) {
+//            if (pair.getKey() instanceof StringLiteral literal) {
+//                var key = (String) visit(literal);
+//                var value = visit(pair.getValue());
+//                map.put(key, value);
+//            }
+//        }
+//        return map;
     }
 
     @Override
     public Object visit(ArrayExpression expression) {
-        var list = new ArrayList<>();
-        for (Expression item : expression.getItems()) {
-            var element = visit(item);
-            list.add(element);
-        }
-        return list;
+        return printer.visit(expression).trim();
+        //        var list = new ArrayList<>();
+//        for (Expression item : expression.getItems()) {
+//            var element = visit(item);
+//            list.add(element);
+//        }
+//        return list;
     }
 
     @Override
