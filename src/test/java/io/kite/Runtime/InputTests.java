@@ -394,10 +394,16 @@ public abstract class InputTests extends RuntimeTest {
         var res = eval("input object[] region");
         assertEquals(List.of(Map.of("env", "dev")), res);
     }
-
     @Test
     void testInputObjectArrayInit() {
         var res = eval("input object[] region=[{env:'dev'}]");
+        assertEquals(List.of(Map.of("env", "dev")), res);
+    }
+
+    @Test
+    void testInputObjectArrayDefaults() {
+        setInput("[{env:'dev'}]");
+        var res = eval("input object[] region = [{env:'prod'}]");
         assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
