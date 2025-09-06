@@ -132,6 +132,10 @@ public abstract class InputTests extends RuntimeTest {
         assertEquals(10, res);
     }
 
+
+    /********************************
+     * HAPPY CASES - default values *
+     * ******************************/
     @Test
     void testInputStringDefault() {
         setInput("hello");
@@ -201,9 +205,6 @@ public abstract class InputTests extends RuntimeTest {
         assertEquals(10, res);
     }
 
-    /********************************
-     * HAPPY CASES - default values *
-     * ******************************/
     @Test
     @DisplayName("Should not prompt for input when default value is provided")
     void testInputStringInit() {
@@ -281,6 +282,13 @@ public abstract class InputTests extends RuntimeTest {
     }
 
     @Test
+    void testInputStringArrayDefault() {
+        setInput("['hello','world']");
+        var res = eval("input string[] region= ['hi','kite'] ");
+        assertEquals(List.of("hello", "world"), res);
+    }
+
+    @Test
     void testInputNumberArray() {
         setInput("[1,2,3]");
         var res = eval("input number[] region");
@@ -288,9 +296,23 @@ public abstract class InputTests extends RuntimeTest {
     }
 
     @Test
+    void testInputNumberArrayDefault() {
+        setInput("[1,2,3]");
+        var res = eval("input number[] region = [4, 5, 6]");
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
     void testInputNumberArrayNoParanthesis() {
         setInput("1,2,3");
         var res = eval("input number[] region");
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
+    void testInputNumberArrayNoParanthesisDefaults() {
+        setInput("1,2,3");
+        var res = eval("input number[] region = [4, 5, 6]");
         assertEquals(List.of(1, 2, 3), res);
     }
 
