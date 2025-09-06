@@ -776,22 +776,45 @@ public final class TypeChecker implements Visitor<Type> {
         if (expression.getForStatement() != null) {
             return new ArrayType(env, visit(expression.getForStatement()));
         }
-
+        // [] (no items, no explicit type)
         if (expression.isEmpty()) {
             return new ArrayType(env);
         }
-        if (expression.getType() != null) {
-            var explicitType = visit(expression.getType());
-            if (explicitType instanceof ArrayType arrayType) {
-                if (arrayType.getType() instanceof UnionType unionType) {
-                    var set = unionType.getTypes().stream().map(this::visit).collect(Collectors.toSet());
-                    var res = getArrayType(expression, set);
-                    return Optional.ofNullable(res).orElseGet(() -> new ArrayType(env, unionType));
-                }
-            }
+        // Try explicit type first (e.g., [: string | number])
+        var explicit = expression.getType();
+        if (explicit != null) {
+            var arrFromExplicit = tryArrayTypeFromExplicit(expression, explicit);
+            if (arrFromExplicit != null) return arrFromExplicit;
         }
-        var r = getArrayType(expression, Set.of(visit(expression.getItems().get(0))));
-        return Optional.ofNullable(r).orElseGet(() -> new ArrayType(env, visit(expression.getItems().get(0))));
+        // Fallback: infer from first item
+        var firstItemType = visit(expression.getItems().get(0));
+        return inferArrayTypeOrWrap(expression, Set.of(firstItemType), firstItemType);
+    }
+
+    private ArrayType tryArrayTypeFromExplicit(ArrayExpression expr, Expression explicitTypeNode) {
+        var explicitType = visit(explicitTypeNode);
+        if (!(explicitType instanceof ArrayType at)) return null;
+
+        var element = at.getType();
+        if (element instanceof UnionType ut) {
+            // We "visit" the union's members to normalize aliases/etc.
+            var visitedMembers = ut.getTypes().stream()
+                    .map(this::visit)
+                    .collect(Collectors.toSet());
+
+            var inferred = getArrayType(expr, visitedMembers);
+            return inferred != null ? inferred : new ArrayType(env, ut);
+        }
+
+        // Non-union explicit arrays don't need special handling here
+        return null;
+    }
+
+    private ArrayType inferArrayTypeOrWrap(ArrayExpression expr,
+                                           Set<Type> candidateElementTypes,
+                                           Type fallbackElementType) {
+        var inferred = getArrayType(expr, candidateElementTypes);
+        return inferred != null ? inferred : new ArrayType(env, fallbackElementType);
     }
 
     private ArrayType getArrayType(ArrayExpression arrayExpression, Set<Type> expression) {
