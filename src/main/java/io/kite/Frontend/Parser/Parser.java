@@ -155,6 +155,7 @@ public class Parser {
                 case Existing, Resource -> ResourceDeclaration();
                 case Component -> ComponentDeclaration();
                 case Input -> InputDeclaration();
+                case Output -> OutputDeclaration();
                 case Var -> VarDeclarations();
 //                case Val -> ValDeclarations();
                 default -> Statement();
@@ -1227,20 +1228,32 @@ public class Parser {
         }
         var body = (BlockExpression) BlockExpression("Expect '{' after component name.", "Expect '}' after component body.");
 
-        validateInputs(name, body);
+        validateInputsOutputs(name, body);
 
         return ComponentStatement.component(componentType, name, body);
     }
 
-    private void validateInputs(Identifier componentName, BlockExpression body) {
+    private void validateInputsOutputs(Identifier componentName, BlockExpression body) {
         var set = new HashSet<String>();
         for (var statement : body.getExpression()) {
-            if (statement instanceof InputDeclaration inputDeclaration) {
-                if (componentName != null) {
-                    throw ParserErrors.error("Component declaration should not have inputs");
+            switch (statement) {
+                case InputDeclaration inputDeclaration -> {
+                    if (componentName != null) {
+                        throw ParserErrors.error("Component declaration should not have inputs");
+                    }
+                    if (!set.add(inputDeclaration.name())) {
+                        throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
+                    }
                 }
-                if (!set.add(inputDeclaration.name())) {
-                    throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
+                case OutputDeclaration outputDeclaration -> {
+                    if (componentName != null) {
+                        throw ParserErrors.error("Component declaration should not have outputs");
+                    }
+                    if (!set.add(outputDeclaration.name())) {
+                        throw ParserErrors.error(format("Duplicate outputs names in component `{0}` : {1}", printer.visit(componentName), printer.visit(outputDeclaration)));
+                    }
+                }
+                case null, default -> {
                 }
             }
         }
@@ -1256,6 +1269,18 @@ public class Parser {
             body = Initialize();
         }
         return InputDeclaration.input(name, type, body);
+    }
+
+    private Statement OutputDeclaration() {
+        eat(Output);
+        var type = TypeIdentifier();
+        var name = Identifier();
+        Expression body = null;
+        if (IsLookAhead(Equal)) {
+            eat(Equal);
+            body = Initialize();
+        }
+        return OutputDeclaration.output(name, type, body);
     }
 
     private Expression LeftHandSideExpression() {
