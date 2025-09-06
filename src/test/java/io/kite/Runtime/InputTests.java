@@ -328,6 +328,28 @@ public abstract class InputTests extends RuntimeTest {
     }
 
     @Test
+    void testInputUnionArrayDefault() {
+        setInput("['hello','world']");
+        var res = eval("""
+                type custom = string | number
+                input custom[] region = ['hi', 'kite']
+                """);
+
+        assertEquals(List.of("hello", "world"), res);
+    }
+
+    @Test
+    void testInputUnionArrayNumbersDefault() {
+        setInput("[1, 2, 3]");
+        var res = eval("""
+                type custom = string | number
+                input custom[] region = [4,5,6]
+                """);
+
+        assertEquals(List.of(1, 2, 3), res);
+    }
+
+    @Test
     void testInputStringArrayInit() {
         var res = eval("input string[] region=['hi']");
         assertEquals(List.of("hi"), res);
