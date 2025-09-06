@@ -80,7 +80,7 @@ public class UnionTypeTest extends CheckerTest {
     @DisplayName("type alias of object assign any object")
     void unionTypeAliasObject() {
         var res = eval("""
-                type alias  = { env: number}
+                type alias  = { env: number} | { env: string }
                 var alias x = { env: 2 } // ok since we assign a object
                 """);
         assertEquals(UnionType.unionType("alias", new ObjectType(checker.getEnv())), res);

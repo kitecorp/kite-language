@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * All tests will be run on the input type provided by the subclass.
  */
 @Log4j2
-public abstract class InputTest extends RuntimeTest {
+public abstract class InputTests extends RuntimeTest {
     private ChainResolver chainResolver;
     private TypeChecker typeChecker;
 
