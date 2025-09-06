@@ -375,6 +375,20 @@ public abstract class InputTests extends RuntimeTest {
     }
 
     @Test
+    void testInputTrueArrayDefaults() {
+        setInput("[true]");
+        var res = eval("input boolean[] region = [false]");
+        assertEquals(List.of(true), res);
+    }
+
+    @Test
+    void testInputFalseArrayDefaults() {
+        setInput("[false]");
+        var res = eval("input boolean[] region = [true]");
+        assertEquals(List.of(false), res);
+    }
+
+    @Test
     void testInputObjectArray() {
         setInput("[{env:'dev'}]");
         var res = eval("input object[] region");
