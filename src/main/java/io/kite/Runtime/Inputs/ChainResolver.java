@@ -230,30 +230,14 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     @Override
     public Object visit(ObjectExpression expression) {
+        // when an input is initialised with an object this will be called.
+        // we just convert it to object({...}) string because later needs to be parsed
         return "object(" + printer.visit(expression).trim() + ")";
-//        if (expression.isEmpty()) {
-//            return Map.of();
-//        }
-//        var map = new HashMap<String, Object>();
-//        for (var pair : expression.getProperties()) {
-//            if (pair.getKey() instanceof StringLiteral literal) {
-//                var key = (String) visit(literal);
-//                var value = visit(pair.getValue());
-//                map.put(key, value);
-//            }
-//        }
-//        return map;
     }
 
     @Override
     public Object visit(ArrayExpression expression) {
         return printer.visit(expression).trim();
-        //        var list = new ArrayList<>();
-//        for (Expression item : expression.getItems()) {
-//            var element = visit(item);
-//            list.add(element);
-//        }
-//        return list;
     }
 
     @Override

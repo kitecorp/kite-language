@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -34,7 +33,7 @@ public class BlockTest extends ParserTest {
     @Test
     void testEmptyBlock() {
         var res = parse("{ }    ");
-        var expected = program(expressionStatement(objectExpression()));
+        var expected = program(expressionStatement(block()));
         assertEquals(expected, res);
         log.info((res));
     }
