@@ -51,6 +51,9 @@ public class ParserIterator {
         return false;
     }
 
+    /**
+     * Do I see a token of kind after followed immediately by one of the type... tokens, before hitting a line break?
+     */
     boolean IsLookAheadAfter(TokenType after, TokenType... type) {
         int index = this.iterator.previousIndex() + 1;
         var iterator = this.tokens.listIterator(index);

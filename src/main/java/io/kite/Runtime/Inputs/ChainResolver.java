@@ -71,7 +71,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
      * 1.	defaults → 2. env file → 3. ENV → 4. CLI
      */
     @Override
-    @Nullable String resolve(InputDeclaration key, String previousValue) {
+    @Nullable String resolve(InputDeclaration key, Object previousValue) {
         for (InputResolver resolver : resolvers) {
             var temp = normalizeArrays(resolver.resolve(key, previousValue));
             if (temp != null) {
@@ -79,7 +79,8 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
                 previousValue = temp;
             }
         }
-        return previousValue;
+        if (previousValue == null) return null;
+        return previousValue.toString();
     }
 
     @Override

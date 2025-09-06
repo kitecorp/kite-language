@@ -610,6 +610,9 @@ public class Parser {
         if (IsLookAheadAfterUntil(Identifier, CloseBraces, Colon) || context == SchemaContext.SCHEMA) {
             blockContext = BlockContext.OBJECT;
         }
+        if (contextStack.peek() != ContextStack.If && IsLookAheadAfter(OpenBraces, CloseBraces)) {
+            blockContext = BlockContext.OBJECT;
+        }
         Expression expression;
         if (blockContext == BlockContext.OBJECT) {
             expression = ObjectDeclaration();
@@ -709,6 +712,7 @@ public class Parser {
     private Statement IfStatement() {
         eat(If);
         eatIf(OpenParenthesis);
+        contextStack.push(ContextStack.If);
         var test = Expression();
         eatIf(CloseParenthesis);
         if (IsLookAhead(NewLine)) {
@@ -718,6 +722,7 @@ public class Parser {
 
         Statement ifBlock = Statement();
         Statement elseBlock = ElseStatement();
+        contextStack.pop();
         return IfStatement.If(test, ifBlock, elseBlock);
     }
 

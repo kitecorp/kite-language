@@ -230,7 +230,7 @@ public class InputsDefaultsFilesFinder extends InputResolver {
     }
 
     @Override
-    String resolve(InputDeclaration input, String previousValue) {
+    String resolve(InputDeclaration input, Object previousValue) {
         // read default file
         if (!wasRead) {
             readFileProperty(Paths.get(INPUTS_DEFAULTS_KITE));
