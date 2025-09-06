@@ -356,6 +356,32 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     @Override
+    public Type visit(OutputDeclaration expression) {
+        var t1 = visit(expression.getType());
+        // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
+        switch (expression.getInit()) {
+            case ArrayExpression arrayExpression -> {
+                if (expression.getType() instanceof ArrayTypeIdentifier arrayTypeIdentifier) {
+                    arrayExpression.setType(arrayTypeIdentifier);
+                }
+                var t2 = visit(arrayExpression);
+                expect(t2, t1, expression.getInit());
+            }
+            case null -> {
+
+            }
+            default -> {
+                var t2 = visit(expression.getInit());
+                expect(t2, t1, expression.getInit());
+            }
+        }
+        if (expression.getType().getType().getKind() != t1.getKind()) {
+            expression.getType().setType(t1);
+        }
+        return t1;
+    }
+
+    @Override
     public Type visit(LogicalExpression expression) {
         Type left = visit(expression.getLeft());
         Type right = visit(expression.getRight());

@@ -73,6 +73,15 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(OutputDeclaration expression) {
+        if (expression.hasInit()) {
+            return format("input {0} {1} = {2}", visit(expression.getType()), visit(expression.getId()), visit(expression.getInit()));
+        } else {
+            return format("input {0} {1}", visit(expression.getType()), visit(expression.getId()));
+        }
+    }
+
+    @Override
     public String visit(LogicalExpression expression) {
         return "(" + visit(expression.getLeft()) + " " + expression.getOperator().toString() + " " + visit(expression.getRight()) + ")";
     }
@@ -210,7 +219,8 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(Type type) {
         return switch (type) {
             case ArrayType arrayType -> visit(arrayType.getType()) + "[]";
-            case UnionType unionType -> unionType.getTypes().stream().map(this::visit).collect(Collectors.joining(" | "));
+            case UnionType unionType ->
+                    unionType.getTypes().stream().map(this::visit).collect(Collectors.joining(" | "));
             default -> type.getValue();
         };
     }

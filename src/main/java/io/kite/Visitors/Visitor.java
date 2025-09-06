@@ -62,6 +62,7 @@ public sealed interface Visitor<R>
             case SchemaDeclaration schemaDeclaration -> visit(schemaDeclaration);
             case ComponentStatement component -> visit(component);
             case InputDeclaration expression -> visit(expression);
+            case OutputDeclaration expression -> visit(expression);
             case VarStatement varStatement -> visit(varStatement);
             case ValStatement valStatement -> visit(valStatement);
             case WhileStatement whileStatement -> visit(whileStatement);
@@ -100,6 +101,8 @@ public sealed interface Visitor<R>
     R visit(ComponentStatement expression);
 
     R visit(InputDeclaration expression);
+
+    R visit(OutputDeclaration expression);
 
     R visit(LogicalExpression expression);
 
