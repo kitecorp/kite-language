@@ -393,6 +393,14 @@ public final class Interpreter implements Visitor<Object> {
         }
         return env.lookup(input.name());
     }
+    @Override
+    public Object visit(OutputDeclaration input) {
+//        if (input.hasInit() && env.get(input.name())==null) {
+//            return env.initOrAssign((String) input.getId().string(), visit(input.getInit()));
+//        }
+//        return env.lookup(input.name());
+        throw new RuntimeException("Invalid output declaration");
+    }
 
     @Override
     public Object visit(LogicalExpression expression) {

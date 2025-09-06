@@ -167,6 +167,18 @@ public final class ScopeResolver implements Visitor<Void> {
     }
 
     @Override
+    public Void visit(OutputDeclaration expression) {
+        visit(expression.getId());
+        if (expression.hasType()) {
+            visit(expression.getType());
+        }
+        if (expression.hasInit()) {
+            visit(expression.getInit());
+        }
+        return null;
+    }
+
+    @Override
     public Void visit(LogicalExpression expression) {
         resolve(expression.getLeft());
         resolve(expression.getRight());

@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.SyntaxPrinter;
@@ -112,6 +113,18 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
             throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
         }
 //        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
+    }
+
+    @Override
+    public Object visit(OutputDeclaration inputDeclaration) {
+        if (inputDeclaration.hasInit()) {
+            var defaultValue = visit(inputDeclaration.getInit());
+//            inputDeclaration.setInit(defaultValue);
+//            return getInputs().initOrAssign((String) visit(inputDeclaration.getId()), defaultValue);
+            return null;
+        }
+
+        throw new InvalidInitException("Missing input %s".formatted(inputDeclaration.getId().string()));
     }
 
     @Override

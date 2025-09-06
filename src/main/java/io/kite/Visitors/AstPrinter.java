@@ -54,6 +54,15 @@ public final class AstPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(OutputDeclaration expression) {
+        if (expression.hasInit()) {
+            return MessageFormat.format("output {0} {1} = {2}", visit(expression.getType()), visit(expression.getId()), visit(expression.getInit()));
+        } else {
+            return MessageFormat.format("output {0} {1}", visit(expression.getType()), visit(expression.getId()));
+        }
+    }
+
+    @Override
     public String visit(LogicalExpression expression) {
         return parenthesize(expression.getOperator().toString(), expression.getLeft(), expression.getRight());
     }
