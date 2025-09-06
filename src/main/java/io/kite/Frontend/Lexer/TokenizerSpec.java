@@ -82,6 +82,7 @@ class TokenizerSpec {
             new Entry("^\\bschema\\b", TokenType.Schema),
             new Entry("^\\bcomponent\\b", TokenType.Component),
             new Entry("^\\binput\\b", TokenType.Input),
+            new Entry("^\\boutput\\b", TokenType.Output),
             new Entry("^\\bobject\\b", TokenType.Object),
             new Entry("^\\bany\\b", TokenType.Any),
             new Entry("^\\w+", TokenType.Identifier)

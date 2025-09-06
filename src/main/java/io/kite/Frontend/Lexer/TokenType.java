@@ -52,6 +52,7 @@ public enum TokenType {
 //    Val("val"),
     Var("var"),
     Input("input"),
+    Output("output"),
     This("this"),
 
 
