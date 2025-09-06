@@ -230,7 +230,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     @Override
     public Object visit(ObjectExpression expression) {
-        return printer.visit(expression).trim();
+        return "object(" + printer.visit(expression).trim() + ")";
 //        if (expression.isEmpty()) {
 //            return Map.of();
 //        }

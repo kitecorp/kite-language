@@ -1,12 +1,12 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.Expressions.ObjectExpression;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
@@ -34,7 +34,7 @@ public class BlockTest extends ParserTest {
     @Test
     void testEmptyBlock() {
         var res = parse("{ }    ");
-        var expected = program(expressionStatement(ObjectExpression.objectExpression()));
+        var expected = program(expressionStatement(objectExpression()));
         assertEquals(expected, res);
         log.info((res));
     }

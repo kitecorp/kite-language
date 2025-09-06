@@ -131,6 +131,7 @@ public abstract class InputTests extends RuntimeTest {
                 """);
         assertEquals(10, res);
     }
+
     @Test
     void testInputStringDefault() {
         setInput("hello");
