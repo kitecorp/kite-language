@@ -41,4 +41,8 @@ public final class ObjectExpression extends Expression {
         return new ObjectExpression();
     }
 
+    public boolean isEmpty() {
+        return this.properties.isEmpty();
+    }
+
 }

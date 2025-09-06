@@ -131,6 +131,67 @@ public abstract class InputTests extends RuntimeTest {
                 """);
         assertEquals(10, res);
     }
+    @Test
+    void testInputStringDefault() {
+        setInput("hello");
+        var res = eval("input string region = 'bello' ");
+        assertEquals("hello", res);
+    }
+
+    @Test
+    void testInputNumberDefault() {
+        setInput(10);
+        var res = eval("input number region = 20 ");
+        assertEquals(10, res);
+    }
+
+    @Test
+    void testInputDecimalDefault() {
+        setInput(10.2);
+        var res = eval("input number region = 20.2");
+        assertEquals(10.2, res);
+    }
+
+    @Test
+    void testInputDecimalHalfDefault() {
+        setInput(0.2);
+        var res = eval("input number region = 0.5 ");
+        assertEquals(0.2, res);
+    }
+
+    @Test
+    void testInputBooleanDefault() {
+        setInput(true);
+        var res = eval("input boolean region = false");
+        assertEquals(true, res);
+    }
+
+    @Test
+    void testInputObjectDefault() {
+        setInput("{ env : 'dev', region : 'us-east-1' }");
+        var res = eval("input object region = { env : 'prod', region : 'us-west-1' } ");
+        assertEquals(Map.of("env", "dev", "region", "us-east-1"), res);
+    }
+
+    @Test
+    void testInputUnionDefault() {
+        setInput("hello");
+        var res = eval("""
+                type custom = string | number
+                input custom region = 'bello'
+                """);
+        assertEquals("hello", res);
+    }
+
+    @Test
+    void testInputUnionNumberDefault() {
+        setInput(10);
+        var res = eval("""
+                type custom = string | number
+                input custom region = 20
+                """);
+        assertEquals(10, res);
+    }
 
     /********************************
      * HAPPY CASES - default values *

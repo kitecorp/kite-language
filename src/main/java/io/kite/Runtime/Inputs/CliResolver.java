@@ -12,7 +12,7 @@ public class CliResolver extends InputResolver {
     }
 
     @Override
-    @Nullable String resolve(InputDeclaration inputDeclaration, String previousValue) {
+    @Nullable String resolve(InputDeclaration inputDeclaration, Object previousValue) {
         if (previousValue != null) {
             // if previous value is not null we don't need to as the user for input.
             // in other words if the input was resolved, skip asking for input.
