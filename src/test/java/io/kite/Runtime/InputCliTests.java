@@ -178,4 +178,11 @@ public class InputCliTests extends InputTests {
         assertEquals(List.of(true), res);
     }
 
+
+    @Test
+    void testInputObjectArrayDefaults() {
+        setInput("[{env:'dev'}]");
+        var res = eval("input object[] region = [{env:'prod'}]");
+        assertEquals(List.of(Map.of("env", "prod")), res);
+    }
 }
