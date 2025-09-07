@@ -95,18 +95,9 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     private Object parseInput(InputDeclaration inputDeclaration, Object init) {
         try {
             var input = resolve(inputDeclaration, init);
-            if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
-                throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
-            }
+            var srcCode = normalizeStringInputs(input,inputDeclaration);
 
-            boolean keepOriginal = NumberUtils.isCreatable(string) ||
-                                   BooleanUtils.toBoolean(string) ||
-                                   StringUtils.startsWith(string, "{") ||
-                                   StringUtils.startsWith(string, "[");
-            if (!keepOriginal && !string.equals("false")) {
-                string = "\"%s\"".formatted(string);
-            }
-            var ast = parser.produceAST(tokenizer.tokenize(string));
+            var ast = parser.produceAST(tokenizer.tokenize(srcCode));
             var statement = (ExpressionStatement) ast.getBody().get(0);
             inputDeclaration.setInit(statement.getStatement());
 
@@ -114,6 +105,20 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         } catch (NoSuchElementException exception) {
             throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
         }
+    }
+
+    private @Nullable String normalizeStringInputs(String input, InputDeclaration inputDeclaration) {
+        if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
+            throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
+        }
+        boolean keepOriginal = NumberUtils.isCreatable(string) ||
+                               BooleanUtils.toBoolean(string) ||
+                               StringUtils.startsWith(string, "{") ||
+                               StringUtils.startsWith(string, "[");
+        if (!keepOriginal && !string.equals("false")) {
+            string = "\"%s\"".formatted(string);
+        }
+        return string;
     }
 
     @Override
