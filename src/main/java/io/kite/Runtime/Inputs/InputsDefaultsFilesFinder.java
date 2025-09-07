@@ -236,7 +236,7 @@ public class InputsDefaultsFilesFinder extends InputResolver {
             readFileProperty(Paths.get(INPUTS_DEFAULTS_KITE));
 
             // read environment specific file. env can be specified using KITE_ENV variable.
-            Optional.ofNullable(System.getenv(EnvVariablesConstants.KITE_ENV))
+            Optional.ofNullable(System.getenv(EnvVariablesConstants.KITE_PROFILE))
                     .ifPresent(env -> readFileProperty(Paths.get(INPUTS_ENV_DEFAULTS_KITE.formatted(env))));
             wasRead = true;
         }

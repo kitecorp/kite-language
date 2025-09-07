@@ -20,7 +20,7 @@ public class EnvResolver extends InputResolver {
      * Convert ENV keys to your internal keys (e.g., REGION -> region, CFG__ENV -> cfg.env).
      */
     public static @Nullable String normalizeKey(String envKey) {
-        String k = envKey.substring(EnvVariablesConstants.PREFIX.length());
+        String k = envKey.substring(EnvVariablesConstants.KITE_INPUT.length());
 
         k = k.toLowerCase(Locale.ROOT); // Windows env is case-insensitive; use ROOT to avoid Turkish-i issues
 
@@ -33,7 +33,7 @@ public class EnvResolver extends InputResolver {
         Map<String, Object> out = new HashMap<>();
         for (var e : System.getenv().entrySet()) {
             var key = e.getKey();
-            if (!key.startsWith(EnvVariablesConstants.PREFIX)) {
+            if (!key.startsWith(EnvVariablesConstants.KITE_INPUT)) {
                 continue;
             }
 
