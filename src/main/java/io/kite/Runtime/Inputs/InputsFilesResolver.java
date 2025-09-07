@@ -17,13 +17,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
-public class InputsDefaultsFilesFinder extends InputResolver {
+public class InputsFilesResolver extends InputResolver {
     static final String INPUTS_DEFAULTS_KITE = "inputs.default.ki";
     static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.ki";
     private final Map<String, String> inputs;
     private boolean wasRead = false;
 
-    public InputsDefaultsFilesFinder() {
+    public InputsFilesResolver() {
         inputs = new HashMap<>();
     }
 
@@ -98,7 +98,7 @@ public class InputsDefaultsFilesFinder extends InputResolver {
                 return quote(en.name());
             }
             case Optional<?> opt -> {
-                return opt.map(InputsDefaultsFilesFinder::toKiteLiteral).orElse("null");
+                return opt.map(InputsFilesResolver::toKiteLiteral).orElse("null");
             }
             case OptionalInt opt -> {
                 return opt.isPresent() ? Integer.toString(opt.getAsInt()) : "null";
@@ -112,7 +112,7 @@ public class InputsDefaultsFilesFinder extends InputResolver {
             case Collection<?> c -> {
                 if (c instanceof Set<?>) {
                     var list = c.stream()
-                            .map(InputsDefaultsFilesFinder::toKiteLiteral)
+                            .map(InputsFilesResolver::toKiteLiteral)
                             .sorted()
                             .collect(Collectors.toCollection(() -> new ArrayList<>(c.size())));
                     return "[" + String.join(", ", list) + "]";
@@ -211,21 +211,8 @@ public class InputsDefaultsFilesFinder extends InputResolver {
 
     public static void deleteDefaults() {
         try {
-            Files.deleteIfExists(Path.of(InputsDefaultsFilesFinder.INPUTS_DEFAULTS_KITE));
-        } catch (IOException e) {
-        }
-    }
-
-    private void readFileProperty(Path file) {
-        try (var stream = Files.lines(file)) {
-            stream.forEach(line -> {
-                var input = line.split("=");
-                if (input.length == 2) {
-                    inputs.put(StringUtils.trim(input[0]), StringUtils.trim(input[1]).replaceAll("^['\"]|['\"]$", ""));
-                }
-            });
-        } catch (IOException e) {
-            log.info("File not present file: {}", file.toAbsolutePath());
+            Files.deleteIfExists(Path.of(InputsFilesResolver.INPUTS_DEFAULTS_KITE));
+        } catch (IOException ignored) {
         }
     }
 
@@ -241,6 +228,19 @@ public class InputsDefaultsFilesFinder extends InputResolver {
             wasRead = true;
         }
         return inputs.get(input.name());
+    }
+
+    private void readFileProperty(Path file) {
+        try (var stream = Files.lines(file)) {
+            stream.forEach(line -> {
+                var input = line.split("=");
+                if (input.length == 2) {
+                    inputs.put(StringUtils.trim(input[0]), StringUtils.trim(input[1]).replaceAll("^['\"]|['\"]$", ""));
+                }
+            });
+        } catch (IOException e) {
+            log.info("File not present file: {}", file.toAbsolutePath());
+        }
     }
 
 }

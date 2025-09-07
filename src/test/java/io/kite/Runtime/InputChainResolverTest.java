@@ -6,7 +6,7 @@ import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.Runtime.Inputs.CliResolver;
 import io.kite.Runtime.Inputs.EnvResolver;
-import io.kite.Runtime.Inputs.InputsDefaultsFilesFinder;
+import io.kite.Runtime.Inputs.InputsFilesResolver;
 import io.kite.Runtime.exceptions.MissingInputException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -26,8 +26,8 @@ public class InputChainResolverTest extends RuntimeTest {
     @BeforeEach
     void initChain() {
         envVariables = new HashMap<>();
-        chainResolver = new ChainResolver(List.of(new EnvResolver(envVariables), new InputsDefaultsFilesFinder(), new CliResolver()));
-        InputsDefaultsFilesFinder.deleteDefaults();
+        chainResolver = new ChainResolver(List.of(new EnvResolver(envVariables), new InputsFilesResolver(), new CliResolver()));
+        InputsFilesResolver.deleteDefaults();
     }
 
     @Test
@@ -48,7 +48,7 @@ public class InputChainResolverTest extends RuntimeTest {
     @DisplayName("Test Env and File is present and Cli absent. File overrides env")
     void testEnvAndFilePresentButCliAbsent() {
         envVariables.put("client", "env");
-        InputsDefaultsFilesFinder.writeToDefaults(Map.of("client", "file"));
+        InputsFilesResolver.writeToDefaults(Map.of("client", "file"));
 
         var res = chainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
         Assertions.assertEquals("file", res);
@@ -57,7 +57,7 @@ public class InputChainResolverTest extends RuntimeTest {
     @Test
     @DisplayName("Test File is present and Env Cli absent. File overrides env")
     void testFilePresentButEnvCliAbsent() {
-        InputsDefaultsFilesFinder.writeToDefaults(Map.of("client", "file"));
+        InputsFilesResolver.writeToDefaults(Map.of("client", "file"));
 
         var res = chainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
         Assertions.assertEquals("file", res);

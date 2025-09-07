@@ -28,7 +28,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
 
     public ChainResolver() {
         this.resolvers = List.of(
-                new InputsDefaultsFilesFinder(),
+                new InputsFilesResolver(),
                 new EnvResolver(),
                 new CliResolver()
         );
