@@ -5,7 +5,7 @@ import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
-import io.kite.Runtime.exceptions.MissingInputException;
+import io.kite.Runtime.exceptions.MissingOutputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
@@ -27,18 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * All tests will be run on the output type provided by the subclass.
  */
 @Log4j2
-public abstract class OutputTests extends RuntimeTest {
+public class OutputTests extends RuntimeTest {
     private TypeChecker typeChecker;
-
-    protected abstract void setOutput(String input);
-
-    protected abstract void setOutput(Integer input);
-
-    protected abstract void setOutput(Boolean input);
-
-    protected abstract void setOutput(Double input);
-
-    protected abstract void setOutput(Float input);
 
     @Override
     protected void init() {
@@ -95,7 +85,7 @@ public abstract class OutputTests extends RuntimeTest {
     @Test
     void testOutputFalse() {
         var res = eval("output boolean region = false");
-        assertEquals(true, res);
+        assertEquals(false, res);
     }
 
     @Test
@@ -249,14 +239,14 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputStringInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 output string region =
                 """));
     }
 
     @Test
     void testOutputStringInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output string region="));
+        assertThrows(MissingOutputException.class, () -> eval("output string region="));
     }
 
     @Test
@@ -321,7 +311,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputStringAliasInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = string
                 output custom region
                 
@@ -330,7 +320,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputStringAliasInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = string
                 output custom region = 
                 """));
@@ -391,29 +381,29 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputNumberInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 output number region = 
                 """));
     }
 
     @Test
     void testOutputNumberInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output number region="));
+        assertThrows(MissingOutputException.class, () -> eval("output number region="));
     }
 
     @Test
     void testOutputNumberInitWithMissingStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output number region=     "));
+        assertThrows(MissingOutputException.class, () -> eval("output number region=     "));
     }
 
     @Test
     void testOutputNumberInitWithBlankStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output number region='     '"));
+        assertThrows(MissingOutputException.class, () -> eval("output number region='     '"));
     }
 
     @Test
     void testOutputNumberInitWithTabStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output number region = \t"));
+        assertThrows(MissingOutputException.class, () -> eval("output number region = \t"));
     }
 
     @Test
@@ -459,7 +449,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputNumberAliasInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = number
                 output custom region =
                 """));
@@ -467,7 +457,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputNumberAliasInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = number
                 output custom region = 
                 """));
@@ -546,14 +536,14 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputBooleanInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 output boolean region = 
                 """));
     }
 
     @Test
     void testOutputBooleanInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output boolean region = "));
+        assertThrows(MissingOutputException.class, () -> eval("output boolean region = "));
     }
 
     @Test
@@ -610,7 +600,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputBooleanAliasInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = boolean
                 output custom region = 
                 
@@ -619,7 +609,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputBooleanAliasInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = boolean
                 output custom region = 
                 """));
@@ -695,14 +685,14 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputObjectInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 output object region=
                 """));
     }
 
     @Test
     void testOutputObjectInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output object region="));
+        assertThrows(MissingOutputException.class, () -> eval("output object region="));
     }
 
     @Test
@@ -762,14 +752,14 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputAnyInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 output any region=
                 """));
     }
 
     @Test
     void testOutputAnyInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output any region="));
+        assertThrows(MissingOutputException.class, () -> eval("output any region="));
     }
 
     @Test
@@ -821,7 +811,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputMixedAliasInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = number | string 
                 output custom region =
                 
@@ -830,7 +820,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputMixedAliasInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 type custom = number | string 
                 output custom region = 
                 """));
@@ -919,7 +909,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputArrayInitWithNewLineError() {
-        assertThrows(MissingInputException.class, () -> eval("""
+        assertThrows(MissingOutputException.class, () -> eval("""
                 output object[] region = 
                 
                 """));
@@ -927,7 +917,7 @@ public abstract class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputArrayInitWithEmptyStringError() {
-        assertThrows(MissingInputException.class, () -> eval("output object[] region = "));
+        assertThrows(MissingOutputException.class, () -> eval("output object[] region = "));
     }
 
     @Test
