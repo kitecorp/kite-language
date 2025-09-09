@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ArrayType extends ReferenceType {
     public static final ArrayType ARRAY_TYPE = new ArrayType(null);
     /**
-     * type of the first element in the array which defines all the other element types or type of the declared array
+     * Array's type
      */
     @Getter
     @Setter

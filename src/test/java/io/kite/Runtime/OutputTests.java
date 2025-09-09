@@ -3,6 +3,7 @@ package io.kite.Runtime;
 import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
+import io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.exceptions.MissingOutputException;
@@ -657,6 +658,7 @@ public class OutputTests extends RuntimeTest {
                 output custom region = [{ env : 'dev' }]
                 """));
     }
+
     @Test
     void testOutputBooleanAliasInitWithObjectError() {
         assertThrows(TypeError.class, () -> eval("""
@@ -785,8 +787,8 @@ public class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputAnyInitWithIntArrayError() {
-        var res =eval("output any region = [1,2,3]"); // throw because it's not declared as arry
-        assertEquals(List.of(1,2,3), res);
+        var res = eval("output any region = [1,2,3]"); // throw because it's not declared as arry
+        assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
@@ -914,13 +916,16 @@ public class OutputTests extends RuntimeTest {
     void testOutputArrayInitWithNewLineError() {
         assertThrows(MissingOutputException.class, () ->
                 interpreter.visit(
-                        output("region", type("custom"), string("")))
+                        output("region", type("custom"), string(""))
+                )
         );
     }
 
     @Test
     void testOutputArrayInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output object[] region = "));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(
+                output("region", ArrayTypeIdentifier.arrayType("object"), "  ")
+        ));
     }
 
     @Test
