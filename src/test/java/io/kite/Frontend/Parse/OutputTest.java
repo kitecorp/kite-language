@@ -23,25 +23,25 @@ public class OutputTest extends ParserTest {
     @Test
     void outputString() {
         parse("output string something");
-        assertEquals("Missing '=' after output declaration: output string something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output string something",ParserErrors.errors());
     }
 
     @Test
     void outputNumber() {
         parse("output number something");
-        assertEquals("Missing '=' after output declaration: output number something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output number something",ParserErrors.errors());
     }
 
     @Test
     void outputBoolean() {
         parse("output boolean something");
-        assertEquals("Missing '=' after output declaration: output boolean something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output boolean something",ParserErrors.errors());
     }
 
     @Test
     void outputObject() {
         parse("output object something");
-        assertEquals("Missing '=' after output declaration: output object something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output object something",ParserErrors.errors());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class OutputTest extends ParserTest {
         var res = parse("""
                 type custom = string | number
                 output custom something""");
-        assertEquals("Missing '=' after output declaration: output custom something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output custom something",ParserErrors.errors());
     }
 
     @Test
@@ -103,25 +103,25 @@ public class OutputTest extends ParserTest {
     @Test
     void outputStringArray() {
         parse("output string[] something");
-        assertEquals("Missing '=' after output declaration: output string[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output string[] something",ParserErrors.errors());
     }
 
     @Test
     void outputNumberArray() {
         parse("output number[] something");
-        assertEquals("Missing '=' after output declaration: output number[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output number[] something",ParserErrors.errors());
     }
 
     @Test
     void outputBooleanArray() {
         parse("output boolean[] something");
-        assertEquals("Missing '=' after output declaration: output boolean[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output boolean[] something",ParserErrors.errors());
     }
 
     @Test
     void outputObjectArray() {
         parse("output object[] something");
-        assertEquals("Missing '=' after output declaration: output object[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output object[] something",ParserErrors.errors());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class OutputTest extends ParserTest {
                 type custom = string | number
                 output custom[] something
                 """);
-        assertEquals("Missing '=' after output declaration: output custom[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output custom[] something",ParserErrors.errors());
     }
 
     @Test
