@@ -163,10 +163,10 @@ public class Parser {
         } catch (RuntimeException error) {
             if (error instanceof ParseError parseError && parseError.getActual() != null) {
                 String message = error.getMessage() + parseError.getActual().raw();
-                ParserErrors.error(message);
+//                ParserErrors.error(message);
                 log.error(message);
             } else {
-                ParserErrors.error(error.getMessage());
+//                ParserErrors.error(error.getMessage());
                 log.error(error.getMessage());
             }
             iterator.synchronize();
@@ -1280,10 +1280,15 @@ public class Parser {
         eat(Output);
         var type = TypeIdentifier();
         var name = Identifier();
-        Expression body = null;
+        Expression body;
         if (IsLookAhead(Equal)) {
             eat(Equal);
+            if (IsLookAhead(NewLine)) {
+                throw ParserErrors.error("Output must have a value assigned " + lookAhead().raw() + lookAhead().type());
+            }
             body = Initialize();
+        } else {
+            throw ParserErrors.error("Missing '=' after output declaration: output %s %s".formatted(type.string(), name.string()));
         }
         return OutputDeclaration.output(name, type, body);
     }
