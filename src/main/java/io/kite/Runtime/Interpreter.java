@@ -26,6 +26,7 @@ import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -398,7 +399,11 @@ public final class Interpreter implements Visitor<Object> {
         if (!input.hasInit()) {
             throw new MissingOutputException("Invalid output declaration");
         }
-        return env.initOrAssign(input.getId().string(), visit(input.getInit()));
+        Object visit = visit(input.getInit());
+        if (visit instanceof String string && StringUtils.isBlank(string)) {
+            throw new MissingOutputException("Invalid output declaration");
+        }
+        return env.initOrAssign(input.getId().string(), visit);
     }
 
     @Override

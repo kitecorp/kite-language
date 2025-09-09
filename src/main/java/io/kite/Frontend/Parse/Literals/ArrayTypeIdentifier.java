@@ -27,10 +27,12 @@ public final class ArrayTypeIdentifier extends TypeIdentifier {
     @Override
     public String string() {
         var res = new StringBuilder(super.string());
+        res.append("[");
         for (Literal item : items) {
             res.append(item.getVal().toString());
             res.append(",");
         }
+        res.append("]");
         return res.toString();
     }
 

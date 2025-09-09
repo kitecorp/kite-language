@@ -1,5 +1,6 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,30 +22,26 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputString() {
-        var res = parse("output string something");
-        var expected = program(output("something", type("string")));
-        assertEquals(expected, res);
+        parse("output string something");
+        assertEquals("Missing '=' after output declaration: output string something",ParserErrors.errors());
     }
 
     @Test
     void outputNumber() {
-        var res = parse("output number something");
-        var expected = program(output("something", type("number")));
-        assertEquals(expected, res);
+        parse("output number something");
+        assertEquals("Missing '=' after output declaration: output number something",ParserErrors.errors());
     }
 
     @Test
     void outputBoolean() {
-        var res = parse("output boolean something");
-        var expected = program(output("something", type("boolean")));
-        assertEquals(expected, res);
+        parse("output boolean something");
+        assertEquals("Missing '=' after output declaration: output boolean something",ParserErrors.errors());
     }
 
     @Test
     void outputObject() {
-        var res = parse("output object something");
-        var expected = program(output("something", type("object")));
-        assertEquals(expected, res);
+        parse("output object something");
+        assertEquals("Missing '=' after output declaration: output object something",ParserErrors.errors());
     }
 
     @Test
@@ -52,11 +49,7 @@ public class OutputTest extends ParserTest {
         var res = parse("""
                 type custom = string | number
                 output custom something""");
-        var expected = program(
-                union("custom", symbol("string"), symbol("number")),
-                output("something", type("custom"))
-        );
-        assertEquals(expected, res);
+        assertEquals("Missing '=' after output declaration: output custom something",ParserErrors.errors());
     }
 
     @Test
@@ -109,43 +102,35 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputStringArray() {
-        var res = parse("output string[] something");
-        var expected = program(output("something", arrayType("string")));
-        assertEquals(expected, res);
+        parse("output string[] something");
+        assertEquals("Missing '=' after output declaration: output string[] something",ParserErrors.errors());
     }
 
     @Test
     void outputNumberArray() {
-        var res = parse("output number[] something");
-        var expected = program(output("something", arrayType("number")));
-        assertEquals(expected, res);
+        parse("output number[] something");
+        assertEquals("Missing '=' after output declaration: output number[] something",ParserErrors.errors());
     }
 
     @Test
     void outputBooleanArray() {
-        var res = parse("output boolean[] something");
-        var expected = program(output("something", arrayType("boolean")));
-        assertEquals(expected, res);
+        parse("output boolean[] something");
+        assertEquals("Missing '=' after output declaration: output boolean[] something",ParserErrors.errors());
     }
 
     @Test
     void outputObjectArray() {
-        var res = parse("output object[] something");
-        var expected = program(output("something", arrayType("object")));
-        assertEquals(expected, res);
+        parse("output object[] something");
+        assertEquals("Missing '=' after output declaration: output object[] something",ParserErrors.errors());
     }
 
     @Test
     void outputUnionArray() {
-        var res = parse("""
+        parse("""
                 type custom = string | number
                 output custom[] something
                 """);
-        var expected = program(
-                union("custom", symbol("string"), symbol("number")),
-                output("something", arrayType("custom")
-                ));
-        assertEquals(expected, res);
+        assertEquals("Missing '=' after output declaration: output custom[] something",ParserErrors.errors());
     }
 
     @Test
