@@ -1288,7 +1288,7 @@ public class Parser {
             }
             body = Initialize();
         } else {
-            throw ParserErrors.error("Missing '=' after output declaration: output %s %s".formatted(type.string(), name.string()));
+            throw ParserErrors.error("Missing '=' after: output %s %s".formatted(type.string(), name.string()));
         }
         return OutputDeclaration.output(name, type, body);
     }
