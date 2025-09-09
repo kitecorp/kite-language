@@ -400,10 +400,18 @@ public final class Interpreter implements Visitor<Object> {
             throw new MissingOutputException("Invalid output declaration");
         }
         Object visit = visit(input.getInit());
-        if (visit instanceof String string && StringUtils.isBlank(string)) {
-            throw new MissingOutputException("Invalid output declaration");
+        if (isBlank(visit)) {
+            throw new MissingOutputException("Invalid output declaration `%s`".formatted(printer.visit(input.getInit())));
         }
         return env.initOrAssign(input.getId().string(), visit);
+    }
+
+    private static boolean isBlank(Object visit) {
+        return switch (visit){
+            case String string -> StringUtils.isBlank(string);
+            case null -> true;
+            default -> false;
+        };
     }
 
     @Override
