@@ -189,6 +189,9 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(Identifier expression) {
+        if (expression instanceof ArrayTypeIdentifier arrayTypeIdentifier) {
+            return env.lookup(arrayTypeIdentifier.getType().getValue(), expression.getHops());
+        }
         return env.lookup(expression.string(), expression.getHops());
     }
 
@@ -821,8 +824,9 @@ public final class Interpreter implements Visitor<Object> {
         if (!expression.hasType()) {
             return;
         }
-        if (expression.getInit() instanceof ArrayExpression arrayExpression && !(expression.getType() instanceof ArrayTypeIdentifier)) {
-            throw new IllegalArgumentException("Invalid type for array: %s".formatted(expression.getId().string()));
+        if (expression.getInit() instanceof ArrayExpression
+            && !(expression.getType() instanceof ArrayTypeIdentifier)) {
+            throw new IllegalArgumentException("Invalid type for array: %s".formatted(printer.visit(expression.getId())));
         }
         var type = visit(expression.getType());
         if (type instanceof Set<?> set) {
