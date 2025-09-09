@@ -50,6 +50,7 @@ public final class Interpreter implements Visitor<Object> {
     private final Deque<ContextStack> contextStacks = new ArrayDeque<>();
     @Getter
     private Environment<Object> env;
+    private Environment<Object> outputs;
     private SchemaContext context;
 
 
@@ -59,6 +60,7 @@ public final class Interpreter implements Visitor<Object> {
 
     public Interpreter(Environment<Object> environment) {
         this.env = environment;
+        this.outputs = new Environment<>();
         this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
         this.env.init("true", true);
@@ -403,7 +405,7 @@ public final class Interpreter implements Visitor<Object> {
         if (isBlank(visit)) {
             throw new MissingOutputException("Invalid output declaration `%s`".formatted(printer.visit(input.getInit())));
         }
-        return env.initOrAssign(input.getId().string(), visit);
+        return outputs.initOrAssign(input.getId().string(), visit);
     }
 
     private static boolean isBlank(Object visit) {

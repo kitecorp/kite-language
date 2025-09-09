@@ -9,7 +9,7 @@ import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.exceptions.MissingOutputException;
 import io.kite.TypeChecker.TypeChecker;
-import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.AnyType;
 import io.kite.TypeChecker.Types.StringType;
 import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
@@ -60,158 +60,158 @@ public class OutputTests extends RuntimeTest {
      * HAPPY CASES *
      * *************/
     @Test
-    void testOutputString() {
-        var res = eval("output string region = 'hello'");
+    void outputString() {
+        var res = eval("output string something = 'hello'");
         assertEquals("hello", res);
     }
 
     @Test
-    void testOutputNumber() {
-        var res = eval("output number region = 10");
+    void outputNumber() {
+        var res = eval("output number something = 10");
         assertEquals(10, res);
     }
 
     @Test
-    void testOutputDecimal() {
-        var res = eval("output number region = 10.2");
+    void outputDecimal() {
+        var res = eval("output number something = 10.2");
         assertEquals(10.2, res);
     }
 
     @Test
-    void testOutputDecimalHalf() {
-        var res = eval("output number region = 0.2");
+    void outputDecimalHalf() {
+        var res = eval("output number something = 0.2");
         assertEquals(0.2, res);
     }
 
     @Test
-    void testOutputTrue() {
-        var res = eval("output boolean region = true");
+    void outputTrue() {
+        var res = eval("output boolean something = true");
         assertEquals(true, res);
     }
 
     @Test
-    void testOutputFalse() {
-        var res = eval("output boolean region = false");
+    void outputFalse() {
+        var res = eval("output boolean something = false");
         assertEquals(false, res);
     }
 
     @Test
-    void testOutputUnion() {
+    void outputUnion() {
         var res = eval("""
                 type custom = string | number
-                output custom region = "hello"
+                output custom something = "hello"
                 """);
         assertEquals("hello", res);
     }
 
     @Test
-    void testOutputUnionNumber() {
+    void outputUnionNumber() {
         var res = eval("""
                 type custom = string | number
-                output custom region = 10
+                output custom something = 10
                 """);
         assertEquals(10, res);
     }
 
     @Test
     @DisplayName("Should not prompt for output when default value is provided")
-    void testOutputObjectInitEmpty() {
-        var res = eval("output object region = {}");
+    void outputObjectInitEmpty() {
+        var res = eval("output object something = {}");
         assertEquals(Map.of(), res);
     }
 
     @Test
-    void testOutputObject() {
-        var res = eval("output object region = { env : 'dev', region : 'us-east-1' } ");
-        assertEquals(Map.of("env", "dev", "region", "us-east-1"), res);
+    void outputObject() {
+        var res = eval("output object something = { env : 'dev', something : 'us-east-1' } ");
+        assertEquals(Map.of("env", "dev", "something", "us-east-1"), res);
     }
 
     /*
      * ARRAYS
      * */
     @Test
-    void testOutputStringArrayDefault() {
-        var res = eval("output string[] region = ['hello','world'] ");
+    void outputStringArrayDefault() {
+        var res = eval("output string[] something = ['hello','world'] ");
         assertEquals(List.of("hello", "world"), res);
     }
 
     @Test
-    void testOutputNumberArrayDefault() {
-        var res = eval("output number[] region = [1, 2, 3]");
+    void outputNumberArrayDefault() {
+        var res = eval("output number[] something = [1, 2, 3]");
         assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
-    void testOutputBooleanArrayDefault() {
-        var res = eval("output boolean[] region=[]");
+    void outputBooleanArrayDefault() {
+        var res = eval("output boolean[] something=[]");
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputStringArrayEmptyDefault() {
-        var res = eval("output string[] region = [] ");
+    void outputStringArrayEmptyDefault() {
+        var res = eval("output string[] something = [] ");
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputNumberArrayEmptyDefault() {
-        var res = eval("output number[] region = []");
+    void outputNumberArrayEmptyDefault() {
+        var res = eval("output number[] something = []");
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputBooleanArrayEmptyDefault() {
-        var res = eval("output boolean[] region=[]");
+    void outputBooleanArrayEmptyDefault() {
+        var res = eval("output boolean[] something=[]");
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputUnionArrayStringDefault() {
+    void outputUnionArrayStringDefault() {
         var res = eval("""
                 type custom = string | number
-                output custom[] region = ['hello','world']
+                output custom[] something = ['hello','world']
                 """);
 
         assertEquals(List.of("hello", "world"), res);
     }
 
     @Test
-    void testOutputUnionArrayNumbersDefault() {
+    void outputUnionArrayNumbersDefault() {
         var res = eval("""
                 type custom = string | number
-                output custom[] region = [1,2,3]
+                output custom[] something = [1,2,3]
                 """);
 
         assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
-    void testOutputUnionArrayNumbersEmptyDefault() {
+    void outputUnionArrayNumbersEmptyDefault() {
         var res = eval("""
                 type custom = string | number
-                output custom[] region = []
+                output custom[] something = []
                 """);
 
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputObjectArrayDefault() {
-        var res = eval("output object[] region=[{env:'dev'}]");
+    void outputObjectArrayDefault() {
+        var res = eval("output object[] something=[{env:'dev'}]");
         assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
     @Test
-    void testOutputObjectArrayEmptyDefault() {
-        var res = eval("output object[] region=[]");
+    void outputObjectArrayEmptyDefault() {
+        var res = eval("output object[] something=[]");
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputUnionArrayStringNumberDefault() {
+    void outputUnionArrayStringNumberDefault() {
         var res = eval("""
                 type custom = string | number
-                output custom[] region = ['hello', 10]
+                output custom[] something = ['hello', 10]
                 """);
         assertEquals(List.of("hello", 10), res);
     }
@@ -224,605 +224,157 @@ public class OutputTests extends RuntimeTest {
     /*
      * String output with invalid values
      * */
+
     @Test
-    void testOutputStringInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("output string region = 10"));
+    void outputStringDefaultNewLineError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", TypeIdentifier.type(new StringType("\n")))));
     }
 
     @Test
-    void testOutputStringInitWithDecimalError() {
-        assertThrows(TypeError.class, () -> eval("output string region = 10.1"));
-    }
-
-    @Test
-    void testOutputStringInitWithDecimalDotError() {
-        assertThrows(TypeError.class, () -> eval("output string region = 0.1"));
-    }
-
-    @Test
-    void testOutputStringInitWithBooleanError() {
-        assertThrows(TypeError.class, () -> eval("output string region = true"));
-    }
-
-    @Test
-    void testOutputStringInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(new StringType("\n")))));
-    }
-
-    @Test
-    void testOutputStringInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(new StringType("")))));
-    }
-
-    @Test
-    void testOutputStringInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("output string region = []"));
-    }
-
-    @Test
-    void testOutputStringInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("output string region = ['hello','world']"));
-    }
-
-    @Test
-    void testOutputStringInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("output string region = [1,2,3]"));
-    }
-
-    @Test
-    void testOutputStringInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("output string region = [true, false] "));
-    }
-
-    @Test
-    void testOutputStringInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("output string region = [{ env : 'dev' }]"));
+    void outputStringDefaultEmptyStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", TypeIdentifier.type(new StringType("")))));
     }
 
     /*
      * output string alias with invalid values
      * */
+
     @Test
-    void testOutputStringAliasInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = 10
-                """));
+    void outputNumberDefaultNewLineError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", type(ValueType.Number), "\n")));
     }
 
     @Test
-    void testOutputStringAliasInitWithDecimalError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = 10.1
-                """));
+    void outputNumberDefaultEmptyStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", type(ValueType.Number), "")));
     }
 
     @Test
-    void testOutputStringAliasInitWithDecimalDotError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = 0.1
-                """));
+    void outputNumberDefaultMissingStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", type(ValueType.Number), "    ")));
     }
 
     @Test
-    void testOutputStringAliasInitWithBooleanError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = true
-                """));
+    void outputNumberDefaultBlankStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", string("     "))));
     }
 
     @Test
-    void testOutputStringAliasInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                type custom = string
-                output custom region
-                
-                """));
+    void outputNumberDefaultTabStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", type(ValueType.Number), "\t")));
     }
 
-    @Test
-    void testOutputStringAliasInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                type custom = string
-                output custom region = 
-                """));
-    }
-
-    @Test
-    void testOutputStringAliasInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = []
-                """));
-    }
-
-    @Test
-    void testOutputStringAliasInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = ['hello','world']
-                """));
-    }
-
-    @Test
-    void testOutputStringAliasInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = [1,2,3]
-                """));
-    }
-
-    @Test
-    void testOutputStringAliasInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = [true, false]
-                """));
-    }
-
-    @Test
-    void testOutputStringAliasInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = [{ env : 'dev' }]
-                """));
-    }
-
-    // NUMBER
-
-
-    @Test
-    void testOutputNumberInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "\n")));
-    }
-
-    @Test
-    void testOutputNumberInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "")));
-    }
-
-    @Test
-    void testOutputNumberInitWithMissingStringError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "    ")));
-    }
-
-    @Test
-    void testOutputNumberInitWithBlankStringError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", string("     "))));
-    }
-
-    @Test
-    void testOutputNumberInitWithTabStringError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "\t")));
-    }
-
-    /*
-     * output number alias with invalid values
-     * */
     // BOOLEAN
     @Test
-    void testOutputBooleanInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = 123"));
+    void outputBooleanDefaultNewLineError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", TypeIdentifier.type(ValueType.Boolean), "\n")));
     }
 
     @Test
-    void testOutputBooleanInitWithDecimalError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = 1.2"));
-    }
-
-    @Test
-    void testOutputBooleanInitWithDecimalDotError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = 0.2"));
-    }
-
-    @Test
-    void testOutputBooleanInitWithStringError() {
-        assertThrows(TypeError.class, () -> eval("""
-                output boolean region = "hello" 
-                """));
-    }
-
-    @Test
-    void testOutputBooleanInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(ValueType.Boolean), "\n")));
-    }
-
-    @Test
-    void testOutputBooleanInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(ValueType.Boolean), "")));
-    }
-
-    @Test
-    void testOutputBooleanInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = []"));
-    }
-
-    @Test
-    void testOutputBooleanInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = ['hello','world']"));
-    }
-
-    @Test
-    void testOutputBooleanInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = [1,2,3]")); // throw because it's not declared as array
-    }
-
-    @Test
-    void testOutputBooleanInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = [true, false]"));
-    }
-
-    @Test
-    void testOutputBooleanInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("output boolean region = [{ env : 'dev' }]"));
-    }
-
-    /*
-     * output string alias with invalid values
-     * */
-    @Test
-    void testOutputBooleanAliasInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string
-                output custom region = 10
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithDecimalError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = 10.1
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithDecimalDotError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = 0.1
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                type custom = boolean
-                output custom region = 
-                
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = []
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = ['hello','world']
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = [1,2,3]
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = [true, false]
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = [{ env : 'dev' }]
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithObjectError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = boolean
-                output custom region = { env : 'dev' }
-                """));
-    }
-
-    // OBJECT
-    @Test
-    void testOutputObjectInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("output object region = 123"));
-    }
-
-    @Test
-    void testOutputObjectInitWithDecimalError() {
-        assertThrows(TypeError.class, () -> eval("output object region = 1.2"));
-    }
-
-    @Test
-    void testOutputObjectInitWithDecimalDotError() {
-        assertThrows(TypeError.class, () -> eval("output object region = 0.2"));
-    }
-
-    @Test
-    void testOutputObjectInitWithStringError() {
-        assertThrows(TypeError.class, () -> eval("output object region ='hello'"));
-    }
-
-    @Test
-    void testOutputObjectInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                output object region=
-                """));
-    }
-
-    @Test
-    void testOutputObjectInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output object region="));
-    }
-
-    @Test
-    void testOutputObjectInitWithBooleanError() {
-        assertThrows(TypeError.class, () -> eval("output object region=true"));
-    }
-
-    @Test
-    void testOutputObjectInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object region = []"));
-    }
-
-    @Test
-    void testOutputObjectInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object region = ['hello','world']"));
-    }
-
-    @Test
-    void testOutputObjectInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object region = [1,2,3]")); // throw because it's not declared as array
-    }
-
-    @Test
-    void testOutputObjectInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object region = [true, false]"));
-    }
-
-    @Test
-    void testOutputObjectInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object region = [{ env : 'dev' }]"));
+    void outputBooleanDefaultEmptyStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", TypeIdentifier.type(ValueType.Boolean), "")));
     }
 
     // ANY
     @Test
-    void testOutputAnyInitWithNumberError() {
-        var res = eval("output any region = 123");
+    void outputAnyDefaultNumberError() {
+        var res = eval("output any something = 123");
         assertEquals(123, res);
     }
 
     @Test
-    void testOutputAnyInitWithDecimalError() {
-        var res = eval("output any region = 1.2");
+    void outputAnyDefaultDecimalError() {
+        var res = eval("output any something = 1.2");
         assertEquals(1.2, res);
     }
 
     @Test
-    void testOutputAnyInitWithDecimalDotError() {
-        var res = eval("output any region = 0.2");
+    void outputAnyDefaultDecimalDotError() {
+        var res = eval("output any something = 0.2");
         assertEquals(0.2, res);
     }
 
     @Test
-    void testOutputAnyInitWithStringError() {
-        var res = eval("output any region = 'hello'");
+    void outputAnyDefaultStringError() {
+        var res = eval("output any something = 'hello'");
         assertEquals("hello", res);
     }
 
     @Test
-    void testOutputAnyInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                output any region=
-                """));
+    void outputAnyDefaultNewLineError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", type(AnyType.INSTANCE), "\n")));
     }
 
     @Test
-    void testOutputAnyInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output any region="));
+    void outputAnyDefaultEmptyStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", type(AnyType.INSTANCE), "")));
     }
 
     @Test
-    void testOutputAnyInitWithBooleanError() {
-        var res = eval("output any region=true");
+    void outputAnyDefaultBooleanError() {
+        var res = eval("output any something=true");
         assertEquals(true, res);
     }
 
     @Test
-    void testOutputAnyInitWithEmptyArrayError() {
-        var res = eval("output any region = []");
+    void outputAnyDefaultEmptyArrayError() {
+        var res = eval("output any something = []");
         assertEquals(List.of(), res);
     }
 
     @Test
-    void testOutputAnyInitWithStringArrayError() {
-        var res = eval("output any region = ['hello','world']");
+    void outputAnyDefaultStringArrayError() {
+        var res = eval("output any something = ['hello','world']");
         assertEquals(List.of("hello", "world"), res);
     }
 
     @Test
-    void testOutputAnyInitWithIntArrayError() {
-        var res = eval("output any region = [1,2,3]"); // throw because it's not declared as arry
+    void outputAnyDefaultIntArrayError() {
+        var res = eval("output any something = [1,2,3]"); // throw because it's not declared as arry
         assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
-    void testOutputAnyInitWithBooleanArrayError() {
-        var res = eval("output any region = [true, false]");
+    void outputAnyDefaultBooleanArrayError() {
+        var res = eval("output any something = [true, false]");
         assertEquals(List.of(true, false), res);
     }
 
     @Test
-    void testOutputAnyInitWithObjectArrayError() {
-        var res = eval("output any region = [{ env : 'dev' }]");
+    void outputAnyDefaultObjectArrayError() {
+        var res = eval("output any something = [{ env : 'dev' }]");
         assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
     /*
      * Mixed Type alias with invalid values
      * */
-    @Test
-    void testOutputMixedAliasInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number | string 
-                output custom region = true
-                """));
-    }
 
     @Test
-    void testOutputMixedAliasInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                type custom = number | string 
-                output custom region =
-                
-                """));
-    }
-
-    @Test
-    void testOutputMixedAliasInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                type custom = number | string 
-                output custom region = 
-                """));
-    }
-
-    @Test
-    void testOutputMixedAliasInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number | string 
-                output custom region = []
-                """));
-    }
-
-    @Test
-    void testOutputMixedAliasInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number | string 
-                output custom region = ['hello','world']
-                """));
-    }
-
-    @Test
-    void testOutputMixedAliasInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number | string 
-                output custom region = [1,2,3]
-                """));
-    }
-
-    @Test
-    void testOutputMixedAliasInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number | string 
-                output custom region = [true, false]
-                """));
-    }
-
-    @Test
-    void testOutputMixedAliasInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = number | string 
-                output custom region = [{ env : 'dev' }]
-                """));
-    }
-
-    @Test
-    void testOutputUnionArrayTrueDefault() {
-        assertThrows(TypeError.class, () -> eval("""
-                    type custom = string | number
-                    output custom[] region = [true]
-                """));
-    }
-
-    @Test
-    void testOutputUnionArrayFalseDefault() {
-        assertThrows(TypeError.class, () -> eval("""
-                    type custom = string | number
-                    output custom[] region = [false]
-                """));
-    }
-
-    /*
-     * OBJECT ARRAY
-     * */
-    @Test
-    void testOutputArrayInitWithNumberError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = 123"));
-    }
-
-    @Test
-    void testOutputArrayInitWithDecimalError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = 1.2"));
-    }
-
-    @Test
-    void testOutputArrayInitWithDecimalDotError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = 0.2"));
-    }
-
-    @Test
-    void testOutputArrayInitWithStringError() {
-        assertThrows(TypeError.class, () -> eval("""
-                output object[] region = 'hello'
-                """));
-    }
-
-    @Test
-    void testOutputArrayInitWithNewLineError() {
+    void outputArrayDefaultNewLineError() {
         assertThrows(MissingOutputException.class, () ->
                 interpreter.visit(
-                        output("region", type("custom"), string(""))
+                        output("something", type("custom"), string(""))
                 )
         );
     }
 
     @Test
-    void testOutputArrayInitWithEmptyStringError() {
+    void outputArrayDefaultEmptyStringError() {
         assertThrows(MissingOutputException.class, () -> interpreter.visit(
-                output("region", ArrayTypeIdentifier.arrayType("object"), "  ")
+                output("something", ArrayTypeIdentifier.arrayType("object"), "  ")
         ));
     }
-
     @Test
-    void testOutputArrayInitWithBooleanError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = true"));
+    void outputArrayDefaultNewlineStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(
+                output("something", ArrayTypeIdentifier.arrayType("object"), "\n")
+        ));
     }
-
     @Test
-    void testOutputArrayInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = ['hello','world']"));
+    void outputArrayDefaultTabStringError() {
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(
+                output("something", ArrayTypeIdentifier.arrayType("object"), "\t")
+        ));
     }
-
-    @Test
-    void testOutputArrayInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = [1,2,3]")); // throw because it's not declared as array
-    }
-
-    @Test
-    void testOutputArrayInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("output object[] region = [true, false]"));
-    }
-
 }

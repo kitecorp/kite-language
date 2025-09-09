@@ -60,6 +60,11 @@ public class OutputErrorsTest extends CheckerTest {
     }
 
     @Test
+    void outputStringDefaultEmptyArrayError() {
+        assertThrows(TypeError.class, () -> eval("output string something = []"));
+    }
+
+    @Test
     void outputStringInitArrayStringError() {
         assertThrows(TypeError.class, () -> eval("output string something = ['hello']"));
     }
@@ -240,6 +245,11 @@ public class OutputErrorsTest extends CheckerTest {
     }
 
     @Test
+    void outputBooleanDefaultEmptyArrayError() {
+        assertThrows(TypeError.class, () -> eval("output boolean something = []"));
+    }
+
+    @Test
     void outputBooleanInitIntError() {
         assertThrows(TypeError.class, () -> eval("output boolean something = [1, 2, 3]"));
     }
@@ -411,13 +421,52 @@ public class OutputErrorsTest extends CheckerTest {
     }
 
     @Test
+    void outputMixedAliasDefaultNumberError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number | string
+                output custom something = true
+                """));
+    }
+
+    @Test
+    void outputStringAliasDefaultNumberError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                output custom something = 10
+                """));
+    }
+
+    @Test
+    void outputStringAliasDefaultDecimalError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                output custom something = 10.1
+                """));
+    }
+
+    @Test
+    void outputStringAliasDefaultDecimalDotError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                output custom something = 0.1
+                """));
+    }
+
+    @Test
+    void outputStringAliasDefaultBooleanError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = string
+                output custom something = true
+                """));
+    }
+
+    @Test
     void testOutputNumberAliasInitWithBooleanError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = number
                 output custom region = true
                 """));
     }
-
 
 
     @Test
@@ -622,5 +671,44 @@ public class OutputErrorsTest extends CheckerTest {
                 """));
     }
 
+    @Test
+    void testOutputArrayInitWithBooleanError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = true"));
+    }
+
+    @Test
+    void testOutputArrayInitWithStringArrayError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = ['hello','world']"));
+    }
+
+    @Test
+    void testOutputArrayInitWithIntArrayError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = [1,2,3]")); // throw because it's not declared as array
+    }
+
+    @Test
+    void testOutputArrayInitWithBooleanArrayError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = [true, false]"));
+    }
+
+    @Test
+    void testOutputArrayInitWithStringError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = 'hello' "));
+    }
+
+    @Test
+    void testOutputArrayInitWithDecimalError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = 1.2"));
+    }
+
+    @Test
+    void testOutputArrayInitWithDecimalDotError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = 0.2"));
+    }
+
+    @Test
+    void testOutputArrayInitWithNumberError() {
+        assertThrows(TypeError.class, () -> eval("output object[] region = 123"));
+    }
 
 }
