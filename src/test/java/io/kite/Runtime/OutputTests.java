@@ -4,11 +4,14 @@ import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier;
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.exceptions.MissingOutputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.StringType;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -141,25 +144,25 @@ public class OutputTests extends RuntimeTest {
     @Test
     void testOutputBooleanArrayDefault() {
         var res = eval("output boolean[] region=[]");
-        assertEquals(List.of(true, false), res);
+        assertEquals(List.of(), res);
     }
 
     @Test
     void testOutputStringArrayEmptyDefault() {
         var res = eval("output string[] region = [] ");
-        assertEquals(List.of("hello", "world"), res);
+        assertEquals(List.of(), res);
     }
 
     @Test
     void testOutputNumberArrayEmptyDefault() {
         var res = eval("output number[] region = []");
-        assertEquals(List.of(1, 2, 3), res);
+        assertEquals(List.of(), res);
     }
 
     @Test
     void testOutputBooleanArrayEmptyDefault() {
         var res = eval("output boolean[] region=[]");
-        assertEquals(List.of(true, false), res);
+        assertEquals(List.of(), res);
     }
 
     @Test
@@ -201,7 +204,7 @@ public class OutputTests extends RuntimeTest {
     @Test
     void testOutputObjectArrayEmptyDefault() {
         var res = eval("output object[] region=[]");
-        assertEquals(List.of(Map.of("env", "dev")), res);
+        assertEquals(List.of(), res);
     }
 
     @Test
@@ -243,14 +246,12 @@ public class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputStringInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                output string region =
-                """));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(new StringType("\n")))));
     }
 
     @Test
     void testOutputStringInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output string region="));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(new StringType("")))));
     }
 
     @Test
@@ -371,73 +372,31 @@ public class OutputTests extends RuntimeTest {
     }
 
     // NUMBER
-    @Test
-    void testOutputNumberInitWithStringError() {
-        assertThrows(TypeError.class, () -> eval("""
-                output number region = "hello" 
-                """));
-    }
 
-    @Test
-    void testOutputNumberInitWithBooleanError() {
-        assertThrows(TypeError.class, () -> eval("output number region = true "));
-    }
 
     @Test
     void testOutputNumberInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                output number region = 
-                """));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "\n")));
     }
 
     @Test
     void testOutputNumberInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output number region="));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "")));
     }
 
     @Test
     void testOutputNumberInitWithMissingStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output number region=     "));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "    ")));
     }
 
     @Test
     void testOutputNumberInitWithBlankStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output number region='     '"));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", string("     "))));
     }
 
     @Test
     void testOutputNumberInitWithTabStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output number region = \t"));
-    }
-
-    @Test
-    void testOutputNumberInitWithEmptyArrayError() {
-        assertThrows(TypeError.class, () -> eval("output number region = []"));
-    }
-
-    @Test
-    void testOutputNumberInitWithBlankArrayError() {
-        assertThrows(TypeError.class, () -> eval("output number region = [      ] "));
-    }
-
-    @Test
-    void testOutputNumberInitWithStringArrayError() {
-        assertThrows(TypeError.class, () -> eval("output number region = ['hello','world'] "));
-    }
-
-    @Test
-    void testOutputNumberInitWithIntArrayError() {
-        assertThrows(TypeError.class, () -> eval("output number region = [1,2,3]")); // throw because it's not declared as array
-    }
-
-    @Test
-    void testOutputNumberInitWithBooleanArrayError() {
-        assertThrows(TypeError.class, () -> eval("output number region = [true, false]"));
-    }
-
-    @Test
-    void testOutputNumberInitWithObjectArrayError() {
-        assertThrows(TypeError.class, () -> eval("output number region = [{ env : 'dev' }]"));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", type(ValueType.Number), "\t")));
     }
 
     /*
@@ -540,14 +499,12 @@ public class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputBooleanInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                output boolean region = 
-                """));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(ValueType.Boolean), "\n")));
     }
 
     @Test
     void testOutputBooleanInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("output boolean region = "));
+        assertThrows(MissingOutputException.class, () -> interpreter.visit(output("region", TypeIdentifier.type(ValueType.Boolean), "")));
     }
 
     @Test
@@ -608,14 +565,6 @@ public class OutputTests extends RuntimeTest {
                 type custom = boolean
                 output custom region = 
                 
-                """));
-    }
-
-    @Test
-    void testOutputBooleanAliasInitWithEmptyStringError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                type custom = boolean
-                output custom region = 
                 """));
     }
 

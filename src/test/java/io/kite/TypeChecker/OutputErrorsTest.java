@@ -158,6 +158,16 @@ public class OutputErrorsTest extends CheckerTest {
     }
 
     @Test
+    void outputNumberInitEmptyArrayError() {
+        assertThrows(TypeError.class, () -> eval("output number something = []"));
+    }
+
+    @Test
+    void outputNumberInitWithBlankArrayError() {
+        assertThrows(TypeError.class, () -> eval("output number something = [      ] "));
+    }
+
+    @Test
     void outputNumberInitArrayNumberError() {
         assertThrows(TypeError.class, () -> eval("output number something = [1,2,3]"));
     }
@@ -190,6 +200,16 @@ public class OutputErrorsTest extends CheckerTest {
     @Test
     void outputNumberInitArrayEmptyObjectKeywordError() {
         assertThrows(TypeError.class, () -> eval("output number something = [object, object]"));
+    }
+
+    @Test
+    void testOutputNumberInitWithTrueError() {
+        assertThrows(TypeError.class, () -> eval("output number something = true"));
+    }
+
+    @Test
+    void testOutputNumberInitWithFalseError() {
+        assertThrows(TypeError.class, () -> eval("output number something = false"));
     }
 
     @Test
@@ -429,6 +449,7 @@ public class OutputErrorsTest extends CheckerTest {
                 output custom something = object
                 """));
     }
+
     @Test
     void outputUnionInitObjectEmptyKeywordExtraSpaceError() {
         assertThrows(TypeError.class, () -> eval("""
