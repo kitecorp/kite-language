@@ -1283,7 +1283,7 @@ public class Parser {
         Expression body;
         if (IsLookAhead(Equal)) {
             eat(Equal);
-            if (IsLookAhead(NewLine)) {
+            if (IsLookAhead(NewLine, WhiteSpace, EOF)) {
                 throw ParserErrors.error("Output must have a value assigned " + lookAhead().raw() + lookAhead().type());
             }
             body = Initialize();
