@@ -48,7 +48,8 @@ public class OutputTest extends ParserTest {
     void outputUnion() {
         var res = parse("""
                 type custom = string | number
-                output custom something""");
+                output custom something
+                """);
         assertEquals("Missing '=' after: output custom something",ParserErrors.errors());
     }
 
