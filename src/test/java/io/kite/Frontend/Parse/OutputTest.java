@@ -275,4 +275,17 @@ public class OutputTest extends ParserTest {
         assertEquals(expected, res);
     }
 
+    @Test
+    void outputObjectVar() {
+        var res = (Program) parse("""
+                var x = { env: 'dev'}
+                output object something=x
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression(object("env", "dev")))),
+                output("something", type(ObjectType.INSTANCE), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
 }
