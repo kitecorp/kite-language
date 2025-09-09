@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
+import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -909,10 +912,10 @@ public class OutputTests extends RuntimeTest {
 
     @Test
     void testOutputArrayInitWithNewLineError() {
-        assertThrows(MissingOutputException.class, () -> eval("""
-                output object[] region = 
-                
-                """));
+        assertThrows(MissingOutputException.class, () ->
+                interpreter.visit(
+                        output("region", type("custom"), string("")))
+        );
     }
 
     @Test
