@@ -411,6 +411,64 @@ public class OutputErrorsTest extends CheckerTest {
     }
 
     @Test
+    void testOutputNumberAliasInitWithBooleanError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = true
+                """));
+    }
+
+
+
+    @Test
+    void testOutputNumberAliasInitWithEmptyArrayError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = []
+                """));
+    }
+
+    @Test
+    void testOutputNumberAliasInitWithStringArrayError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = ['hello','world']
+                """));
+    }
+
+    @Test
+    void testOutputNumberAliasInitWithIntArrayError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = [1,2,3]
+                """));
+    }
+
+    @Test
+    void testOutputNumberAliasInitWithBooleanArrayError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = [true, false]
+                """));
+    }
+
+    @Test
+    void testOutputNumberAliasInitWithObjectArrayError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = [{ env : 'dev' }]
+                """));
+    }
+
+    @Test
+    void testOutputNumberAliasInitWithObjectArrayKeyStringError() {
+        assertThrows(TypeError.class, () -> eval("""
+                type custom = number
+                output custom region = [{ 'env' : 'dev' }]
+                """));
+    }
+
+    @Test
     void outputUnionInitBooleanError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
