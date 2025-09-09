@@ -1,19 +1,27 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.Program;
+import io.kite.TypeChecker.Types.ObjectType;
+import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.UnionTypeStatement.union;
+import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Factory.program;
+import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -23,25 +31,25 @@ public class OutputTest extends ParserTest {
     @Test
     void outputString() {
         parse("output string something");
-        assertEquals("Missing '=' after: output string something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output string something", ParserErrors.errors());
     }
 
     @Test
     void outputNumber() {
         parse("output number something");
-        assertEquals("Missing '=' after: output number something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output number something", ParserErrors.errors());
     }
 
     @Test
     void outputBoolean() {
         parse("output boolean something");
-        assertEquals("Missing '=' after: output boolean something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output boolean something", ParserErrors.errors());
     }
 
     @Test
     void outputObject() {
         parse("output object something");
-        assertEquals("Missing '=' after: output object something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output object something", ParserErrors.errors());
     }
 
     @Test
@@ -50,7 +58,7 @@ public class OutputTest extends ParserTest {
                 type custom = string | number
                 output custom something
                 """);
-        assertEquals("Missing '=' after: output custom something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output custom something", ParserErrors.errors());
     }
 
     @Test
@@ -104,25 +112,25 @@ public class OutputTest extends ParserTest {
     @Test
     void outputStringArray() {
         parse("output string[] something");
-        assertEquals("Missing '=' after: output string[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output string[] something", ParserErrors.errors());
     }
 
     @Test
     void outputNumberArray() {
         parse("output number[] something");
-        assertEquals("Missing '=' after: output number[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output number[] something", ParserErrors.errors());
     }
 
     @Test
     void outputBooleanArray() {
         parse("output boolean[] something");
-        assertEquals("Missing '=' after: output boolean[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output boolean[] something", ParserErrors.errors());
     }
 
     @Test
     void outputObjectArray() {
         parse("output object[] something");
-        assertEquals("Missing '=' after: output object[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output object[] something", ParserErrors.errors());
     }
 
     @Test
@@ -131,7 +139,7 @@ public class OutputTest extends ParserTest {
                 type custom = string | number
                 output custom[] something
                 """);
-        assertEquals("Missing '=' after: output custom[] something",ParserErrors.errors());
+        assertEquals("Missing '=' after: output custom[] something", ParserErrors.errors());
     }
 
     @Test
@@ -175,4 +183,96 @@ public class OutputTest extends ParserTest {
                 ));
         assertEquals(expected, res);
     }
+
+    @Test
+    void outputStringVar() {
+        var res = (Program) parse("""
+                var x = "hello"
+                output string something=x
+                """);
+        var expected = program(
+                varStatement(var("x", string("hello"))),
+                output("something", type(ValueType.String), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputNumberVar() {
+        var res = (Program) parse("""
+                var x = 10
+                output number something=x
+                """);
+        var expected = program(
+                varStatement(var("x", number(10))),
+                output("something", type(ValueType.Number), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputDecimalVar() {
+        var res = (Program) parse("""
+                var x = 10.2
+                output number something=x
+                """);
+        var expected = program(
+                varStatement(var("x", number(10.2))),
+                output("something", type(ValueType.Number), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputDecimalZeroVar() {
+        var res = (Program) parse("""
+                var x = 0.1
+                output number something=x
+                """);
+        var expected = program(
+                varStatement(var("x", number(0.1))),
+                output("something", type(ValueType.Number), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputTrueVar() {
+        var res = (Program) parse("""
+                var x = true
+                output boolean something=x
+                """);
+        var expected = program(
+                varStatement(var("x", bool(true))),
+                output("something", type(ValueType.Boolean), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputFalseVar() {
+        var res = (Program) parse("""
+                var x = false
+                output boolean something=x
+                """);
+        var expected = program(
+                varStatement(var("x", bool(false))),
+                output("something", type(ValueType.Boolean), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputObjectEmptyVar() {
+        var res = (Program) parse("""
+                var x = {}
+                output object something=x
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression())),
+                output("something", type(ObjectType.INSTANCE), symbol("x")
+                ));
+        assertEquals(expected, res);
+    }
+
 }
