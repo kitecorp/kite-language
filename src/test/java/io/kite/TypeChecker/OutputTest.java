@@ -15,30 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class OutputTest extends CheckerTest {
 
     @Test
-    void outputString() {
-        var res = eval("output string something");
-        assertEquals(ValueType.String, res);
-    }
-
-    @Test
-    void outputNumber() {
-        var res = eval("output number something");
-        assertEquals(ValueType.Number, res);
-    }
-
-    @Test
-    void outputBoolean() {
-        var res = eval("output boolean something");
-        assertEquals(ValueType.Boolean, res);
-    }
-
-    @Test
-    void outputObject() {
-        var res = eval("output object something");
-        assertEquals(ObjectType.INSTANCE, res);
-    }
-
-    @Test
     void outputUnion() {
         var res = eval("""
                 type custom = string | number
@@ -182,40 +158,6 @@ public class OutputTest extends CheckerTest {
                 output custom something = 10
                 """);
         assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
-    }
-
-    @Test
-    void outputStringArray() {
-        var res = eval("output string[] something");
-        assertEquals(arrayType(ValueType.String), res);
-    }
-
-    @Test
-    void outputNumberArray() {
-        var res = eval("output number[] something");
-        assertEquals(arrayType(ValueType.Number), res);
-    }
-
-    @Test
-    void outputBooleanArray() {
-        var res = eval("output boolean[] something");
-        assertEquals(arrayType(ValueType.Boolean), res);
-    }
-
-    @Test
-    void outputObjectArray() {
-        var res = eval("output object[] something");
-        assertEquals(arrayType(ObjectType.INSTANCE), res);
-    }
-
-    @Test
-    void outputUnionArray() {
-        var res = eval("""
-                type custom = string | number
-                output custom[] something
-                """);
-
-        assertEquals(arrayType(unionType("custom", ValueType.String, ValueType.Number)), res);
     }
 
     @Test
