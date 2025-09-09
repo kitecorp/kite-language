@@ -16,6 +16,7 @@ import io.kite.Visitors.SyntaxPrinter;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Range;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1284,7 +1285,7 @@ public class Parser {
         if (IsLookAhead(Equal)) {
             eat(Equal);
             if (IsLookAhead(NewLine, WhiteSpace, EOF)) {
-                throw ParserErrors.error("Output must have a value assigned " + lookAhead().raw() + lookAhead().type());
+                throw ParserErrors.error("Missing value for `output %s %s = %s` ".formatted(type.string(), name.string(), StringEscapeUtils.escapeJava(lookAhead().value().toString())));
             }
             body = Initialize();
         } else {
