@@ -288,4 +288,108 @@ public class OutputTest extends ParserTest {
         assertEquals(expected, res);
     }
 
+    @Test
+    void outputArrayStringVar() {
+        var res = (Program) parse("""
+                var x = "hello"
+                output string[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", string("hello"))),
+                output("something", arrayType(type(ValueType.String)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayNumberVar() {
+        var res = (Program) parse("""
+                var x = 10
+                output number[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", number(10))),
+                output("something", arrayType(type(ValueType.Number)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayDecimalVar() {
+        var res = (Program) parse("""
+                var x = 10.2
+                output number[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", number(10.2))),
+                output("something", arrayType(type(ValueType.Number)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayDecimalZeroVar() {
+        var res = (Program) parse("""
+                var x = 0.1
+                output number[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", number(0.1))),
+                output("something", arrayType(type(ValueType.Number)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayTrueVar() {
+        var res = (Program) parse("""
+                var x = true
+                output boolean[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", bool(true))),
+                output("something", arrayType(type(ValueType.Boolean)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayFalseVar() {
+        var res = (Program) parse("""
+                var x = false
+                output boolean[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", bool(false))),
+                output("something", arrayType(type(ValueType.Boolean)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayObjectEmptyVar() {
+        var res = (Program) parse("""
+                var x = {}
+                output object[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression())),
+                output("something", arrayType(type(ObjectType.INSTANCE)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void outputArrayObjectVar() {
+        var res = (Program) parse("""
+                var x = { env: 'dev'}
+                output object[] something=[x]
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression(object("env", "dev")))),
+                output("something", arrayType(type(ObjectType.INSTANCE)), array(symbol("x"))
+                ));
+        assertEquals(expected, res);
+    }
+
 }
