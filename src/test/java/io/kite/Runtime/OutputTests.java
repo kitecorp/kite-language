@@ -233,7 +233,6 @@ public class OutputTests extends RuntimeTest {
     /*
      * String output with invalid values
      * */
-
     @Test
     void outputStringDefaultNewLineError() {
         assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", TypeIdentifier.type(new StringType("\n")))));
@@ -284,7 +283,9 @@ public class OutputTests extends RuntimeTest {
         assertThrows(MissingOutputException.class, () -> interpreter.visit(output("something", TypeIdentifier.type(ValueType.Boolean), "")));
     }
 
-    // ANY
+    /// ////////
+    /// ANY ///
+    /// ///////
     @Test
     void outputAnyDefaultNumberError() {
         var res = eval("output any something = 123");
@@ -301,6 +302,18 @@ public class OutputTests extends RuntimeTest {
     void outputAnyDefaultDecimalDotError() {
         var res = eval("output any something = 0.2");
         assertEquals(0.2, res);
+    }
+
+    @Test
+    void outputAnyTrueDefaultError() {
+        var res = eval("output any something = true");
+        assertEquals(true, res);
+    }
+
+    @Test
+    void outputAnyFalseDefaultError() {
+        var res = eval("output any something = false");
+        assertEquals(false, res);
     }
 
     @Test
@@ -374,12 +387,14 @@ public class OutputTests extends RuntimeTest {
                 output("something", ArrayTypeIdentifier.arrayType("object"), "  ")
         ));
     }
+
     @Test
     void outputArrayDefaultNewlineStringError() {
         assertThrows(MissingOutputException.class, () -> interpreter.visit(
                 output("something", ArrayTypeIdentifier.arrayType("object"), "\n")
         ));
     }
+
     @Test
     void outputArrayDefaultTabStringError() {
         assertThrows(MissingOutputException.class, () -> interpreter.visit(
