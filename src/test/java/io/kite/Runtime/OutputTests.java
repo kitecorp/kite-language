@@ -114,6 +114,15 @@ public class OutputTests extends RuntimeTest {
     }
 
     @Test
+    void outputUnionDecimal() {
+        var res = eval("""
+                type custom = string | number
+                output custom something = 0.2
+                """);
+        assertEquals(0.2, res);
+    }
+
+    @Test
     @DisplayName("Should not prompt for output when default value is provided")
     void outputObjectInitEmpty() {
         var res = eval("output object something = {}");
