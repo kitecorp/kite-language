@@ -41,26 +41,33 @@ import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class Interpreter implements Visitor<Object> {
-    private static boolean hadRuntimeError;
-    private final Deque<Callstack> callstack = new ArrayDeque<>();
+    private final Deque<Callstack> callstack;
 
     @Getter
-    private final SyntaxPrinter printer = new SyntaxPrinter();
-    private final DeferredObservable deferredObservable = new DeferredObservable();
-    private final Deque<ContextStack> contextStacks = new ArrayDeque<>();
+    private final SyntaxPrinter printer;
+    private final DeferredObservable deferredObservable;
+    private final Deque<ContextStack> contextStacks;
     @Getter
     private Environment<Object> env;
-    private Environment<Object> outputs;
+    @Getter
+    private List<OutputDeclaration> outputs;
     private SchemaContext context;
-
+    @Getter
+    private List<RuntimeException> errors;
 
     public Interpreter() {
-        this(new Environment());
+        this(new Environment<>());
     }
 
     public Interpreter(Environment<Object> environment) {
         this.env = environment;
-        this.outputs = new Environment<>();
+        this.outputs = new ArrayList<>();
+        this.printer = new SyntaxPrinter();
+        this.deferredObservable = new DeferredObservable();
+        this.callstack = new ArrayDeque<>();
+        this.contextStacks = new ArrayDeque<>();
+        this.errors = new ArrayList<>();
+
         this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
         this.env.init("true", true);
@@ -87,11 +94,6 @@ public final class Interpreter implements Visitor<Object> {
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
     }
 
-    static void runtimeError(RuntimeError error) {
-        System.err.printf("%s\n[line %d]%n", error.getMessage(), error.getToken().line());
-        hadRuntimeError = true;
-    }
-
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
         if (schemaValue.getInstances().get(name) == null) {
             // if instance was not installed yet -> it will be installed later so we return a deferred object
@@ -105,6 +107,14 @@ public final class Interpreter implements Visitor<Object> {
         if (statement != null) {
             forEnv.initOrAssign(statement.string(), i);
         }
+    }
+
+    private static boolean isBlank(Object visit) {
+        return switch (visit) {
+            case String string -> StringUtils.isBlank(string);
+            case null -> true;
+            default -> false;
+        };
     }
 
     private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
@@ -394,29 +404,10 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(InputDeclaration input) {
-        if (input.hasInit() && env.get(input.name())==null) {
+        if (input.hasInit() && env.get(input.name()) == null) {
             return env.initOrAssign(input.getId().string(), visit(input.getInit()));
         }
         return env.lookup(input.name());
-    }
-    @Override
-    public Object visit(OutputDeclaration input) {
-        if (!input.hasInit()) {
-            throw new MissingOutputException("Invalid output declaration");
-        }
-        Object visit = visit(input.getInit());
-        if (isBlank(visit)) {
-            throw new MissingOutputException("Invalid output declaration `%s`".formatted(printer.visit(input.getInit())));
-        }
-        return outputs.initOrAssign(input.getId().string(), visit);
-    }
-
-    private static boolean isBlank(Object visit) {
-        return switch (visit){
-            case String string -> StringUtils.isBlank(string);
-            case null -> true;
-            default -> false;
-        };
     }
 
     @Override
@@ -820,7 +811,7 @@ public final class Interpreter implements Visitor<Object> {
         return env.init(symbol, value);
     }
 
-    private void expect(VarDeclaration expression, Object value) {
+    private void expect(DependencyHolder expression, Object value) {
         if (!expression.hasType()) {
             return;
         }
@@ -837,6 +828,20 @@ public final class Interpreter implements Visitor<Object> {
             } else if (!set.contains(value)) {
                 throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
             }
+        }
+    }
+
+    @Override
+    public Object visit(OutputDeclaration input) {
+        outputs.add(input); // just collect the outputs since they need to be evaluated after the program is run
+        if (!input.hasInit()) {
+            throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
+        } else {
+            Object visit = visit(input.getInit());
+            if (isBlank(visit)) {
+                throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
+            }
+            return visit;
         }
     }
 
@@ -888,16 +893,21 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(Program program) {
-        Object lastEval = new NullValue();
+        try {
+            Object lastEval = new NullValue();
 
-        if (ParserErrors.hadErrors()) {
+            if (ParserErrors.hadErrors()) {
+                return null;
+            }
+            for (Statement i : program.getBody()) {
+                lastEval = executeBlock(i, env);
+            }
+
+            return lastEval;
+        } catch (RuntimeException e) {
+            errors.add(e);
             return null;
         }
-        for (Statement i : program.getBody()) {
-            lastEval = executeBlock(i, env);
-        }
-
-        return lastEval;
     }
 
     @Override
@@ -924,19 +934,6 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(ExpressionStatement statement) {
         return executeBlock(statement.getStatement(), env);
-    }
-
-    Object interpret(List<Statement> statements) {
-        try {
-            Object res = null;
-            for (Statement statement : statements) {
-                res = visit(statement);
-            }
-            return res;
-        } catch (RuntimeError error) {
-            runtimeError(error);
-            return null;
-        }
     }
 
     Object executeBlock(List<Statement> statements, Environment environment) {
@@ -968,6 +965,9 @@ public final class Interpreter implements Visitor<Object> {
         try {
             this.env = environment;
             return visit(statement);
+        } catch (RuntimeException e) {
+            errors.add(e);
+            throw e;
         } finally {
             this.env = previous;
         }

@@ -368,6 +368,21 @@ public class OutputTests extends RuntimeTest {
         assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
+    @Test
+    void outputResourceStringError() {
+        var res = eval("""
+                schema vm {
+                    var string name
+                 }
+                
+                 resource vm main {
+                   name     = 'prod'
+                 }
+                
+                 output string something = vm.main.name
+                """);
+    }
+
     /*
      * Mixed Type alias with invalid values
      * */

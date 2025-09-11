@@ -753,4 +753,21 @@ public class ResourceTest extends RuntimeTest {
         assertEquals("prod", resource.argVal("name"));
     }
 
+    @Test
+    void testAccessResourceProperty() {
+        var res = eval("""
+                schema vm {
+                   var string name
+                }
+                
+                resource vm main {
+                  name     = 'prod'
+                }
+                
+                var name = vm.main.name
+                """);
+
+        assertEquals("prod", res);
+    }
+
 }
