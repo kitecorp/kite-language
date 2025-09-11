@@ -112,6 +112,7 @@ public final class Interpreter implements Visitor<Object> {
     private static boolean isBlank(Object visit) {
         return switch (visit) {
             case String string -> StringUtils.isBlank(string);
+            case Dependency dependency -> isBlank(dependency.value());
             case null -> true;
             default -> false;
         };
@@ -838,10 +839,14 @@ public final class Interpreter implements Visitor<Object> {
             throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
         } else {
             Object visit = visit(input.getInit());
+            expect(input, visit);
             if (isBlank(visit)) {
                 throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
             }
-            return visit;
+            return switch (visit){
+                case Dependency dependency -> env.init(input.name(), dependency.value());
+                default ->  env.init(input.name(), visit);
+            };
         }
     }
 

@@ -381,6 +381,7 @@ public class OutputTests extends RuntimeTest {
                 
                  output string something = vm.main.name
                 """);
+        assertEquals("prod", res);
     }
 
     /*
