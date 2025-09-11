@@ -906,7 +906,7 @@ public final class Interpreter implements Visitor<Object> {
             return lastEval;
         } catch (RuntimeException e) {
             errors.add(e);
-            return null;
+            throw e;
         }
     }
 
@@ -966,7 +966,6 @@ public final class Interpreter implements Visitor<Object> {
             this.env = environment;
             return visit(statement);
         } catch (RuntimeException e) {
-            errors.add(e);
             throw e;
         } finally {
             this.env = previous;
