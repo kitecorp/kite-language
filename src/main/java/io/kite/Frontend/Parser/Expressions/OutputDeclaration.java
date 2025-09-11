@@ -3,6 +3,7 @@ package io.kite.Frontend.Parser.Expressions;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.Statement;
+import io.kite.Runtime.Values.DependencyHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,7 +13,7 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class OutputDeclaration extends Statement {
+public final class OutputDeclaration extends Statement implements DependencyHolder {
     private Identifier id;
     private Expression init;
     private TypeIdentifier type;

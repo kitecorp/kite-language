@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.TypeChecker.Types.UnionType;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -17,6 +18,9 @@ import static java.util.Objects.requireNonNull;
 
 
 public non-sealed class SyntaxPrinter implements Visitor<String> {
+    private Ansi ansi = Ansi.ansi(50)
+            .reset()
+            .eraseScreen();
 
     private static @NotNull String formatParameter(ParameterIdentifier it) {
         if (it.getType() == null || it.getType().getType() == null) {
@@ -74,11 +78,18 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(OutputDeclaration expression) {
-        if (expression.hasInit()) {
-            return format("input {0} {1} = {2}", visit(expression.getType()), visit(expression.getId()), visit(expression.getInit()));
-        } else {
-            return format("input {0} {1}", visit(expression.getType()), visit(expression.getId()));
-        }
+        return ansi.fgMagenta()
+                .a("output ")
+                .reset()
+                .a(visit(expression.getType()))
+                .fgDefault()
+                .a(" ")
+                .a(visit(expression.getId()))
+                .a(" = ")
+                .a(visit(expression.getInit()))
+                .a("\n")
+                .reset()
+                .toString();
     }
 
     @Override
@@ -325,16 +336,26 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(BooleanLiteral expression) {
-        return expression.getVal().toString();
+        return Ansi.ansi().fgYellow().a(expression.getVal().toString()).fgDefault().toString();
     }
 
     @Override
     public String visit(Identifier expression) {
         return switch (expression) {
-            case ParameterIdentifier parameterIdentifier -> formatParameter(parameterIdentifier);
-            case ArrayTypeIdentifier arrayTypeIdentifier -> visit(arrayTypeIdentifier.getType()) + "[]";
+            case ParameterIdentifier parameterIdentifier -> colorizeType(formatParameter(parameterIdentifier));
+            case ArrayTypeIdentifier arrayTypeIdentifier -> colorizeType(visit(arrayTypeIdentifier.getType()) + "[]");
+            case TypeIdentifier identifier -> colorizeType(identifier.string());
+            case null-> null;
             default -> expression.string();
         };
+    }
+
+    private static String colorizeType(String t) {
+        return Ansi.ansi()
+                .fgBlue()
+                .a(t)
+                .fgDefault()
+                .toString();
     }
 
     @Override
@@ -349,7 +370,12 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(StringLiteral expression) {
-        return "\"" + expression.getValue() + "\"";
+        return Ansi.ansi().fgGreen()
+                .a('"')
+                .a(expression.getValue())
+                .a('"')
+                .fgDefault()
+                .toString();
     }
 
     @Override
