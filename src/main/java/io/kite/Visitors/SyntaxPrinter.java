@@ -336,7 +336,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(BooleanLiteral expression) {
-        return Ansi.ansi().fgYellow().a(expression.getVal().toString()).fgDefault().toString();
+        return expression.getVal().toString();
     }
 
     @Override
@@ -370,12 +370,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(StringLiteral expression) {
-        return Ansi.ansi().fgGreen()
-                .a('"')
-                .a(expression.getValue())
-                .a('"')
-                .fgDefault()
-                .toString();
+        return "\"" + expression.getValue() + "\"";
     }
 
     @Override
