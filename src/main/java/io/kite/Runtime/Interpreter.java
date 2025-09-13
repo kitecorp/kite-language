@@ -838,15 +838,7 @@ public final class Interpreter implements Visitor<Object> {
         if (!input.hasInit()) {
             throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
         } else {
-            Object visit = visit(input.getInit());
-            expect(input, visit);
-            if (isBlank(visit)) {
-                throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
-            }
-            return switch (visit){
-                case Dependency dependency -> env.init(input.name(), dependency.value());
-                default ->  env.init(input.name(), visit);
-            };
+            return null;// we just care to save the outputs as all of them will be printed after resources have been created
         }
     }
 
