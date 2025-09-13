@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 public class ResourceValue {
-    private Environment properties;
+    private Environment<Object> properties;
     private SchemaValue schema;
     private String name;
     private Set<String> dependencies;
@@ -28,7 +28,7 @@ public class ResourceValue {
     public ResourceValue() {
     }
 
-    public ResourceValue(String name, Environment parent) {
+    public ResourceValue(String name, Environment<Object> parent) {
         this.name = name;
         this.properties = parent;
     }
