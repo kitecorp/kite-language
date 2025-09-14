@@ -318,10 +318,9 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         builder.append(" {\n");
         for (SchemaDeclaration.SchemaProperty property : statement.getProperties()) {
             builder.append("\t");
-            var declaration = property.declaration();
-            builder.append(visit(declaration.getType()));
+            builder.append(visit(property.type()));
             builder.append(" ");
-            builder.append(declaration.name());
+            builder.append(property.name());
             builder.append("\n");
         }
         builder.append("}\n");

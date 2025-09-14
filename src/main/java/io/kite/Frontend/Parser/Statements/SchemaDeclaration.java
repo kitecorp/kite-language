@@ -1,9 +1,10 @@
 package io.kite.Frontend.Parser.Statements;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.Frontend.Parser.Expressions.VarDeclaration;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -43,13 +44,42 @@ public final class SchemaDeclaration extends Statement {
         return new SchemaDeclaration(name, properties);
     }
 
-    public record SchemaProperty(VarDeclaration declaration, AnnotationDeclaration annotation) {
-        public static SchemaProperty schemaProperty(VarDeclaration declaration) {
-            return new SchemaProperty(declaration, null);
+    public record SchemaProperty(TypeIdentifier type,
+                                 Identifier identifier,
+                                 Expression init,
+                                 AnnotationDeclaration annotation) {
+
+
+        public SchemaProperty(TypeIdentifier typeIdentifier, Identifier identifier, Expression init) {
+            this(typeIdentifier, identifier, init, null);
         }
 
-        public static SchemaProperty schemaProperty(VarDeclaration declaration, AnnotationDeclaration annotation) {
-            return new SchemaProperty(declaration, annotation);
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, Identifier identifier, Expression init, AnnotationDeclaration annotation) {
+            return new SchemaProperty(typeIdentifier, identifier, init, annotation);
+        }
+
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, Expression init, AnnotationDeclaration annotation) {
+            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), init, annotation);
+        }
+
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init, AnnotationDeclaration annotation) {
+            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), annotation);
+        }
+
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init) {
+            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init));
+        }
+
+        public String name() {
+            return identifier.string();
+        }
+
+        public boolean hasInit() {
+            return init != null;
+        }
+
+        public boolean hasType() {
+            return type != null;
         }
     }
 }

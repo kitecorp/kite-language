@@ -18,7 +18,7 @@ public class ForResourceTest extends RuntimeTest {
     void testForReturnsResourceNestedVar() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -43,7 +43,7 @@ public class ForResourceTest extends RuntimeTest {
     void multipleResources() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -73,7 +73,7 @@ public class ForResourceTest extends RuntimeTest {
     void rangeSingleIteration() {
         eval("""
                       schema vm {
-                        var string name
+                        string name
                       }
                       for i in 5..6 {
                         resource vm main { name = '$i' }
@@ -86,7 +86,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void rangeEmpty_noInstances() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in 2..2 {
                     resource vm main { name = '$i' }
                   }
@@ -98,7 +98,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void arrayOfObjects_nestedProps() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var cfgs = [{meta: {client: "dev"}}, {meta: {client: "prod"}}]
                   for i, item in cfgs {
                     resource vm main { 
@@ -114,7 +114,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void stringKeyNamingFromArray() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in ["prod","test"] {
                     resource vm main { name = i }
                   }
@@ -128,7 +128,7 @@ public class ForResourceTest extends RuntimeTest {
     void duplicateStringKeys_conflict() {
         // Expect either last-write-wins OR a specific exception; assert accordingly.
         Assertions.assertThrows(DeclarationExistsException.class, () -> eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var items = ["dup","dup"]
                   for i in items {
                     resource vm main { name = i }
@@ -139,7 +139,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void loopVarShadowsOuterVar() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var name = "outer"
                   for i in 0..1 {
                     var name = "inner"
@@ -153,7 +153,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void itemVarDoesNotCollideWithSchemaProps() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var items = [{name:"x"}, {name:"y"}]
                   for i, item in items {
                     resource vm main { name = item.name }
@@ -167,7 +167,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void forwardReferenceAcrossOrderInLoop() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in 0..2 {
                     resource vm cidr { name = vm.vpc.name }
                     resource vm vpc  { name = 'vpc-$i' }
@@ -181,7 +181,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void indirectCycleDetection() {
         Assertions.assertThrows(CycleException.class, () -> eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in 0..1 {
                     resource vm a {  name = vm.b.name }  // a -> b
                 
@@ -193,7 +193,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void collectInstancesToArrayVar() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var vm[] col = []
                   for i in ["prod","test"] {
                     resource vm main { name = i }
@@ -208,7 +208,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void loopVarOutOfScope_error() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in 0..1 { resource vm main { name = 'ok' } }
                   resource vm late { name = i } // i not in scope
                 """));
@@ -217,7 +217,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void crossLoopIndexSpace_error() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in 0..2 { resource vm a { name = '$i' } }
                   for j in 0..2 { resource vm b { name = vm.a[j].name } } // if bracket-indexing unsupported
                 """));
@@ -227,7 +227,7 @@ public class ForResourceTest extends RuntimeTest {
     @Disabled("not implemented right now. We will support it later")
     void nestedLoops_captureBothIndices() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   for i in 0..2 {
                     for j in 0..2 {
                       resource vm main { name = '$i-$j' }
@@ -243,7 +243,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void nestedLoopScopeRules() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var outer = "X"
                   for i in 0..1 {
                     var mid = "M"
@@ -259,7 +259,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void indexInNameAndProperty() {
         eval("""
-                  schema vm { var string name }
+                  schema vm { string name }
                   var items = ["a","b","c"]
                   for i, v in items {
                     resource vm main { name = '$v-$i' }
@@ -279,7 +279,7 @@ public class ForResourceTest extends RuntimeTest {
     void testForReturnsRsdesourceNestedVar() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -305,7 +305,7 @@ public class ForResourceTest extends RuntimeTest {
     void multiResourcesWithInterpolation() {
         eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -330,7 +330,7 @@ public class ForResourceTest extends RuntimeTest {
     void multiResourcesWithDependencies() {
         eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -366,7 +366,7 @@ public class ForResourceTest extends RuntimeTest {
     void dependsOnEarlyResource() {
         eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -402,8 +402,8 @@ public class ForResourceTest extends RuntimeTest {
     void dependsOnEarlyResourceCycle() {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm {
-                   var string name
-                   var string color 
+                   string name
+                   string color 
                 }
                 for i in 0..2 {
                     var name = 'prod'
@@ -426,7 +426,7 @@ public class ForResourceTest extends RuntimeTest {
     void testMultipleResourcesAreCreatedForLoop() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 var vm[] vms = []
                 for i in 0..2 {
@@ -452,7 +452,7 @@ public class ForResourceTest extends RuntimeTest {
     void testMultipleResourcesAreCreatedForLoopUsingStringInterpolation() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 var vm[] vms = []
                 var items = ['prod','test']
@@ -481,7 +481,7 @@ public class ForResourceTest extends RuntimeTest {
     void testForLoopInlineArray() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 var vm[] vms = []
                 for i in ['prod','test'] {
@@ -509,7 +509,7 @@ public class ForResourceTest extends RuntimeTest {
     void testMultipleResourcesAreCreatedForLoopUsingIndex() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 var vm[] vms = []
                 var items = ['prod','test']
@@ -537,7 +537,7 @@ public class ForResourceTest extends RuntimeTest {
     void testResourceNamingByStringArray() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 for i in ['prod','test'] {
                     resource vm main {
@@ -568,7 +568,7 @@ public class ForResourceTest extends RuntimeTest {
     void testForNameResource() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 var configs = [
                      { name: "photos", location: "eu-west1" },

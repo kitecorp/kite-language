@@ -15,7 +15,7 @@ public class IfResourceTest extends RuntimeTest {
     void testIfConditionReturnsResourceNestedVarStringInterpolation() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 if true {
                     var name = 'prod'
@@ -39,7 +39,7 @@ public class IfResourceTest extends RuntimeTest {
     void testInterpolationNestedInIf() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 if true {
                     var name = 'prod'
@@ -64,7 +64,7 @@ public class IfResourceTest extends RuntimeTest {
     void testInterpolationNestedDeepInIf() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 if true {
                     var name = 'prod'
@@ -89,7 +89,7 @@ public class IfResourceTest extends RuntimeTest {
     void testIfConditionReturnsResourceNestedVar() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 if true {
                     var name = 'prod'
@@ -111,7 +111,7 @@ public class IfResourceTest extends RuntimeTest {
     void testIfConditionReturnsResource() {
         var res = eval("""
                 schema vm {
-                   var string name
+                   string name
                 }
                 if true {
                     resource vm main {

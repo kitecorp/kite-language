@@ -11,7 +11,6 @@ import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Factory.program;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
@@ -25,17 +24,16 @@ public class SchemaTest extends ParserTest {
     void schemaDeclaration() {
         var actual = (Program) parse("""
                 schema square { 
-                   var Vm x =1
-                   var Vm y =1
+                   Vm x =1
+                   Vm y =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1)),
-                        schemaProperty(var("y", type("Vm"), 1))
+                        schemaProperty(type("Vm"),"x", 1),
+                        schemaProperty(type("Vm"),"y", 1)
                 )
         );
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -43,15 +41,14 @@ public class SchemaTest extends ParserTest {
     void schemaCloudVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   @Cloud var Vm x =1
+                   @cloud Vm x =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1), annotation("Cloud"))
+                        schemaProperty(type("Vm"),"x",  1, annotation("cloud"))
                 )
         );
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -59,15 +56,14 @@ public class SchemaTest extends ParserTest {
     void schemaCloudWithArgsVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   @Cloud(importable) var Vm x =1
+                   @cloud(importable) Vm x =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1), annotation("Cloud", id("importable")))
+                        schemaProperty(type("Vm"),"x",  1, annotation("cloud", id("importable")))
                 )
         );
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -75,17 +71,16 @@ public class SchemaTest extends ParserTest {
     void schemaCloudArrayVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   @Cloud([importable]) var Vm x =1
+                   @cloud([importable]) Vm x =1
                 }
                 """);
         ArrayExpression array = ArrayExpression.array(id("importable"));
 
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), array))
+                        schemaProperty(type("Vm"),"x", 1, annotation(id("cloud"), array))
                 )
         );
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -93,17 +88,16 @@ public class SchemaTest extends ParserTest {
     void schemaCloudNumbersVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   @Cloud([1,2,3]) var Vm x =1
+                   @cloud([1,2,3]) Vm x =1
                 }
                 """);
-        ArrayExpression array = ArrayExpression.array(1, 2, 3);
+        var array = ArrayExpression.array(1, 2, 3);
 
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), array))
+                        schemaProperty(type("Vm"),"x",  1, annotation(id("cloud"), array))
                 )
         );
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -111,17 +105,16 @@ public class SchemaTest extends ParserTest {
     void schemaCloudStringsVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   @Cloud(["test"]) var Vm x =1
+                   @cloud(["test"]) Vm x =1
                 }
                 """);
-        ArrayExpression array = ArrayExpression.array("test");
+        var array = ArrayExpression.array("test");
 
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), array))
+                        schemaProperty(type("Vm"),"x", 1, annotation(id("cloud"), array))
                 )
         );
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -129,15 +122,15 @@ public class SchemaTest extends ParserTest {
     void schemaObjectVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   @Cloud({env="test"}) var Vm x =1
+                   @cloud({env="test"}) Vm x =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1), annotation(id("Cloud"), objectExpression(object("env", "test")))
+                        schemaProperty(type("Vm"),"x",  1, annotation(id("cloud"),
+                                objectExpression(object("env", "test")))
                         )
                 ));
-        log.warn(actual);
         assertEquals(expected, actual);
     }
 
@@ -145,14 +138,13 @@ public class SchemaTest extends ParserTest {
     void schemaDeclarationVar() {
         var actual = (Program) parse("""
                 schema square { 
-                   var Vm x =1
+                   Vm x =1
                 }
                 """);
         var expected = program(
                 schema(id("square"),
-                        schemaProperty(var("x", type("Vm"), 1))
-                ));
-        log.warn(actual);
+                        schemaProperty(type("Vm"),"x", 1))
+                );
         assertEquals(expected, actual);
     }
 

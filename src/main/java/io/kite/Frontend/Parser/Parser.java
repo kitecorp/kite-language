@@ -30,7 +30,6 @@ import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static java.text.MessageFormat.format;
@@ -84,7 +83,7 @@ public class Parser {
      * Used to detect when a val/var is declared in a schema or in a resource.
      * When in a schema, a val can be left uninitialised:
      * val String x
-     * this is ok because it's just a declaration but when in a resource, it must be initialised
+     * this is ok because it's just a type but when in a resource, it must be initialised
      */
     private SchemaContext context;
     private BlockContext blockContext;
@@ -249,7 +248,7 @@ public class Parser {
         if (IsLookAhead(Comma)) {
             eat(Comma);
             index = IsLookAhead(Identifier) ? Identifier() : null;
-            if (index != null) { // switch names. Index is always the first name in the for declaration
+            if (index != null) { // switch names. Index is always the first name in the for type
                 var tmp = index;
                 index = varName;
                 varName = tmp;
@@ -555,7 +554,7 @@ public class Parser {
                 }
                 return type;
             } else {
-                throw new RuntimeException("Type declaration expected during schema declaration: var " + printer.visit(Identifier()));
+                throw new RuntimeException("Type type expected during schema type: var " + printer.visit(Identifier()));
             }
         } else {
             TypeIdentifier type = null;
@@ -650,7 +649,7 @@ public class Parser {
             array.add(Literal());
             return array;
         } else if (IsLookAhead(For)) {
-            throw new RuntimeException("For declaration in array not supported yet: " + getIterator().getCurrent());
+            throw new RuntimeException("For type in array not supported yet: " + getIterator().getCurrent());
         } else {
             throw new RuntimeException("Can't index an array using token: " + getIterator().getCurrent());
         }
@@ -797,10 +796,23 @@ public class Parser {
     private SchemaProperty SchemaProperty() {
         AnnotationDeclaration annotation = null;
         if (IsLookAhead(AT)) {
-            annotation = (AnnotationDeclaration) AnnotationDeclaration();
+            annotation = AnnotationDeclaration();
         }
-        var statement = (VarStatement) VarDeclarations();
-        return schemaProperty(statement.getDeclarations().get(0), annotation);
+        var type = TypeIdentifier();
+        var id = Identifier();
+        var init = IsLookAhead(lineTerminator, Comma, CloseBraces, EOF) ? null : PropertyInitializer();
+        return new SchemaProperty(type, id, init, annotation);
+    }
+
+    /**
+     * PropertyInitializer
+     * : SIMPLE_ASSIGN ObjectExpression
+     */
+    private Expression PropertyInitializer() {
+        if (IsLookAhead(Equal)) {
+            eat(Equal);
+        }
+        return Initialize();
     }
 
     /**
@@ -808,23 +820,24 @@ public class Parser {
      * : '@' Identifier ( '(' ArgList ')' )?
      * ;
      */
-    private Expression AnnotationDeclaration() {
+    private AnnotationDeclaration AnnotationDeclaration() {
         eat(AT);
         var name = Identifier();
         if (IsLookAhead(OpenParenthesis)) {
             eat(OpenParenthesis);
+            var statement = AnnotationArgs();
+            if (IsLookAhead(CloseParenthesis)) {
+                eat(CloseParenthesis);
+            }
+            return switch (statement) {
+                case ArrayExpression identifier -> annotation(name, identifier);
+                case ObjectExpression expression -> annotation(name, expression);
+                case Identifier identifier -> annotation(name, identifier);
+                case null -> annotation(name);
+                default -> throw new IllegalStateException("Unexpected value: " + statement);
+            };
         }
-        var statement = AnnotationArgs();
-        if (IsLookAhead(CloseParenthesis)) {
-            eat(CloseParenthesis);
-        }
-        return switch (statement) {
-            case ArrayExpression identifier -> annotation(name, identifier);
-            case ObjectExpression expression -> annotation(name, expression);
-            case Identifier identifier -> annotation(name, identifier);
-            case null -> annotation(name);
-            default -> throw new IllegalStateException("Unexpected value: " + statement);
-        };
+        return annotation(name);
     }
 
     private Expression AnnotationArgs() {
@@ -883,8 +896,8 @@ public class Parser {
             TypeIdentifier type;
             if (IsLookAheadAfter(Identifier, Identifier)) { // param has type, parse it. If it doesn't the TypeChecker will throw an exception
                 type = typeParser.identifier();
-            } else { // enforce parameter type declaration
-                throw ParserErrors.error("Type declaration expected for parameter: ", lookAhead(), lookAhead().type());
+            } else { // enforce parameter type type
+                throw ParserErrors.error("Type type expected for parameter: ", lookAhead(), lookAhead().type());
             }
             var symbol = SymbolIdentifier();
             return param(symbol, type);
@@ -1146,7 +1159,7 @@ public class Parser {
      */
     private Statement ResourceDeclaration() {
         if (contextStack.contains(ContextStack.FUNCTION)) {
-            throw ParserErrors.error("Resource declaration not allowed in function body: ", lookAhead(), lookAhead().type());
+            throw ParserErrors.error("Resource type not allowed in function body: ", lookAhead(), lookAhead().type());
         }
         boolean existing = false;
         if (IsLookAhead(Existing)) {
@@ -1248,7 +1261,7 @@ public class Parser {
             switch (statement) {
                 case InputDeclaration inputDeclaration -> {
                     if (componentName != null) {
-                        throw ParserErrors.error("Component declaration should not have inputs");
+                        throw ParserErrors.error("Component type should not have inputs");
                     }
                     if (!set.add(inputDeclaration.name())) {
                         throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
@@ -1256,7 +1269,7 @@ public class Parser {
                 }
                 case OutputDeclaration outputDeclaration -> {
                     if (componentName != null) {
-                        throw ParserErrors.error("Component declaration should not have outputs");
+                        throw ParserErrors.error("Component type should not have outputs");
                     }
                     if (!set.add(outputDeclaration.name())) {
                         throw ParserErrors.error(format("Duplicate outputs names in component `{0}` : {1}", printer.visit(componentName), printer.visit(outputDeclaration)));

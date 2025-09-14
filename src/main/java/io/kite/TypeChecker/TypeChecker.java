@@ -37,7 +37,7 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     /**
-     * Explicit type declaration should allow assigning empty array like
+     * Explicit type type should allow assigning empty array like
      * type[] name = []
      */
     private static void handleArrayType(Type implicit, Type explicit) {
@@ -269,7 +269,7 @@ public final class TypeChecker implements Visitor<Type> {
         }
         if (declaredType.getTypes().contains(actualType)) {
             if (actualType instanceof ObjectType properties) {
-                // iterate over init object properties to make sure all declarations match the allowed properties in the union type declaration
+                // iterate over init object properties to make sure all declarations match the allowed properties in the union type type
                 for (var entry : properties.getEnvironment().getVariables().entrySet()) {
                     for (Expression type : declaredType.getTypes()) {
                         if (type instanceof ObjectType objectType) {
@@ -441,10 +441,10 @@ public final class TypeChecker implements Visitor<Type> {
         try {
             // if property was not found check if is a variable declared in a higher scope
             var storedType = objectType.lookup(resourceName);
-            // if we found the var declaration, we know it's value so we try to access the member of the object using the variable value
+            // if we found the var type, we know it's value so we try to access the member of the object using the variable value
             // x[a] -> x["a"] works only with strings
             return switch (storedType) {
-                // if we found the var declaration, we know it's value so we try to access the member of the object using the variable value
+                // if we found the var type, we know it's value so we try to access the member of the object using the variable value
                 // x[a] -> x["a"] works only with strings
                 case StringType stringType -> objectType.lookup(stringType.getString());
                 case null, default -> throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
@@ -636,20 +636,9 @@ public final class TypeChecker implements Visitor<Type> {
 
         var schemaType = new SchemaType(name.string(), env);
         env.init(name, schemaType);
-        for (var property : body) {
-            executeBlock(property.declaration(), schemaType.getEnvironment());
-//            var t1 = visit(property.type());
-//            if (property.defaultValue() instanceof BlockExpression objectExpression) {
-//                var t2 = executeBlock(objectExpression.getExpression(), schemaType.getEnvironment());
-//                expect(t2, t1, property.defaultValue());
-//                schemaType.setProperty(property.name().string(), t2);
-//            } else {
-//                var t2 = visit(property.defaultValue());
-//                if (t2 != null) { // when property is not initialised
-//                    expect(t2, t1, property.defaultValue());
-//                }
-//                schemaType.setProperty(property.name().string(), t1);
-//            }
+        for (SchemaDeclaration.SchemaProperty property : body) {
+            var vardeclaration = VarDeclaration.var(property.name(), property.type(), property.init());
+            executeBlock(vardeclaration, schemaType.getEnvironment());
         }
 
         return schemaType;
@@ -762,7 +751,7 @@ public final class TypeChecker implements Visitor<Type> {
             }
             return env.init(var, explicitType);
         } else if (implicitType == ValueType.Null) {
-            throw new TypeError("Explicit type declaration required for: " + printer.visit(expression));
+            throw new TypeError("Explicit type type required for: " + printer.visit(expression));
         }
         if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
             // member assignment like val x = a.b.c
