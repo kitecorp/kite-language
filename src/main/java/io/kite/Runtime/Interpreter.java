@@ -19,7 +19,6 @@ import io.kite.Runtime.Functions.PrintlnFunction;
 import io.kite.Runtime.Values.*;
 import io.kite.Runtime.exceptions.*;
 import io.kite.Runtime.interpreter.OperatorComparator;
-import io.kite.SchemaContext;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.SyntaxPrinter;
@@ -51,7 +50,6 @@ public final class Interpreter implements Visitor<Object> {
     private Environment<Object> env;
     @Getter
     private final List<OutputDeclaration> outputs;
-    private SchemaContext context;
     @Getter
     private final List<RuntimeException> errors;
 
@@ -229,7 +227,7 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.isInterpolated()) {
             // when doing string interpolation on a property assignment we should look in the parent environment
             // for the interpolated string not in the "properties/environment of the resource"
-            var hops = SchemaContext.RESOURCE == context ? 1 : 0;
+            var hops = contextStacks.peek() == ContextStack.Resource ? 1 : 0;
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
                 var value = env.lookup(interpolationVar, hops);
@@ -537,8 +535,7 @@ public final class Interpreter implements Visitor<Object> {
 //        if (callstack.peekLast() instanceof ForStatement) {
 //            resource = ResourceExpression.resource(resource);
 //        }
-
-        context = SchemaContext.RESOURCE;
+        contextStacks.push(ContextStack.Resource);
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
@@ -553,7 +550,7 @@ public final class Interpreter implements Visitor<Object> {
                 return detectCycle(resource, instance);
             }
         } finally {
-            context = null;
+            contextStacks.pop();
         }
     }
 
@@ -730,7 +727,7 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(SchemaDeclaration expression) {
         var environment = new Environment<>(env);
-        context = SchemaContext.SCHEMA;
+        contextStacks.push(ContextStack.Schema);
 
         for (var property : expression.getProperties()) {
             switch (property.init()) {
@@ -738,7 +735,7 @@ public final class Interpreter implements Visitor<Object> {
                 case null, default -> environment.init(property.name(), visit(property.init()));
             }
         }
-        context = null;
+        contextStacks.pop();
         var name = expression.getName();
         return env.init(name.string(), SchemaValue.of(name, environment)); // install the type into the global env
     }
@@ -874,7 +871,7 @@ public final class Interpreter implements Visitor<Object> {
     public Object visit(ValDeclaration expression) {
         String symbol = expression.getId().string();
         Object value = null;
-        if (context == SchemaContext.RESOURCE) {
+        if (contextStacks.peek() == ContextStack.Resource) {
             if (!expression.hasInit()) {
                 throw new InvalidInitException("Val type must be initialised: " + expression.getId().string() + " is null");
             }
