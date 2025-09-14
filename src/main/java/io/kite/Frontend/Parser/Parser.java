@@ -9,7 +9,6 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
 import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.Runtime.exceptions.InvalidInitException;
-import io.kite.SchemaContext;
 import io.kite.TypeChecker.Types.TypeParser;
 import io.kite.TypeChecker.Types.ValueType;
 import io.kite.Visitors.SyntaxPrinter;
@@ -85,7 +84,6 @@ public class Parser {
      * val String x
      * this is ok because it's just a type but when in a resource, it must be initialised
      */
-    private SchemaContext context;
     private BlockContext blockContext;
     private Deque<ContextStack> contextStack = new ArrayDeque<>();
 
@@ -536,7 +534,7 @@ public class Parser {
     private ValDeclaration ValDeclaration() {
         var type = TypeIdentifier();
         var id = Identifier();
-        if (context != SchemaContext.SCHEMA) {
+        if (contextStack.peek() != ContextStack.Schema) {
             if (!IsLookAhead(Equal)) {
                 throw new InvalidInitException(VAL_NOT_INITIALISED.formatted(id.string()));
             }
@@ -546,7 +544,7 @@ public class Parser {
     }
 
     private TypeIdentifier TypeIdentifier() {
-        if (context == SchemaContext.SCHEMA) {
+        if (contextStack.peek() == ContextStack.Schema) {
             if (HasType()) { // type mandatory inside a schema. Init/default value is optional
                 TypeIdentifier type = typeParser.identifier();
                 if (IsLookAhead(OpenBrackets)) {
@@ -613,7 +611,7 @@ public class Parser {
     private @NotNull Expression ObjectExpression() {
         if (IsLookAheadAfterUntil(Identifier, CloseBraces, Colon)
             || IsLookAhead(Object)
-            || context == SchemaContext.SCHEMA) {
+            || contextStack.peek() == ContextStack.Schema) {
             blockContext = BlockContext.OBJECT;
         }
 
@@ -767,13 +765,17 @@ public class Parser {
      */
     private Statement SchemaDeclaration() {
         eat(Schema);
+
+        contextStack.push(ContextStack.Schema);
+
         var schemaName = Identifier();
 
-        context = SchemaContext.SCHEMA;
         eat(OpenBraces);
         var body = SchemaProperties();
         eat(CloseBraces);
-        context = null;
+
+        contextStack.pop();
+
         return schema(schemaName, body);
     }
 
@@ -1169,9 +1171,9 @@ public class Parser {
         eat(Resource);
         var type = typeParser.TypeIdentifier();
         Identifier name = resourceSymbol(type);
-        context = SchemaContext.RESOURCE;
+        contextStack.push(ContextStack.Resource);
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
-        context = null;
+        contextStack.pop();
         return ResourceExpression.resource(existing, type, name, (BlockExpression) body);
     }
 
