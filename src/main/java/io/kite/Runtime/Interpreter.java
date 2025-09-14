@@ -733,10 +733,9 @@ public final class Interpreter implements Visitor<Object> {
         context = SchemaContext.SCHEMA;
 
         for (var property : expression.getProperties()) {
-            var declaration = property.declaration();
-            switch (declaration.getInit()) {
+            switch (property.init()) {
                 case BlockExpression blockExpression -> executeBlock(blockExpression.getExpression(), environment);
-                case null, default -> environment.init(declaration.getId().string(), visit(declaration.getInit()));
+                case null, default -> environment.init(property.name(), visit(property.init()));
             }
         }
         context = null;
@@ -836,13 +835,13 @@ public final class Interpreter implements Visitor<Object> {
     public Object visit(OutputDeclaration input) {
         outputs.add(input); // just collect the outputs since they need to be evaluated after the program is run
         if (!input.hasInit()) {
-            throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
+            throw new MissingOutputException("Output type without an init value: " + printer.visit(input));
         } else {
             var res = visit(input.getInit());
             if (res instanceof Dependency value && value.value() == null) {
                 return value;
             } else if (res instanceof String s && StringUtils.isBlank(s)) {
-                log.warn("Output declaration without an init value: " + printer.visit(input));
+                log.warn("Output type without an init value: " + printer.visit(input));
                 return NullValue.of();
             } else {
                 return res;
@@ -877,7 +876,7 @@ public final class Interpreter implements Visitor<Object> {
         Object value = null;
         if (context == SchemaContext.RESOURCE) {
             if (!expression.hasInit()) {
-                throw new InvalidInitException("Val declaration must be initialised: " + expression.getId().string() + " is null");
+                throw new InvalidInitException("Val type must be initialised: " + expression.getId().string() + " is null");
             }
         }
         if (expression.hasInit()) {// resource/schema can both have init but is only mandatory in the resource
