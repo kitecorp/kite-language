@@ -50,10 +50,10 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private Environment<Object> env;
     @Getter
-    private List<OutputDeclaration> outputs;
+    private final List<OutputDeclaration> outputs;
     private SchemaContext context;
     @Getter
-    private List<RuntimeException> errors;
+    private final List<RuntimeException> errors;
 
     public Interpreter() {
         this(new Environment<>());
@@ -250,7 +250,7 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(BlockExpression block) {
         Object res = NullValue.of();
-        var env = new Environment(this.env);
+        var env = new Environment<>(this.env);
         for (var it : block.getExpression()) {
             res = executeBlock(it, env);
         }
@@ -296,7 +296,7 @@ public final class Interpreter implements Visitor<Object> {
             case String left when rightBlock instanceof String right -> compare(op, left, right);
             case String left when rightBlock instanceof Number right -> compare(op, left, right);
             case Boolean left when rightBlock instanceof Boolean right -> compare(op, left, right);
-            case HashMap left when rightBlock instanceof HashMap right -> switch (op) {
+            case Map<?,?> left when rightBlock instanceof Map<?,?> right -> switch (op) {
                 case "==" -> Objects.equals(left, right);
                 case "!=" -> !Objects.equals(left, right);
                 default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
@@ -359,7 +359,7 @@ public final class Interpreter implements Visitor<Object> {
         // for function execution, use the clojured environment from the declared scope
         var declared = (FunValue) function.getClojure().lookup(function.name(), "Function not declared: %s".formatted(function.name()));
 
-        if (args.size() != declared.arity()) {
+        if (declared != null && args.size() != declared.arity()) {
             throw new RuntimeException("Expected %s arguments but got %d: %s".formatted(function.getParams().size(), args.size(), function.getName()));
         }
 
@@ -513,7 +513,7 @@ public final class Interpreter implements Visitor<Object> {
                 }
                 return resourceValue.lookup(propertyName);
             }
-            case Map map -> {
+            case Map<?,?> map -> {
                 return map.get(propertyName);
             }
             case null, default -> {
@@ -542,7 +542,7 @@ public final class Interpreter implements Visitor<Object> {
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
-        Environment typeEnvironment = installedSchema.getEnvironment();
+        var typeEnvironment = installedSchema.getEnvironment();
         setResourceName(resource);
         try {
             if (resource.isEvaluating()) {
@@ -678,8 +678,8 @@ public final class Interpreter implements Visitor<Object> {
 
     private Object ForWithRange(ForStatement statement) {
         var range = statement.getRange();
-        int min = range.getMinimum();
-        int max = range.getMaximum();
+        var min = range.getMinimum();
+        var max = range.getMaximum();
 
         // No iterations? Fast exits keep intent obvious.
         if (min >= max) {
@@ -961,8 +961,8 @@ public final class Interpreter implements Visitor<Object> {
         return executeBlock(statement.getStatement(), env);
     }
 
-    Object executeBlock(List<Statement> statements, Environment environment) {
-        Environment previous = this.env;
+    Object executeBlock(List<Statement> statements, Environment<Object> environment) {
+        Environment<Object> previous = this.env;
         try {
             this.env = environment;
             Object res = null;
@@ -975,8 +975,8 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    Object executeBlock(Expression expression, Environment environment) {
-        Environment previous = this.env;
+    Object executeBlock(Expression expression, Environment<Object> environment) {
+        Environment<Object> previous = this.env;
         try {
             this.env = environment;
             return Visitor.super.visit(expression);
@@ -985,8 +985,8 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    Object executeBlock(Statement statement, Environment environment) {
-        Environment previous = this.env;
+    Object executeBlock(Statement statement, Environment<Object> environment) {
+        Environment<Object> previous = this.env;
         try {
             this.env = environment;
             return visit(statement);
