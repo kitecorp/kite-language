@@ -2,6 +2,8 @@ package io.kite;
 
 public enum ContextStack {
     FUNCTION,
-    If
+    If,
+    Schema,
+    Resource,
 
 }
