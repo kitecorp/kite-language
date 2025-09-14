@@ -45,6 +45,9 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private final SyntaxPrinter printer;
     private final DeferredObservable deferredObservable;
+    /**
+     * Used to track where are we in the execution of the program. Are we in an for statement? or in a Schema declaration? in a resource declaration?
+     */
     private final Deque<ContextStack> contextStacks;
     @Getter
     private Environment<Object> env;
