@@ -11,6 +11,7 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
@@ -86,10 +87,23 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
                 .a(" ")
                 .a(visit(expression.getId()))
                 .a(" = ")
-                .a(expression.value())
+                .a(visit(expression.value()))
                 .a("\n")
                 .reset()
                 .toString();
+    }
+
+    private Object visit(Object value) {
+        return switch (value){
+          case Integer integer -> Ansi.ansi().fgCyan().a(visit(integer.intValue())).fgDefault().toString();
+          case Double doubleValue -> Ansi.ansi().fgCyan().a(visit(doubleValue.doubleValue())).fgDefault().toString();
+          case Float floatValue -> Ansi.ansi().fgCyan().a(visit(floatValue.floatValue())).fgDefault().toString();
+          case Boolean booleanValue -> Ansi.ansi().fgCyan().a(visit(booleanValue.booleanValue())).fgDefault().toString();
+          case String stringValue -> Ansi.ansi().fgGreen().a('"').a(visit(stringValue)).a('"').fgDefault().toString();
+          case List list -> list.stream().map(this::visit).collect(Collectors.joining(", ", "[", "]"));
+          case Map<?,?> map -> map.entrySet().stream().map(e -> visit(e.getKey()) + ": " + visit(e.getValue())).collect(Collectors.joining(", ", "{", "}"));
+          case null, default -> value;
+        };
     }
 
     @Override
@@ -343,7 +357,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(Identifier expression) {
         return switch (expression) {
             case ParameterIdentifier parameterIdentifier -> colorizeType(formatParameter(parameterIdentifier));
-            case ArrayTypeIdentifier arrayTypeIdentifier -> colorizeType(visit(arrayTypeIdentifier.getType()) + "[]");
+            case ArrayTypeIdentifier arrayTypeIdentifier -> colorizeType(visit(arrayTypeIdentifier.getType()));
             case TypeIdentifier identifier -> colorizeType(identifier.string());
             case null-> null;
             default -> expression.string();

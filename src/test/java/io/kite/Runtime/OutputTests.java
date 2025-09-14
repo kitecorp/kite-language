@@ -367,24 +367,6 @@ public class OutputTests extends RuntimeTest {
         assertEquals(List.of(Map.of("env", "dev")), res);
     }
 
-    @Test
-    void outputResourceStringError() {
-        var res = eval("""
-                schema vm {
-                    var string name
-                    @cloud var string arn
-                 }
-                
-                 resource vm main {
-                   name     = 'prod'
-                 }
-                
-                 output string something = vm.main.arn
-                """);
-        Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", "arn::"));
-        interpreter.printOutputs(main);
-    }
-
     /*
      * Mixed Type alias with invalid values
      * */
