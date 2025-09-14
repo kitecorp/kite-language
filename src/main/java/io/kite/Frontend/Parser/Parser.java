@@ -549,7 +549,11 @@ public class Parser {
     private TypeIdentifier TypeIdentifier() {
         if (context == SchemaContext.SCHEMA) {
             if (HasType()) { // type mandatory inside a schema. Init/default value is optional
-                return typeParser.identifier();
+                TypeIdentifier type = typeParser.identifier();
+                if (IsLookAhead(OpenBrackets)) {
+                    type = ArrayDeclaration(type);
+                }
+                return type;
             } else {
                 throw new RuntimeException("Type declaration expected during schema declaration: var " + printer.visit(Identifier()));
             }
@@ -779,11 +783,10 @@ public class Parser {
 
         var params = new ArrayList<SchemaProperty>();
         while (!IsLookAhead(CloseBraces)) {
-            if (IsLookAhead(lineTerminator) && eat(lineTerminator) != null) {
-                continue;
-            }
-            if (IsLookAhead(lineTerminator)) {
-                continue;
+            eatWhitespace();
+
+            if (IsLookAhead(CloseBraces)) {
+                break;
             }
             params.add(SchemaProperty());
         }
