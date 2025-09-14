@@ -841,6 +841,9 @@ public final class Interpreter implements Visitor<Object> {
             var res = visit(input.getInit());
             if (res instanceof Dependency value && value.value() == null) {
                 return value;
+            } else if (res instanceof String s && StringUtils.isBlank(s)) {
+                log.warn("Output declaration without an init value: " + printer.visit(input));
+                return NullValue.of();
             } else {
                 return res;
             }
