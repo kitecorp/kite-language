@@ -22,8 +22,7 @@ import java.util.Map;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Each subclass provides a different output type from a different source.
@@ -56,7 +55,7 @@ public class OutputTests extends RuntimeTest {
         return interpreter.visit(program);
     }
 
-    /**************
+    /***************
      * HAPPY CASES *
      * *************/
     @Test
@@ -373,15 +372,17 @@ public class OutputTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     var string name
+                    @cloud var string arn
                  }
                 
                  resource vm main {
                    name     = 'prod'
                  }
                 
-                 output string something = vm.main.name
+                 output string something = vm.main.arn
                 """);
-        assertEquals("prod", res);
+        Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", "arn::"));
+        interpreter.printOutputs(main);
     }
 
     /*

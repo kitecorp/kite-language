@@ -16,6 +16,7 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 public final class OutputDeclaration extends Statement implements DependencyHolder {
     private Identifier id;
     private Expression init;
+    private Object resolvedValue;
     private TypeIdentifier type;
 
     public OutputDeclaration() {
@@ -38,6 +39,10 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         this.id = (Identifier) id;
         this.init = init;
         this.type = type;
+    }
+
+    public Object value() {
+        return resolvedValue != null ? resolvedValue : init;
     }
 
     private OutputDeclaration(Expression id) {

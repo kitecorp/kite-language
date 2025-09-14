@@ -86,7 +86,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
                 .a(" ")
                 .a(visit(expression.getId()))
                 .a(" = ")
-                .a(visit(expression.getInit()))
+                .a(expression.value())
                 .a("\n")
                 .reset()
                 .toString();

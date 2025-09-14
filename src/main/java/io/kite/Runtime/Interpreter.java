@@ -523,12 +523,12 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private @NotNull String getSymbolIdentifier(MemberExpression expression) {
-        if (expression.getProperty() instanceof SymbolIdentifier resourceName) {
-            return resourceName.string();
-        } else if (expression.getProperty() instanceof StringLiteral literal) {
-            return literal.getValue();
-        }
-        throw new OperationNotImplementedException("Membership expression not implemented for: " + printer.visit(expression));
+        return switch (expression.getProperty()) {
+            case SymbolIdentifier identifier -> identifier.string();
+            case StringLiteral literal -> literal.getValue();
+            case null, default ->
+                    throw new OperationNotImplementedException("Membership expression not implemented for: " + printer.visit(expression));
+        };
     }
 
     @Override
@@ -838,8 +838,34 @@ public final class Interpreter implements Visitor<Object> {
         if (!input.hasInit()) {
             throw new MissingOutputException("Output declaration without an init value: " + printer.visit(input));
         } else {
-            return null;// we just care to save the outputs as all of them will be printed after resources have been created
+            var res = visit(input.getInit());
+            if (res instanceof Dependency value && value.value() == null) {
+                return value;
+            } else {
+                return res;
+            }
         }
+    }
+
+    public Object printOutputs(Map<String, Map<String, Object>> resources) {
+        Object value = null;
+        for (OutputDeclaration output : outputs) {
+            value = getObject(resources, output);
+            output.setResolvedValue(value);
+            System.out.println(printer.visit(output));
+        }
+        return value;
+    }
+
+    private Object getObject(Map<String, Map<String, Object>> resources, OutputDeclaration output) {
+        if (output.getInit() instanceof MemberExpression memberExpression) {
+            if (visit(output.getInit()) instanceof Dependency dependency) {
+                var resource = dependency.resource();
+                var propertyName = getSymbolIdentifier(memberExpression);
+                return resources.get(resource.getName()).get(propertyName);
+            }
+        }
+        return visit(output.getInit());
     }
 
     @Override
