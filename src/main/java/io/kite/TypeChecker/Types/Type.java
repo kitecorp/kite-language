@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.StringJoiner;
 
 public sealed abstract class Type extends Expression
-        permits FunType, ReferenceType, ValueType {
+        permits AnnotationType, FunType, ReferenceType, ValueType {
     @Getter
     @Setter
     private String value;
@@ -55,6 +55,10 @@ public sealed abstract class Type extends Expression
 
     public boolean hasValue() {
         return StringUtils.isNotBlank(value);
+    }
+
+    public String name() {
+        return getValue();
     }
 
 }

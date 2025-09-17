@@ -7,6 +7,8 @@ import io.kite.Runtime.Values.DependencyHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
@@ -18,6 +20,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     private Expression init;
     private Object resolvedValue;
     private TypeIdentifier type;
+    private List<AnnotationDeclaration> annotations;
 
     public OutputDeclaration() {
     }
@@ -41,12 +44,13 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         this.type = type;
     }
 
-    public Object value() {
-        return resolvedValue != null ? resolvedValue : init;
-    }
-
     private OutputDeclaration(Expression id) {
         this(id, null);
+    }
+
+    public OutputDeclaration(Expression id, TypeIdentifier type, Expression init, List<AnnotationDeclaration> annotations) {
+        this(id, type, init);
+        this.annotations = annotations;
     }
 
     public static OutputDeclaration output(Expression id, Expression init) {
@@ -81,6 +85,10 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         return new OutputDeclaration(id, type, init);
     }
 
+    public static OutputDeclaration output(Expression id, TypeIdentifier type, Expression init, List<AnnotationDeclaration> annotations) {
+        return new OutputDeclaration(id, type, init, annotations);
+    }
+
     public static OutputDeclaration output(Expression id, TypeIdentifier type) {
         return new OutputDeclaration(id, type);
     }
@@ -106,6 +114,10 @@ public final class OutputDeclaration extends Statement implements DependencyHold
 
     public static OutputDeclaration output(String id, TypeIdentifier type, boolean init) {
         return OutputDeclaration.output(Identifier.id(id), type, bool(init));
+    }
+
+    public Object value() {
+        return resolvedValue != null ? resolvedValue : init;
     }
 
     public String name() {
