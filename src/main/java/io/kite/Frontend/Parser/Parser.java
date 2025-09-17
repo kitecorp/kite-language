@@ -86,6 +86,11 @@ public class Parser {
      */
     private BlockContext blockContext;
     private Deque<ContextStack> contextStack = new ArrayDeque<>();
+    /**
+     * Parsed annotation before inputs/outputs. We need to know what was parsed previously before we reach an input/output
+     * This gets cleared after each input/output declaration.
+     */
+    private List<AnnotationDeclaration> annotations;
 
     public Parser(List<Token> tokens) {
         setTokens(tokens);
@@ -120,6 +125,9 @@ public class Parser {
         for (; iterator.hasNext(); eat()) {
             if (IsLookAhead(endTokenType)) { // need to check for EOF before doing any work
                 break;
+            }
+            if (IsLookAhead(NewLine)) {
+                continue;
             }
             Statement statement = Declaration();
             if (statement == null || statement instanceof EmptyStatement) {
@@ -604,6 +612,15 @@ public class Parser {
         return switch (lookAhead().type()) {
             case OpenBraces, Object -> ObjectExpression();
             case OpenBrackets -> ArrayExpression();
+            case AT -> {
+                // this gets reset after each output as the annotations will be added to the input/output
+                if (annotations == null) {
+                    annotations = new ArrayList<>();
+                }
+                var annotation = AnnotationDeclaration();
+                annotations.add(annotation);
+                yield annotation;
+            }
             default -> AssignmentExpression();
         };
     }
@@ -796,10 +813,8 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        AnnotationDeclaration annotation = null;
-        if (IsLookAhead(AT)) {
-            annotation = AnnotationDeclaration();
-        }
+        var annotation = AnnotationDeclaration();
+
         var type = TypeIdentifier();
         var id = Identifier();
         var init = IsLookAhead(lineTerminator, Comma, CloseBraces, EOF) ? null : PropertyInitializer();
@@ -823,6 +838,9 @@ public class Parser {
      * ;
      */
     private AnnotationDeclaration AnnotationDeclaration() {
+        if (!IsLookAhead(AT)) {
+            return null;
+        }
         eat(AT);
         var name = Identifier();
         if (IsLookAhead(OpenParenthesis)) {
@@ -1309,7 +1327,9 @@ public class Parser {
         } else {
             throw ParserErrors.error("Missing '=' after: output %s %s".formatted(type.string(), name.string()));
         }
-        return OutputDeclaration.output(name, type, body);
+        var res = OutputDeclaration.output(name, type, body, annotations);
+        annotations = null;
+        return res;
     }
 
     private Expression LeftHandSideExpression() {

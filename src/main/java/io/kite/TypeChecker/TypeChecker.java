@@ -27,6 +27,7 @@ public final class TypeChecker implements Visitor<Type> {
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
+    private TypeRegistry<AnnotationType> annotationTypeRegistry;
 
     public TypeChecker() {
         env = new TypeEnvironment();
