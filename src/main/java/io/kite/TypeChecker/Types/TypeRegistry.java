@@ -6,7 +6,7 @@ import java.util.Map;
 public class TypeRegistry<T extends Type> {
     private final Map<String, T> store ;
 
-    private TypeRegistry() {
+    public TypeRegistry() {
         store = new HashMap<>();
     }
 

@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.TypeChecker.Types.UnionType;
+import lombok.Getter;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +20,7 @@ import static java.util.Objects.requireNonNull;
 
 
 public non-sealed class SyntaxPrinter implements Visitor<String> {
+    @Getter
     private Ansi ansi = Ansi.ansi(50)
             .reset()
             .eraseScreen();
@@ -28,6 +30,14 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             return it.getName().string();
         }
         return it.getName().string() + " :" + it.getType().string();
+    }
+
+    private static String colorizeType(String t) {
+        return Ansi.ansi()
+                .fgBlue()
+                .a(t)
+                .fgDefault()
+                .toString();
     }
 
     public String print(Expression expr) {
@@ -79,6 +89,42 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(OutputDeclaration expression) {
+        if (!expression.getAnnotations().isEmpty()) {
+            for (AnnotationDeclaration annotation : expression.getAnnotations()) {
+                String string = annotation.getName().string();
+                if (string.equals("deprecated")) {
+                    return ansi.fgBrightYellow()
+                            .a("deprecated: ")
+                            .fgMagenta()
+                            .a("output ")
+                            .reset()
+                            .a(visit(expression.getType()))
+                            .fgDefault()
+                            .a(" ")
+                            .a(visit(expression.getId()))
+                            .a(" = ")
+                            .a(visit(expression.value()))
+                            .a("\n")
+                            .reset()
+                            .toString();
+                } else if (string.equals("sensitive")) {
+                    return ansi.fgMagenta()
+                            .a("output ")
+                            .reset()
+                            .a(visit(expression.getType()))
+                            .fgDefault()
+                            .a(" ")
+                            .a(visit(expression.getId()))
+                            .a(" = ")
+                            .fgBrightBlack()
+                            .a(Ansi.Attribute.ITALIC)
+                            .a("<sensitive value>")
+                            .a("\n")
+                            .reset()
+                            .toString();
+                }
+            }
+        }
         return ansi.fgMagenta()
                 .a("output ")
                 .reset()
@@ -94,15 +140,17 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     private Object visit(Object value) {
-        return switch (value){
-          case Integer integer -> Ansi.ansi().fgCyan().a(visit(integer.intValue())).fgDefault().toString();
-          case Double doubleValue -> Ansi.ansi().fgCyan().a(visit(doubleValue.doubleValue())).fgDefault().toString();
-          case Float floatValue -> Ansi.ansi().fgCyan().a(visit(floatValue.floatValue())).fgDefault().toString();
-          case Boolean booleanValue -> Ansi.ansi().fgCyan().a(visit(booleanValue.booleanValue())).fgDefault().toString();
-          case String stringValue -> Ansi.ansi().fgGreen().a('"').a(visit(stringValue)).a('"').fgDefault().toString();
-          case List list -> list.stream().map(this::visit).collect(Collectors.joining(", ", "[", "]"));
-          case Map<?,?> map -> map.entrySet().stream().map(e -> visit(e.getKey()) + ": " + visit(e.getValue())).collect(Collectors.joining(", ", "{", "}"));
-          case null, default -> value;
+        return switch (value) {
+            case Integer integer -> Ansi.ansi().fgCyan().a(visit(integer.intValue())).fgDefault().toString();
+            case Double doubleValue -> Ansi.ansi().fgCyan().a(visit(doubleValue.doubleValue())).fgDefault().toString();
+            case Float floatValue -> Ansi.ansi().fgCyan().a(visit(floatValue.floatValue())).fgDefault().toString();
+            case Boolean booleanValue ->
+                    Ansi.ansi().fgCyan().a(visit(booleanValue.booleanValue())).fgDefault().toString();
+            case String stringValue -> Ansi.ansi().fgGreen().a('"').a(visit(stringValue)).a('"').fgDefault().toString();
+            case List list -> list.stream().map(this::visit).collect(Collectors.joining(", ", "[", "]"));
+            case Map<?, ?> map ->
+                    map.entrySet().stream().map(e -> visit(e.getKey()) + ": " + visit(e.getValue())).collect(Collectors.joining(", ", "{", "}"));
+            case null, default -> value;
         };
     }
 
@@ -358,17 +406,9 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             case ParameterIdentifier parameterIdentifier -> colorizeType(formatParameter(parameterIdentifier));
             case ArrayTypeIdentifier arrayTypeIdentifier -> colorizeType(visit(arrayTypeIdentifier.getType()));
             case TypeIdentifier identifier -> colorizeType(identifier.string());
-            case null-> null;
+            case null -> null;
             default -> expression.string();
         };
-    }
-
-    private static String colorizeType(String t) {
-        return Ansi.ansi()
-                .fgBlue()
-                .a(t)
-                .fgDefault()
-                .toString();
     }
 
     @Override

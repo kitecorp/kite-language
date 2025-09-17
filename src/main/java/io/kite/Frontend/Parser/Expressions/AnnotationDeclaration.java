@@ -11,6 +11,7 @@ public final class AnnotationDeclaration extends Expression {
     private Identifier value;
     private ArrayExpression args; // for positional args
     private ObjectExpression object; // for named args
+    private Object target;
 
     public AnnotationDeclaration() {
     }
