@@ -89,54 +89,42 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(OutputDeclaration expression) {
-        if (!expression.getAnnotations().isEmpty()) {
-            for (AnnotationDeclaration annotation : expression.getAnnotations()) {
-                String string = annotation.getName().string();
-                if (string.equals("deprecated")) {
-                    return ansi.fgBrightYellow()
-                            .a("deprecated: ")
-                            .fgMagenta()
-                            .a("output ")
-                            .reset()
-                            .a(visit(expression.getType()))
-                            .fgDefault()
-                            .a(" ")
-                            .a(visit(expression.getId()))
-                            .a(" = ")
-                            .a(visit(expression.value()))
-                            .a("\n")
-                            .reset()
-                            .toString();
-                } else if (string.equals("sensitive")) {
-                    return ansi.fgMagenta()
-                            .a("output ")
-                            .reset()
-                            .a(visit(expression.getType()))
-                            .fgDefault()
-                            .a(" ")
-                            .a(visit(expression.getId()))
-                            .a(" = ")
-                            .fgBrightBlack()
-                            .a(Ansi.Attribute.ITALIC)
-                            .a("<sensitive value>")
-                            .a("\n")
-                            .reset()
-                            .toString();
-                }
+        boolean isDeprecated = false;
+        boolean isSensitive  = false;
+
+        // 1) Collect annotation flags (order-independent)
+        for (var a : expression.getAnnotations()) {
+            switch (a.getName().string()) {
+                case "deprecated" -> isDeprecated = true;
+                case "sensitive"  -> isSensitive  = true;
+                // default: ignore or record unknowns
             }
         }
-        return ansi.fgMagenta()
-                .a("output ")
-                .reset()
-                .a(visit(expression.getType()))
-                .fgDefault()
-                .a(" ")
-                .a(visit(expression.getId()))
-                .a(" = ")
-                .a(visit(expression.value()))
-                .a("\n")
-                .reset()
-                .toString();
+
+        // 2) Build once, applying styles based on flags
+        var ansi = Ansi.ansi();
+
+        if (isDeprecated) {
+            ansi.fgBrightYellow()
+                    .a("deprecated: ")
+                    .reset();
+        }
+
+        ansi.fgMagenta().a("output ").reset()
+                .a(visit(expression.getType())).a(" ")
+                .a(visit(expression.getId())).a(" = ");
+
+        if (isSensitive) {
+            // mask, don’t print the actual value
+            ansi.fgBrightBlack().a(Ansi.Attribute.ITALIC)
+                    .a("<sensitive value>")
+                    .reset();
+        } else {
+            ansi.a(visit(expression.value()));
+        }
+
+        ansi.a("\n").reset();
+        return ansi.toString();
     }
 
     private Object visit(Object value) {
