@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Runtime.Values.DependencyHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     private Expression init;
     private Object resolvedValue;
     private TypeIdentifier type;
-    private List<AnnotationDeclaration> annotations;
+    @Nullable private List<AnnotationDeclaration> annotations;
 
     public OutputDeclaration() {
     }

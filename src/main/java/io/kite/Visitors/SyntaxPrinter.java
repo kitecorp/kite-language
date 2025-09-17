@@ -93,11 +93,13 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         boolean isSensitive  = false;
 
         // 1) Collect annotation flags (order-independent)
-        for (var a : expression.getAnnotations()) {
-            switch (a.getName().string()) {
-                case "deprecated" -> isDeprecated = true;
-                case "sensitive"  -> isSensitive  = true;
-                // default: ignore or record unknowns
+        if (expression.getAnnotations() != null) {
+            for (var a : expression.getAnnotations()) {
+                switch (a.getName().string()) {
+                    case "deprecated" -> isDeprecated = true;
+                    case "sensitive" -> isSensitive = true;
+                    // default: ignore or record unknowns
+                }
             }
         }
 
