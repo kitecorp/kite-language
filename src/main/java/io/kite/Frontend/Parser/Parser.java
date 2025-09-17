@@ -1328,8 +1328,10 @@ public class Parser {
             throw ParserErrors.error("Missing '=' after: output %s %s".formatted(type.string(), name.string()));
         }
         var res = OutputDeclaration.output(name, type, body, annotations);
-        for (AnnotationDeclaration annotation : annotations) {
-            annotation.setTarget(res);
+        if (annotations != null) {
+            for (AnnotationDeclaration annotation : annotations) {
+                annotation.setTarget(res);
+            }
         }
         annotations = null;
         return res;
