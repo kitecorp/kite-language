@@ -852,18 +852,19 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    public Object printOutputs(Map<String, Map<String, Object>> resources) {
-        Object value = null;
+    public String printOutputs(Map<String, Map<String, Object>> resources) {
+        String value = null;
         System.out.println(Ansi.ansi().a(Ansi.Attribute.INTENSITY_BOLD).a("Final Outputs:").toString());
         for (OutputDeclaration output : outputs) {
-            value = getObject(resources, output);
-            output.setResolvedValue(value);
-            System.out.println(printer.visit(output));
+            var object = resolveResource(resources, output);
+            output.setResolvedValue(object);
+            value = printer.visit(output);
+            System.out.println(value);
         }
         return value;
     }
 
-    private Object getObject(Map<String, Map<String, Object>> resources, OutputDeclaration output) {
+    private Object resolveResource(Map<String, Map<String, Object>> resources, OutputDeclaration output) {
         if (output.getInit() instanceof MemberExpression memberExpression) {
             if (visit(output.getInit()) instanceof Dependency dependency) {
                 var resource = dependency.resource();

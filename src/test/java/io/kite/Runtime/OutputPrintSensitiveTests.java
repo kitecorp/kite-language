@@ -6,6 +6,7 @@ import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.TypeChecker.TypeChecker;
+import io.kite.tool.JansiHelper;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +58,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", "arn::"));
         var value = interpreter.printOutputs(main);
-        assertEquals("arn::", value);
+        assertEquals("output string something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -72,11 +73,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output number something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 10));
         var value = interpreter.printOutputs(main);
-        assertEquals(10, value);
+        assertEquals("output number something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -91,11 +93,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output number something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 0.2));
         var value = interpreter.printOutputs(main);
-        assertEquals(0.2, value);
+        assertEquals("output number something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -109,12 +112,13 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  resource vm main {
                    name     = 'prod'
                  }
-                
+
+                @sensitive
                  output boolean something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", true));
         var value = interpreter.printOutputs(main);
-        assertEquals(true, value);
+        assertEquals("output boolean something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -129,11 +133,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output boolean something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
-        assertEquals(false, value);
+        assertEquals("output boolean something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -148,11 +153,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
-        assertEquals(false, value);
+        assertEquals("output any something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -167,11 +173,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
-        assertEquals(false, value);
+        assertEquals("output any something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -186,11 +193,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", "arn::"));
         var value = interpreter.printOutputs(main);
-        assertEquals("arn::", value);
+        assertEquals("output any something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -205,11 +213,13 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 10));
         var value = interpreter.printOutputs(main);
-        assertEquals(10, value);
+        assertEquals("output any something = <sensitive value>", JansiHelper.strip(value));
+
     }
 
     @Test
@@ -224,11 +234,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 0.2));
         var value = interpreter.printOutputs(main);
-        assertEquals(0.2, value);
+        assertEquals("output any something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -243,11 +254,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(10)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(10), value);
+        assertEquals("output any[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -262,11 +274,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(0.2)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(0.2), value);
+        assertEquals("output any[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -281,11 +294,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of("hello")));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of("hello"), value);
+        assertEquals("output any[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -300,11 +314,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(true)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(true), value);
+        assertEquals("output any[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -319,11 +334,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output any[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(false)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(false), value);
+        assertEquals("output any[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -338,11 +354,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output number[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(10)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(10), value);
+        assertEquals("output number[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -357,11 +374,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output number[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(0.2)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(0.2), value);
+        assertEquals("output number[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -376,11 +394,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output boolean[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(true)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(true), value);
+        assertEquals("output boolean[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -395,11 +414,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output boolean[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(false)));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(false), value);
+        assertEquals("output boolean[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -414,11 +434,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output string[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of("arn::")));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of("arn::"), value);
+        assertEquals("output string[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -433,11 +454,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                    name     = 'prod'
                  }
                 
+                @sensitive
                  output object something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", Map.of("env", "dev")));
         var value = interpreter.printOutputs(main);
-        assertEquals(Map.of("env", "dev"), value);
+        assertEquals("output object something = <sensitive value>", JansiHelper.strip(value));
     }
 
     @Test
@@ -450,11 +472,12 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  resource vm main {
                  }
                 
+                @sensitive
                  output object[] something = vm.main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(Map.of("env", "dev"))));
         var value = interpreter.printOutputs(main);
-        assertEquals(List.of(Map.of("env", "dev")), value);
+        assertEquals("output object[] something = <sensitive value>", JansiHelper.strip(value));
     }
 
 
