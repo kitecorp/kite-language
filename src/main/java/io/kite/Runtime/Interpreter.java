@@ -26,6 +26,7 @@ import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +54,7 @@ public final class Interpreter implements Visitor<Object> {
     private Environment<Object> env;
     @Getter
     private final List<OutputDeclaration> outputs;
+    private final Deque<AnnotationDeclaration> annotations;
     @Getter
     private final List<RuntimeException> errors;
 
@@ -68,6 +70,7 @@ public final class Interpreter implements Visitor<Object> {
         this.callstack = new ArrayDeque<>();
         this.contextStacks = new ArrayDeque<>();
         this.errors = new ArrayList<>();
+        this.annotations = new ArrayDeque<>();
 
         this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
@@ -851,6 +854,7 @@ public final class Interpreter implements Visitor<Object> {
 
     public Object printOutputs(Map<String, Map<String, Object>> resources) {
         Object value = null;
+        System.out.println(Ansi.ansi().a(Ansi.Attribute.INTENSITY_BOLD).a("Final Outputs:").toString());
         for (OutputDeclaration output : outputs) {
             value = getObject(resources, output);
             output.setResolvedValue(value);
@@ -913,7 +917,7 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
-        throw new RuntimeException("Annotations are not yet supported");
+        return expression.getValue();
     }
 
     @Override
