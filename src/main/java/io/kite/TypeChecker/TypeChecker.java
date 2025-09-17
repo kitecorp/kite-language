@@ -27,7 +27,7 @@ public final class TypeChecker implements Visitor<Type> {
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
-    private TypeRegistry<AnnotationType> annotationRegistry;
+    private TypeEnvironment annotationRepository;
 
     public TypeChecker() {
         this(new TypeEnvironment());
@@ -35,8 +35,8 @@ public final class TypeChecker implements Visitor<Type> {
 
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
-        this.annotationRegistry = new TypeRegistry<>();
-        this.env.init("sensitive", AnnotationType.annotation("sensitive", AnnotationType.Target.INPUT, AnnotationType.Target.OUTPUT));
+        this.annotationRepository = new TypeEnvironment();
+        this.annotationRepository.init("sensitive", AnnotationType.annotation("sensitive", AnnotationType.Target.INPUT, AnnotationType.Target.OUTPUT));
     }
 
     /**
@@ -848,16 +848,14 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     @Override
-    public Type visit(AnnotationDeclaration expression) {
-        if (expression.getValue() != null) {
-            return visit(expression.getValue());
-        } else if (expression.getArgs() != null) {
-            return visit(expression.getArgs());
-        } else if (expression.getObject() != null) {
-            return visit(expression.getObject());
-        } else {
-            return visit(expression.getName());
+    public Type visit(AnnotationDeclaration declaration) {
+        var annotation = annotationRepository.get(declaration.name());
+        if (annotation == null || annotation.getKind() != SystemType.ANNOTATION) {
+            throw new TypeError("Unknown annotation `%s`".formatted(declaration.name()));
         }
+
+
+        return ValueType.Void;
     }
 
     private Type validatePropertyIsString(Expression key) {
