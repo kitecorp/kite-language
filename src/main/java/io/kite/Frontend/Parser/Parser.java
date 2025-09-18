@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -170,10 +171,10 @@ public class Parser {
             if (error instanceof ParseError parseError && parseError.getActual() != null) {
                 String message = error.getMessage() + parseError.getActual().raw();
 //                ParserErrors.error(message);
-                log.error(message);
+                System.out.println(Ansi.ansi().fgRed().a(message).reset().toString());
             } else {
 //                ParserErrors.error(error.getMessage());
-                log.error(error.getMessage());
+                System.out.println(Ansi.ansi().fgRed().a(error.getMessage()).reset().toString());
             }
             iterator.synchronize();
             return null;
