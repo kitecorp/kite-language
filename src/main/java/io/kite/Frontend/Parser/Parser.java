@@ -87,11 +87,6 @@ public class Parser {
      */
     private BlockContext blockContext;
     private Deque<ContextStack> contextStack = new ArrayDeque<>();
-    /**
-     * Parsed annotation before inputs/outputs. We need to know what was parsed previously before we reach an input/output
-     * This gets cleared after each input/output declaration.
-     */
-    private List<AnnotationDeclaration> annotations;
 
     public Parser(List<Token> tokens) {
         setTokens(tokens);
@@ -130,11 +125,10 @@ public class Parser {
             if (IsLookAhead(NewLine)) {
                 continue;
             }
-            Set<AnnotationDeclaration> annotation = Set.of();
-            if (IsLookAhead(AT)) {
-                annotation = AnnotationDeclaration();
-            }
-            Statement statement = Declaration(annotation);
+
+            var annotations = AnnotationDeclaration();// extract the annotations
+
+            Statement statement = Declaration(annotations);
             if (statement == null || statement instanceof EmptyStatement) {
                 if (iterator.hasNext()) {
                     continue;
@@ -807,7 +801,7 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        var annotation = AnnotationDeclaration();
+        var annotation = AnnotationList();
 
         var type = TypeIdentifier();
         var id = Identifier();
@@ -832,13 +826,21 @@ public class Parser {
      * ;
      */
     private Set<AnnotationDeclaration> AnnotationDeclaration() {
-        var list = new HashSet<AnnotationDeclaration>();
+        Set<AnnotationDeclaration> res = Set.of();
+        if (IsLookAhead(AT)) {
+            res = AnnotationList();
+        }
+        return res;
+    }
+
+    private Set<AnnotationDeclaration> AnnotationList() {
+        var set = new HashSet<AnnotationDeclaration>(1, 1.0f);
         while (IsLookAhead(AT) && !IsLookAhead(EOF, NewLine)) {
             var annotation = getAnnotationDeclarations();
-            list.add(annotation);
+            set.add(annotation);
             eatWhitespace();
         }
-        return list;
+        return set;
     }
 
     private AnnotationDeclaration getAnnotationDeclarations() {
