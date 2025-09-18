@@ -801,7 +801,7 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        var annotation = AnnotationList();
+        var annotation = AnnotationDeclaration();
 
         var type = TypeIdentifier();
         var id = Identifier();
@@ -826,11 +826,9 @@ public class Parser {
      * ;
      */
     private Set<AnnotationDeclaration> AnnotationDeclaration() {
-        Set<AnnotationDeclaration> res = Set.of();
-        if (IsLookAhead(AT)) {
-            res = AnnotationList();
-        }
-        return res;
+        if (!IsLookAhead(AT)) return Set.of(); //efficient empty set
+
+        return AnnotationList();
     }
 
     private Set<AnnotationDeclaration> AnnotationList() {
