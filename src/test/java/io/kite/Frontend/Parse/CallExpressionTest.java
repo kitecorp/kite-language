@@ -23,7 +23,7 @@ public class CallExpressionTest extends ParserTest {
         var expected = Program.of(ExpressionStatement.expressionStatement(
                 CallExpression.call("foo", "x")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -32,7 +32,7 @@ public class CallExpressionTest extends ParserTest {
         var expected = Program.of(ExpressionStatement.expressionStatement(
                 CallExpression.call("foo", 2)));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -41,7 +41,7 @@ public class CallExpressionTest extends ParserTest {
         var expected = Program.of(ExpressionStatement.expressionStatement(
                 CallExpression.call("foo", 2.2)));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class CallExpressionTest extends ParserTest {
         var expected = Program.of(ExpressionStatement.expressionStatement(
                 CallExpression.call("foo", "x","y")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class CallExpressionTest extends ParserTest {
         var expected = Program.of(ExpressionStatement.expressionStatement(
                 CallExpression.call(CallExpression.call("foo", "x"), Collections.emptyList())));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class CallExpressionTest extends ParserTest {
         var expected = Program.of(ExpressionStatement.expressionStatement(
                 CallExpression.call(CallExpression.call("foo", "x"), "y")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class CallExpressionTest extends ParserTest {
         ));
 
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 

@@ -35,7 +35,7 @@ public class FunTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FunTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class FunTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class FunTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class FunTest extends ParserTest {
                 """);
         var expected = program(fun("square", block()));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 

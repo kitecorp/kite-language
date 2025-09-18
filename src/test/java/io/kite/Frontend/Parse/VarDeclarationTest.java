@@ -26,7 +26,7 @@ public class VarDeclarationTest extends ParserTest {
         var res = parse("var x");
         var expected = program(statement(var("x")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("y")
                 ));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("x", 2)
                 ));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("y", 2)
                 ));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("y", 2)
                 ));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("y", 2))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("y", bool(false)))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("x", nullLiteral()))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("y", 2))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     /**
@@ -144,7 +144,7 @@ public class VarDeclarationTest extends ParserTest {
                 expressionStatement(AssignmentExpression.assign("x", "hello"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test

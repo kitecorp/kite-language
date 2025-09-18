@@ -30,7 +30,7 @@ public class ArrayTest extends ParserTest {
                 statement(var("z", array(id("x"), id("y"))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     /**
@@ -54,7 +54,7 @@ public class ArrayTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     /**
@@ -78,6 +78,6 @@ public class ArrayTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 }
