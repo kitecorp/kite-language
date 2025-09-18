@@ -7,6 +7,8 @@ import io.kite.Runtime.Values.DependencyHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Set;
+
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
@@ -16,8 +18,10 @@ public final class VarDeclaration extends Expression implements DependencyHolder
     private Identifier id;
     private Expression init;
     private TypeIdentifier type;
+    private Set<AnnotationDeclaration> annotations;
 
     public VarDeclaration() {
+        this.annotations = Set.of();
     }
 
     private VarDeclaration(Expression id, Expression init) {
@@ -39,8 +43,19 @@ public final class VarDeclaration extends Expression implements DependencyHolder
         this.type = type;
     }
 
+    private VarDeclaration(Expression id, TypeIdentifier type, Expression init, AnnotationDeclaration... annotations) {
+        this(annotations);
+        this.id = (Identifier) id;
+        this.init = init;
+        this.type = type;
+    }
+
     private VarDeclaration(Expression id) {
         this(id, null);
+    }
+
+    public VarDeclaration(AnnotationDeclaration... annotations) {
+        this.annotations = Set.of(annotations);
     }
 
     public static VarDeclaration of(Expression id, Expression init) {
@@ -79,6 +94,10 @@ public final class VarDeclaration extends Expression implements DependencyHolder
         return new VarDeclaration(id, type, init);
     }
 
+    public static VarDeclaration of(Expression id, TypeIdentifier type, Expression init, AnnotationDeclaration... annotations) {
+        return new VarDeclaration(id, type, init, annotations);
+    }
+
     public static VarDeclaration of(Expression id, TypeIdentifier type) {
         return new VarDeclaration(id, type);
     }
@@ -104,6 +123,10 @@ public final class VarDeclaration extends Expression implements DependencyHolder
 
     public static VarDeclaration var(String id, TypeIdentifier type, Expression init) {
         return VarDeclaration.of(Identifier.id(id), type, init);
+    }
+
+    public static VarDeclaration var(String id, TypeIdentifier type, Expression init, AnnotationDeclaration... annotations) {
+        return VarDeclaration.of(Identifier.id(id), type, init, annotations);
     }
 
     public static VarDeclaration var(String id, TypeIdentifier type, int init) {
