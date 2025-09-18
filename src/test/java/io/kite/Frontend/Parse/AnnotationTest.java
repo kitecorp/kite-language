@@ -1,5 +1,6 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +17,7 @@ import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 
 @Log4j2
@@ -53,6 +55,18 @@ public class AnnotationTest extends ParserTest {
                 """);
         var program = program(
                 input("something", type("string"), 10, annotation("annotation"))
+        );
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationResource() {
+        var res = parse("""
+                @annotation
+                resource vm something { }
+                """);
+        var program = program(
+                ResourceExpression.resource(type("vm"), symbol("something"), Set.of(annotation("annotation")), block())
         );
         Assertions.assertEquals(program, res);
     }

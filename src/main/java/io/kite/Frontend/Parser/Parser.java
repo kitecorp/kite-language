@@ -157,7 +157,7 @@ public class Parser {
                 case Fun -> FunctionDeclaration();
                 case Type -> TypeDeclaration();
                 case Schema -> SchemaDeclaration();
-                case Existing, Resource -> ResourceDeclaration();
+                case Existing, Resource -> ResourceDeclaration(annotations);
                 case Component -> ComponentDeclaration();
                 case Input -> InputDeclaration(annotations);
                 case Output -> OutputDeclaration(annotations);
@@ -275,7 +275,7 @@ public class Parser {
 
         Statement body = null;
         if (IsLookAhead(Resource, Existing)) {
-            body = ResourceDeclaration();
+            body = ResourceDeclaration(Set.of());
         } else {
             body = ForBody();
         }
@@ -1180,7 +1180,7 @@ public class Parser {
      * : '}'
      * ;
      */
-    private Statement ResourceDeclaration() {
+    private Statement ResourceDeclaration(Set<AnnotationDeclaration> annotations) {
         if (contextStack.contains(ContextStack.FUNCTION)) {
             throw ParserErrors.error("Resource type not allowed in function body: ", lookAhead(), lookAhead().type());
         }

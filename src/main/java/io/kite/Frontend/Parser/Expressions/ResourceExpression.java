@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 public final class ResourceExpression extends Statement implements DeferredObserverValue {
@@ -25,6 +26,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private boolean existing;
     private ResourceValue value;
     private Object index;
+    private Set<AnnotationDeclaration> annotations;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -70,6 +72,14 @@ public final class ResourceExpression extends Statement implements DeferredObser
         this.block = block;
     }
 
+    private ResourceExpression(Identifier type, Identifier name, Set<AnnotationDeclaration> annotation, BlockExpression block) {
+        this();
+        this.type = type;
+        this.name = name;
+        this.block = block;
+        this.annotations = annotation;
+    }
+
     private ResourceExpression(boolean existing, Identifier type, Identifier name, BlockExpression block) {
         this();
         this.type = type;
@@ -79,6 +89,10 @@ public final class ResourceExpression extends Statement implements DeferredObser
     }
 
     public static Statement resource(Identifier type, Identifier name, BlockExpression block) {
+        return new ResourceExpression(type, name, block);
+    }
+
+    public static Statement resource(Identifier type, Identifier name, Set<AnnotationDeclaration> annotation, BlockExpression block) {
         return new ResourceExpression(type, name, block);
     }
 
