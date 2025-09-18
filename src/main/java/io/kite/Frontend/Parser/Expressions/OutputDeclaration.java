@@ -117,7 +117,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         return OutputDeclaration.output(Identifier.id(id), type, bool(init));
     }
 
-    public Object value() {
+    public Object resolvedValue() {
         return resolvedValue != null ? resolvedValue : init;
     }
 

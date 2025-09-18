@@ -122,7 +122,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
                     .a("<sensitive value>")
                     .reset();
         } else {
-            ansi.a(visit(expression.value()));
+            ansi.a(visit(expression.resolvedValue()));
         }
 
         ansi.a("\n").reset();
