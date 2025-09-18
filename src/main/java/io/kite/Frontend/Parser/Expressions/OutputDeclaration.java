@@ -7,7 +7,6 @@ import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Values.DependencyHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -23,11 +22,10 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     private Expression init;
     private Object resolvedValue;
     private TypeIdentifier type;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @Nullable private Set<AnnotationDeclaration> annotations;
 
     public OutputDeclaration() {
+        annotations = Set.of();
     }
 
     private OutputDeclaration(Expression id, Expression init) {

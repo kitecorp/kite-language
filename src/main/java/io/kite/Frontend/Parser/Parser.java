@@ -1328,9 +1328,7 @@ public class Parser {
         } else {
             throw ParserErrors.error("Missing '=' after: output %s %s".formatted(type.string(), name.string()));
         }
-        var res = OutputDeclaration.output(name, type, body, annotations);
-        annotations.forEach(annotation -> annotation.setTarget(res));
-        return res;
+        return OutputDeclaration.output(name, type, body, annotations);
     }
 
     private Expression LeftHandSideExpression() {

@@ -2,19 +2,13 @@ package io.kite.Frontend.Parser.Expressions;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.builder.ToStringExclude;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public final class AnnotationDeclaration extends Expression {
+public final class AnnotationDeclaration {
     private Identifier name;
     private Identifier value;
     private ArrayExpression args; // for positional args
     private ObjectExpression object; // for named args
-    @EqualsAndHashCode.Exclude
-    @ToStringExclude
-    private Object target;
 
     public AnnotationDeclaration() {
     }
