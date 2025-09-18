@@ -161,7 +161,7 @@ public class Parser {
                 case Component -> ComponentDeclaration();
                 case Input -> InputDeclaration();
                 case Output -> OutputDeclaration(annotations);
-                case Var -> VarDeclarations();
+                case Var -> VarDeclarations(annotations);
 //                case Val -> ValDeclarations();
                 default -> Statement();
             };
@@ -328,9 +328,9 @@ public class Parser {
      * : var VarDeclarations LineTerminator
      * ;
      */
-    private Statement VarDeclarations() {
+    private Statement VarDeclarations(Set<AnnotationDeclaration> annotations) {
         eat(Var);
-        var statement = VarStatementInit();
+        var statement = VarStatementInit(annotations);
         return statement;
     }
 
@@ -359,8 +359,8 @@ public class Parser {
      * VarStatementInit
      * : var VarStatements ";"
      */
-    private Statement VarStatementInit() {
-        var declarations = VarDeclarationList();
+    private Statement VarStatementInit(Set<AnnotationDeclaration> annotations) {
+        var declarations = VarDeclarationList(annotations);
         return varStatement(declarations);
     }
 
@@ -497,10 +497,12 @@ public class Parser {
      * | VarDeclarationList , VarDeclaration
      * ;
      */
-    private List<VarDeclaration> VarDeclarationList() {
+    private List<VarDeclaration> VarDeclarationList(Set<AnnotationDeclaration> annotations) {
         var declarations = new ArrayList<VarDeclaration>();
         do {
-            declarations.add(VarDeclaration());
+            var e = VarDeclaration();
+            e.setAnnotations(annotations);
+            declarations.add(e);
         } while (IsLookAhead(Comma) && eat(Comma) != null);
         return declarations;
     }
