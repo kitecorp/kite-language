@@ -130,7 +130,11 @@ public class Parser {
             if (IsLookAhead(NewLine)) {
                 continue;
             }
-            Statement statement = Declaration();
+            Set<AnnotationDeclaration> annotation = Set.of();
+            if (IsLookAhead(AT)) {
+                annotation = AnnotationDeclaration();
+            }
+            Statement statement = Declaration(annotation);
             if (statement == null || statement instanceof EmptyStatement) {
                 if (iterator.hasNext()) {
                     continue;
@@ -153,7 +157,7 @@ public class Parser {
         return statementList;
     }
 
-    private Statement Declaration() {
+    private Statement Declaration(Set<AnnotationDeclaration> annotations) {
         try {
             return switch (lookAhead().type()) {
                 case Fun -> FunctionDeclaration();
@@ -162,7 +166,7 @@ public class Parser {
                 case Existing, Resource -> ResourceDeclaration();
                 case Component -> ComponentDeclaration();
                 case Input -> InputDeclaration();
-                case Output -> OutputDeclaration();
+                case Output -> OutputDeclaration(annotations);
                 case Var -> VarDeclarations();
 //                case Val -> ValDeclarations();
                 default -> Statement();
@@ -170,10 +174,8 @@ public class Parser {
         } catch (RuntimeException error) {
             if (error instanceof ParseError parseError && parseError.getActual() != null) {
                 String message = error.getMessage() + parseError.getActual().raw();
-//                ParserErrors.error(message);
                 System.out.println(Ansi.ansi().fgRed().a(message).reset().toString());
             } else {
-//                ParserErrors.error(error.getMessage());
                 System.out.println(Ansi.ansi().fgRed().a(error.getMessage()).reset().toString());
             }
             iterator.synchronize();
@@ -613,15 +615,6 @@ public class Parser {
         return switch (lookAhead().type()) {
             case OpenBraces, Object -> ObjectExpression();
             case OpenBrackets -> ArrayExpression();
-            case AT -> {
-                // this gets reset after each output as the annotations will be added to the input/output
-                if (annotations == null) {
-                    annotations = new ArrayList<>();
-                }
-                var annotation = AnnotationDeclaration();
-                annotations.add(annotation);
-                yield annotation;
-            }
             default -> AssignmentExpression();
         };
     }
@@ -838,10 +831,17 @@ public class Parser {
      * : '@' Identifier ( '(' ArgList ')' )?
      * ;
      */
-    private AnnotationDeclaration AnnotationDeclaration() {
-        if (!IsLookAhead(AT)) {
-            return null;
+    private Set<AnnotationDeclaration> AnnotationDeclaration() {
+        var list = new HashSet<AnnotationDeclaration>();
+        while (IsLookAhead(AT) && !IsLookAhead(EOF, NewLine)) {
+            var annotation = getAnnotationDeclarations();
+            list.add(annotation);
+            eatWhitespace();
         }
+        return list;
+    }
+
+    private AnnotationDeclaration getAnnotationDeclarations() {
         eat(AT);
         var name = Identifier();
         if (IsLookAhead(OpenParenthesis)) {
@@ -1314,7 +1314,7 @@ public class Parser {
         return InputDeclaration.input(name, type, body);
     }
 
-    private Statement OutputDeclaration() {
+    private Statement OutputDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Output);
         var type = TypeIdentifier();
         var name = Identifier();
@@ -1329,12 +1329,7 @@ public class Parser {
             throw ParserErrors.error("Missing '=' after: output %s %s".formatted(type.string(), name.string()));
         }
         var res = OutputDeclaration.output(name, type, body, annotations);
-        if (annotations != null) {
-            for (AnnotationDeclaration annotation : annotations) {
-                annotation.setTarget(res);
-            }
-        }
-        annotations = null;
+        annotations.forEach(annotation -> annotation.setTarget(res));
         return res;
     }
 

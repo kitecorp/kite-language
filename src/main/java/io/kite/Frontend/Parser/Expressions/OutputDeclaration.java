@@ -3,12 +3,14 @@ package io.kite.Frontend.Parser.Expressions;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Values.DependencyHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Set;
 
 import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
@@ -16,12 +18,14 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class OutputDeclaration extends Statement implements DependencyHolder {
+public final class OutputDeclaration extends Statement implements DependencyHolder, Annotatable {
     private Identifier id;
     private Expression init;
     private Object resolvedValue;
     private TypeIdentifier type;
-    @Nullable private List<AnnotationDeclaration> annotations;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Nullable private Set<AnnotationDeclaration> annotations;
 
     public OutputDeclaration() {
     }
@@ -49,7 +53,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         this(id, null);
     }
 
-    public OutputDeclaration(Expression id, TypeIdentifier type, Expression init, List<AnnotationDeclaration> annotations) {
+    public OutputDeclaration(Expression id, TypeIdentifier type, Expression init, Set<AnnotationDeclaration> annotations) {
         this(id, type, init);
         this.annotations = annotations;
     }
@@ -86,7 +90,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         return new OutputDeclaration(id, type, init);
     }
 
-    public static OutputDeclaration output(Expression id, TypeIdentifier type, Expression init, List<AnnotationDeclaration> annotations) {
+    public static OutputDeclaration output(Expression id, TypeIdentifier type, Expression init, Set<AnnotationDeclaration> annotations) {
         return new OutputDeclaration(id, type, init, annotations);
     }
 
