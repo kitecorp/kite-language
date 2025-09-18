@@ -6,6 +6,8 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Set;
+
 import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
@@ -16,8 +18,10 @@ public final class InputDeclaration extends Statement {
     private Identifier id;
     private Expression init;
     private TypeIdentifier type;
+    private Set<AnnotationDeclaration> annotations;
 
     public InputDeclaration() {
+        this.annotations = Set.of();
     }
 
     private InputDeclaration(Expression id, Expression init) {
@@ -37,6 +41,21 @@ public final class InputDeclaration extends Statement {
         this.id = (Identifier) id;
         this.init = init;
         this.type = type;
+    }
+
+    private InputDeclaration(Expression id, TypeIdentifier type, Expression init, AnnotationDeclaration... annotations) {
+        this();
+        this.id = (Identifier) id;
+        this.init = init;
+        this.type = type;
+        this.annotations = Set.of(annotations);
+    }
+    private InputDeclaration(Expression id, TypeIdentifier type, Expression init, Set<AnnotationDeclaration> annotations) {
+        this();
+        this.id = (Identifier) id;
+        this.init = init;
+        this.type = type;
+        this.annotations = annotations;
     }
 
     private InputDeclaration(Expression id) {
@@ -93,6 +112,9 @@ public final class InputDeclaration extends Statement {
     public static InputDeclaration input(String id, TypeIdentifier type, int init) {
         return InputDeclaration.input(Identifier.id(id), type, number(init));
     }
+    public static InputDeclaration input(String id, TypeIdentifier type, int init, AnnotationDeclaration... annotations) {
+        return new InputDeclaration(Identifier.id(id), type, number(init), annotations);
+    }
 
     public static InputDeclaration input(String id, TypeIdentifier type, String init) {
         return InputDeclaration.input(Identifier.id(id), type, string(init));
@@ -100,6 +122,10 @@ public final class InputDeclaration extends Statement {
 
     public static InputDeclaration input(String id, TypeIdentifier type, boolean init) {
         return InputDeclaration.input(Identifier.id(id), type, bool(init));
+    }
+
+    public static Statement input(Identifier name, TypeIdentifier type, Expression body, Set<AnnotationDeclaration> annotations) {
+        return new InputDeclaration(name, type, body, annotations);
     }
 
     public String name() {

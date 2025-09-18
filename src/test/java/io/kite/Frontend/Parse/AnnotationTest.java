@@ -12,6 +12,7 @@ import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
+import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
@@ -40,6 +41,18 @@ public class AnnotationTest extends ParserTest {
                 """);
         var program = program(
                 varStatement(var("something", type("string"), number(10), annotation("annotation")))
+        );
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationInput() {
+        var res = parse("""
+                @annotation
+                input string something = 10
+                """);
+        var program = program(
+                input("something", type("string"), 10, annotation("annotation"))
         );
         Assertions.assertEquals(program, res);
     }
