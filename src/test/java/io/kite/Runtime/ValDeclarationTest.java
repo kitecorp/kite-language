@@ -27,7 +27,7 @@ public class ValDeclarationTest extends RuntimeTest {
     void varInt() {
         var res = eval("val x = 2");
         assertEquals(2, res);
-        log.info((res));
+        log.info(res);
     }
 
 
@@ -35,14 +35,14 @@ public class ValDeclarationTest extends RuntimeTest {
     void varDecimal() {
         var res = (Double) eval("val x = 2.1");
         assertEquals(2.1, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
     void varBool() {
         var res = (Boolean) eval("val x = true");
         assertTrue(res);
-        log.info((res));
+        log.info(res);
     }
 
 
@@ -50,28 +50,28 @@ public class ValDeclarationTest extends RuntimeTest {
     void varExpressionPlus() {
         var res = eval("val x = 2+2");
         assertEquals(4, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
     void varExpressionMinus() {
         var res = eval("val x = 2-2");
         assertEquals(0, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
     void varExpressionMultiplication() {
         var res = eval("val x = 2*2");
         assertEquals(4, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
     void varExpressionDivision() {
         var res = eval("val x = 2/2");
         assertEquals(1, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ValDeclarationTest extends RuntimeTest {
         var res = eval("val x = 2==2");
         var expected = true;
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class ValDeclarationTest extends RuntimeTest {
         var res = eval("val x = 2==1");
         var expected = false;
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ValDeclarationTest extends RuntimeTest {
                 }
                 """);
 
-        log.info((res));
+        log.info(res);
         assertEquals(1, res);
     }
 

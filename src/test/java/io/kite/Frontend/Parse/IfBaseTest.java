@@ -38,7 +38,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class IfBaseTest extends ParserTest {
                         expressionStatement(
                                 assign("=", id("x"), number(1)))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class IfBaseTest extends ParserTest {
                         block(expressionStatement(number(1))),
                         block(expressionStatement(number(2)))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -146,7 +146,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -168,7 +168,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -187,7 +187,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -207,7 +207,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -226,7 +226,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class IfBaseTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -268,7 +268,7 @@ public class IfBaseTest extends ParserTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -290,7 +290,7 @@ public class IfBaseTest extends ParserTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -312,7 +312,7 @@ public class IfBaseTest extends ParserTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -334,7 +334,7 @@ public class IfBaseTest extends ParserTest {
                         block(expressionStatement(
                                 assign("+=", id("x"), number(2)))
                         )));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 

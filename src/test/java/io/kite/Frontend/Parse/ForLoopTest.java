@@ -44,7 +44,7 @@ public class ForLoopTest extends ParserTest {
                         )).build()
 
         );
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 

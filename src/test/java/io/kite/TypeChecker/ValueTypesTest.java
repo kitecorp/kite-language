@@ -26,7 +26,7 @@ public class ValueTypesTest extends ParserTest {
         var res = parse("var string x\n");
         var expected = program(varStatement(var("x", type("string"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -34,7 +34,7 @@ public class ValueTypesTest extends ParserTest {
         var res = parse("var string x ");
         var expected = program(varStatement(var("x", type("string"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ValueTypesTest extends ParserTest {
         var res = parse("var number x ");
         var expected = program(varStatement(var("x", type("number"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class ValueTypesTest extends ParserTest {
         var res = parse("var object x ");
         var expected = program(varStatement(var("x", type("object"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ValueTypesTest extends ParserTest {
         var res = parse("var string x ;");
         var expected = program(varStatement(var("x", type("string"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class ValueTypesTest extends ParserTest {
                 """);
         var expected = program(var(id("x"), type("string"), string("test")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test

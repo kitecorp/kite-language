@@ -32,7 +32,7 @@ public class LambdaTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class LambdaTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class LambdaTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class LambdaTest extends ParserTest {
                                 param("y", "number"), binary("*", "x", "y")))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class LambdaTest extends ParserTest {
                                 block(expressionStatement(binary("*", "x", "y"))))
                 ));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class LambdaTest extends ParserTest {
                 )
         )));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class LambdaTest extends ParserTest {
                 )
         )));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test

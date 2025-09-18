@@ -29,7 +29,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var res = parse("var x = {}");
         var expected = program(varStatement(var(id("x"), objectExpression())));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", number(2))))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", number(2.2))))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", bool(true))))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", NullLiteral.nullLiteral())))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                         objectExpression(object("b", number(2)))
                 )))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", string("2"))))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", string("hello"))))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class ObjectVarExpressionTest extends ParserTest {
         var expected = program(varStatement(var(id("x"),
                 objectExpression(object("a", string("hello"))))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                         object("b", "hello b")
                 ))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                         object("b", "hello b")
                 ))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                         object("b", string("hello b"))
                 ))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -209,7 +209,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                                         )))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -245,7 +245,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                                         )))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -281,7 +281,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                                         )))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -317,7 +317,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                                         )))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 
@@ -354,7 +354,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                                         )))))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -370,7 +370,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 expressionStatement(member("x", "name"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -386,7 +386,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 expressionStatement(assign(member, 1, "="))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -402,7 +402,7 @@ public class ObjectVarExpressionTest extends ParserTest {
                 expressionStatement(assign(member, 1, "="))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 }

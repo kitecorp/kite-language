@@ -20,7 +20,7 @@ public class TypeDeclarationTest extends ParserTest {
         var res = parse("var number x");
         var expected = program(statement(var("x", type("number"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class TypeDeclarationTest extends ParserTest {
         var res = parse("var boolean x");
         var expected = program(statement(var("x", type("boolean"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class TypeDeclarationTest extends ParserTest {
         var res = parse("var string x ");
         var expected = program(statement(var("x", type("string"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class TypeDeclarationTest extends ParserTest {
         var res = parse("var Subnet x");
         var expected = program(statement(var("x", type("Subnet"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TypeDeclarationTest extends ParserTest {
         var res = parse("var Aws.Networking.Subnet x");
         var expected = program(statement(var("x", type("Aws.Networking.Subnet"))));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 

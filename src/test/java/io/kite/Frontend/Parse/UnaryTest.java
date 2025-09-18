@@ -15,7 +15,7 @@ public class UnaryTest extends ParserTest {
     void testLogicalUnary() {
         var res = parse("-x");
         var expected = program(unary("-", "x"));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -23,7 +23,7 @@ public class UnaryTest extends ParserTest {
     void testLogicalNot() {
         var res = parse("!x");
         var expected = program(unary("!", "x"));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -31,7 +31,7 @@ public class UnaryTest extends ParserTest {
     void prefixDecrement() {
         var res = parse("--x");
         var expected = program(unary("--", "x"));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -41,7 +41,7 @@ public class UnaryTest extends ParserTest {
 //        var expected = program()(
 //                unary()("--", "x"))
 //        );
-//        log.info((res));
+//        log.info(res);
 //        assertEquals(expected, res);
 //    }
 
@@ -49,7 +49,7 @@ public class UnaryTest extends ParserTest {
     void prefixIncrement() {
         var res = parse("++x");
         var expected = program(unary("++", "x"));
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -59,7 +59,7 @@ public class UnaryTest extends ParserTest {
 //        var expected = program()(
 //                unary()("++", "x")
 //        ));
-//        log.info((res));
+//        log.info(res);
 //        assertEquals(expected, res);
 //    }
 
@@ -68,7 +68,7 @@ public class UnaryTest extends ParserTest {
         var res = parse("-x * 2");
         var expected = program(binary("*", unary("-", "x"), 2));
 
-        log.info((res));
+        log.info(res);
         assertEquals(expected, res);
     }
 

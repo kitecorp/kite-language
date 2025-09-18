@@ -21,7 +21,7 @@ public class OperatorsTest extends ParserTest {
 
         var expected = program(expressionStatement(binary(1, 1, "+")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class OperatorsTest extends ParserTest {
                 expressionStatement(
                         binary(2, 2, "+")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class OperatorsTest extends ParserTest {
 
         var expected = program(expressionStatement(binary(1, 1, "-")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class OperatorsTest extends ParserTest {
 
         var expected = program(expressionStatement(binary(1, 1, "*")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class OperatorsTest extends ParserTest {
 
         var expected = program(expressionStatement(binary(1, 1, "/")));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class OperatorsTest extends ParserTest {
                         "+"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class OperatorsTest extends ParserTest {
                         "-"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class OperatorsTest extends ParserTest {
                                 "+"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class OperatorsTest extends ParserTest {
                 ));
 
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class OperatorsTest extends ParserTest {
                 ));
 
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class OperatorsTest extends ParserTest {
                                 "-"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 
@@ -155,7 +155,7 @@ public class OperatorsTest extends ParserTest {
                 binary(binary(1, 2, "*"), binary(3, 4, "*"), "-"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class OperatorsTest extends ParserTest {
                                 "+"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class OperatorsTest extends ParserTest {
                                 "-"))
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 

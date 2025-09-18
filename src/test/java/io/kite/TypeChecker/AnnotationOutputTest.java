@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("TypeChecker Output")
+@DisplayName("TypeChecker Annotation")
 public class AnnotationOutputTest extends CheckerTest {
 
     @Test

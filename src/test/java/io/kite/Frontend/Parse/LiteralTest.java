@@ -22,7 +22,7 @@ public class LiteralTest extends ParserTest {
         var res = parse("1");
         var expected = Program.of(expressionStatement(NumberLiteral.of(1)));
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -41,7 +41,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("Hello")
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(1)
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
 
@@ -68,7 +68,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("42")
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("42")
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("  42  ")
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(42)
         );
         assertEquals(expected, res);
-        log.info((res));
+        log.info(res);
     }
 
     @Test
