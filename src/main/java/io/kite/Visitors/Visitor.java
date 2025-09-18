@@ -33,7 +33,6 @@ public sealed interface Visitor<R>
             case Type type -> visit(type);
             case ObjectExpression expression -> visit(expression);
             case ArrayExpression arrayExpression -> visit(arrayExpression);
-            case AnnotationDeclaration annotationDeclaration -> visit(annotationDeclaration);
             case null -> null;
         };
     }
