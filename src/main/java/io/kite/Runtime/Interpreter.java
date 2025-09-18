@@ -838,16 +838,15 @@ public final class Interpreter implements Visitor<Object> {
         outputs.add(input); // just collect the outputs since they need to be evaluated after the program is run
         if (!input.hasInit()) {
             throw new MissingOutputException("Output type without an init value: " + printer.visit(input));
+        }
+        var res = visit(input.getInit());
+        if (res instanceof Dependency value && value.value() == null) {
+            return value;
+        } else if (res instanceof String s && StringUtils.isBlank(s)) {
+            log.warn("Output type without an init value: {}", printer.visit(input));
+            return NullValue.of();
         } else {
-            var res = visit(input.getInit());
-            if (res instanceof Dependency value && value.value() == null) {
-                return value;
-            } else if (res instanceof String s && StringUtils.isBlank(s)) {
-                log.warn("Output type without an init value: {}", printer.visit(input));
-                return NullValue.of();
-            } else {
-                return res;
-            }
+            return res;
         }
     }
 
