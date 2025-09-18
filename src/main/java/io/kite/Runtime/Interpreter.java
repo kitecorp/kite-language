@@ -825,9 +825,8 @@ public final class Interpreter implements Visitor<Object> {
         var type = visit(expression.getType());
         if (type instanceof Set<?> set) {
             if (value instanceof Collection<?> collection) {
-                if (!set.containsAll(collection)) {
+                if (!set.containsAll(collection))
                     throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
-                }
             } else if (!set.contains(value)) {
                 throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
             }
@@ -844,7 +843,7 @@ public final class Interpreter implements Visitor<Object> {
             if (res instanceof Dependency value && value.value() == null) {
                 return value;
             } else if (res instanceof String s && StringUtils.isBlank(s)) {
-                log.warn("Output type without an init value: " + printer.visit(input));
+                log.warn("Output type without an init value: {}", printer.visit(input));
                 return NullValue.of();
             } else {
                 return res;
