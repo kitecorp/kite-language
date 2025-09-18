@@ -159,7 +159,7 @@ public class Parser {
                 case Schema -> SchemaDeclaration();
                 case Existing, Resource -> ResourceDeclaration();
                 case Component -> ComponentDeclaration();
-                case Input -> InputDeclaration();
+                case Input -> InputDeclaration(annotations);
                 case Output -> OutputDeclaration(annotations);
                 case Var -> VarDeclarations(annotations);
 //                case Val -> ValDeclarations();
@@ -1304,7 +1304,7 @@ public class Parser {
         }
     }
 
-    private Statement InputDeclaration() {
+    private Statement InputDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Input);
         var type = TypeIdentifier();
         var name = Identifier();
@@ -1313,7 +1313,7 @@ public class Parser {
             eat(Equal);
             body = Initialize();
         }
-        return InputDeclaration.input(name, type, body);
+        return InputDeclaration.input(name, type, body, annotations);
     }
 
     private Statement OutputDeclaration(Set<AnnotationDeclaration> annotations) {
