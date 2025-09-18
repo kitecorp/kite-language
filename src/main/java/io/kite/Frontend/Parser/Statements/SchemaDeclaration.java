@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -47,23 +48,40 @@ public final class SchemaDeclaration extends Statement {
     public record SchemaProperty(TypeIdentifier type,
                                  Identifier identifier,
                                  Expression init,
-                                 AnnotationDeclaration annotation) {
+                                 Set<AnnotationDeclaration> annotation) {
 
 
         public SchemaProperty(TypeIdentifier typeIdentifier, Identifier identifier, Expression init) {
-            this(typeIdentifier, identifier, init, null);
+            this(typeIdentifier, identifier, init, Set.of());
         }
 
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, Identifier identifier, Expression init, AnnotationDeclaration annotation) {
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier,
+                                                    Identifier identifier,
+                                                    Expression init,
+                                                    Set<AnnotationDeclaration> annotation) {
             return new SchemaProperty(typeIdentifier, identifier, init, annotation);
         }
 
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, Expression init, AnnotationDeclaration annotation) {
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier,
+                                                    Identifier identifier,
+                                                    Expression init,
+                                                    AnnotationDeclaration... annotation) {
+            return new SchemaProperty(typeIdentifier, identifier, init, Set.of(annotation));
+        }
+
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier,
+                                                    Expression init, Set<AnnotationDeclaration> annotation) {
             return new SchemaProperty(typeIdentifier, Identifier.id(identifier), init, annotation);
         }
 
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init, AnnotationDeclaration annotation) {
-            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), annotation);
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier,
+                                                    Expression init, AnnotationDeclaration... annotation) {
+            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), init, Set.of(annotation));
+        }
+
+        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init,
+                                                    AnnotationDeclaration... annotation) {
+            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), Set.of(annotation));
         }
 
         public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init) {
