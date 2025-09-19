@@ -203,6 +203,7 @@ public class AnnotationTest extends ParserTest {
                 annotation("annotation", array(1, 2, 3))));
         Assertions.assertEquals(program, res);
     }
+
     @Test
     void annotationObject() {
         var res = parse("""
@@ -225,7 +226,7 @@ public class AnnotationTest extends ParserTest {
 
         var expected = Factory.program(
                 schema(Identifier.id("square"),
-                        schemaProperty(type("Vm"),"x", 1, annotation(Identifier.id("annotation"), array))
+                        schemaProperty(type("Vm"), "x", 1, annotation(Identifier.id("annotation"), array))
                 )
         );
         assertEquals(expected, actual);
@@ -240,8 +241,8 @@ public class AnnotationTest extends ParserTest {
                 """);
         var expected = Factory.program(
                 schema(Identifier.id("square"),
-                        schemaProperty(type("Vm"),"x",  1, annotation(Identifier.id("annotation"),
-                                objectExpression(object("env", "test")))
+                        schemaProperty(type("Vm"), "x", 1,
+                                annotation("annotation", objectExpression(object("env", "test")))
                         )
                 ));
         assertEquals(expected, actual);
@@ -258,11 +259,12 @@ public class AnnotationTest extends ParserTest {
 
         var expected = Factory.program(
                 schema(Identifier.id("square"),
-                        schemaProperty(type("Vm"),"x",  1, annotation(Identifier.id("annotation"), array))
+                        schemaProperty(type("Vm"), "x", 1, annotation(Identifier.id("annotation"), array))
                 )
         );
         assertEquals(expected, actual);
     }
+
     @Test
     void schemaCloudArrayVar() {
         var actual = (Program) parse("""
@@ -274,7 +276,7 @@ public class AnnotationTest extends ParserTest {
 
         var expected = Factory.program(
                 schema(Identifier.id("square"),
-                        schemaProperty(type("Vm"),"x", 1, annotation(Identifier.id("annotation"), array))
+                        schemaProperty(type("Vm"), "x", 1, annotation(Identifier.id("annotation"), array))
                 )
         );
         assertEquals(expected, actual);
@@ -289,7 +291,7 @@ public class AnnotationTest extends ParserTest {
                 """);
         var expected = Factory.program(
                 schema(Identifier.id("square"),
-                        schemaProperty(type("Vm"),"x",  1, annotation("annotation"))
+                        schemaProperty(type("Vm"), "x", 1, annotation("annotation"))
                 )
         );
         assertEquals(expected, actual);
@@ -304,12 +306,11 @@ public class AnnotationTest extends ParserTest {
                 """);
         var expected = Factory.program(
                 schema(Identifier.id("square"),
-                        schemaProperty(type("Vm"),"x",  1, annotation("annotation", Identifier.id("importable")))
+                        schemaProperty(type("Vm"), "x", 1, annotation("annotation", Identifier.id("importable")))
                 )
         );
         assertEquals(expected, actual);
     }
-
 
 
 }
