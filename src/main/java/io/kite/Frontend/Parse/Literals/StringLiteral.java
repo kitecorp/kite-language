@@ -45,6 +45,13 @@ public class StringLiteral extends Literal {
         return new StringLiteral(value);
     }
 
+    public static StringLiteral string(Object value) {
+        if (value instanceof String s) {
+            return new StringLiteral(s);
+        }
+        return new StringLiteral(value.toString());
+    }
+
     private void setValue(@Nullable String value) {
         if (isBlank(value)) {
             this.value = value;

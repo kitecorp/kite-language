@@ -11,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Set;
 
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.SymbolIdentifier.id;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
@@ -141,7 +143,47 @@ public class AnnotationTest extends ParserTest {
                 @count(2)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", number(2))));
+        var program = Factory.program(component("Backend", "api", block(), annotation("count", number(2))));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationDecimal() {
+        var res = parse("""
+                @count(2.2)
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(), annotation("count", number(2.2))));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationString() {
+        var res = parse("""
+                @count("2.2")
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(), annotation("count", string("2.2"))));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationTrue() {
+        var res = parse("""
+                @disabled(true)
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(), annotation("disabled", bool(true))));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationFalse() {
+        var res = parse("""
+                @disabled(false)
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(), annotation("disabled", bool(false))));
         Assertions.assertEquals(program, res);
     }
 

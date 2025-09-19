@@ -26,7 +26,11 @@ import java.util.*;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
 import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.*;
+import static io.kite.Frontend.Parse.Literals.NullLiteral.*;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.*;
 import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
+import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
@@ -880,10 +884,11 @@ public class Parser {
             case OpenBrackets -> ArrayExpression();
             case Identifier -> Identifier();
             case OpenBraces -> ObjectDeclaration();
-            case True, False -> BooleanLiteral.bool(lookAhead().value());
-            case Number -> NumberLiteral.number(lookAhead().value());
-            case String -> new StringLiteral(lookAhead().value());
-            default -> null;
+            case True, False, Number, String -> {
+                eat();
+                yield Literal();
+            }
+           default -> null;
         };
     }
 
@@ -1479,12 +1484,12 @@ public class Parser {
         var current = iterator.getCurrent();
         var value = current.value();
         return switch (current.type()) {
-            case True, False -> BooleanLiteral.bool(value);
-            case Null -> NullLiteral.nullLiteral();
-            case Number -> NumberLiteral.number(value);
-            case String -> new StringLiteral(value);
+            case True, False -> bool(value);
+            case Null -> nullLiteral();
+            case Number -> number(value);
+            case String -> string(value);
 //            default -> new ErrorExpression(current.value());
-            default -> NullLiteral.nullLiteral();
+            default -> nullLiteral();
         };
     }
 
