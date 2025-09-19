@@ -158,7 +158,7 @@ public class Parser {
                 case Type -> TypeDeclaration();
                 case Schema -> SchemaDeclaration();
                 case Existing, Resource -> ResourceDeclaration(annotations);
-                case Component -> ComponentDeclaration();
+                case Component -> ComponentDeclaration(annotations);
                 case Input -> InputDeclaration(annotations);
                 case Output -> OutputDeclaration(annotations);
                 case Var -> VarDeclarations(annotations);
@@ -1264,7 +1264,7 @@ public class Parser {
      * : '}'
      * ;
      */
-    private Statement ComponentDeclaration() {
+    private Statement ComponentDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Component);
         var componentType = ComponentType();
         Identifier name = null;
@@ -1275,7 +1275,7 @@ public class Parser {
 
         validateInputsOutputs(name, body);
 
-        return ComponentStatement.component(componentType, name, body);
+        return ComponentStatement.component(componentType, name, body, annotations);
     }
 
     private void validateInputsOutputs(Identifier componentName, BlockExpression body) {

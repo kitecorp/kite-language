@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
+import io.kite.Frontend.Parser.Factory;
 import io.kite.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +14,7 @@ import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
+import static io.kite.Frontend.Parser.Expressions.ComponentStatement.component;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
@@ -20,8 +22,18 @@ import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 
+/**
+ * Annotations can be attached to:
+ * - Input
+ * - Output
+ * - Var
+ * - Resource
+ * - Component
+ * - Schema
+ * - SchemaProperty
+ */
 @Log4j2
-@DisplayName("Parser Outputs")
+@DisplayName("Parser annotations")
 public class AnnotationTest extends ParserTest {
 
     @Test
@@ -68,6 +80,16 @@ public class AnnotationTest extends ParserTest {
         var program = program(
                 ResourceExpression.resource(type("vm"), symbol("something"), Set.of(annotation("annotation")), block())
         );
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationSchemaProperty() {
+        var res = parse("""
+                @annotation
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation")));
         Assertions.assertEquals(program, res);
     }
 

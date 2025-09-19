@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * A component is a collection of resources, inputs and outputs.
@@ -25,8 +26,10 @@ public final class ComponentStatement extends Statement {
     @Nullable
     private Identifier name;
     private BlockExpression block;
+    private Set<AnnotationDeclaration> annotations;
 
     private ComponentStatement() {
+        this.annotations = Set.of();
     }
 
     private ComponentStatement(PluginIdentifier type, @Nullable Identifier name, BlockExpression block) {
@@ -36,8 +39,20 @@ public final class ComponentStatement extends Statement {
         this.block = block;
     }
 
-    public static Statement component(PluginIdentifier type, Identifier name, BlockExpression block) {
-        return new ComponentStatement(type, name, block);
+    private ComponentStatement(PluginIdentifier type, @Nullable Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
+        this();
+        this.type = type;
+        this.name = name;
+        this.block = block;
+        this.annotations = annotations;
+    }
+
+    public static Statement component(PluginIdentifier type, Identifier name, BlockExpression block, AnnotationDeclaration... annotations) {
+        return new ComponentStatement(type, name, block, Set.of(annotations));
+    }
+
+    public static Statement component(PluginIdentifier type, Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
+        return new ComponentStatement(type, name, block, annotations);
     }
 
     public static Statement component() {
@@ -47,6 +62,11 @@ public final class ComponentStatement extends Statement {
     public static Statement component(String type, String name, BlockExpression operator) {
         var build = PluginIdentifier.fromString(type);
         return component(build, Identifier.id(name), operator);
+    }
+
+    public static Statement component(String type, String name, BlockExpression operator, AnnotationDeclaration... annotations) {
+        var build = PluginIdentifier.fromString(type);
+        return component(build, Identifier.id(name), operator, annotations);
     }
 
     public static Statement component(String type, BlockExpression operator) {
