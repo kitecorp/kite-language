@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Annotation")
-public class AnnotationOutputTest extends CheckerTest {
+public class DecoratorTest extends CheckerTest {
 
     @Test
-    void outputAnyInitNull() {
+    void decoratorSensitive() {
         var res = eval("""
                 @sensitive
                 output any something = null""");
@@ -20,7 +20,7 @@ public class AnnotationOutputTest extends CheckerTest {
     }
 
     @Test
-    void annotationUnkown() {
+    void decoratorUnkown() {
         assertThrows(TypeError.class, () -> eval("""
                 @sensitiveUnknown
                 output any something = null"""));
