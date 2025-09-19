@@ -2,7 +2,6 @@ package io.kite.Frontend.Parser;
 
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
-import io.kite.Visitors.AstPrinter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +13,6 @@ import java.util.ListIterator;
 public class ParserIterator {
     private final List<Token> tokens;
     private final ListIterator<Token> iterator;
-    private final AstPrinter astPrinter = new AstPrinter();
 
     @Getter
     @Setter

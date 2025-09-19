@@ -865,6 +865,9 @@ public class Parser {
                 case ArrayExpression identifier -> annotation(name, identifier);
                 case ObjectExpression expression -> annotation(name, expression);
                 case Identifier identifier -> annotation(name, identifier);
+                case StringLiteral literal -> annotation(name, literal);
+                case BooleanLiteral literal -> annotation(name, literal);
+                case NumberLiteral literal -> annotation(name, literal);
                 case null -> annotation(name);
                 default -> throw new IllegalStateException("Unexpected value: " + statement);
             };
@@ -873,20 +876,15 @@ public class Parser {
     }
 
     private Expression AnnotationArgs() {
-        switch (lookAhead().type()) {
-            case OpenBrackets -> {
-                return ArrayExpression();
-            }
-            case Identifier -> {
-                return Identifier();
-            }
-            case OpenBraces -> {
-                return ObjectDeclaration();
-            }
-            default -> {
-                return null;
-            }
-        }
+       return switch (lookAhead().type()) {
+            case OpenBrackets -> ArrayExpression();
+            case Identifier -> Identifier();
+            case OpenBraces -> ObjectDeclaration();
+            case True, False -> BooleanLiteral.bool(lookAhead().value());
+            case Number -> NumberLiteral.number(lookAhead().value());
+            case String -> new StringLiteral(lookAhead().value());
+            default -> null;
+        };
     }
 
     /**
