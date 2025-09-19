@@ -11,7 +11,7 @@ import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
 
 public sealed interface Visitor<R>
-        permits ScopeResolver, io.kite.Runtime.Inputs.ChainResolver, Interpreter, TypeChecker, AstPrinter, SyntaxPrinter {
+        permits ScopeResolver, io.kite.Runtime.Inputs.ChainResolver, Interpreter, TypeChecker, SyntaxPrinter {
 
     default R visit(@Nullable Expression expr) {
         return switch (expr) {

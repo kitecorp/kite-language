@@ -1,12 +1,14 @@
 package io.kite.Frontend.Parser.Expressions;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor(staticName = "annotation")
 public final class AnnotationDeclaration {
     private Identifier name;
-    private Identifier value;
+    private Object value;
     private ArrayExpression args; // for positional args
     private ObjectExpression object; // for named args
 
@@ -17,6 +19,17 @@ public final class AnnotationDeclaration {
         this();
         this.name = name;
         this.args = args;
+    }
+
+    private AnnotationDeclaration(String name, Object value) {
+        this();
+        this.name = Identifier.id(name);
+        this.value = value;
+    }
+    private AnnotationDeclaration(Identifier name, Object value) {
+        this();
+        this.name = name;
+        this.value = value;
     }
 
     private AnnotationDeclaration(Identifier name) {
@@ -58,6 +71,18 @@ public final class AnnotationDeclaration {
 
     public static AnnotationDeclaration annotation(Identifier name, Identifier args) {
         return new AnnotationDeclaration(name, args);
+    }
+
+    public static AnnotationDeclaration annotation(String name, String args) {
+        return new AnnotationDeclaration(name, Identifier.id(args));
+    }
+
+    public static AnnotationDeclaration annotation(String name, Object value) {
+        return new AnnotationDeclaration(name, value);
+    }
+
+    public static AnnotationDeclaration annotation(Identifier name, Object value) {
+        return new AnnotationDeclaration(name, value);
     }
 
     public static AnnotationDeclaration annotation(String name, Identifier args) {

@@ -102,6 +102,7 @@ public class AnnotationTest extends ParserTest {
     void annotationSchema() {
         var res = parse("""
                 @annotation
+                @version
                 schema Backend { string name = 0 }
                 """);
 
@@ -109,6 +110,24 @@ public class AnnotationTest extends ParserTest {
                 schema(
                         id("Backend"),
                         List.of(schemaProperty(type("string"), "name", 0)),
+                        annotation("annotation"),
+                        annotation("version")
+                )
+        );
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationSchemaProperty() {
+        var res = parse("""
+                @annotation
+                schema Backend { @sensitive @deprecated string name = 0 }
+                """);
+
+        var program = Factory.program(
+                schema(
+                        id("Backend"),
+                        List.of(schemaProperty(type("string"), "name", 0, annotation("sensitive"), annotation("deprecated"))),
                         annotation("annotation")
                 )
         );
