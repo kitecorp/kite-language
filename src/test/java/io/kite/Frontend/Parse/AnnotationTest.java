@@ -135,4 +135,14 @@ public class AnnotationTest extends ParserTest {
     }
 
 
+    @Test
+    void annotationNumber() {
+        var res = parse("""
+                @count(2)
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", number(2))));
+        Assertions.assertEquals(program, res);
+    }
+
 }
