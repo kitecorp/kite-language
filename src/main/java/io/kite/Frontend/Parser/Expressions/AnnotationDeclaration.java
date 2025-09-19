@@ -27,6 +27,12 @@ public final class AnnotationDeclaration {
         this.value = value;
     }
 
+    private AnnotationDeclaration(String name, ObjectExpression objectExpression) {
+        this();
+        this.name = Identifier.id(name);
+        this.object = objectExpression;
+    }
+
     private AnnotationDeclaration(String name, ArrayExpression value) {
         this();
         this.name = Identifier.id(name);
@@ -85,6 +91,10 @@ public final class AnnotationDeclaration {
     }
 
     public static AnnotationDeclaration annotation(String name, Object value) {
+        return new AnnotationDeclaration(name, value);
+    }
+
+    public static AnnotationDeclaration annotation(String name, ObjectExpression value) {
         return new AnnotationDeclaration(name, value);
     }
 

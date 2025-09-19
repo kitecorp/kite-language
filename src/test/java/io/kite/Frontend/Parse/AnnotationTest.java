@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.ObjectLiteral;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Factory;
@@ -205,13 +206,35 @@ public class AnnotationTest extends ParserTest {
     }
 
     @Test
-    void annotationObject() {
+    void annotationArrayEmpty() {
+        var res = parse("""
+                @annotation([])
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(),
+                annotation("annotation", array())));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationObjectEmpty() {
         var res = parse("""
                 @annotation({})
                 component Backend api { }
                 """);
         var program = Factory.program(component("Backend", "api", block(),
-                annotation("annotation", array(1, 2, 3))));
+                annotation("annotation", objectExpression())));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationObject() {
+        var res = parse("""
+                @annotation({env: 'prod'})
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(),
+                annotation("annotation", objectExpression(ObjectLiteral.object("env", "prod")))));
         Assertions.assertEquals(program, res);
     }
 
