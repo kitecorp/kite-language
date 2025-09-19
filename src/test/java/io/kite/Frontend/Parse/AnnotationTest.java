@@ -18,6 +18,7 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.SymbolIdentifier.id;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
+import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.ComponentStatement.component;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
@@ -140,50 +141,61 @@ public class AnnotationTest extends ParserTest {
     @Test
     void annotationNumber() {
         var res = parse("""
-                @count(2)
+                @annotation(2)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("count", number(2))));
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", number(2))));
         Assertions.assertEquals(program, res);
     }
 
     @Test
     void annotationDecimal() {
         var res = parse("""
-                @count(2.2)
+                @annotation(2.2)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("count", number(2.2))));
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", number(2.2))));
         Assertions.assertEquals(program, res);
     }
 
     @Test
     void annotationString() {
         var res = parse("""
-                @count("2.2")
+                @annotation("2.2")
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("count", string("2.2"))));
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", string("2.2"))));
         Assertions.assertEquals(program, res);
     }
 
     @Test
     void annotationTrue() {
         var res = parse("""
-                @disabled(true)
+                @annotation(true)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("disabled", bool(true))));
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", bool(true))));
         Assertions.assertEquals(program, res);
     }
 
     @Test
     void annotationFalse() {
         var res = parse("""
-                @disabled(false)
+                @annotation(false)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("disabled", bool(false))));
+        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", bool(false))));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationArray() {
+        var res = parse("""
+                @annotation([1,2,3])
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(),
+                annotation("annotation", array(1, 2, 3))));
         Assertions.assertEquals(program, res);
     }
 

@@ -26,6 +26,13 @@ public final class AnnotationDeclaration {
         this.name = Identifier.id(name);
         this.value = value;
     }
+
+    private AnnotationDeclaration(String name, ArrayExpression value) {
+        this();
+        this.name = Identifier.id(name);
+        this.args = value;
+    }
+
     private AnnotationDeclaration(Identifier name, Object value) {
         this();
         this.name = name;
@@ -78,6 +85,10 @@ public final class AnnotationDeclaration {
     }
 
     public static AnnotationDeclaration annotation(String name, Object value) {
+        return new AnnotationDeclaration(name, value);
+    }
+
+    public static AnnotationDeclaration annotation(String name, ArrayExpression value) {
         return new AnnotationDeclaration(name, value);
     }
 
