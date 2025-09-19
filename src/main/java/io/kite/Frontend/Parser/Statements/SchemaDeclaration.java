@@ -43,6 +43,7 @@ public final class SchemaDeclaration extends Statement {
     }
 
     public SchemaDeclaration() {
+        this.annotations = Set.of();
     }
 
     public static Statement schema(Identifier name, @Nullable SchemaProperty... properties) {
