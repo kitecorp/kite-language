@@ -1,5 +1,7 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Factory;
 import io.kite.Frontend.Parser.Program;
@@ -14,6 +16,7 @@ import java.util.Set;
 import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
 import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parse.Literals.SymbolIdentifier.id;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
@@ -21,6 +24,7 @@ import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotati
 import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.ComponentStatement.component;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
+import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
@@ -28,6 +32,7 @@ import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Annotations can be attached to:
@@ -198,5 +203,113 @@ public class AnnotationTest extends ParserTest {
                 annotation("annotation", array(1, 2, 3))));
         Assertions.assertEquals(program, res);
     }
+    @Test
+    void annotationObject() {
+        var res = parse("""
+                @annotation({})
+                component Backend api { }
+                """);
+        var program = Factory.program(component("Backend", "api", block(),
+                annotation("annotation", array(1, 2, 3))));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void schemaCloudStringsVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation(["test"]) Vm x =1
+                }
+                """);
+        var array = ArrayExpression.array("test");
+
+        var expected = Factory.program(
+                schema(Identifier.id("square"),
+                        schemaProperty(type("Vm"),"x", 1, annotation(Identifier.id("annotation"), array))
+                )
+        );
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaObjectVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation({env="test"}) Vm x =1
+                }
+                """);
+        var expected = Factory.program(
+                schema(Identifier.id("square"),
+                        schemaProperty(type("Vm"),"x",  1, annotation(Identifier.id("annotation"),
+                                objectExpression(object("env", "test")))
+                        )
+                ));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudNumbersVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation([1,2,3]) Vm x =1
+                }
+                """);
+        var array = ArrayExpression.array(1, 2, 3);
+
+        var expected = Factory.program(
+                schema(Identifier.id("square"),
+                        schemaProperty(type("Vm"),"x",  1, annotation(Identifier.id("annotation"), array))
+                )
+        );
+        assertEquals(expected, actual);
+    }
+    @Test
+    void schemaCloudArrayVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation([importable]) Vm x =1
+                }
+                """);
+        ArrayExpression array = ArrayExpression.array(Identifier.id("importable"));
+
+        var expected = Factory.program(
+                schema(Identifier.id("square"),
+                        schemaProperty(type("Vm"),"x", 1, annotation(Identifier.id("annotation"), array))
+                )
+        );
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation Vm x =1
+                }
+                """);
+        var expected = Factory.program(
+                schema(Identifier.id("square"),
+                        schemaProperty(type("Vm"),"x",  1, annotation("annotation"))
+                )
+        );
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void schemaCloudWithArgsVar() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation(importable) Vm x =1
+                }
+                """);
+        var expected = Factory.program(
+                schema(Identifier.id("square"),
+                        schemaProperty(type("Vm"),"x",  1, annotation("annotation", Identifier.id("importable")))
+                )
+        );
+        assertEquals(expected, actual);
+    }
+
+
 
 }
