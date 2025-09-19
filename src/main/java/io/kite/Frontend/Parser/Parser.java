@@ -192,7 +192,7 @@ public class Parser {
 
     /**
      * {@snippet
-             *: Statement
+     *: Statement
      * | EmptyStatement
      * | VarStatement
      * | IfStatement
