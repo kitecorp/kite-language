@@ -7,6 +7,7 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
+import io.kite.Frontend.Parser.errors.ErrorList;
 import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.TypeChecker.Types.TypeParser;
@@ -20,6 +21,7 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
@@ -95,6 +97,11 @@ public class Parser {
     public Parser() {
     }
 
+    private static void logParseError(ParseError parseError) {
+        var message = MessageFormat.format("{0}{1}", parseError.getMessage(), parseError.getActual().raw());
+        System.out.println(Ansi.ansi().fgRed().a(message).reset().toString());
+    }
+
     private void setTokens(List<Token> tokens) {
         iterator = new ParserIterator(tokens);
     }
@@ -156,7 +163,7 @@ public class Parser {
             return switch (lookAhead().type()) {
                 case Fun -> FunctionDeclaration();
                 case Type -> TypeDeclaration();
-                case Schema -> SchemaDeclaration();
+                case Schema -> SchemaDeclaration(annotations);
                 case Existing, Resource -> ResourceDeclaration(annotations);
                 case Component -> ComponentDeclaration(annotations);
                 case Input -> InputDeclaration(annotations);
@@ -166,11 +173,13 @@ public class Parser {
                 default -> Statement();
             };
         } catch (RuntimeException error) {
-            if (error instanceof ParseError parseError && parseError.getActual() != null) {
-                String message = error.getMessage() + parseError.getActual().raw();
-                System.out.println(Ansi.ansi().fgRed().a(message).reset().toString());
-            } else {
-                System.out.println(Ansi.ansi().fgRed().a(error.getMessage()).reset().toString());
+            switch (error) {
+                case ParseError parseError when parseError.getActual() != null -> logParseError(parseError);
+                case ErrorList errorList -> {
+                    List<ParseError> errors = errorList.getErrors();
+                    errors.forEach(Parser::logParseError);
+                }
+                default -> System.out.println(Ansi.ansi().fgRed().a(error.getMessage()).reset().toString());
             }
             iterator.synchronize();
             return null;
@@ -770,7 +779,7 @@ public class Parser {
      * schema Name '{' SchemaProperty* '}'
      * ;
      */
-    private Statement SchemaDeclaration() {
+    private Statement SchemaDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Schema);
 
         contextStack.push(ContextStack.Schema);
@@ -783,7 +792,7 @@ public class Parser {
 
         contextStack.pop();
 
-        return schema(schemaName, body);
+        return schema(schemaName, body, annotations);
     }
 
     private List<SchemaProperty> SchemaProperties() {
