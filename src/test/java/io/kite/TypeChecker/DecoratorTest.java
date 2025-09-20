@@ -45,10 +45,51 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
-    void decoratorCount() {
+    void decoratorCountError() {
         assertThrows(TypeError.class, () -> eval("""
                 @count(2)
                 output any something = null"""));
+
+    }
+
+    @Test
+    void decoratorCountErrorString() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count("2")
+                output any something = null"""));
+
+    }
+
+    @Test
+    void decoratorCountErrorArrayString() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count(["2"])
+                output any something = null"""));
+
+    }
+
+    @Test
+    void decoratorCountErrorArrayNumber() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count([2])
+                output any something = null"""));
+
+    }
+
+    @Test
+    void decoratorCountErrorObject() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count({env: 2})
+                output any something = null"""));
+
+    }
+
+    @Test
+    void decoratorCount() {
+        var res = eval("""
+                schema vm {}
+                @count(2)
+                resource vm something {}""");
 
     }
 
