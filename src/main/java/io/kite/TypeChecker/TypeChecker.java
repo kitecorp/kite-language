@@ -8,6 +8,9 @@ import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.Decorators.CountDecorator;
+import io.kite.TypeChecker.Types.Decorators.DescriptionDecorator;
+import io.kite.TypeChecker.Types.Decorators.SensitiveDecorator;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
@@ -20,7 +23,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.kite.TypeChecker.Types.DecoratorType.*;
+import static io.kite.TypeChecker.Types.DecoratorType.Target;
 import static java.text.MessageFormat.format;
 
 @Log4j2
@@ -29,7 +32,7 @@ public final class TypeChecker implements Visitor<Type> {
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
-    private Map<String, DecoratorType> decoratorInfoMap;
+    private Map<String, DecoratorCallable> decoratorInfoMap;
 
     public TypeChecker() {
         this(new TypeEnvironment());
@@ -38,8 +41,9 @@ public final class TypeChecker implements Visitor<Type> {
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
         this.decoratorInfoMap = new HashMap<>();
-        this.decoratorInfoMap.put("sensitive", decorator(Target.INPUT, Target.OUTPUT));
-        this.decoratorInfoMap.put("count", decorator(List.of(ValueType.Number), Set.of(Target.RESOURCE, Target.COMPONENT)));
+        this.decoratorInfoMap.put("sensitive", new SensitiveDecorator());
+        this.decoratorInfoMap.put("count", new CountDecorator());
+        this.decoratorInfoMap.put("description", new DescriptionDecorator());
     }
 
     /**
@@ -338,7 +342,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ComponentStatement expression) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return ReferenceType.Resource;
     }
 
     @Override
@@ -871,16 +875,17 @@ public final class TypeChecker implements Visitor<Type> {
         if (decoratorInfo == null) {
             throw new TypeError("Unknown decorator `%s`".formatted(declaration.name()));
         }
-        if (shouldNotProvideArgs(declaration, decoratorInfo)) {
+        if (shouldNotProvideArgs(declaration, decoratorInfo.getType())) {
             throw new TypeError("Decorator `@%s` must not have any parameters and must not have any value or object".formatted(declaration.name()));
         }
 
+        decoratorInfo.validate(declaration);
 
-        if (!decoratorInfo.getTargets().contains(declaration.targetType())) {
+        if (!decoratorInfo.targets().contains(declaration.targetType())) {
             throw new TypeError("Decorator `@%s` can only be used on: %s".formatted(declaration.name(), decoratorInfo.targetString()));
         }
 
-        return decoratorInfo;
+        return decoratorInfo.getType();
     }
 
     private Type validatePropertyIsString(Expression key) {

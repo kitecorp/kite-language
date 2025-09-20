@@ -101,4 +101,57 @@ public class DecoratorTest extends CheckerTest {
 
     }
 
+    @Test
+    void decoratorCountMax() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @count(1000)
+                component vm {}""")
+        );
+    }
+
+    @Test
+    void decoratorCountMin() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @count(-10)
+                component vm {}""")
+        );
+    }
+
+    @Test
+    void decoratorDescriptionResource() {
+        var res = eval("""
+                schema vm {}
+                @description("some markdown")
+                resource vm something {}""");
+
+    }
+
+    @Test
+    void decoratorDescriptionComponent() {
+        var res = eval("""
+                @description("some markdown")
+                component something {}""");
+    }
+
+    @Test
+    void decoratorDescriptionVar() {
+        var res = eval("""
+                @description("some markdown")
+                var something = 2""");
+    }
+
+    @Test
+    void decoratorDescriptionFun() {
+        var res = eval("""
+                @description("some markdown")
+                fun something(){return void;}""");
+    }
+
+    @Test
+    void decoratorDescriptionSchema() {
+        var res = eval("""
+                @description("some markdown")
+                schema something{}""");
+    }
+
 }
