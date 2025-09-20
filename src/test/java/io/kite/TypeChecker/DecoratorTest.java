@@ -17,6 +17,7 @@ public class DecoratorTest extends CheckerTest {
         var res = eval("""
                 @sensitive
                 output any something = null""");
+
         assertEquals(AnyType.INSTANCE, res);
     }
 
@@ -43,5 +44,12 @@ public class DecoratorTest extends CheckerTest {
 
     }
 
+    @Test
+    void decoratorCount() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count(2)
+                output any something = null"""));
+
+    }
 
 }
