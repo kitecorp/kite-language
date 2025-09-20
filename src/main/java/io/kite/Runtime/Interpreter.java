@@ -113,15 +113,6 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    private static boolean isBlank(Object visit) {
-        return switch (visit) {
-            case String string -> StringUtils.isBlank(string);
-            case Dependency dependency -> isBlank(dependency.value());
-            case null -> true;
-            default -> false;
-        };
-    }
-
     private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
         for (Callstack next : callstack) {
             if (next.getClass().equals(forStatementClass)) {
