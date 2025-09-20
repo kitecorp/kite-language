@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,7 +91,7 @@ public final class TypeChecker implements Visitor<Type> {
             case null, default -> {
             }
         }
-        throw new TypeError(expression.string());
+        throw new TypeError(expression != null ? expression.string() : null);
     }
 
     @Override
@@ -222,21 +221,23 @@ public final class TypeChecker implements Visitor<Type> {
         if (expectedType == ValueType.Null) {
             return actualType;
         }
-        if (expectedType == null || !Objects.equals(actualType.getValue(), expectedType.getValue())) {
-            return switch (expectedType.getKind()) {
-                case ARRAY -> expectArray(actualType, expectedType, expectedVal);
-                case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
-                case ANY ->
-                        actualType; // just return the type of the actual value since we don't care what is declared in code
-                case null, default -> {
-                    // only evaluate printing if we need to
-                    String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                            expectedType, actualType, printer.visit(expectedVal));
-                    throw new TypeError(string);
-                }
-            };
+        if (expectedType != null && Objects.equals(actualType.getValue(), expectedType.getValue())) {
+            return expectArray(actualType, expectedType, expectedVal);
         }
-        return expectArray(actualType, expectedType, expectedVal);
+        if (expectedType == null) return actualType;
+
+        return switch (expectedType.getKind()) {
+            case ARRAY -> expectArray(actualType, expectedType, expectedVal);
+            case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
+            case ANY ->
+                    actualType; // just return the type of the actual value since we don't care what is declared in code
+            case null, default -> {
+                // only evaluate printing if we need to
+                String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
+                        expectedType, actualType, printer.visit(expectedVal));
+                throw new TypeError(string);
+            }
+        };
     }
 
     private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
@@ -363,7 +364,7 @@ public final class TypeChecker implements Visitor<Type> {
         for (AnnotationDeclaration annotation : expression.getAnnotations()) {
             var decorator = (DecoratorType) visit(annotation);
             if (!decorator.getTargets().contains(Target.OUTPUT)) {
-                throw new TypeError(MessageFormat.format("{0} decorator can't be used on outputs: {1}", annotation.getName().string(), printer.visit(annotation)));
+                throw new TypeError(format("{0} decorator can't be used on outputs: {1}", annotation.getName().string(), printer.visit(annotation)));
             }
         }
 
