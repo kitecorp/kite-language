@@ -141,6 +141,15 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("decorator @description only allows strings as arguments")
+    void decoratorDescriptionError() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @description(10)
+                component something {}""")
+        );
+    }
+
+    @Test
     void decoratorDescriptionVar() {
         var res = eval("""
                 @description("some markdown")
