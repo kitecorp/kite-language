@@ -20,6 +20,9 @@ public final class DecoratorType extends Type {
     public static DecoratorType decorator(List<Type> params, Set<Target> targets) {
         return new DecoratorType(params, targets);
     }
+    public static DecoratorType decorator(List<Type> params, Target targets) {
+        return new DecoratorType(params, Set.of(targets));
+    }
 
     public static DecoratorType decorator(Target... targets) {
         return new DecoratorType(List.of(), Set.of(targets));

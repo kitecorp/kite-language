@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.kite.TypeChecker.Types.DecoratorType.*;
 import static java.text.MessageFormat.format;
 
 @Log4j2
@@ -37,7 +38,8 @@ public final class TypeChecker implements Visitor<Type> {
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
         this.decoratorInfoMap = new HashMap<>();
-        this.decoratorInfoMap.put("sensitive", DecoratorType.decorator(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT));
+        this.decoratorInfoMap.put("sensitive", decorator(Target.INPUT, Target.OUTPUT));
+        this.decoratorInfoMap.put("count", decorator(List.of(ValueType.Number), Set.of(Target.RESOURCE, Target.COMPONENT)));
     }
 
     /**
@@ -369,7 +371,7 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(OutputDeclaration expression) {
         for (AnnotationDeclaration annotation : expression.getAnnotations()) {
             var decorator = (DecoratorType) visit(annotation);
-            if (!decorator.getTargets().contains(DecoratorType.Target.OUTPUT)) {
+            if (!decorator.getTargets().contains(Target.OUTPUT)) {
                 throw new TypeError(MessageFormat.format("{0} decorator can't be used on outputs: {1}", annotation.getName().string(), printer.visit(annotation)));
             }
         }
