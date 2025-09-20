@@ -2,6 +2,7 @@ package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
 import io.kite.TypeChecker.Types.AnyType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,13 @@ public class DecoratorTest extends CheckerTest {
                 @sensitive
                 output any something = null""");
         assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void decoratorSensitiveInvalidElement() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @sensitive
+                var x = 2"""));
     }
 
     @Test

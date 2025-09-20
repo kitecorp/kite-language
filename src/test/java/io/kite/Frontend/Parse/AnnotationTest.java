@@ -1,7 +1,6 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
-import io.kite.Frontend.Parse.Literals.ObjectLiteral;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Factory;
@@ -30,8 +29,9 @@ import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
-import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
+import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
+import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -56,6 +56,7 @@ public class AnnotationTest extends ParserTest {
                 output string something = 10
                 """);
         Program annotation = program(
+                expressionStatement(annotation("annotation")),
                 output(symbol("something"), type("string"), number(10), Set.of(annotation("annotation"))));
         Assertions.assertEquals(annotation, res);
     }
@@ -67,6 +68,7 @@ public class AnnotationTest extends ParserTest {
                 var string something = 10
                 """);
         var program = program(
+                expressionStatement(annotation("annotation")),
                 varStatement(var("something", type("string"), number(10), annotation("annotation")))
         );
         Assertions.assertEquals(program, res);
@@ -79,6 +81,7 @@ public class AnnotationTest extends ParserTest {
                 input string something = 10
                 """);
         var program = program(
+                expressionStatement(annotation("annotation")),
                 input("something", type("string"), 10, annotation("annotation"))
         );
         Assertions.assertEquals(program, res);
@@ -91,6 +94,7 @@ public class AnnotationTest extends ParserTest {
                 resource vm something { }
                 """);
         var program = program(
+                expressionStatement(annotation("annotation")),
                 ResourceExpression.resource(type("vm"), symbol("something"), Set.of(annotation("annotation")), block())
         );
         Assertions.assertEquals(program, res);
@@ -102,7 +106,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation")));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation")),
+                component("Backend", "api", block(), annotation("annotation"))
+        );
         Assertions.assertEquals(program, res);
     }
 
@@ -116,6 +123,8 @@ public class AnnotationTest extends ParserTest {
                 """);
 
         var program = Factory.program(
+                expressionStatement(annotation("version")),
+                expressionStatement(annotation("annotation")),
                 schema(
                         id("Backend"),
                         List.of(schemaProperty(type("string"), "name", 0)),
@@ -134,6 +143,7 @@ public class AnnotationTest extends ParserTest {
                 """);
 
         var program = Factory.program(
+                expressionStatement(annotation("annotation")),
                 schema(
                         id("Backend"),
                         List.of(schemaProperty(type("string"), "name", 0, annotation("sensitive"), annotation("deprecated"))),
@@ -150,7 +160,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation(2)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", number(2))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", number(2))),
+                component("Backend", "api", block(), annotation("annotation", number(2)))
+        );
         Assertions.assertEquals(program, res);
     }
 
@@ -160,7 +173,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation(2.2)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", number(2.2))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", number(2.2))),
+                component("Backend", "api", block(), annotation("annotation", number(2.2)))
+        );
         Assertions.assertEquals(program, res);
     }
 
@@ -170,7 +186,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation("2.2")
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", string("2.2"))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", string("2.2"))),
+                component("Backend", "api", block(), annotation("annotation", string("2.2")))
+        );
         Assertions.assertEquals(program, res);
     }
 
@@ -180,7 +199,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation(true)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", bool(true))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", bool(true))),
+                component("Backend", "api", block(), annotation("annotation", bool(true)))
+        );
         Assertions.assertEquals(program, res);
     }
 
@@ -190,7 +212,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation(false)
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(), annotation("annotation", bool(false))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", bool(false))),
+                component("Backend", "api", block(), annotation("annotation", bool(false)))
+        );
         Assertions.assertEquals(program, res);
     }
 
@@ -200,8 +225,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation([1,2,3])
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(),
-                annotation("annotation", array(1, 2, 3))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", array(1, 2, 3))),
+                component("Backend", "api", block(),
+                        annotation("annotation", array(1, 2, 3))));
         Assertions.assertEquals(program, res);
     }
 
@@ -211,8 +238,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation([])
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(),
-                annotation("annotation", array())));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", array())),
+                component("Backend", "api", block(),
+                        annotation("annotation", array())));
         Assertions.assertEquals(program, res);
     }
 
@@ -222,8 +251,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation({})
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(),
-                annotation("annotation", objectExpression())));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", objectExpression())),
+                component("Backend", "api", block(),
+                        annotation("annotation", objectExpression())));
         Assertions.assertEquals(program, res);
     }
 
@@ -233,8 +264,10 @@ public class AnnotationTest extends ParserTest {
                 @annotation({env: 'prod'})
                 component Backend api { }
                 """);
-        var program = Factory.program(component("Backend", "api", block(),
-                annotation("annotation", objectExpression(ObjectLiteral.object("env", "prod")))));
+        var program = Factory.program(
+                expressionStatement(annotation("annotation", objectExpression(object("env", "prod")))),
+                component("Backend", "api", block(),
+                        annotation("annotation", objectExpression(object("env", "prod")))));
         Assertions.assertEquals(program, res);
     }
 

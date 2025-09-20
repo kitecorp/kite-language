@@ -44,7 +44,7 @@ public final class VarStatement extends Statement {
         return new VarStatement(List.of(var(expression)));
     }
 
-    public static Statement varStatement(List<VarDeclaration> expression) {
+    public static VarStatement varStatement(List<VarDeclaration> expression) {
         return new VarStatement(expression);
     }
 

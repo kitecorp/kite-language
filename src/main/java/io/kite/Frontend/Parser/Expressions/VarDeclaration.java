@@ -3,7 +3,9 @@ package io.kite.Frontend.Parser.Expressions;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.VarStatement;
+import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Values.DependencyHolder;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +16,7 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class VarDeclaration extends Expression implements DependencyHolder {
+public final class VarDeclaration extends Expression implements DependencyHolder, Annotatable {
     private Identifier id;
     private Expression init;
     private TypeIdentifier type;
@@ -143,5 +145,10 @@ public final class VarDeclaration extends Expression implements DependencyHolder
 
     public boolean hasType() {
         return type != null;
+    }
+
+    @Override
+    public DecoratorType.Target getTarget() {
+        return DecoratorType.Target.VAR;
     }
 }

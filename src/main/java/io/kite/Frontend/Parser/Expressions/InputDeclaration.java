@@ -3,6 +3,8 @@ package io.kite.Frontend.Parser.Expressions;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +16,7 @@ import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class InputDeclaration extends Statement {
+public final class InputDeclaration extends Statement implements Annotatable {
     private Identifier id;
     private Expression init;
     private TypeIdentifier type;
@@ -124,7 +126,7 @@ public final class InputDeclaration extends Statement {
         return InputDeclaration.input(Identifier.id(id), type, bool(init));
     }
 
-    public static Statement input(Identifier name, TypeIdentifier type, Expression body, Set<AnnotationDeclaration> annotations) {
+    public static InputDeclaration input(Identifier name, TypeIdentifier type, Expression body, Set<AnnotationDeclaration> annotations) {
         return new InputDeclaration(name, type, body, annotations);
     }
 
@@ -138,5 +140,10 @@ public final class InputDeclaration extends Statement {
 
     public boolean hasType() {
         return type != null;
+    }
+
+    @Override
+    public DecoratorType.Target getTarget() {
+        return DecoratorType.Target.INPUT;
     }
 }

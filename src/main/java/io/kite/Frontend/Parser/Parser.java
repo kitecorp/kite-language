@@ -6,9 +6,9 @@ import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty;
 import io.kite.Frontend.Parser.errors.ErrorList;
 import io.kite.Frontend.Parser.errors.ParseError;
+import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.TypeChecker.Types.TypeParser;
 import io.kite.TypeChecker.Types.ValueType;
@@ -26,9 +26,9 @@ import java.util.*;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
 import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
-import static io.kite.Frontend.Parse.Literals.BooleanLiteral.*;
-import static io.kite.Frontend.Parse.Literals.NullLiteral.*;
-import static io.kite.Frontend.Parse.Literals.NumberLiteral.*;
+import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
+import static io.kite.Frontend.Parse.Literals.NullLiteral.nullLiteral;
+import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ParameterIdentifier.param;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
 import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
@@ -37,6 +37,7 @@ import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
+import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static java.text.MessageFormat.format;
 
@@ -106,6 +107,13 @@ public class Parser {
         System.out.println(Ansi.ansi().fgRed().a(message).reset().toString());
     }
 
+    private static Object setTarget(Set<AnnotationDeclaration> annotation, Annotatable res) {
+        for (AnnotationDeclaration annotationDeclaration : annotation) {
+            annotationDeclaration.setTarget(res);
+        }
+        return res;
+    }
+
     private void setTokens(List<Token> tokens) {
         iterator = new ParserIterator(tokens);
     }
@@ -138,6 +146,7 @@ public class Parser {
             }
 
             var annotations = AnnotationDeclaration();// extract the annotations
+            annotations.forEach(annotation -> statementList.add(ExpressionStatement.expressionStatement(annotation)));
 
             Statement statement = Declaration(annotations);
             if (statement == null || statement instanceof EmptyStatement) {
@@ -167,11 +176,31 @@ public class Parser {
             return switch (lookAhead().type()) {
                 case Fun -> FunctionDeclaration();
                 case Type -> TypeDeclaration();
-                case Schema -> SchemaDeclaration(annotations);
-                case Existing, Resource -> ResourceDeclaration(annotations);
-                case Component -> ComponentDeclaration(annotations);
-                case Input -> InputDeclaration(annotations);
-                case Output -> OutputDeclaration(annotations);
+                case Schema -> {
+                    var res = SchemaDeclaration(annotations);
+                    setTarget(annotations, res);
+                    yield res;
+                }
+                case Existing, Resource -> {
+                    var res = ResourceDeclaration(annotations);
+                    setTarget(annotations, res);
+                    yield res;
+                }
+                case Component -> {
+                    var res = ComponentDeclaration(annotations);
+                    setTarget(annotations, res);
+                    yield res;
+                }
+                case Input -> {
+                    var res = InputDeclaration(annotations);
+                    setTarget(annotations, res);
+                    yield res;
+                }
+                case Output -> {
+                    var res = OutputDeclaration(annotations);
+                    setTarget(annotations, res);
+                    yield res;
+                }
                 case Var -> VarDeclarations(annotations);
 //                case Val -> ValDeclarations();
                 default -> Statement();
@@ -192,7 +221,7 @@ public class Parser {
 
     /**
      * {@snippet
-     *: Statement
+             *: Statement
      * | EmptyStatement
      * | VarStatement
      * | IfStatement
@@ -346,7 +375,6 @@ public class Parser {
         var statement = VarStatementInit(annotations);
         return statement;
     }
-
 
     /**
      * ValStatement
@@ -515,6 +543,7 @@ public class Parser {
         do {
             var e = VarDeclaration();
             e.setAnnotations(annotations);
+            setTarget(annotations, e);
             declarations.add(e);
         } while (IsLookAhead(Comma) && eat(Comma) != null);
         return declarations;
@@ -585,7 +614,6 @@ public class Parser {
             return type;
         }
     }
-
 
     /**
      * VarInitializer
@@ -783,7 +811,7 @@ public class Parser {
      * schema Name '{' SchemaProperty* '}'
      * ;
      */
-    private Statement SchemaDeclaration(Set<AnnotationDeclaration> annotations) {
+    private SchemaDeclaration SchemaDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Schema);
 
         contextStack.push(ContextStack.Schema);
@@ -816,12 +844,14 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        var annotation = AnnotationDeclaration();
+        var annotations = AnnotationDeclaration();
 
         var type = TypeIdentifier();
         var id = Identifier();
         var init = IsLookAhead(lineTerminator, Comma, CloseBraces, EOF) ? null : PropertyInitializer();
-        return new SchemaProperty(type, id, init, annotation);
+        var res = schemaProperty(type, id, init, annotations);
+        setTarget(annotations, res);
+        return res;
     }
 
     /**
@@ -880,7 +910,7 @@ public class Parser {
     }
 
     private Expression AnnotationArgs() {
-       return switch (lookAhead().type()) {
+        return switch (lookAhead().type()) {
             case OpenBrackets -> ArrayExpression();
             case Identifier -> Identifier();
             case OpenBraces -> ObjectDeclaration();
@@ -888,7 +918,7 @@ public class Parser {
                 eat();
                 yield Literal();
             }
-           default -> null;
+            default -> null;
         };
     }
 
@@ -1192,7 +1222,7 @@ public class Parser {
      * : '}'
      * ;
      */
-    private Statement ResourceDeclaration(Set<AnnotationDeclaration> annotations) {
+    private ResourceExpression ResourceDeclaration(Set<AnnotationDeclaration> annotations) {
         if (contextStack.contains(ContextStack.FUNCTION)) {
             throw ParserErrors.error("Resource type not allowed in function body: ", lookAhead(), lookAhead().type());
         }
@@ -1276,7 +1306,7 @@ public class Parser {
      * : '}'
      * ;
      */
-    private Statement ComponentDeclaration(Set<AnnotationDeclaration> annotations) {
+    private ComponentStatement ComponentDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Component);
         var componentType = ComponentType();
         Identifier name = null;
@@ -1316,7 +1346,7 @@ public class Parser {
         }
     }
 
-    private Statement InputDeclaration(Set<AnnotationDeclaration> annotations) {
+    private InputDeclaration InputDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Input);
         var type = TypeIdentifier();
         var name = Identifier();
@@ -1328,7 +1358,7 @@ public class Parser {
         return InputDeclaration.input(name, type, body, annotations);
     }
 
-    private Statement OutputDeclaration(Set<AnnotationDeclaration> annotations) {
+    private OutputDeclaration OutputDeclaration(Set<AnnotationDeclaration> annotations) {
         eat(Output);
         var type = TypeIdentifier();
         var name = Identifier();

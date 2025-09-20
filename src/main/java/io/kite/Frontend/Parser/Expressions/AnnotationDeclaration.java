@@ -1,16 +1,22 @@
 package io.kite.Frontend.Parser.Expressions;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.annotations.Annotatable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor(staticName = "annotation")
-public final class AnnotationDeclaration {
+public final class AnnotationDeclaration extends Expression {
     private Identifier name;
     private Object value;
-    private ArrayExpression args; // for positional args
+    private ArrayExpression args; // for positional args [1,2,3]; ['dev','env']
     private ObjectExpression object; // for named args
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Annotatable target;
 
     public AnnotationDeclaration() {
     }
