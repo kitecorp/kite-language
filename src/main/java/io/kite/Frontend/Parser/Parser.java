@@ -918,6 +918,19 @@ public class Parser {
                 eat();
                 yield Literal();
             }
+            case Minus -> {
+                eat(Minus);
+                Object value1 = eat().value();
+                yield switch (value1) {
+                    case Integer value -> number(-value);
+                    case Double value -> number(-value);
+                    case Float value -> number(-value);
+                    case Long value -> number(-value);
+                    case Short value -> number(-value);
+                    case Byte value -> number(-value);
+                    case null, default -> throw ParserErrors.error("Can't negate a null value");
+                };
+            }
             default -> null;
         };
     }
