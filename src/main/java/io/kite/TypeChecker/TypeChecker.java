@@ -864,17 +864,22 @@ public final class TypeChecker implements Visitor<Type> {
         if (decoratorInfo == null) {
             throw new TypeError("Unknown decorator `%s`".formatted(declaration.name()));
         }
-        if (decoratorInfo.getParams().isEmpty() &&
-            (declaration.getValue() != null || declaration.getObject() != null ||
-             declaration.getArgs() != null && !declaration.getArgs().isEmpty())) {
+        if (shouldNotProvideArgs(declaration, decoratorInfo)) {
             throw new TypeError("Decorator `@%s` must not have any parameters and must not have any value or object".formatted(declaration.name()));
         }
+
 
         if (!decoratorInfo.getTargets().contains(declaration.targetType())){
             throw new TypeError("Decorator `@%s` can only be used on: %s".formatted(declaration.name(), decoratorInfo.targetString()));
         }
 
         return decoratorInfo;
+    }
+
+    private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
+        return decoratorInfo.getParams().isEmpty() &&
+               (declaration.getValue() != null || declaration.getObject() != null ||
+                declaration.getArgs() != null && !declaration.getArgs().isEmpty());
     }
 
     private Type validatePropertyIsString(Expression key) {
