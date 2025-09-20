@@ -53,6 +53,14 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    void decoratorCountErrorBoolean() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count(true)
+                output any something = null"""));
+
+    }
+
+    @Test
     void decoratorCountErrorString() {
         assertThrows(TypeError.class, () -> eval("""
                 @count("2")
