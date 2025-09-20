@@ -2,6 +2,7 @@ package io.kite.Frontend.Parser.Expressions;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -119,6 +120,10 @@ public final class AnnotationDeclaration extends Expression {
 
     public String name() {
         return name.string();
+    }
+
+    public DecoratorType.Target targetType() {
+        return target.getTarget();
     }
 
 }

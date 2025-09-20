@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 public final class DecoratorType extends Type {
@@ -25,7 +26,15 @@ public final class DecoratorType extends Type {
     }
 
     public enum Target {
-        OUTPUT, INPUT, VAR, RESOURCE, COMPONENT, SCHEMA, SCHEMA_PROPERTY,
+        OUTPUT, INPUT, VAR, RESOURCE, COMPONENT, SCHEMA, SCHEMA_PROPERTY;
+
+        String lowercase() {
+            return toString().toLowerCase();
+        }
+    }
+
+    public String targetString() {
+        return targets.stream().map(Target::lowercase).collect(Collectors.joining(", "));
     }
 
 }
