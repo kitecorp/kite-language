@@ -125,6 +125,14 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("decorator @count with decimal value rounds it to the floor")
+    void decoratorCountZeroDecimal() {
+        eval("""
+                @count(0.7)
+                component vm {}""");
+    }
+
+    @Test
     void decoratorDescriptionResource() {
         var res = eval("""
                 schema vm {}
