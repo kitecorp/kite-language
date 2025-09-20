@@ -178,4 +178,18 @@ public class DecoratorTest extends CheckerTest {
                 schema something{}""");
     }
 
+    @Test
+    void decoratorMaxLengthMissingNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxLength
+                input string something"""));
+    }
+
+    @Test
+    void decoratorMaxLengthSchema() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxLength(-10)
+                input string something"""));
+    }
+
 }

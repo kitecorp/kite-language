@@ -1,6 +1,5 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorCallable;
@@ -25,16 +24,12 @@ public class MaxLengthDecorator extends DecoratorCallable {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        var value = declaration.getValue();
-        var number = switch (value) {
-            case NumberLiteral literal -> literal.getValue();
-            default -> throw new TypeError("Invalid count value: " + value);
-        };
-        int i = number.intValue();
-        if (i < 0) {
+        var number = validateNumber(declaration);
+        var value = number.longValue();
+        if (value < 0) {
             throw new TypeError(MessageFormat.format("Invalid count: must be greater than 0, got `{0}`", number));
-        } else if (i >= 999999) {
-            throw new TypeError(MessageFormat.format("Invalid count: must be less than 1000, got `{0}`", number));
+        } else if (value >= 9999999) {
+            throw new TypeError(MessageFormat.format("Invalid count: must be less than 9999999, got `{0}`", number));
         }
         return null;
     }
