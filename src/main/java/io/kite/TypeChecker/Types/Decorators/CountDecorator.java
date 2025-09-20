@@ -1,6 +1,5 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorCallable;
@@ -23,25 +22,14 @@ public class CountDecorator extends DecoratorCallable {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
-            throw new TypeError("Count decorator does not accept arrays as arguments");
-        } else if (declaration.getObject() != null) {
-            throw new TypeError("Count decorator does not accept objects as arguments");
-        } else if (declaration.getValue() == null) {
-            throw new TypeError("Count decorator requires a number as argument");
-        }
-
-        var value = declaration.getValue();
-        var number = switch (value) {
-            case NumberLiteral literal -> literal.getValue();
-            default -> throw new TypeError("Invalid count value: " + value);
-        };
-        int i = number.intValue();
-        if (i < 0) {
+        var number = validateNumber(declaration);
+        int intValue = number.intValue();
+        if (intValue < 0) {
             throw new TypeError(MessageFormat.format("Invalid count: must be greater than 0, got `{0}`", number));
-        } else if (i >= 1000) {
+        } else if (intValue >= 1000) {
             throw new TypeError(MessageFormat.format("Invalid count: must be less than 1000, got `{0}`", number));
         }
         return null;
     }
+
 }

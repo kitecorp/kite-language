@@ -1,8 +1,11 @@
 package io.kite.TypeChecker.Types;
 
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.TypeChecker.TypeError;
 import lombok.Data;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -34,4 +37,22 @@ public abstract class DecoratorCallable {
     public String targetString() {
         return type.targetString();
     }
+
+    protected Number validateNumber(AnnotationDeclaration declaration) {
+        if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
+            throw new TypeError(MessageFormat.format("@{0} does not accept arrays as arguments", name));
+        } else if (declaration.getObject() != null) {
+            throw new TypeError(MessageFormat.format("@{0} does not accept objects as arguments", name));
+        } else if (declaration.getValue() == null) {
+            throw new TypeError(MessageFormat.format("@{0} requires a number as argument", name));
+        }
+
+        var value = declaration.getValue();
+        var number = switch (value) {
+            case NumberLiteral literal -> literal.getValue();
+            default -> throw new TypeError("Invalid count value: " + value);
+        };
+        return number;
+    }
+
 }

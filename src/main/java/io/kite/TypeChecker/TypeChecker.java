@@ -271,26 +271,27 @@ public final class TypeChecker implements Visitor<Type> {
         if (Objects.equals(actualType, declaredType)) {
             return declaredType;
         }
-        if (declaredType.getTypes().contains(actualType)) {
-            if (actualType instanceof ObjectType properties) {
-                // iterate over init object properties to make sure all declarations match the allowed properties in the union type type
-                for (var entry : properties.getEnvironment().getVariables().entrySet()) {
-                    for (Expression type : declaredType.getTypes()) {
-                        if (type instanceof ObjectType objectType) {
-                            var declared = objectType.lookup(entry.getKey()); // make sure the property exists in the declared type
-                            expect(entry.getValue(), declared, declared);
-                        }
-                    }
-                }
-            }
+        if (!declaredType.getTypes().contains(actualType)) {
+            String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
+                    printer.visit(declaredType),
+                    printer.visit(declaredType),
+                    actualType.getValue(),
+                    printer.visit(expectedVal));
+            throw new TypeError(string);
+        }
+        if (!(actualType instanceof ObjectType properties)) {
             return declaredType;
         }
-        String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
-                printer.visit(declaredType),
-                printer.visit(declaredType),
-                actualType.getValue(),
-                printer.visit(expectedVal));
-        throw new TypeError(string);
+        // iterate over init object properties to make sure all declarations match the allowed properties in the union type type
+        for (var entry : properties.getEnvironment().getVariables().entrySet()) {
+            for (Expression type : declaredType.getTypes()) {
+                if (type instanceof ObjectType objectType) {
+                    var declared = objectType.lookup(entry.getKey()); // make sure the property exists in the declared type
+                    expect(entry.getValue(), declared, declared);
+                }
+            }
+        }
+        return declaredType;
     }
 
     private Type expect(Type actualType, Type expectedType, Statement actualVal, Statement expectedVal) {
