@@ -118,6 +118,13 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    void decoratorCountZero() {
+        eval("""
+                @count(0)
+                component vm {}""");
+    }
+
+    @Test
     void decoratorDescriptionResource() {
         var res = eval("""
                 schema vm {}
