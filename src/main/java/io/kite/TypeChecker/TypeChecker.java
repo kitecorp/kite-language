@@ -10,6 +10,7 @@ import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.Types.*;
 import io.kite.TypeChecker.Types.Decorators.CountDecorator;
 import io.kite.TypeChecker.Types.Decorators.DescriptionDecorator;
+import io.kite.TypeChecker.Types.Decorators.MaxLengthDecorator;
 import io.kite.TypeChecker.Types.Decorators.SensitiveDecorator;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
@@ -32,7 +33,7 @@ public final class TypeChecker implements Visitor<Type> {
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
-    private Map<String, DecoratorCallable> decoratorInfoMap;
+    private final Map<String, DecoratorCallable> decoratorInfoMap;
 
     public TypeChecker() {
         this(new TypeEnvironment());
@@ -41,24 +42,10 @@ public final class TypeChecker implements Visitor<Type> {
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
         this.decoratorInfoMap = new HashMap<>();
-        this.decoratorInfoMap.put("sensitive", new SensitiveDecorator());
-        this.decoratorInfoMap.put("count", new CountDecorator());
-        this.decoratorInfoMap.put("description", new DescriptionDecorator());
-    }
-
-    /**
-     * Explicit type type should allow assigning empty array like
-     * type[] name = []
-     */
-    private static void handleArrayType(Type implicit, Type explicit) {
-        if (explicit == null || explicit.getKind() != SystemType.ARRAY || implicit.getKind() != SystemType.ARRAY) {
-            return;
-        }
-        if (implicit instanceof ArrayType implicitArray && implicitArray.getType() == null) {
-            if (explicit instanceof ArrayType expectedArrayType) {
-                implicitArray.setType(expectedArrayType.getType());
-            }
-        }
+        this.decoratorInfoMap.put(SensitiveDecorator.SENSITIVE, new SensitiveDecorator());
+        this.decoratorInfoMap.put(CountDecorator.COUNT, new CountDecorator());
+        this.decoratorInfoMap.put(DescriptionDecorator.DESCRIPTION, new DescriptionDecorator());
+        this.decoratorInfoMap.put(MaxLengthDecorator.MAX_LENGTH, new MaxLengthDecorator());
     }
 
     private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
@@ -759,7 +746,6 @@ public final class TypeChecker implements Visitor<Type> {
         var implicitType = visit(init);
         if (typeIdentifier != null) { // val type name
             var explicitType = visit(typeIdentifier);
-            handleArrayType(implicitType, explicitType);
             if (explicitType instanceof UnionType unionType) {
                 var unionType1 = expect(implicitType, unionType, expression);
                 return env.init(var, unionType1);

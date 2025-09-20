@@ -10,8 +10,10 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class SensitiveDecorator extends DecoratorCallable {
 
+    public static final String SENSITIVE = "sensitive";
+
     public SensitiveDecorator() {
-        super("sensitive", decorator(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT));
+        super(SENSITIVE, decorator(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT));
     }
 
     @Override
