@@ -13,24 +13,18 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class CountDecorator extends DecoratorCallable {
+public class MaxLengthDecorator extends DecoratorCallable {
+    public static final String MAX_LENGTH = "maxLength";
 
-    public static final String COUNT = "count";
-
-    public CountDecorator() {
-        super(COUNT, decorator(List.of(ValueType.Number), Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)));
+    public MaxLengthDecorator() {
+        super(MAX_LENGTH, decorator(List.of(ValueType.Number), Set.of(
+                DecoratorType.Target.INPUT,
+                DecoratorType.Target.OUTPUT
+        )));
     }
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
-            throw new TypeError("Count decorator does not accept arrays as arguments");
-        } else if (declaration.getObject() != null) {
-            throw new TypeError("Count decorator does not accept objects as arguments");
-        } else if (declaration.getValue() == null) {
-            throw new TypeError("Count decorator requires a number as argument");
-        }
-
         var value = declaration.getValue();
         var number = switch (value) {
             case NumberLiteral literal -> literal.getValue();
@@ -39,7 +33,7 @@ public class CountDecorator extends DecoratorCallable {
         int i = number.intValue();
         if (i < 0) {
             throw new TypeError(MessageFormat.format("Invalid count: must be greater than 0, got `{0}`", number));
-        } else if (i >= 1000) {
+        } else if (i >= 999999) {
             throw new TypeError(MessageFormat.format("Invalid count: must be less than 1000, got `{0}`", number));
         }
         return null;

@@ -1,5 +1,6 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorCallable;
@@ -13,8 +14,10 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class DescriptionDecorator extends DecoratorCallable {
 
+    public static final String DESCRIPTION = "description";
+
     public DescriptionDecorator() {
-        super("description", decorator(List.of(ValueType.String), Set.of(
+        super(DESCRIPTION, decorator(List.of(ValueType.String), Set.of(
                         Target.RESOURCE,
                         Target.COMPONENT,
                         Target.INPUT,
@@ -33,8 +36,8 @@ public class DescriptionDecorator extends DecoratorCallable {
             throw new TypeError("Description decorator does not accept arrays as arguments");
         } else if (declaration.getObject() != null) {
             throw new TypeError("Description decorator does not accept objects as arguments");
-        } else if (declaration.getValue() != null && declaration.getValue() instanceof String value) {
-            return value;
+        } else if (declaration.getValue() != null && declaration.getValue() instanceof StringLiteral value) {
+            return value.getValue();
         } else {
             throw new TypeError("Description decorator requires a string as argument");
         }
