@@ -21,6 +21,14 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    void decoratorSensitiveInvalidArgs() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @sensitive(2)
+                output any something = null
+                """));
+    }
+
+    @Test
     void decoratorSensitiveInvalidElement() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 @sensitive
