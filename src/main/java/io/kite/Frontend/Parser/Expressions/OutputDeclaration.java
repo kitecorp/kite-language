@@ -8,7 +8,6 @@ import io.kite.Runtime.Values.DependencyHolder;
 import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -23,7 +22,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     private Expression init;
     private Object resolvedValue;
     private TypeIdentifier type;
-    @Nullable private Set<AnnotationDeclaration> annotations;
+    private Set<AnnotationDeclaration> annotations;
 
     public OutputDeclaration() {
         annotations = Set.of();
