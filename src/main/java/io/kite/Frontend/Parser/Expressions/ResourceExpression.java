@@ -5,9 +5,11 @@ import io.kite.Frontend.Parse.Literals.SymbolIdentifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Data
-public final class ResourceExpression extends Statement implements DeferredObserverValue {
+public final class ResourceExpression extends Statement implements DeferredObserverValue, Annotatable {
     private Identifier type;
     @Nullable
     private Identifier name;
@@ -104,7 +106,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
         return new ResourceExpression(type, name, block);
     }
 
-    public static Statement resource(boolean existing, TypeIdentifier type, Identifier name, BlockExpression block) {
+    public static ResourceExpression resource(boolean existing, TypeIdentifier type, Identifier name, BlockExpression block) {
         return new ResourceExpression(existing, type, name, block);
     }
 
@@ -131,4 +133,8 @@ public final class ResourceExpression extends Statement implements DeferredObser
         return interpreter.visit(this);
     }
 
+    @Override
+    public DecoratorType.Target getTarget() {
+        return DecoratorType.Target.RESOURCE;
+    }
 }

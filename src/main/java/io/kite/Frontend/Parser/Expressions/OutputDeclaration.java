@@ -5,6 +5,7 @@ import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Values.DependencyHolder;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -133,5 +134,10 @@ public final class OutputDeclaration extends Statement implements DependencyHold
 
     public boolean hasType() {
         return type != null;
+    }
+
+    @Override
+    public DecoratorType.Target getTarget() {
+        return DecoratorType.Target.OUTPUT;
     }
 }

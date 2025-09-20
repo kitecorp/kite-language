@@ -4,6 +4,8 @@ import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.PluginIdentifier;
 import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +20,7 @@ import java.util.Set;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class ComponentStatement extends Statement {
+public final class ComponentStatement extends Statement implements Annotatable {
     private PluginIdentifier type;
     /**
      * When missing it will be a component type. When present it will be an initialization
@@ -51,7 +53,7 @@ public final class ComponentStatement extends Statement {
         return new ComponentStatement(type, name, block, Set.of(annotations));
     }
 
-    public static Statement component(PluginIdentifier type, Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
+    public static ComponentStatement component(PluginIdentifier type, Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
         return new ComponentStatement(type, name, block, annotations);
     }
 
@@ -89,4 +91,8 @@ public final class ComponentStatement extends Statement {
         return name != null;
     }
 
+    @Override
+    public DecoratorType.Target getTarget() {
+        return DecoratorType.Target.COMPONENT;
+    }
 }

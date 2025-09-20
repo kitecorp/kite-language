@@ -5,13 +5,14 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
 
 public sealed interface Visitor<R>
-        permits ScopeResolver, io.kite.Runtime.Inputs.ChainResolver, Interpreter, TypeChecker, SyntaxPrinter {
+        permits ScopeResolver, ChainResolver, Interpreter, TypeChecker, SyntaxPrinter {
 
     default R visit(@Nullable Expression expr) {
         return switch (expr) {
@@ -33,6 +34,7 @@ public sealed interface Visitor<R>
             case Type type -> visit(type);
             case ObjectExpression expression -> visit(expression);
             case ArrayExpression arrayExpression -> visit(arrayExpression);
+            case AnnotationDeclaration annotationDeclaration -> visit(annotationDeclaration);
             case null -> null;
         };
     }

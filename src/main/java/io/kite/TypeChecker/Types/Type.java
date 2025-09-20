@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.StringJoiner;
 
 public sealed abstract class Type extends Expression
-        permits AnnotationType, FunType, ReferenceType, ValueType {
+        permits DecoratorType, FunType, ReferenceType, ValueType {
     @Getter
     @Setter
     private String value;

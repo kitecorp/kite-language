@@ -1,10 +1,10 @@
 package io.kite.Frontend.Parser.Statements;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
-import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.Frontend.Parser.Expressions.Expression;
+import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +16,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(staticName = "schema")
-public final class SchemaDeclaration extends Statement {
+public final class SchemaDeclaration extends Statement implements Annotatable {
     private Identifier name;
     private List<SchemaProperty> properties;
     private Set<AnnotationDeclaration> annotations;
@@ -58,59 +58,8 @@ public final class SchemaDeclaration extends Statement {
         return new SchemaDeclaration(name, properties, Set.of(annotations));
     }
 
-    public record SchemaProperty(TypeIdentifier type,
-                                 Identifier identifier,
-                                 Expression init,
-                                 Set<AnnotationDeclaration> annotation) {
-
-
-        public SchemaProperty(TypeIdentifier typeIdentifier, Identifier identifier, Expression init) {
-            this(typeIdentifier, identifier, init, Set.of());
-        }
-
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier,
-                                                    Identifier identifier,
-                                                    Expression init,
-                                                    Set<AnnotationDeclaration> annotation) {
-            return new SchemaProperty(typeIdentifier, identifier, init, annotation);
-        }
-
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier,
-                                                    Identifier identifier,
-                                                    Expression init,
-                                                    AnnotationDeclaration... annotation) {
-            return new SchemaProperty(typeIdentifier, identifier, init, Set.of(annotation));
-        }
-
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier,
-                                                    Expression init, Set<AnnotationDeclaration> annotation) {
-            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), init, annotation);
-        }
-
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier,
-                                                    Expression init, AnnotationDeclaration... annotation) {
-            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), init, Set.of(annotation));
-        }
-
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init,
-                                                    AnnotationDeclaration... annotation) {
-            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), Set.of(annotation));
-        }
-
-        public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init) {
-            return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init));
-        }
-
-        public String name() {
-            return identifier.string();
-        }
-
-        public boolean hasInit() {
-            return init != null;
-        }
-
-        public boolean hasType() {
-            return type != null;
-        }
+    @Override
+    public DecoratorType.Target getTarget() {
+        return DecoratorType.Target.SCHEMA;
     }
 }

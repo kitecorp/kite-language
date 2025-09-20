@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public final class TypeChecker implements Visitor<Type> {
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
-    private TypeEnvironment annotationRepository;
+    private Map<String, DecoratorType> decoratorInfoMap;
 
     public TypeChecker() {
         this(new TypeEnvironment());
@@ -35,8 +36,8 @@ public final class TypeChecker implements Visitor<Type> {
 
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
-        this.annotationRepository = new TypeEnvironment();
-        this.annotationRepository.init("sensitive", AnnotationType.annotation("sensitive", AnnotationType.Target.INPUT, AnnotationType.Target.OUTPUT));
+        this.decoratorInfoMap = new HashMap<>();
+        this.decoratorInfoMap.put("sensitive", DecoratorType.decorator(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT));
     }
 
     /**
@@ -360,6 +361,13 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(OutputDeclaration expression) {
+        for (AnnotationDeclaration annotation : expression.getAnnotations()) {
+            var decorator = (DecoratorType)visit(annotation);
+            if (!decorator.getTargets().contains(DecoratorType.Target.OUTPUT)) {
+                throw new TypeError(MessageFormat.format("{0} decorator can't be used on outputs: {1}", annotation.getName().string(), printer.visit(annotation)));
+            }
+        }
+
         var t1 = visit(expression.getType());
         // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
         switch (expression.getInit()) {
@@ -639,7 +647,7 @@ public final class TypeChecker implements Visitor<Type> {
 
         var schemaType = new SchemaType(name.string(), env);
         env.init(name, schemaType);
-        for (SchemaDeclaration.SchemaProperty property : body) {
+        for (SchemaProperty property : body) {
             var vardeclaration = VarDeclaration.var(property.name(), property.type(), property.init());
             executeBlock(vardeclaration, schemaType.getEnvironment());
         }
@@ -847,15 +855,17 @@ public final class TypeChecker implements Visitor<Type> {
         return null;
     }
 
+    /**
+     * This must be manually called from the following statement(output, input, resource, schema, schemaProperty, component)
+     */
     @Override
     public Type visit(AnnotationDeclaration declaration) {
-        var annotation = annotationRepository.get(declaration.name());
-        if (annotation == null || annotation.getKind() != SystemType.ANNOTATION) {
-            throw new TypeError("Unknown annotation `%s`".formatted(declaration.name()));
+        var decoratorInfo = decoratorInfoMap.get(declaration.name());
+        if (decoratorInfo == null) {
+            throw new TypeError("Unknown decorator `%s`".formatted(declaration.name()));
         }
 
-
-        return ValueType.Void;
+        return decoratorInfo;
     }
 
     private Type validatePropertyIsString(Expression key) {

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.Frontend.Parse.Literals.Identifier.id;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Factory.program;
-import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.SchemaProperty.schemaProperty;
+import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
