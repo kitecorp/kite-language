@@ -48,7 +48,7 @@ public class MaxValueDecorator extends DecoratorCallable {
                     .fgYellow()
                     .a("@").a(getName())
                     .reset()
-                    .a(" is only valid for numbers. Applied to: ")
+                    .a(" is only valid for numbers but it is applied to: ")
                     .fgBlue()
                     .a(identifier.getType().getValue())
                     .toString();

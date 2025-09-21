@@ -2,6 +2,7 @@ package io.kite.Frontend.annotations;
 
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.Type;
 
 import java.util.Set;
 
@@ -11,5 +12,7 @@ public interface Annotatable {
     void setAnnotations(Set<AnnotationDeclaration> anns);
 
     DecoratorType.Target getTarget();
+
+    Type targetType();
 
 }

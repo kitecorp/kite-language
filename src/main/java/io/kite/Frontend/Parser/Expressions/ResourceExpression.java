@@ -10,6 +10,8 @@ import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.ResourceType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -136,5 +138,10 @@ public final class ResourceExpression extends Statement implements DeferredObser
     @Override
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.RESOURCE;
+    }
+
+    @Override
+    public Type targetType() {
+        return ResourceType.Resource;
     }
 }
