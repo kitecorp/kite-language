@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -69,5 +70,10 @@ public class SchemaProperty implements Annotatable {
     @Override
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.SCHEMA_PROPERTY;
+    }
+
+    @Override
+    public Type targetType() {
+        return type.getType();
     }
 }

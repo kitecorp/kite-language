@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class SchemaType extends ReferenceType {
+    public static final ReferenceType Schema = new ReferenceType(SystemType.RESOURCE);
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

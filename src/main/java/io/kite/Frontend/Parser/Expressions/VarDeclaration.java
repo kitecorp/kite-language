@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Statements.VarStatement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Values.DependencyHolder;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -150,5 +151,10 @@ public final class VarDeclaration extends Expression implements DependencyHolder
     @Override
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.VAR;
+    }
+
+    @Override
+    public Type targetType() {
+        return type.getType();
     }
 }

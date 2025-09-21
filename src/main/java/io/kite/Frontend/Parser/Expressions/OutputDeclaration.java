@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Runtime.Values.DependencyHolder;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -138,5 +139,10 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     @Override
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.OUTPUT;
+    }
+
+    @Override
+    public Type targetType() {
+        return type.getType();
     }
 }

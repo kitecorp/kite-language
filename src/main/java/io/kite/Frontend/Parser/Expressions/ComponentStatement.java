@@ -6,6 +6,8 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.ObjectType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -95,4 +97,10 @@ public final class ComponentStatement extends Statement implements Annotatable {
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.COMPONENT;
     }
+
+    public Type targetType() {
+        // todo change to component type
+        return ObjectType.Resource;
+    }
+
 }

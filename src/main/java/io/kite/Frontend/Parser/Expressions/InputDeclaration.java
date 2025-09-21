@@ -5,6 +5,7 @@ import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -145,5 +146,10 @@ public final class InputDeclaration extends Statement implements Annotatable {
     @Override
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.INPUT;
+    }
+
+    @Override
+    public Type targetType() {
+        return type.getType();
     }
 }
