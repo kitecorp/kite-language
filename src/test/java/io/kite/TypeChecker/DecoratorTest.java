@@ -301,4 +301,67 @@ public class DecoratorTest extends CheckerTest {
                 input string something"""));
     }
 
+    @Test
+    void decoratorMinValueMissingNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue
+                input string something"""));
+    }
+
+    @Test
+    void decoratorMinValue() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue(10)
+                input string something"""));
+    }
+
+    @Test
+    void decoratorMinValueNumber() {
+        eval("""
+                @minValue(10)
+                input number something""");
+    }
+
+    @Test
+    void decoratorMinValueArray() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue(10)
+                input string[] something"""));
+    }
+
+    @Test
+    void decoratorMinValueArrayNumber() {
+        eval("""
+                @minValue(10)
+                input number[] something""");
+    }
+
+    @Test
+    void decoratorMinValueArrayAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue(10)
+                input any[] something"""));
+    }
+
+    @Test
+    void decoratorMinValueArrayObject() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue(10)
+                input object[] something"""));
+    }
+
+    @Test
+    void decoratorMinValueSchema() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue
+                schema something{}"""));
+    }
+
+    @Test
+    void decoratorMinValueNegative() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minValue(-10)
+                input string something"""));
+    }
+
 }
