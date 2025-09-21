@@ -10,6 +10,7 @@ import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Decorators.DecoratorInterpreter;
+import io.kite.Runtime.Decorators.MaxLengthDecorator;
 import io.kite.Runtime.Decorators.MaxValueDecorator;
 import io.kite.Runtime.Decorators.MinValueDecorator;
 import io.kite.Runtime.Environment.ActivationEnvironment;
@@ -28,7 +29,6 @@ import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -102,6 +102,7 @@ public final class Interpreter implements Visitor<Object> {
 
         this.decoratorInterpreter.put("minValue", new MinValueDecorator());
         this.decoratorInterpreter.put("maxValue", new MaxValueDecorator());
+        this.decoratorInterpreter.put("maxLength", new MaxLengthDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -839,9 +840,6 @@ public final class Interpreter implements Visitor<Object> {
         var res = visit(input.getInit());
         if (res instanceof Dependency value && value.value() == null) {
             return value;
-        } else if (res instanceof String s && StringUtils.isBlank(s)) {
-            log.warn("Output type without an init value: {}", printer.visit(input));
-            return NullValue.of();
         } else {
             return res;
         }

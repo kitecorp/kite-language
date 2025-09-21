@@ -136,4 +136,44 @@ public class DecoratorTests extends RuntimeTest {
     }
 
 
+    @Test
+    void outputMaxLength() {
+        eval("""
+                @maxLength(10)
+                output string something = "hello"
+                """);
+    }
+
+    @Test
+    void outputMaxLengthGreaterThan() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxLength(10)
+                output string something = "hello world!!!!!!!!!!!"
+                """));
+    }
+
+    @Test
+    void outputMaxLengthWrongInit() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxLength(10)
+                output string something = 10
+                """));
+    }
+
+    @Test
+    void outputMaxLengthEmpty() {
+        eval("""
+                @maxLength(0)
+                output string something = ""
+                """);
+    }
+
+    @Test
+    void outputMaxLengthNegative() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxLength(0)
+                output string something = "a"
+                """));
+    }
+
 }
