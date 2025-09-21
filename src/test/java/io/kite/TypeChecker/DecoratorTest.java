@@ -456,6 +456,20 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    void decoratorAllowStringsArray() {
+        eval("""
+                @allowed(["hello", "world"])
+                input string[] something""");
+    }
+
+    @Test
+    void decoratorAllowNumberArray() {
+        eval("""
+                @allowed([10, 20])
+                input number[] something""");
+    }
+
+    @Test
     void decoratorAllowArray() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 @allowed(10)
