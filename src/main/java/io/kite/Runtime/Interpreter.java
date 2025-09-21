@@ -9,10 +9,7 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.Runtime.Decorators.DecoratorInterpreter;
-import io.kite.Runtime.Decorators.MaxLengthDecorator;
-import io.kite.Runtime.Decorators.MaxValueDecorator;
-import io.kite.Runtime.Decorators.MinValueDecorator;
+import io.kite.Runtime.Decorators.*;
 import io.kite.Runtime.Environment.ActivationEnvironment;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Functions.Cast.*;
@@ -103,6 +100,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decoratorInterpreter.put("minValue", new MinValueDecorator());
         this.decoratorInterpreter.put("maxValue", new MaxValueDecorator());
         this.decoratorInterpreter.put("maxLength", new MaxLengthDecorator());
+        this.decoratorInterpreter.put("minLength", new MinLengthDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
