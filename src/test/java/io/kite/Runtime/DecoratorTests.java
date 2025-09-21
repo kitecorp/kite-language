@@ -76,6 +76,7 @@ public class DecoratorTests extends RuntimeTest {
                 output number something = -9
                 """));
     }
+
     @Test
     void outputMaxValue() {
         eval("""
@@ -86,18 +87,18 @@ public class DecoratorTests extends RuntimeTest {
 
     @Test
     void outputMaxValueGreaterThan() {
-        eval("""
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
                 @maxValue(10)
                 output number something = 11
-                """);
+                """));
     }
 
     @Test
     void outputMaxValueLessThan() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+        eval("""
                 @maxValue(10)
                 output number something = 9
-                """));
+                """);
     }
 
     @Test
@@ -110,10 +111,10 @@ public class DecoratorTests extends RuntimeTest {
 
     @Test
     void outputMaxValueNegative() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+        eval("""
                 @maxValue(10)
                 output number something = -9
-                """));
+                """);
     }
 
 

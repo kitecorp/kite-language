@@ -10,6 +10,7 @@ import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Decorators.DecoratorInterpreter;
+import io.kite.Runtime.Decorators.MaxValueDecorator;
 import io.kite.Runtime.Decorators.MinValueDecorator;
 import io.kite.Runtime.Environment.ActivationEnvironment;
 import io.kite.Runtime.Environment.Environment;
@@ -100,6 +101,7 @@ public final class Interpreter implements Visitor<Object> {
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
 
         this.decoratorInterpreter.put("minValue", new MinValueDecorator());
+        this.decoratorInterpreter.put("maxValue", new MaxValueDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -911,15 +913,17 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
-        try {
+//        try {
             var decorator = decoratorInterpreter.get(expression.name());
             if (decorator != null) {
                 decorator.execute(this, expression);
+            } else {
+                log.warn("Unknown decorator: {}", expression.name());
             }
-        } catch (Exception e) {
-            System.out.println("Decorator error! " + e.getMessage());
-            throw e;
-        }
+//        } catch (Exception e) {
+//            System.out.println("Decorator error! " + e.getMessage());
+//            throw e;
+//        }
         return expression.getValue();
     }
 
