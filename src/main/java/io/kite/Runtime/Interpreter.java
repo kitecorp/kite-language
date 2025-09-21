@@ -917,7 +917,8 @@ public final class Interpreter implements Visitor<Object> {
                 decorator.execute(this, expression);
             }
         } catch (Exception e) {
-            System.out.println("Error executing decorator: " + e.getMessage());
+            System.out.println("Decorator error! " + e.getMessage());
+            throw e;
         }
         return expression.getValue();
     }
