@@ -1,12 +1,10 @@
 package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorCallable;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -22,13 +20,8 @@ public class CountDecorator extends DecoratorCallable {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        var number = validateNumber(declaration);
-        int intValue = number.intValue();
-        if (intValue < 0) {
-            throw new TypeError(MessageFormat.format("Invalid count: must be greater than 0, got `{0}`", number));
-        } else if (intValue >= 1000) {
-            throw new TypeError(MessageFormat.format("Invalid count: must be less than 1000, got `{0}`", number));
-        }
+        var number = validateNumber(declaration, 0, 1000);
+
         return null;
     }
 

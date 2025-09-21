@@ -1,12 +1,13 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier;
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.Frontend.Parser.Expressions.InputDeclaration;
+import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.DecoratorCallable;
-import io.kite.TypeChecker.Types.DecoratorType;
-import io.kite.TypeChecker.Types.ValueType;
+import io.kite.TypeChecker.Types.*;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -22,15 +23,29 @@ public class MaxLengthDecorator extends DecoratorCallable {
         )));
     }
 
+    private static boolean isAllowedOn(TypeIdentifier literal) {
+        Type type = literal.getType();
+        SystemType kind = type.getKind();
+        return kind == SystemType.STRING || literal instanceof ArrayTypeIdentifier;
+    }
+
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        var number = validateNumber(declaration);
-        var value = number.longValue();
-        if (value < 0) {
-            throw new TypeError(MessageFormat.format("Invalid count: must be greater than 0, got `{0}`", number));
-        } else if (value >= 9999999) {
-            throw new TypeError(MessageFormat.format("Invalid count: must be less than 9999999, got `{0}`", number));
+        validateNumber(declaration,0,999999);
+
+        switch (declaration.getTarget()) {
+            case InputDeclaration input -> extracted(input.getType());
+            case OutputDeclaration output -> extracted(output.getType());
+            default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         }
         return null;
+    }
+
+    private static void extracted(TypeIdentifier input) {
+        if (input instanceof TypeIdentifier literal) {
+            if (!isAllowedOn(literal)) {
+                throw new TypeError("@maxLength is only valid for strings and arrays. Applied to: " + literal.getType());
+            }
+        }
     }
 }

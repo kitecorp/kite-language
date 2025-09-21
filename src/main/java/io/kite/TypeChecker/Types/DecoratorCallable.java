@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import lombok.Data;
+import org.fusesource.jansi.Ansi;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -38,7 +39,7 @@ public abstract class DecoratorCallable {
         return type.targetString();
     }
 
-    protected Number validateNumber(AnnotationDeclaration declaration) {
+    protected Number validateNumber(AnnotationDeclaration declaration, int min, int max) {
         if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
             throw new TypeError(MessageFormat.format("@{0} does not accept arrays as arguments", name));
         } else if (declaration.getObject() != null) {
@@ -52,7 +53,15 @@ public abstract class DecoratorCallable {
             case NumberLiteral literal -> literal.getValue();
             default -> throw new TypeError("Invalid count value: " + value);
         };
-        return number;
+        var longValue = number.longValue();
+        if (longValue < min) {
+            String decorator = Ansi.ansi().fgYellow().a("@").a(name).reset().toString();
+            throw new TypeError(MessageFormat.format("Invalid {0}: must be greater than {1}, got: {2}", decorator, min, number));
+        } else if (longValue >= max) {
+            String decorator = Ansi.ansi().fgYellow().a("@").a(name).reset().toString();
+            throw new TypeError(MessageFormat.format("Invalid {0}: must be less than {1}, got: {2}", decorator, max, number));
+        }
+        return longValue;
     }
 
 }

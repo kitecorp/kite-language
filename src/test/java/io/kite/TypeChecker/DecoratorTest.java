@@ -186,7 +186,58 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
+    void decoratorMaxLength() {
+        eval("""
+                @maxLength(10)
+                input string something""");
+    }
+
+    @Test
+    void decoratorMaxLengthNumber() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @maxLength(10)
+                        input number something""")
+        );
+    }
+
+    @Test
+    void decoratorMaxLengthArray() {
+        eval("""
+                @maxLength(10)
+                input string[] something""");
+    }
+
+    @Test
+    void decoratorMaxLengthArrayNumber() {
+        eval("""
+                @maxLength(10)
+                input number[] something""");
+    }
+
+    @Test
+    void decoratorMaxLengthArrayAny() {
+        eval("""
+                @maxLength(10)
+                input any[] something""");
+    }
+
+    @Test
+    void decoratorMaxLengthArrayObject() {
+        eval("""
+                @maxLength(10)
+                input object[] something""");
+    }
+
+    @Test
     void decoratorMaxLengthSchema() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxLength
+                schema something{}"""));
+    }
+
+    @Test
+    void decoratorMaxLengthNegative() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 @maxLength(-10)
                 input string something"""));
