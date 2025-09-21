@@ -1,6 +1,7 @@
 package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorCallable;
@@ -60,5 +61,10 @@ public class DescriptionDecorator extends DecoratorCallable {
                     .toString();
             throw new TypeError(message);
         }
+    }
+
+    @Override
+    protected boolean isAllowedOn(TypeIdentifier literal) {
+        return true;
     }
 }

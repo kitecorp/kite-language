@@ -23,7 +23,8 @@ public class MinValueDecorator extends DecoratorCallable {
         )));
     }
 
-    private static boolean isAllowedOn(TypeIdentifier literal) {
+    @Override
+    protected boolean isAllowedOn(TypeIdentifier literal) {
         Type type = literal.getType();
         SystemType kind = type.getKind();
         return kind == SystemType.NUMBER;
@@ -31,7 +32,7 @@ public class MinValueDecorator extends DecoratorCallable {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        validateNumber(declaration,0,999999);
+        validateNumber(declaration, 0, 999999);
 
         switch (declaration.getTarget()) {
             case InputDeclaration input -> extracted(input.getType());
@@ -41,19 +42,17 @@ public class MinValueDecorator extends DecoratorCallable {
         return null;
     }
 
-    private void extracted(TypeIdentifier input) {
-        if (input instanceof TypeIdentifier literal) {
-            if (!isAllowedOn(literal)) {
-                String message = Ansi.ansi()
-                        .fgYellow()
-                        .a("@").a(getName())
-                        .reset()
-                        .a(" is only valid for numbers. Applied to: ")
-                        .fgBlue()
-                        .a(literal.getType())
-                        .toString();
-                throw new TypeError(message);
-            }
+    private void extracted(TypeIdentifier identifier) {
+        if (!isAllowedOn(identifier)) {
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(getName())
+                    .reset()
+                    .a(" is only valid for numbers. Applied to: ")
+                    .fgBlue()
+                    .a(identifier.getType().getValue())
+                    .toString();
+            throw new TypeError(message);
         }
     }
 }
