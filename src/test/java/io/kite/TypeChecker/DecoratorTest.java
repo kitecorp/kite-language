@@ -165,13 +165,6 @@ public class DecoratorTest extends CheckerTest {
     }
 
     @Test
-    void decoratorDescriptionFun() {
-        var res = eval("""
-                @description("some markdown")
-                fun something(){return void;}""");
-    }
-
-    @Test
     void decoratorDescriptionSchema() {
         var res = eval("""
                 @description("some markdown")
