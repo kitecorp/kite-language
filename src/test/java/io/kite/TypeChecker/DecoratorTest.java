@@ -236,4 +236,69 @@ public class DecoratorTest extends CheckerTest {
                 input string something"""));
     }
 
+    @Test
+    void decoratorMinLengthMissingNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minLength
+                input string something"""));
+    }
+
+    @Test
+    void decoratorMinLength() {
+        eval("""
+                @minLength(10)
+                input string something""");
+    }
+
+    @Test
+    void decoratorMinLengthNumber() {
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @minLength(10)
+                        input number something""")
+        );
+    }
+
+    @Test
+    void decoratorMinLengthArray() {
+        eval("""
+                @minLength(10)
+                input string[] something""");
+    }
+
+    @Test
+    void decoratorMinLengthArrayNumber() {
+        eval("""
+                @minLength(10)
+                input number[] something""");
+    }
+
+    @Test
+    void decoratorMinLengthArrayAny() {
+        eval("""
+                @minLength(10)
+                input any[] something""");
+    }
+
+    @Test
+    void decoratorMinLengthArrayObject() {
+        eval("""
+                @minLength(10)
+                input object[] something""");
+    }
+
+    @Test
+    void decoratorMinLengthSchema() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minLength
+                schema something{}"""));
+    }
+
+    @Test
+    void decoratorMinLengthNegative() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minLength(-10)
+                input string something"""));
+    }
+
 }

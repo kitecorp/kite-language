@@ -5,6 +5,7 @@ import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorCallable;
 import io.kite.TypeChecker.Types.ValueType;
+import org.fusesource.jansi.Ansi;
 
 import java.util.List;
 import java.util.Set;
@@ -33,13 +34,31 @@ public class DescriptionDecorator extends DecoratorCallable {
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
-            throw new TypeError("Description decorator does not accept arrays as arguments");
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(getName()).a("([..])")
+                    .reset()
+                    .a(" does not accept arrays as arguments")
+                    .toString();
+            throw new TypeError(message);
         } else if (declaration.getObject() != null) {
-            throw new TypeError("Description decorator does not accept objects as arguments");
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(getName()).a("({..})")
+                    .reset()
+                    .a(" does not accept objects as arguments")
+                    .toString();
+            throw new TypeError(message);
         } else if (declaration.getValue() != null && declaration.getValue() instanceof StringLiteral value) {
             return value.getValue();
         } else {
-            throw new TypeError("Description decorator requires a string as argument");
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(getName())
+                    .reset()
+                    .a(" requires a string as argument")
+                    .toString();
+            throw new TypeError(message);
         }
     }
 }

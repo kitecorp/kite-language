@@ -1,12 +1,13 @@
 package io.kite.TypeChecker.Types;
 
+import io.kite.Frontend.Parse.Literals.BooleanLiteral;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import lombok.Data;
 import org.fusesource.jansi.Ansi;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -41,25 +42,57 @@ public abstract class DecoratorCallable {
 
     protected Number validateNumber(AnnotationDeclaration declaration, int min, int max) {
         if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
-            throw new TypeError(MessageFormat.format("@{0} does not accept arrays as arguments", name));
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(name).a("([..])")
+                    .reset()
+                    .a(" does not accept arrays as arguments")
+                    .toString();
+            throw new TypeError(message);
         } else if (declaration.getObject() != null) {
-            throw new TypeError(MessageFormat.format("@{0} does not accept objects as arguments", name));
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(name).a("({..})")
+                    .reset()
+                    .a(" does not accept objects as arguments")
+                    .toString();
+            throw new TypeError(message);
         } else if (declaration.getValue() == null) {
-            throw new TypeError(MessageFormat.format("@{0} requires a number as argument", name));
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(name)
+                    .reset()
+                    .a(" requires a number as argument")
+                    .toString();
+            throw new TypeError(message);
         }
 
         var value = declaration.getValue();
         var number = switch (value) {
             case NumberLiteral literal -> literal.getValue();
-            default -> throw new TypeError("Invalid count value: " + value);
+            case StringLiteral literal -> throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(\"").a(literal.getValue()).a("\")").reset().a(" is invalid. Only numbers are valid arguments").toString());
+            case BooleanLiteral literal -> throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(").a(literal.isValue()).a(")").reset().a(" is invalid. Only numbers are valid arguments").toString());
+            default -> throw new TypeError(Ansi.ansi().fgYellow().a(name).a("(").a(value).a(")").reset().a(" is invalid").toString());
         };
         var longValue = number.longValue();
         if (longValue < min) {
-            String decorator = Ansi.ansi().fgYellow().a("@").a(name).reset().toString();
-            throw new TypeError(MessageFormat.format("Invalid {0}: must be greater than {1}, got: {2}", decorator, min, number));
+            String decorator = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(name).a("(").a(number).a(")")
+                    .reset()
+                    .a(" must have a value greater than ").a(min).a(", got: ").fgYellow().a(number)
+                    .reset()
+                    .toString();
+            throw new TypeError(decorator);
         } else if (longValue >= max) {
-            String decorator = Ansi.ansi().fgYellow().a("@").a(name).reset().toString();
-            throw new TypeError(MessageFormat.format("Invalid {0}: must be less than {1}, got: {2}", decorator, max, number));
+            String decorator = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(name).a("(").a(number).a(")")
+                    .reset()
+                    .a(" must have a value less than ").a(min).a(", got: ").fgYellow().a(number)
+                    .reset()
+                    .toString();
+            throw new TypeError(decorator);
         }
         return longValue;
     }
