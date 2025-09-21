@@ -9,6 +9,8 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.Decorators.DecoratorInterpreter;
+import io.kite.Runtime.Decorators.MinValueDecorator;
 import io.kite.Runtime.Environment.ActivationEnvironment;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Functions.Cast.*;
@@ -20,7 +22,6 @@ import io.kite.Runtime.Values.*;
 import io.kite.Runtime.exceptions.*;
 import io.kite.Runtime.interpreter.OperatorComparator;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.Decorators.DecoratorChecker;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
@@ -55,7 +56,7 @@ public final class Interpreter implements Visitor<Object> {
     private Environment<Object> env;
     @Getter
     private final List<OutputDeclaration> outputs;
-    private final Map<String, DecoratorChecker> decoratorInfoMap;
+    private final Map<String, DecoratorInterpreter> decoratorInterpreter;
     @Getter
     private final List<RuntimeException> errors;
 
@@ -71,7 +72,7 @@ public final class Interpreter implements Visitor<Object> {
         this.callstack = new ArrayDeque<>();
         this.contextStacks = new ArrayDeque<>();
         this.errors = new ArrayList<>();
-        this.annotations = new ArrayDeque<>();
+        this.decoratorInterpreter = new HashMap<>();
 
         this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
@@ -97,6 +98,8 @@ public final class Interpreter implements Visitor<Object> {
         this.env.init("abs", new AbsFunction());
         this.env.init("date", new DateFunction());
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
+
+        this.decoratorInterpreter.put("minValue", new MinValueDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -908,6 +911,10 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
+        var decorator = decoratorInterpreter.get(expression.name());
+        if (decorator != null) {
+            decorator.execute(this, expression);
+        }
         return expression.getValue();
     }
 
