@@ -364,4 +364,67 @@ public class DecoratorTest extends CheckerTest {
                 input string something"""));
     }
 
+    @Test
+    void decoratorMaxValueMissingNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue
+                input string something"""));
+    }
+
+    @Test
+    void decoratorMaxValue() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue(10)
+                input string something"""));
+    }
+
+    @Test
+    void decoratorMaxValueNumber() {
+        eval("""
+                @maxValue(10)
+                input number something""");
+    }
+
+    @Test
+    void decoratorMaxValueArray() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue(10)
+                input string[] something"""));
+    }
+
+    @Test
+    void decoratorMaxValueArrayNumber() {
+        eval("""
+                @maxValue(10)
+                input number[] something""");
+    }
+
+    @Test
+    void decoratorMaxValueArrayAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue(10)
+                input any[] something"""));
+    }
+
+    @Test
+    void decoratorMaxValueArrayObject() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue(10)
+                input object[] something"""));
+    }
+
+    @Test
+    void decoratorMaxValueSchema() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue
+                schema something{}"""));
+    }
+
+    @Test
+    void decoratorMaxValueNegative() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue(-10)
+                input string something"""));
+    }
+
 }

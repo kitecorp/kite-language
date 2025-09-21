@@ -44,6 +44,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(MaxLengthDecorator.MAX_LENGTH, new MaxLengthDecorator());
         this.decoratorInfoMap.put(MinLengthDecorator.MIN_LENGTH, new MinLengthDecorator());
         this.decoratorInfoMap.put(MinValueDecorator.MIN_VALUE, new MinValueDecorator());
+        this.decoratorInfoMap.put(MaxValueDecorator.MAX_VALUE, new MaxValueDecorator());
     }
 
     private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
