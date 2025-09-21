@@ -14,11 +14,11 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class MaxLengthDecorator extends DecoratorCallable {
-    public static final String MAX_LENGTH = "maxLength";
+public class MinLengthDecorator extends DecoratorCallable {
+    public static final String MIN_LENGTH = "minLength";
 
-    public MaxLengthDecorator() {
-        super(MAX_LENGTH, decorator(List.of(ValueType.Number), Set.of(
+    public MinLengthDecorator() {
+        super(MIN_LENGTH, decorator(List.of(ValueType.Number), Set.of(
                 DecoratorType.Target.INPUT,
                 DecoratorType.Target.OUTPUT
         )));

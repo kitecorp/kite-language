@@ -8,22 +8,19 @@ import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.Types.*;
-import io.kite.TypeChecker.Types.Decorators.CountDecorator;
-import io.kite.TypeChecker.Types.Decorators.DescriptionDecorator;
-import io.kite.TypeChecker.Types.Decorators.MaxLengthDecorator;
-import io.kite.TypeChecker.Types.Decorators.SensitiveDecorator;
+import io.kite.TypeChecker.Types.Decorators.*;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.kite.TypeChecker.Types.DecoratorType.Target;
 import static java.text.MessageFormat.format;
 
 @Log4j2
@@ -45,6 +42,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(CountDecorator.COUNT, new CountDecorator());
         this.decoratorInfoMap.put(DescriptionDecorator.DESCRIPTION, new DescriptionDecorator());
         this.decoratorInfoMap.put(MaxLengthDecorator.MAX_LENGTH, new MaxLengthDecorator());
+        this.decoratorInfoMap.put(MinLengthDecorator.MIN_LENGTH, new MinLengthDecorator());
     }
 
     private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
@@ -362,13 +360,6 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(OutputDeclaration expression) {
-        for (AnnotationDeclaration annotation : expression.getAnnotations()) {
-            var decorator = (DecoratorType) visit(annotation);
-            if (!decorator.getTargets().contains(Target.OUTPUT)) {
-                throw new TypeError(format("{0} decorator can't be used on outputs: {1}", annotation.getName().string(), printer.visit(annotation)));
-            }
-        }
-
         var t1 = visit(expression.getType());
         // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
         switch (expression.getInit()) {
@@ -861,16 +852,22 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(AnnotationDeclaration declaration) {
         var decoratorInfo = decoratorInfoMap.get(declaration.name());
         if (decoratorInfo == null) {
-            throw new TypeError("Unknown decorator `%s`".formatted(declaration.name()));
+            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" is unknown").toString();
+            throw new TypeError(message);
         }
         if (shouldNotProvideArgs(declaration, decoratorInfo.getType())) {
-            throw new TypeError("Decorator `@%s` must not have any parameters and must not have any value or object".formatted(declaration.name()));
+            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any parameters and must not have any value or object").toString();
+            throw new TypeError(message);
         }
 
         decoratorInfo.validate(declaration);
 
         if (!decoratorInfo.targets().contains(declaration.targetType())) {
-            throw new TypeError("Decorator `@%s` can only be used on: %s".formatted(declaration.name(), decoratorInfo.targetString()));
+            var ansi = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset()
+                    .a(" can only be used on: ")
+                    .fgMagenta()
+                    .a(decoratorInfo.targetString()).reset();
+            throw new TypeError(ansi.toString());
         }
 
         return decoratorInfo.getType();
