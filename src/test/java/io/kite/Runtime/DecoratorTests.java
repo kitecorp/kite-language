@@ -176,4 +176,44 @@ public class DecoratorTests extends RuntimeTest {
                 """));
     }
 
+    @Test
+    void outputMinLength() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @minLength(10)
+                output string something = "hello"
+                """));
+    }
+
+    @Test
+    void outputMinLengthGreaterThan() {
+        eval("""
+                @minLength(10)
+                output string something = "hello world!!!!!!!!!!!"
+                """);
+    }
+
+    @Test
+    void outputMinLengthWrongInit() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @minLength(10)
+                output string something = 10
+                """));
+    }
+
+    @Test
+    void outputMinLengthEmpty() {
+        eval("""
+                @minLength(0)
+                output string something = ""
+                """);
+    }
+
+    @Test
+    void outputMinLengthNegative() {
+        eval("""
+                @minLength(0)
+                output string something = "a"
+                """);
+    }
+
 }
