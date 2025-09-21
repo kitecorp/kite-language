@@ -76,6 +76,45 @@ public class DecoratorTests extends RuntimeTest {
                 output number something = -9
                 """));
     }
+    @Test
+    void outputMaxValue() {
+        eval("""
+                @maxValue(10)
+                output number something = 10
+                """);
+    }
+
+    @Test
+    void outputMaxValueGreaterThan() {
+        eval("""
+                @maxValue(10)
+                output number something = 11
+                """);
+    }
+
+    @Test
+    void outputMaxValueLessThan() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxValue(10)
+                output number something = 9
+                """));
+    }
+
+    @Test
+    void outputMaxValueWrongInit() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @maxValue(10)
+                output number something = "hello"
+                """));
+    }
+
+    @Test
+    void outputMaxValueNegative() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxValue(10)
+                output number something = -9
+                """));
+    }
 
 
 }

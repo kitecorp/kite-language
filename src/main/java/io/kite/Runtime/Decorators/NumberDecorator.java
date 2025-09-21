@@ -9,6 +9,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public abstract class NumberDecorator extends DecoratorInterpreter {
+    public NumberDecorator(String name) {
+        super(name);
+    }
+
     protected static int compareNumbers(Number a, Number b) {
         return toBigDecimal(a).compareTo(toBigDecimal(b));
     }

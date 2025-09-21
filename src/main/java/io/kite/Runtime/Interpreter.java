@@ -53,12 +53,12 @@ public final class Interpreter implements Visitor<Object> {
      */
     private final Deque<ContextStack> contextStacks;
     @Getter
-    private Environment<Object> env;
-    @Getter
     private final List<OutputDeclaration> outputs;
     private final Map<String, DecoratorInterpreter> decoratorInterpreter;
     @Getter
     private final List<RuntimeException> errors;
+    @Getter
+    private Environment<Object> env;
 
     public Interpreter() {
         this(new Environment<>());
@@ -295,7 +295,7 @@ public final class Interpreter implements Visitor<Object> {
             case String left when rightBlock instanceof String right -> compare(op, left, right);
             case String left when rightBlock instanceof Number right -> compare(op, left, right);
             case Boolean left when rightBlock instanceof Boolean right -> compare(op, left, right);
-            case Map<?,?> left when rightBlock instanceof Map<?,?> right -> switch (op) {
+            case Map<?, ?> left when rightBlock instanceof Map<?, ?> right -> switch (op) {
                 case "==" -> Objects.equals(left, right);
                 case "!=" -> !Objects.equals(left, right);
                 default -> throw new IllegalArgumentException("Operator could not be evaluated: " + op);
@@ -512,7 +512,7 @@ public final class Interpreter implements Visitor<Object> {
                 }
                 return resourceValue.lookup(propertyName);
             }
-            case Map<?,?> map -> {
+            case Map<?, ?> map -> {
                 return map.get(propertyName);
             }
             case null, default -> {
@@ -911,9 +911,13 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
-        var decorator = decoratorInterpreter.get(expression.name());
-        if (decorator != null) {
-            decorator.execute(this, expression);
+        try {
+            var decorator = decoratorInterpreter.get(expression.name());
+            if (decorator != null) {
+                decorator.execute(this, expression);
+            }
+        } catch (Exception e) {
+            System.out.println("Error executing decorator: " + e.getMessage());
         }
         return expression.getValue();
     }
