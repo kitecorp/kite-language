@@ -1,4 +1,4 @@
-package io.kite.TypeChecker.Types;
+package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.BooleanLiteral;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
@@ -6,6 +6,7 @@ import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.Data;
 import org.fusesource.jansi.Ansi;
 
@@ -13,25 +14,23 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public abstract class DecoratorCallable {
+public abstract class DecoratorChecker {
     private final String name;
     private final DecoratorType type;
 
-    public DecoratorCallable(String name, DecoratorType type) {
+    public DecoratorChecker(String name, DecoratorType type) {
         this.name = name;
         this.type = type;
     }
 
     public abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
-    protected boolean isAllowedOn(TypeIdentifier literal){return true;};
+    protected boolean isAllowedOn(TypeIdentifier literal) {
+        return true;
+    }
 
     public Object validate(AnnotationDeclaration declaration, Object... args) {
         return validate(declaration, List.of(args));
-    }
-
-    public int arity() {
-        return 0;
     }
 
     public Set<DecoratorType.Target> targets() {

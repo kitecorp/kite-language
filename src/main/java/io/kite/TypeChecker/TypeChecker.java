@@ -29,7 +29,7 @@ public final class TypeChecker implements Visitor<Type> {
     private final Set<String> vals = new HashSet<>();
     @Getter
     private TypeEnvironment env;
-    private final Map<String, DecoratorCallable> decoratorInfoMap;
+    private final Map<String, DecoratorChecker> decoratorInfoMap;
 
     public TypeChecker() {
         this(new TypeEnvironment());
