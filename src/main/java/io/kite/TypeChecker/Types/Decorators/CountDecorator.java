@@ -1,7 +1,6 @@
 package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.TypeChecker.Types.DecoratorCallable;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
 
@@ -10,7 +9,7 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class CountDecorator extends DecoratorCallable {
+public class CountDecorator extends DecoratorChecker {
 
     public static final String COUNT = "count";
 

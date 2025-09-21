@@ -13,7 +13,7 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class MaxValueDecorator extends DecoratorCallable {
+public class MaxValueDecorator extends DecoratorChecker {
     public static final String MAX_VALUE = "maxValue";
 
     public MaxValueDecorator() {

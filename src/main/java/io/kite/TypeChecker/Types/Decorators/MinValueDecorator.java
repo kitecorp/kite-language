@@ -13,7 +13,7 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class MinValueDecorator extends DecoratorCallable {
+public class MinValueDecorator extends DecoratorChecker {
     public static final String MIN_VALUE = "minValue";
 
     public MinValueDecorator() {

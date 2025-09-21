@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class MaxLengthDecorator extends DecoratorCallable {
+public class MaxLengthDecorator extends DecoratorChecker {
     public static final String MAX_LENGTH = "maxLength";
 
     public MaxLengthDecorator() {

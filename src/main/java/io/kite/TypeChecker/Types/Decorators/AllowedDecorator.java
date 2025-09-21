@@ -17,7 +17,7 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class AllowedDecorator extends DecoratorCallable {
+public class AllowedDecorator extends DecoratorChecker {
     public static final String ALLOWED = "allowed";
 
     public AllowedDecorator() {

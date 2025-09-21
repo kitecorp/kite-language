@@ -4,7 +4,6 @@ import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.DecoratorCallable;
 import io.kite.TypeChecker.Types.ValueType;
 import org.fusesource.jansi.Ansi;
 
@@ -14,7 +13,7 @@ import java.util.Set;
 import static io.kite.TypeChecker.Types.DecoratorType.Target;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class DescriptionDecorator extends DecoratorCallable {
+public class DescriptionDecorator extends DecoratorChecker {
 
     public static final String DESCRIPTION = "description";
 

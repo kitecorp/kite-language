@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class MinLengthDecorator extends DecoratorCallable {
+public class MinLengthDecorator extends DecoratorChecker {
     public static final String MIN_LENGTH = "minLength";
 
     public MinLengthDecorator() {

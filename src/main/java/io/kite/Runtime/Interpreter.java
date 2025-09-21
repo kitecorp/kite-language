@@ -20,6 +20,7 @@ import io.kite.Runtime.Values.*;
 import io.kite.Runtime.exceptions.*;
 import io.kite.Runtime.interpreter.OperatorComparator;
 import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.Decorators.DecoratorChecker;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
@@ -54,7 +55,7 @@ public final class Interpreter implements Visitor<Object> {
     private Environment<Object> env;
     @Getter
     private final List<OutputDeclaration> outputs;
-    private final Deque<AnnotationDeclaration> annotations;
+    private final Map<String, DecoratorChecker> decoratorInfoMap;
     @Getter
     private final List<RuntimeException> errors;
 
