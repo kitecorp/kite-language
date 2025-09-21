@@ -117,5 +117,23 @@ public class DecoratorTests extends RuntimeTest {
                 """);
     }
 
+    @Test
+    void outputMinMaxValue() {
+        eval("""
+                @maxValue(10)
+                @minValue(0)
+                output number something = 5
+                """);
+    }
+
+    @Test
+    void outputMinMaxValueNegative() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxValue(10)
+                @minValue(6)
+                output number something = 5
+                """));
+    }
+
 
 }
