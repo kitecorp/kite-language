@@ -129,6 +129,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     private Object visit(Object value) {
         return switch (value) {
+            case NumberLiteral numberLiteral -> Ansi.ansi().fgCyan().a(visit(numberLiteral)).fgDefault().toString();
             case Integer integer -> Ansi.ansi().fgCyan().a(visit(integer.intValue())).fgDefault().toString();
             case Double doubleValue -> Ansi.ansi().fgCyan().a(visit(doubleValue.doubleValue())).fgDefault().toString();
             case Float floatValue -> Ansi.ansi().fgCyan().a(visit(floatValue.floatValue())).fgDefault().toString();
@@ -221,21 +222,27 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(AnnotationDeclaration expression) {
-        var string = new StringBuilder("@" + visit(expression.getName()));
+        var ansi = Ansi.ansi()
+                .fgYellow()
+                .a("@")
+                .a(visit(expression.getName()));
         if (expression.getArgs() != null) {
-            string.append("(")
-                    .append(visit(expression.getArgs()))
-                    .append(")");
+            ansi.a("(")
+                    .a(visit(expression.getArgs()))
+                    .fgYellow()
+                    .a(")");
         } else if (expression.getValue() != null) {
-            string.append("(")
-                    .append(visit(expression.getValue()))
-                    .append(")");
+            ansi.a("(")
+                    .a(visit(expression.getValue()).toString())
+                    .fgYellow()
+                    .a(")");
         } else if (expression.getObject() != null) {
-            string.append("(")
-                    .append(visit(expression.getObject()))
-                    .append(")");
+            ansi.a("(")
+                    .a(visit(expression.getObject()))
+                    .fgYellow()
+                    .a(")");
         }
-        return string + "\n";
+        return ansi.toString() + "\n";
     }
 
     @Override

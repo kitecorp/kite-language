@@ -8,6 +8,10 @@ import lombok.Data;
 public abstract class DecoratorInterpreter {
     private String name;
 
+    public DecoratorInterpreter(String name) {
+        this.name = name;
+    }
+
     public abstract Object execute(Interpreter interpreter, AnnotationDeclaration declaration);
 
 }

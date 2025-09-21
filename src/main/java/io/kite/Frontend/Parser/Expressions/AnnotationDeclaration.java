@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(staticName = "annotation")
 public final class AnnotationDeclaration extends Expression {
     private Identifier name;
