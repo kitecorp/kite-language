@@ -24,7 +24,8 @@ public class MaxLengthDecorator extends DecoratorCallable {
         )));
     }
 
-    private static boolean isAllowedOn(TypeIdentifier literal) {
+    @Override
+    protected boolean isAllowedOn(TypeIdentifier literal) {
         Type type = literal.getType();
         SystemType kind = type.getKind();
         return kind == SystemType.STRING || literal instanceof ArrayTypeIdentifier;
@@ -32,7 +33,7 @@ public class MaxLengthDecorator extends DecoratorCallable {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        validateNumber(declaration,0,999999);
+        validateNumber(declaration, 0, 999999);
 
         switch (declaration.getTarget()) {
             case InputDeclaration input -> extracted(input.getType());

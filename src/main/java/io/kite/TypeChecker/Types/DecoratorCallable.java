@@ -3,6 +3,7 @@ package io.kite.TypeChecker.Types;
 import io.kite.Frontend.Parse.Literals.BooleanLiteral;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import lombok.Data;
@@ -23,6 +24,7 @@ public abstract class DecoratorCallable {
 
     public abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
+    protected boolean isAllowedOn(TypeIdentifier literal){return true;};
 
     public Object validate(AnnotationDeclaration declaration, Object... args) {
         return validate(declaration, List.of(args));
@@ -70,9 +72,12 @@ public abstract class DecoratorCallable {
         var value = declaration.getValue();
         var number = switch (value) {
             case NumberLiteral literal -> literal.getValue();
-            case StringLiteral literal -> throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(\"").a(literal.getValue()).a("\")").reset().a(" is invalid. Only numbers are valid arguments").toString());
-            case BooleanLiteral literal -> throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(").a(literal.isValue()).a(")").reset().a(" is invalid. Only numbers are valid arguments").toString());
-            default -> throw new TypeError(Ansi.ansi().fgYellow().a(name).a("(").a(value).a(")").reset().a(" is invalid").toString());
+            case StringLiteral literal ->
+                    throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(\"").a(literal.getValue()).a("\")").reset().a(" is invalid. Only numbers are valid arguments").toString());
+            case BooleanLiteral literal ->
+                    throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(").a(literal.isValue()).a(")").reset().a(" is invalid. Only numbers are valid arguments").toString());
+            default ->
+                    throw new TypeError(Ansi.ansi().fgYellow().a(name).a("(").a(value).a(")").reset().a(" is invalid").toString());
         };
         var longValue = number.longValue();
         if (longValue < min) {
