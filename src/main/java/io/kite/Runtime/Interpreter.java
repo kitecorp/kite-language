@@ -102,6 +102,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decoratorInterpreter.put("maxLength", new MaxLengthDecorator());
         this.decoratorInterpreter.put("minLength", new MinLengthDecorator());
         this.decoratorInterpreter.put("description", new DescriptionDecorator());
+        this.decoratorInterpreter.put("sensitive", new SensitiveDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
