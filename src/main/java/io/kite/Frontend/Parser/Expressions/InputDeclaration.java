@@ -22,6 +22,7 @@ public final class InputDeclaration extends Statement implements Annotatable {
     private Expression init;
     private TypeIdentifier type;
     private Set<AnnotationDeclaration> annotations;
+    private boolean sensitive;
 
     public InputDeclaration() {
         this.annotations = Set.of();
@@ -151,5 +152,9 @@ public final class InputDeclaration extends Statement implements Annotatable {
     @Override
     public Type targetType() {
         return type.getType();
+    }
+
+    public void setSensitive(boolean sensitive) {
+        this.sensitive = sensitive;
     }
 }

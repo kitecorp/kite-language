@@ -89,32 +89,14 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(OutputDeclaration expression) {
-        boolean isDeprecated = false;
-        boolean isSensitive = false;
-
-        // 1) Collect annotation flags (order-independent)
-        for (var a : expression.getAnnotations()) {
-            switch (a.getName().string()) {
-                case "deprecated" -> isDeprecated = true;
-                case "sensitive" -> isSensitive = true;
-                // default: ignore or record unknowns
-            }
-        }
-
         // 2) Build once, applying styles based on flags
         var ansi = Ansi.ansi();
-
-        if (isDeprecated) {
-            ansi.fgBrightYellow()
-                    .a("deprecated: ")
-                    .reset();
-        }
 
         ansi.fgMagenta().a("output ").reset()
                 .a(visit(expression.getType())).a(" ")
                 .a(visit(expression.getId())).a(" = ");
 
-        if (isSensitive) {
+        if (expression.isSensitive()) {
             // mask, don’t print the actual value
             ansi.fgBrightBlack().a(Ansi.Attribute.ITALIC)
                     .a("<sensitive value>")

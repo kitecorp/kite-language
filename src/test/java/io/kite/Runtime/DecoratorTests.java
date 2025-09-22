@@ -215,5 +215,12 @@ public class DecoratorTests extends RuntimeTest {
                 output string something = "a"
                 """);
     }
+    @Test
+    void outputSensitive() {
+        eval("""
+                @sensitive
+                output string something = "a"
+                """);
+    }
 
 }

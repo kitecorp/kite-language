@@ -24,6 +24,7 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     private Object resolvedValue;
     private TypeIdentifier type;
     private Set<AnnotationDeclaration> annotations;
+    private boolean sensitive;
 
     public OutputDeclaration() {
         annotations = Set.of();
@@ -144,5 +145,13 @@ public final class OutputDeclaration extends Statement implements DependencyHold
     @Override
     public Type targetType() {
         return type.getType();
+    }
+
+    public void setSensitive(boolean sensitive) {
+        this.sensitive = sensitive;
+    }
+
+    public boolean isSensitive() {
+        return sensitive;
     }
 }
