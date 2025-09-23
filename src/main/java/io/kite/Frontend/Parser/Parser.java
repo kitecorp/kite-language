@@ -301,7 +301,7 @@ public class Parser {
         }
         eat(In);
         Range<Integer> range = null;
-        @NotNull Expression arrayName = null;
+        Expression arrayName = null;
         if (IsLookAheadAfter(Number, Range)) {
             range = RangeDeclaration();
         } else if (IsLookAhead(OpenBrackets)) {

@@ -103,6 +103,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decoratorInterpreter.put("minLength", new MinLengthDecorator());
         this.decoratorInterpreter.put("description", new DescriptionDecorator());
         this.decoratorInterpreter.put("sensitive", new SensitiveDecorator());
+        this.decoratorInterpreter.put("count", new CountDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -114,9 +115,9 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    private static void forInit(Environment<Object> forEnv, Identifier statement, Object i) {
-        if (statement != null) {
-            forEnv.initOrAssign(statement.string(), i);
+    private static void forInit(Environment<Object> forEnv, Identifier index, Object i) {
+        if (index != null) {
+            forEnv.initOrAssign(index.string(), i);
         }
     }
 
@@ -573,15 +574,21 @@ public final class Interpreter implements Visitor<Object> {
             switch (visit) {
                 case String s -> resource.setIndex("\"%s\"".formatted(s));
                 case Number number -> resource.setIndex(number);
-                case Map<?, ?> map -> resource.setIndex(visit(forStatement.getIndex()));
+                case Map<?, ?> map -> {
+                    if (forStatement.getIndex() != null) {
+                        resource.setIndex(visit(forStatement.getIndex()));
+                    } else {
+                        resource.setIndex(visit(forStatement.getItem()));
+                    }
+                }
                 default -> throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
             }
         }
     }
 
-    private ResourceValue initResource(ResourceExpression resource, SchemaValue installedSchema, Environment typeEnvironment) {
+    private ResourceValue initResource(ResourceExpression resource, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
-        var resourceEnv = new Environment(env, typeEnvironment.getVariables());
+        var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
         var res = new ResourceValue(resource.name(), resourceEnv, installedSchema, resource.isExisting());
         try {
@@ -669,6 +676,9 @@ public final class Interpreter implements Visitor<Object> {
 
                     forInit(forEnv, statement.getIndex(), i);
                     forInit(forEnv, statement.getItem(), item);
+                    if (item instanceof Map<?, ?> map) {
+                        map.forEach((key, value) -> forInit(forEnv, Identifier.symbol(statement.getItem().string() + "." + key), value));
+                    }
                     result = executeBlock(statement.getBody(), forEnv);
                 }
                 return result;
@@ -691,36 +701,42 @@ public final class Interpreter implements Visitor<Object> {
         // Seed loop env with the item var (as before)
         var forEnv = new Environment<>(env, Map.of(statement.getItem().string(), min));
 
-        // Block-style: execute body each iteration, return last result
-        if (statement.isBodyBlock()) {
-            Object last = null;
-            var body = statement.discardBlock();
-            for (int i = min; i < max; i++) {
-                initIteration(forEnv, statement, i);
-                last = executeBlock(body, new Environment<>(forEnv));
-            }
-            return last;
+        if (statement.isBodyBlock()) { // Block-style: execute body each iteration, return last result
+            return ExecuteForBodyBlock(statement, min, max, forEnv);
+        } else if (statement.getBody() != null) { // Expr-style: build a list from body results (with If support)
+            return ExecuteForBody(statement, max, min, forEnv);
+        } else {
+            throw new OperationNotImplementedException("For statement operation not implemented");
         }
+    }
 
-        // Expr-style: build a list from body results (with If support)
-        if (statement.getBody() != null) {
-            var body = statement.getBody();
-            var out = new ArrayList<>(max - min);
-            for (int i = min; i < max; i++) {
-                initIteration(forEnv, statement, i);
-                var iterEnv = new Environment<>(forEnv);
+    private @NotNull ArrayList<Object> ExecuteForBody(ForStatement statement, Integer max, Integer min, Environment<Object> forEnv) {
+        var body = statement.getBody();
+        var out = new ArrayList<>(max - min);
+        for (int i = min; i < max; i++) {
+            initIteration(forEnv, statement, i);
+            var iterEnv = new Environment<>(forEnv);
 
-                if (body instanceof IfStatement iff) {
-                    var result = executeBlock(iff, iterEnv);
-                    if (result != null) out.add(result);
-                } else {
-                    out.add(executeBlock(body, iterEnv));
+            if (body instanceof IfStatement iff) {
+                var result = executeBlock(iff, iterEnv);
+                if (result != null) {
+                    out.add(result);
                 }
+            } else {
+                out.add(executeBlock(body, iterEnv));
             }
-            return out;
         }
+        return out;
+    }
 
-        throw new OperationNotImplementedException("For statement operation not implemented");
+    private @Nullable Object ExecuteForBodyBlock(ForStatement statement, Integer min, Integer max, Environment<Object> forEnv) {
+        Object last = null;
+        var body = statement.discardBlock();
+        for (int i = min; i < max; i++) {
+            initIteration(forEnv, statement, i);
+            last = executeBlock(body, new Environment<>(forEnv));
+        }
+        return last;
     }
 
     private void initIteration(Environment<Object> env, ForStatement st, int i) {
@@ -912,12 +928,12 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(AnnotationDeclaration expression) {
 //        try {
-            var decorator = decoratorInterpreter.get(expression.name());
-            if (decorator != null) {
-                decorator.execute(this, expression);
-            } else {
-                log.warn("Unknown decorator: {}", expression.name());
-            }
+        var decorator = decoratorInterpreter.get(expression.name());
+        if (decorator != null) {
+            decorator.execute(this, expression);
+        } else {
+            log.warn("Unknown decorator: {}", expression.name());
+        }
 //        } catch (Exception e) {
 //            System.out.println("Decorator error! " + e.getMessage());
 //            throw e;
