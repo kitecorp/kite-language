@@ -1,13 +1,19 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
+import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
+import io.kite.TypeChecker.Types.ArrayType;
+import io.kite.TypeChecker.Types.ResourceType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -564,7 +570,6 @@ public class ForResourceTest extends RuntimeTest {
 
     @Test
     @DisplayName("resource naming by for loop")
-    @Disabled("doesn't make sense to implement this because it's difficult to reference the resource later. vm.cfg.name? vm.photos? it's not even defined in code so how does it make sense?")
     void testForNameResource() {
         var res = eval("""
                 schema vm {
@@ -589,4 +594,66 @@ public class ForResourceTest extends RuntimeTest {
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
     }
+
+    @Test
+    void arrayResourcesOverObjects() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = [{client: 'amazon'},{client: 'bmw'}]
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index.client}'
+                }
+                """);
+
+        Assertions.assertInstanceOf(ArrayType.class, array);
+        var arrayType = (ArrayType) array;
+        var resourceType = (ResourceType) arrayType.getType();
+        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
+        assertEquals(res, arrayType.getType());
+    }
+
+    @Test
+    void arrayResourcesOverNumbers() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = [1,2,3]
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index}'
+                }
+                """);
+        var map = new HashMap<String, ResourceValue>();
+        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
+        map.put("photos[1]", new ResourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
+        map.put("photos[2]", new ResourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
+        map.put("photos[3]", new ResourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));
+        assertEquals(map, schemaValue.getInstances().getVariables());
+    }
+
+    @Test
+    void arrayResourcesOverStrings() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = ['hello', 'world']
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index}'
+                }
+                """);
+
+        var map = new HashMap<String, ResourceValue>();
+        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
+        map.put("photos[\"hello\"]", new ResourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue));
+        map.put("photos[\"world\"]", new ResourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue));
+        assertEquals(map, schemaValue.getInstances().getVariables());
+    }
+
+
 }
