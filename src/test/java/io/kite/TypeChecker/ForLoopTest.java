@@ -3,7 +3,9 @@ package io.kite.TypeChecker;
 import io.kite.Base.CheckerTest;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.ObjectType;
+import io.kite.TypeChecker.Types.ResourceType;
 import io.kite.TypeChecker.Types.ValueType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -118,6 +120,66 @@ public class ForLoopTest extends CheckerTest {
         var varType = (ArrayType) res;
         var objectType = new ObjectType(new TypeEnvironment(varType.getEnvironment().getParent(), Map.of("name", ValueType.String)));
         assertEquals(objectType, varType.getType());
+    }
+
+    @Test
+    void arrayResourcesOverObjects() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = [{client: 'amazon'},{client: 'bmw'}]
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index.client}'
+                }
+                """);
+
+        Assertions.assertInstanceOf(ArrayType.class, array);
+        var arrayType = (ArrayType) array;
+        var resourceType = (ResourceType) arrayType.getType();
+        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
+        assertEquals(res, arrayType.getType());
+    }
+
+    @Test
+    void arrayResourcesOverNumbers() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = [1,2,3]
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index}'
+                }
+                """);
+
+        Assertions.assertInstanceOf(ArrayType.class, array);
+        var arrayType = (ArrayType) array;
+        var resourceType = (ResourceType) arrayType.getType();
+        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
+        assertEquals(res, arrayType.getType());
+    }
+
+    @Test
+    void arrayResourcesOverStrings() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = ['hello', 'world']
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index}'
+                }
+                """);
+
+        Assertions.assertInstanceOf(ArrayType.class, array);
+        var arrayType = (ArrayType) array;
+        var resourceType = (ResourceType) arrayType.getType();
+        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
+        assertEquals(res, arrayType.getType());
     }
 
 }
