@@ -24,8 +24,8 @@ import java.util.List;
 public final class ForStatement extends Statement {
     @Nullable
     private Identifier item;
-    private Identifier index;
-    private Expression array;// for i in varName (typically array) or an actual array ['a', 'b', 'c']
+    private Identifier index; // keeps track of the index of the array: [for index, j in varName]
+    private Expression array; // for i in varName (typically array) or an actual array ['a', 'b', 'c']
     private Statement body;
     @Nullable
     private Range<Integer> range;
@@ -65,4 +65,5 @@ public final class ForStatement extends Statement {
     public boolean hasArray() {
         return array != null;
     }
+
 }

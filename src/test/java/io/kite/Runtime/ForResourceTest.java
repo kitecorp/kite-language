@@ -5,8 +5,6 @@ import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
-import io.kite.TypeChecker.Types.ArrayType;
-import io.kite.TypeChecker.Types.ResourceType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -569,8 +567,8 @@ public class ForResourceTest extends RuntimeTest {
     }
 
     @Test
-    @DisplayName("resource naming by for loop")
-    void testForNameResource() {
+    @DisplayName("for loop over objects to create resources")
+    void forResourceObjects() {
         var res = eval("""
                 schema vm {
                    string name
@@ -596,23 +594,24 @@ public class ForResourceTest extends RuntimeTest {
     }
 
     @Test
+    @DisplayName("for loop comprehension over objects to create resources")
     void arrayResourcesOverObjects() {
         var array = eval("""
                 schema Bucket {
                    string name
                 }
-                var envs = [{client: 'amazon'},{client: 'bmw'}]
+                var envs = [{client: 'amazon'}, {client: 'bmw'}]
                 [for index in envs]
                 resource Bucket photos {
                   name     = 'name-${index.client}'
                 }
                 """);
 
-        Assertions.assertInstanceOf(ArrayType.class, array);
-        var arrayType = (ArrayType) array;
-        var resourceType = (ResourceType) arrayType.getType();
-        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
-        assertEquals(res, arrayType.getType());
+        var map = new HashMap<String, ResourceValue>();
+        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
+        map.put("photos[\"amazon\"]", new ResourceValue("photos[\"amazon\"]", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
+        map.put("photos[\"bmw\"]", new ResourceValue("photos[\"bmw\"]", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
+        assertEquals(map, schemaValue.getInstances().getVariables());
     }
 
     @Test
