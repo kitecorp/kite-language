@@ -8,15 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract sealed class Identifier extends Expression
-        permits ParameterIdentifier, PathIdentifier, PluginIdentifier, SymbolIdentifier, TypeIdentifier{
+        permits ParameterIdentifier, PathIdentifier, PluginIdentifier, SymbolIdentifier, TypeIdentifier {
     @Setter
     @Getter
     private Integer hops; // used to figure out the scope without creating extra classes
 
     public Identifier() {
     }
-
-    public abstract String string();
 
     public static Identifier id(String identifier) {
         return SymbolIdentifier.id(identifier);
@@ -30,6 +28,7 @@ public abstract sealed class Identifier extends Expression
         return SymbolIdentifier.id(identifier);
     }
 
+    public abstract String string();
 
 
 }

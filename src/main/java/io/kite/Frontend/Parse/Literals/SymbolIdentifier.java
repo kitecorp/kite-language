@@ -46,6 +46,10 @@ public final class SymbolIdentifier extends Identifier {
         return new SymbolIdentifier(left);
     }
 
+    public static Identifier symbol(String identifier, int hops) {
+        return new SymbolIdentifier(identifier, hops);
+    }
+
     @Override
     public String string() {
         return symbol;

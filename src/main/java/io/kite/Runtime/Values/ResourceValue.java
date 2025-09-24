@@ -1,10 +1,7 @@
 package io.kite.Runtime.Values;
 
 import io.kite.Runtime.Environment.Environment;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -16,7 +13,11 @@ import java.util.Set;
 @AllArgsConstructor
 public class ResourceValue {
     private Environment<Object> properties;
+    @Setter
+    @Getter
     private SchemaValue schema;
+    @Setter
+    @Getter
     private String name;
     private Set<String> dependencies;
 
@@ -37,6 +38,7 @@ public class ResourceValue {
         this.name = name;
         this.properties = parent;
         this.schema = schema;
+        existing = Boolean.FALSE;
     }
 
     public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema, boolean existing) {
@@ -134,19 +136,4 @@ public class ResourceValue {
         this.properties = properties;
     }
 
-    public SchemaValue getSchema() {
-        return schema;
-    }
-
-    public void setSchema(SchemaValue schema) {
-        this.schema = schema;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

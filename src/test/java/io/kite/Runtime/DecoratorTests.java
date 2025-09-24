@@ -215,11 +215,24 @@ public class DecoratorTests extends RuntimeTest {
                 output string something = "a"
                 """);
     }
+
     @Test
     void outputSensitive() {
         eval("""
                 @sensitive
                 output string something = "a"
+                """);
+    }
+
+    @Test
+    void outputCount() {
+        eval("""
+                schema vm { string name }
+                
+                @count(2)
+                resource vm main {
+                   
+                }
                 """);
     }
 

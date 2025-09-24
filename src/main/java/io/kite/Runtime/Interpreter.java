@@ -167,14 +167,7 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(Expression expression) {
-        if (expression != null) {
-            callstack.push(expression);
-        }
-        var res = executeBlock(expression, env);
-        if (expression != null) {
-            callstack.pop();
-        }
-        return res;
+        return executeBlock(expression, env);
     }
 
     @Override
@@ -536,6 +529,9 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(ResourceExpression resource) {
+        if (resource.counted()) {
+            return resource;
+        }
         validate(resource);
 //        if (callstack.peekLast() instanceof ForStatement) {
 //            resource = ResourceExpression.resource(resource);
@@ -596,7 +592,7 @@ public final class Interpreter implements Visitor<Object> {
             installedSchema.initInstance(resource.name(), res);
             resource.setValue(res);
         } catch (DeclarationExistsException e) {
-            throw new DeclarationExistsException("Resource %s already exists: \n%s".formatted(resource.name(), printer.visit(resource)));
+            throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));
         }
         return res;
     }
@@ -664,25 +660,30 @@ public final class Interpreter implements Visitor<Object> {
      */
     @Override
     public Object visit(ForStatement statement) {
-        if (statement.hasRange()) {
-            return ForWithRange(statement);
-        } else if (statement.hasArray()) {
-            var array = visit(statement.getArray());// get array items
-            if (array instanceof List<?> list) {
-                var forEnv = new Environment<>(env);
-                Object result = null;
-                for (int i = 0; i < list.size(); i++) {
-                    Object item = list.get(i);
+        try {
+            callstack.push(statement);
+            if (statement.hasRange()) {
+                return ForWithRange(statement);
+            } else if (statement.hasArray()) {
+                var array = visit(statement.getArray());// get array items
+                if (array instanceof List<?> list) {
+                    var forEnv = new Environment<>(env);
+                    Object result = null;
+                    for (int i = 0; i < list.size(); i++) {
+                        Object item = list.get(i);
 
-                    forInit(forEnv, statement.getIndex(), i);
-                    forInit(forEnv, statement.getItem(), item);
-                    if (item instanceof Map<?, ?> map) {
-                        map.forEach((key, value) -> forInit(forEnv, Identifier.symbol(statement.getItem().string() + "." + key), value));
+                        forInit(forEnv, statement.getIndex(), i);
+                        forInit(forEnv, statement.getItem(), item);
+                        if (item instanceof Map<?, ?> map) {
+                            map.forEach((key, value) -> forInit(forEnv, Identifier.symbol(statement.getItem().string() + "." + key), value));
+                        }
+                        result = executeBlock(statement.getBody(), forEnv);
                     }
-                    result = executeBlock(statement.getBody(), forEnv);
+                    return result;
                 }
-                return result;
             }
+        } finally {
+            callstack.pop();
         }
         throw new OperationNotImplementedException("For statement not implemented");
     }
@@ -1001,12 +1002,18 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     Object executeBlock(Expression expression, Environment<Object> environment) {
+        if (expression != null) {
+            callstack.push(expression);
+        }
         Environment<Object> previous = this.env;
         try {
             this.env = environment;
             return Visitor.super.visit(expression);
         } finally {
             this.env = previous;
+            if (expression != null) {
+                callstack.pop();
+            }
         }
     }
 

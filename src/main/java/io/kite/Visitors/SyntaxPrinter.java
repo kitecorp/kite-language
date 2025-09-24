@@ -359,9 +359,13 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(ResourceExpression expression) {
-        return "resource " + visit(expression.getType()) + " " + visit(expression.getName()) + " {\n"
-               + visit(expression.getBlock())
-               + "}\n";
+        return Ansi.ansi()
+                .fgMagenta().a("resource ")
+                .fgBlue().a(visit(expression.getType())).a(" ")
+                .fgDefault().a(visit(expression.getName())).a(" {\n")
+                .a(visit(expression.getBlock()))
+                .a("}\n")
+                .toString();
     }
 
     @Override
