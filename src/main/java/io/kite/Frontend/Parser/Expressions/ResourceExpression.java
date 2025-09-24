@@ -6,6 +6,7 @@ import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
+import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
@@ -20,7 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Data
-public final class ResourceExpression extends Statement implements DeferredObserverValue, Annotatable {
+public final class ResourceExpression extends Statement implements DeferredObserverValue, Annotatable, CountAnnotatable {
     private Identifier type;
     @Nullable
     private Identifier name;
@@ -31,6 +32,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private ResourceValue value;
     private Object index;
     private Set<AnnotationDeclaration> annotations;
+    private Boolean counted;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -144,5 +146,15 @@ public final class ResourceExpression extends Statement implements DeferredObser
     @Override
     public Type targetType() {
         return ResourceType.Resource;
+    }
+
+    @Override
+    public Boolean counted() {
+        return counted != null && counted;
+    }
+
+    @Override
+    public void counted(Boolean evaluatedCount) {
+        this.counted = evaluatedCount;
     }
 }

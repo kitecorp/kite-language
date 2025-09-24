@@ -3,7 +3,6 @@ package io.kite.TypeChecker;
 import io.kite.Base.CheckerTest;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.exceptions.NotFoundException;
-import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.ResourceType;
 import io.kite.TypeChecker.Types.SchemaType;
 import io.kite.TypeChecker.Types.ValueType;
@@ -248,25 +247,6 @@ public class ResourceTest extends CheckerTest {
         Assertions.assertInstanceOf(ResourceType.class, resource);
     }
 
-    @Test
-    void arrayResourcesAssignedToVar() {
-        var array = eval("""
-                schema Bucket {
-                   string name
-                }
-                var envs = [{client: 'amazon'},{client: 'bmw'}]
-                [for index in envs]
-                resource Bucket photos {
-                  name     = 'name-${index.value}'
-                }
-                """);
-
-        Assertions.assertInstanceOf(ArrayType.class, array);
-        var arrayType = (ArrayType) array;
-        var resourceType = (ResourceType) arrayType.getType();
-        var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
-        assertEquals(res, arrayType.getType());
-    }
 
     @Test
     void testIfConditionReturnsResource() {

@@ -5,6 +5,7 @@ import io.kite.Frontend.Parse.Literals.PluginIdentifier;
 import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
+import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.Type;
@@ -22,7 +23,7 @@ import java.util.Set;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class ComponentStatement extends Statement implements Annotatable {
+public final class ComponentStatement extends Statement implements Annotatable, CountAnnotatable {
     private PluginIdentifier type;
     /**
      * When missing it will be a component type. When present it will be an initialization
@@ -31,6 +32,7 @@ public final class ComponentStatement extends Statement implements Annotatable {
     private Identifier name;
     private BlockExpression block;
     private Set<AnnotationDeclaration> annotations;
+    private Boolean counted;
 
     private ComponentStatement() {
         this.annotations = Set.of();
@@ -103,4 +105,13 @@ public final class ComponentStatement extends Statement implements Annotatable {
         return ObjectType.Resource;
     }
 
+    @Override
+    public Boolean counted() {
+        return counted;
+    }
+
+    @Override
+    public void counted(Boolean counted) {
+        this.counted = counted;
+    }
 }
