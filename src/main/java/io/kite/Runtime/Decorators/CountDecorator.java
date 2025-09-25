@@ -36,6 +36,8 @@ public class CountDecorator extends NumberDecorator {
 
         var res = interpreter.visit(forStatement);
         if (declaration.getTarget() instanceof CountAnnotatable countAnnotatable) {
+            // mark the resource as counted so during the next iteration while traversing the AST
+            // we know that this resource was counted and we can skip it
             countAnnotatable.counted(true);
         }
         return res;
