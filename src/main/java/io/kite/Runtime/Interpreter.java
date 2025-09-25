@@ -586,10 +586,10 @@ public final class Interpreter implements Visitor<Object> {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resource.name(), resourceEnv, installedSchema, resource.isExisting());
+        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting());
         try {
             // init any kind of new resource
-            installedSchema.initInstance(resource.name(), res);
+            installedSchema.initInstance(resourceName(resource), res);
             resource.setValue(res);
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));
@@ -618,7 +618,7 @@ public final class Interpreter implements Visitor<Object> {
         }
         if (resource.isEvaluated()) {
             // if not fully evaluated, doesn't make sense to notify observers(resources that depend on this resource)
-            deferredObservable.notifyObservers(this, resource.name());
+            deferredObservable.notifyObservers(this, resourceName(resource));
         }
         return instance;
     }

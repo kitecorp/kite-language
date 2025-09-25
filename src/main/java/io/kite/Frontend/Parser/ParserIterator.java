@@ -70,6 +70,29 @@ public class ParserIterator {
         return false;
     }
 
+    /**
+     * Checks whether a given sequence of token types occurs ahead in the token stream,
+     * bounded by a specified end token.
+     * <p>
+     * Starting from the current parser position (just after the last returned token),
+     * this method scans forward until it either finds the {@code endToken} or runs out of tokens.
+     * While scanning, if it encounters a token of type {@code after}, it looks immediately
+     * at the next token. If that next token matches any of the types provided in {@code type},
+     * the method returns {@code true}.
+     * </p>
+     *
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * // Returns true if, before reaching a RIGHT_BRACE, we see a COLON followed by IDENTIFIER
+     * IsLookAheadAfter(TokenType.COLON, TokenType.RIGHT_BRACE, TokenType.IDENTIFIER);
+     * }</pre>
+     *
+     * @param after    the token type that triggers the lookahead check
+     * @param endToken the token type that bounds the lookahead search; scanning stops when this is found
+     * @param type     one or more token types to check immediately after {@code after}
+     * @return {@code true} if a token of type {@code after} is followed by any of the {@code type}
+     *         before encountering {@code endToken}; otherwise {@code false}
+     */
     boolean IsLookAheadAfter(TokenType after, TokenType endToken, TokenType... type) {
         int index = this.iterator.previousIndex() + 1;
         var iterator = this.tokens.listIterator(index);

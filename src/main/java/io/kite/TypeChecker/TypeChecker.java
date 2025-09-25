@@ -653,13 +653,13 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(ResourceExpression resource) {
         if (resource.getName() == null) {
-            throw new InvalidInitException("Resource does not have a name: " + resource.name());
+            throw new InvalidInitException("Resource does not have a name: " + resourceName(resource));
         }
         // SchemaValue already installed globally when evaluating a SchemaDeclaration.
         // This means the schema must be declared before the resource
         var installedSchema = (SchemaType) env.lookup(resource.getType().string());
         if (installedSchema == null) {
-            throw new InvalidInitException("Schema not found during " + resource.name() + " initialization");
+            throw new InvalidInitException("Schema not found during " + resourceName(resource) + " initialization");
         }
 
         var schemaEnv = installedSchema.getEnvironment();
@@ -675,8 +675,8 @@ public final class TypeChecker implements Visitor<Type> {
         }
 
 
-        var resourceType = new ResourceType(resource.name(), installedSchema, resourceEnv);
-        installedSchema.addInstance(resource.name(), resourceType);
+        var resourceType = new ResourceType(resourceName(resource), installedSchema, resourceEnv);
+        installedSchema.addInstance(resourceName(resource), resourceType);
 
         return resourceType;
 //        try {
@@ -690,7 +690,7 @@ public final class TypeChecker implements Visitor<Type> {
 //                FunType initType = (FunType) init;
 //            } else {
 //            }
-//            var res = installedSchema.initInstance(resource.name(), ResourceValue.of(resource.name(), resourceEnv, installedSchema));
+//            var res = installedSchema.initInstance(resourceName(resource), ResourceValue.of(resourceName(resource), resourceEnv, installedSchema));
 //            engine.process(installedSchema.typeString(), resourceEnv.getVariables());
 //        } catch (NotFoundException e) {
 //            throw new NotFoundException("Field '%s' not found on resource '%s'".formatted(e.getObjectNotFound(), expression.name()),e);

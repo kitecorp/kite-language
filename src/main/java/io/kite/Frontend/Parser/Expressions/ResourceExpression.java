@@ -13,6 +13,7 @@ import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ResourceType;
 import io.kite.TypeChecker.Types.Type;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,10 +22,11 @@ import java.util.Objects;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor(staticName = "resource")
 public final class ResourceExpression extends Statement implements DeferredObserverValue, Annotatable, CountAnnotatable {
     private Identifier type;
     @Nullable
-    private Identifier name;
+    private Expression name;
     private BlockExpression block;
     private boolean isEvaluated;
     private boolean isEvaluating;
@@ -54,6 +56,14 @@ public final class ResourceExpression extends Statement implements DeferredObser
     }
 
     private ResourceExpression(boolean existing, Identifier type, Identifier name, BlockExpression block) {
+        this();
+        this.type = type;
+        this.name = name;
+        this.block = block;
+        this.existing = existing;
+    }
+
+    private ResourceExpression(boolean existing, Identifier type, Expression name, BlockExpression block) {
         this();
         this.type = type;
         this.name = name;
@@ -102,6 +112,12 @@ public final class ResourceExpression extends Statement implements DeferredObser
         return new ResourceExpression(existing, type, name, block);
     }
 
+    public static ResourceExpression resource(Set<AnnotationDeclaration> annotations, boolean existing, TypeIdentifier type, Expression name, BlockExpression block) {
+        var res = new ResourceExpression(existing, type, name, block);
+        res.setAnnotations(annotations);
+        return res;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,20 +133,6 @@ public final class ResourceExpression extends Statement implements DeferredObser
 
     public List<Statement> getArguments() {
         return block.getExpression();
-    }
-
-    public String name() {
-        if (index != null) {
-            String formatted = "%s[%s]".formatted(name.string(), index);
-//            if (value != null) {
-//                value.setName(formatted);
-//            }
-            return formatted;
-        }
-//        if (value != null) {
-//            value.setName(name.string());
-//        }
-        return name.string();
     }
 
     @Override
@@ -156,5 +158,9 @@ public final class ResourceExpression extends Statement implements DeferredObser
     @Override
     public void counted(Boolean evaluatedCount) {
         this.counted = evaluatedCount;
+    }
+
+    public boolean hasIndex() {
+        return index != null;
     }
 }
