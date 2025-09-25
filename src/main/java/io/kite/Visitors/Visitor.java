@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.Runtime.Interpreter;
+import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
@@ -169,4 +170,19 @@ public sealed interface Visitor<R>
      * the 'parent' component of the instance environment is set to the class environment making class members accessible
      */
     R visit(ResourceExpression expression);
+
+    default String resourceName(ResourceExpression resource) {
+        var resourceName = switch (resource.getName()) {
+            case SymbolIdentifier identifier -> identifier.string();
+            case StringLiteral literal -> literal.getValue();
+            case Identifier identifier -> identifier.string();
+            case MemberExpression memberExpression -> visit(memberExpression).toString();
+            case null, default ->
+                    throw new OperationNotImplementedException("Resource name not implemented for: " + visit(resource));
+        };
+        if (resource.hasIndex()) {
+            return "%s[%s]".formatted(resourceName, resource.getIndex());
+        }
+        return resourceName;
+    }
 }

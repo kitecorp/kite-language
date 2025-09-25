@@ -326,8 +326,21 @@ public final class ScopeResolver implements Visitor<Void> {
     public Void visit(ResourceExpression expression) {
         beginScope();
         if (expression.getName() != null) {
-            declare(expression.getName());
-            define(expression.getName());
+            switch (expression.getName()){
+                case SymbolIdentifier identifier->{
+                    declare(identifier);
+                    define(identifier);
+                }
+                case Identifier id -> {
+                    declare(id);
+                    define(id);
+                }
+                case MemberExpression memberExpression -> {
+                    visit(memberExpression);
+                }
+                default -> {
+                }
+            }
             resolve(expression.getName());
         }
         for (Statement argument : expression.getArguments()) {

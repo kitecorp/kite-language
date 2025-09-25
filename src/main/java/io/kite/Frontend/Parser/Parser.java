@@ -719,6 +719,7 @@ public class Parser {
 
     private @NotNull Expression OptArray() {
         var res = IsLookAhead(CloseBrackets) ? array() : ArrayItems();
+        eatWhitespace();
         eat(CloseBrackets);
         return res;
     }
@@ -729,6 +730,7 @@ public class Parser {
     private ArrayExpression ArrayItems() {
         var array = new ArrayExpression();
         do {
+            eatWhitespace();
             array.add(ArrayItem());
         } while (!IsLookAhead(CloseBrackets) &&
                  !IsLookAhead(EOF) &&
@@ -1236,7 +1238,7 @@ public class Parser {
      * ;
      */
     private ResourceExpression ResourceDeclaration(Set<AnnotationDeclaration> annotations) {
-        if (contextStack.contains(ContextStack.FUNCTION)) {
+        if (inContext(ContextStack.FUNCTION)) {
             throw ParserErrors.error("Resource type not allowed in function body: ", lookAhead(), lookAhead().type());
         }
         boolean existing = false;
@@ -1246,15 +1248,21 @@ public class Parser {
         }
         eat(Resource);
         var type = typeParser.TypeIdentifier();
-        Identifier name = resourceSymbol(type);
+        Expression name = resourceSymbol(type);
         contextStack.push(ContextStack.Resource);
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
         contextStack.pop();
-        return ResourceExpression.resource(existing, type, name, (BlockExpression) body);
+        return ResourceExpression.resource(annotations, existing, type, name, (BlockExpression) body);
     }
 
-    private Identifier resourceSymbol(TypeIdentifier type) {
-        if (IsLookAhead(TokenType.Identifier)) {
+    private boolean inContext(ContextStack stack) {
+        return contextStack.contains(stack);
+    }
+
+    private Expression resourceSymbol(TypeIdentifier type) {
+        if (IsLookAheadAfterUntil(Dot, OpenBraces, Identifier)) {
+            return MemberExpression();
+        } else if (IsLookAhead(TokenType.Identifier)) {
             return Identifier();
         } else if (IsLookAhead(String)) {
             var id = eat(String);
@@ -1540,6 +1548,29 @@ public class Parser {
         return iterator.IsLookAheadAfter(after, type);
     }
 
+    /**
+     * Checks whether a given sequence of token types occurs ahead in the token stream,
+     * bounded by a specified end token.
+     * <p>
+     * Starting from the current parser position (just after the last returned token),
+     * this method scans forward until it either finds the {@code endToken} or runs out of tokens.
+     * While scanning, if it encounters a token of type {@code after}, it looks immediately
+     * at the next token. If that next token matches any of the types provided in {@code type},
+     * the method returns {@code true}.
+     * </p>
+     *
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * // Returns true if, before reaching a RIGHT_BRACE, we see a COLON followed by IDENTIFIER
+     * IsLookAheadAfter(TokenType.COLON, TokenType.RIGHT_BRACE, TokenType.IDENTIFIER);
+     * }</pre>
+     *
+     * @param after    the token type that triggers the lookahead check
+     * @param endToken the token type that bounds the lookahead search; scanning stops when this is found
+     * @param type     one or more token types to check immediately after {@code after}
+     * @return {@code true} if a token of type {@code after} is followed by any of the {@code type}
+     *         before encountering {@code endToken}; otherwise {@code false}
+     */
     boolean IsLookAheadAfterUntil(TokenType after, TokenType endToken, TokenType... type) {
         return iterator.IsLookAheadAfter(after, endToken, type);
     }
