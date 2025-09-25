@@ -624,15 +624,15 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 var envs = [{client: 'amazon'}, {client: 'bmw'}]
                 [for index in envs]
-                resource Bucket index.client {
+                resource Bucket "main-${index.client}" {
                   name     = 'name-${index.client}'
                 }
                 """);
 
         var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("amazon", new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
-        map.put("bmw", new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
+        map.put("main-amazon", new ResourceValue("main-amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
+        map.put("main-bmw", new ResourceValue("main-bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
         assertEquals(map, schemaValue.getInstances().getVariables());
     }
 
