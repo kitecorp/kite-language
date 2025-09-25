@@ -336,7 +336,12 @@ public final class ScopeResolver implements Visitor<Void> {
                     define(id);
                 }
                 case MemberExpression memberExpression -> {
-                    visit(memberExpression);
+                    if (memberExpression.getObject() instanceof SymbolIdentifier identifier){
+                        declare(identifier);
+                        define(identifier);
+                    }
+//                    visit(memberExpression.getObject());
+//                    visit(memberExpression.getProperty());
                 }
                 default -> {
                 }

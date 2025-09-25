@@ -587,10 +587,12 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main[0]");
+        var videos = schema.getInstances().get("videos");
 
-        assertInstanceOf(ResourceValue.class, resource);
-        assertEquals(resource, res);
+        Assertions.assertNotNull(videos);
+        Assertions.assertNotNull(schema.getInstances().get("photos"));
+        assertInstanceOf(ResourceValue.class, videos);
+        assertEquals(videos, res);
     }
 
     @Test
@@ -602,15 +604,15 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 var envs = [{client: 'amazon'}, {client: 'bmw'}]
                 [for index in envs]
-                resource Bucket photos {
+                resource Bucket index.client {
                   name     = 'name-${index.client}'
                 }
                 """);
 
         var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("photos[\"amazon\"]", new ResourceValue("photos[\"amazon\"]", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
-        map.put("photos[\"bmw\"]", new ResourceValue("photos[\"bmw\"]", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
+        map.put("amazon", new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
+        map.put("bmw", new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
         assertEquals(map, schemaValue.getInstances().getVariables());
     }
 

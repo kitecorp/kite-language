@@ -41,26 +41,16 @@ public final class ResourceExpression extends Statement implements DeferredObser
     }
 
     private ResourceExpression(Identifier type, Identifier name, BlockExpression block) {
-        this();
-        this.type = type;
-        this.name = name;
-        this.block = block;
+        this(false, type, name, block);
     }
 
-    private ResourceExpression(Identifier type, Identifier name, Set<AnnotationDeclaration> annotation, BlockExpression block) {
-        this();
-        this.type = type;
-        this.name = name;
-        this.block = block;
-        this.annotations = annotation;
+    private ResourceExpression(Identifier type, Identifier name, Set<AnnotationDeclaration> annotations, BlockExpression block) {
+        this(false, type, name, block);
+        this.annotations = annotations;
     }
 
     private ResourceExpression(boolean existing, Identifier type, Identifier name, BlockExpression block) {
-        this();
-        this.type = type;
-        this.name = name;
-        this.block = block;
-        this.existing = existing;
+        this(existing, type, (Expression) name, block);
     }
 
     private ResourceExpression(boolean existing, Identifier type, Expression name, BlockExpression block) {
@@ -69,10 +59,6 @@ public final class ResourceExpression extends Statement implements DeferredObser
         this.name = name;
         this.block = block;
         this.existing = existing;
-    }
-
-    public static Statement resource(String type, String name, BlockExpression operator) {
-        return resource(TypeIdentifier.type(type), Identifier.id(name), operator);
     }
 
     public static ResourceExpression resource(ResourceExpression expression) {
@@ -87,33 +73,61 @@ public final class ResourceExpression extends Statement implements DeferredObser
         copy.isEvaluating = expression.isEvaluating;
         return copy;
     }
-
-    public static Statement resource(boolean existing, String type, String name, BlockExpression operator) {
-        return resource(existing, TypeIdentifier.type(type), Identifier.id(name), operator);
+    public static ResourceExpression resource(boolean existing,
+                                              Identifier type,
+                                              Expression name,
+                                              BlockExpression block) {
+        return new ResourceExpression(existing, type, name, block);
     }
 
-    public static Statement resource(Identifier type, Identifier name, BlockExpression block) {
-        return new ResourceExpression(type, name, block);
-    }
-
-    public static Statement resource(Identifier type, Identifier name, Set<AnnotationDeclaration> annotation, BlockExpression block) {
-        return new ResourceExpression(type, name, block);
-    }
-
+    // Convenience: no-arg
     public static Statement resource() {
         return new ResourceExpression();
     }
 
+    // Convenience: String inputs
+    public static Statement resource(String type, String name, BlockExpression block) {
+        return resource(false, TypeIdentifier.type(type), Identifier.id(name), block);
+    }
+
+    public static Statement resource(boolean existing, String type, String name, BlockExpression block) {
+        return resource(existing, TypeIdentifier.type(type), Identifier.id(name), block);
+    }
+
+    // Convenience: Identifier + Identifier
+    public static Statement resource(Identifier type, Identifier name, BlockExpression block) {
+        return resource(false, type, name, block);
+    }
+
+    // With annotations (Identifier + Identifier)
+    public static Statement resource(Identifier type,
+                                     Identifier name,
+                                     Set<AnnotationDeclaration> annotations,
+                                     BlockExpression block) {
+        var res = resource(false, type, name, block);
+        res.setAnnotations(annotations);
+        return res;
+    }
+
+    // TypeIdentifier-specific convenience (if you keep TypeIdentifier separate)
     public static Statement resource(TypeIdentifier type, Identifier name, BlockExpression block) {
-        return new ResourceExpression(type, name, block);
+        return resource(false, type, (Expression) name, block);
     }
 
-    public static ResourceExpression resource(boolean existing, TypeIdentifier type, Identifier name, BlockExpression block) {
-        return new ResourceExpression(existing, type, name, block);
+    public static ResourceExpression resource(boolean existing,
+                                              TypeIdentifier type,
+                                              Identifier name,
+                                              BlockExpression block) {
+        return resource(existing, type, (Expression) name, block);
     }
 
-    public static ResourceExpression resource(Set<AnnotationDeclaration> annotations, boolean existing, TypeIdentifier type, Expression name, BlockExpression block) {
-        var res = new ResourceExpression(existing, type, name, block);
+    // With annotations + existing + TypeIdentifier + Expression name
+    public static ResourceExpression resource(Set<AnnotationDeclaration> annotations,
+                                              boolean existing,
+                                              TypeIdentifier type,
+                                              Expression name,
+                                              BlockExpression block) {
+        var res = resource(existing, type, name, block);
         res.setAnnotations(annotations);
         return res;
     }
