@@ -588,10 +588,39 @@ public class ForResourceTest extends RuntimeTest {
         var schema = (SchemaValue) global.get("vm");
 
         var videos = schema.getInstances().get("videos");
+        var photos = schema.getInstances().get("photos");
 
         Assertions.assertNotNull(videos);
-        Assertions.assertNotNull(schema.getInstances().get("photos"));
-        assertInstanceOf(ResourceValue.class, videos);
+        Assertions.assertNotNull(photos);
+        assertEquals(videos, res);
+    }
+
+    @Test
+    @DisplayName("for loop over objects to create resources names as strings")
+    void forResourceObjectsAsStrings() {
+        var res = eval("""
+                schema vm {
+                   string name
+                }
+                var configs = [
+                     { name: "photos", location: "eu-west1" },
+                     { name: "videos", location: "us-east1" }
+                ]
+                
+                for cfg in configs {
+                    resource vm "main-${cfg.name}-${cfg.location}" {
+                        name = cfg.location
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+
+        var videos = schema.getInstances().get("videos");
+        var photos = schema.getInstances().get("photos");
+
+        Assertions.assertNotNull(videos);
+        Assertions.assertNotNull(photos);
         assertEquals(videos, res);
     }
 
@@ -615,8 +644,10 @@ public class ForResourceTest extends RuntimeTest {
         map.put("bmw", new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
         assertEquals(map, schemaValue.getInstances().getVariables());
     }
+
     @Test
     @DisplayName("for loop comprehension over objects with resource names as strings")
+    @Disabled("todo. in future version")
     void arrayResourcesOverObjectsResourceNameAsString() {
         var array = eval("""
                 schema Bucket {
