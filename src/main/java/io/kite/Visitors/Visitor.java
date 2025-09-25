@@ -12,6 +12,8 @@ import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 public sealed interface Visitor<R>
         permits ScopeResolver, ChainResolver, Interpreter, TypeChecker, SyntaxPrinter {
 
@@ -180,9 +182,13 @@ public sealed interface Visitor<R>
             case null, default ->
                     throw new OperationNotImplementedException("Resource name not implemented for: " + visit(resource));
         };
-        if (resource.hasIndex()) {
-            return "%s[%s]".formatted(resourceName, resource.getIndex());
-        }
-        return resourceName;
+        return switch (resource.getIndex()) {
+//            case SymbolIdentifier identifier -> resourceName += identifier.string();
+//            case StringLiteral literal -> resourceName += literal.getValue();
+//            case Identifier identifier -> resourceName += identifier.string();
+            case Map<?, ?> map -> "%s".formatted(resourceName);
+            case null -> resourceName;
+            default -> "%s[%s]".formatted(resourceName, resource.getIndex());
+        };
     }
 }

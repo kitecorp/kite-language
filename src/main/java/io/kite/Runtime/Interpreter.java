@@ -574,7 +574,7 @@ public final class Interpreter implements Visitor<Object> {
                     if (forStatement.getIndex() != null) {
                         resource.setIndex(visit(forStatement.getIndex()));
                     } else {
-                        resource.setIndex(visit(forStatement.getItem()));
+                        resource.setIndex(map);
                     }
                 }
                 default -> throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
