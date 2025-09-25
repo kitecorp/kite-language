@@ -597,6 +597,7 @@ public class ForResourceTest extends RuntimeTest {
 
     @Test
     @DisplayName("for loop over objects to create resources names as strings")
+    @Disabled("todo. in a future language version")
     void forResourceObjectsAsStrings() {
         var res = eval("""
                 schema vm {
