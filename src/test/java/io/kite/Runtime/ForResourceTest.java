@@ -596,8 +596,28 @@ public class ForResourceTest extends RuntimeTest {
     }
 
     @Test
-    @DisplayName("for loop comprehension over objects to create resources")
-    void arrayResourcesOverObjects() {
+    @DisplayName("for loop comprehension over objects with resource names as object properties")
+    void arrayResourcesOverObjectsWithResourceNamesFromObjects() {
+        var array = eval("""
+                schema Bucket {
+                   string name
+                }
+                var envs = [{client: 'amazon'}, {client: 'bmw'}]
+                [for index in envs]
+                resource Bucket index.client {
+                  name     = 'name-${index.client}'
+                }
+                """);
+
+        var map = new HashMap<String, ResourceValue>();
+        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
+        map.put("amazon", new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
+        map.put("bmw", new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
+        assertEquals(map, schemaValue.getInstances().getVariables());
+    }
+    @Test
+    @DisplayName("for loop comprehension over objects with resource names as strings")
+    void arrayResourcesOverObjectsResourceNameAsString() {
         var array = eval("""
                 schema Bucket {
                    string name
