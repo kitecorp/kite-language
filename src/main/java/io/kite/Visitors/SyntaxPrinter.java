@@ -109,9 +109,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         return ansi.toString();
     }
 
-    private Object visit(Object value) {
+    public Object visit(Object value) {
         return switch (value) {
             case NumberLiteral numberLiteral -> Ansi.ansi().fgCyan().a(visit(numberLiteral)).fgDefault().toString();
+            case StringLiteral stringLiteral -> Ansi.ansi().fgCyan().a(visit(stringLiteral)).fgDefault().toString();
+            case BooleanLiteral booleanLiteral -> Ansi.ansi().fgCyan().a(visit(booleanLiteral)).fgDefault().toString();
             case Integer integer -> Ansi.ansi().fgCyan().a(visit(integer.intValue())).fgDefault().toString();
             case Double doubleValue -> Ansi.ansi().fgCyan().a(visit(doubleValue.doubleValue())).fgDefault().toString();
             case Float floatValue -> Ansi.ansi().fgCyan().a(visit(floatValue.floatValue())).fgDefault().toString();
