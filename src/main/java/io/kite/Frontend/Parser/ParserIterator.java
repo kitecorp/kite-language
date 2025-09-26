@@ -93,12 +93,12 @@ public class ParserIterator {
      * @return {@code true} if a token of type {@code after} is followed by any of the {@code type}
      *         before encountering {@code endToken}; otherwise {@code false}
      */
-    boolean IsLookAheadAfter(TokenType after, TokenType endToken, TokenType... type) {
+    boolean IsLookAheadAfter(TokenType after, List<TokenType> endToken, TokenType... type) {
         int index = this.iterator.previousIndex() + 1;
         var iterator = this.tokens.listIterator(index);
         while (iterator.hasNext()) {
             var token = iterator.next();
-            if (token.is(endToken)) {
+            if (endToken.contains(token.type())) {
                 break;
             }
             if (token.is(after)) {

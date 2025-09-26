@@ -743,6 +743,9 @@ public class Parser {
      * We return an expression because it can be a Literal or an Identifier (variable name)
      */
     private Expression ArrayItem() {
+        if (IsLookAheadAfterUntil(Dot, CloseParenthesis, Identifier)) {
+            return MemberExpression();
+        }
         return switch (lookAhead().type()) {
             case Identifier -> SymbolIdentifier(); // Identifier() also checks for types
             case OpenBraces, Object -> {
@@ -913,7 +916,7 @@ public class Parser {
     }
 
     private Expression AnnotationArgs() {
-        if (IsLookAheadAfterUntil(Dot,  CloseParenthesis, Identifier)) {
+        if (IsLookAheadAfterUntil(Dot, List.of(OpenBrackets,CloseParenthesis), Identifier)) {
             return MemberExpression();
         }
         return switch (lookAhead().type()) {
@@ -937,7 +940,7 @@ public class Parser {
                     case null, default -> throw ParserErrors.error("Can't negate a null value");
                 };
             }
-            default -> null;
+            default -> throw ParserErrors.error("Unexpected token: " + lookAhead());
         };
     }
 
@@ -1573,9 +1576,13 @@ public class Parser {
      * @param endToken the token type that bounds the lookahead search; scanning stops when this is found
      * @param type     one or more token types to check immediately after {@code after}
      * @return {@code true} if a token of type {@code after} is followed by any of the {@code type}
-     *         before encountering {@code endToken}; otherwise {@code false}
+     * before encountering {@code endToken}; otherwise {@code false}
      */
     boolean IsLookAheadAfterUntil(TokenType after, TokenType endToken, TokenType... type) {
+        return iterator.IsLookAheadAfter(after, List.of(endToken), type);
+    }
+
+    boolean IsLookAheadAfterUntil(TokenType after, List<TokenType> endToken, TokenType... type) {
         return iterator.IsLookAheadAfter(after, endToken, type);
     }
 

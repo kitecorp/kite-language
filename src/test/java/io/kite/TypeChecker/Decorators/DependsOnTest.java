@@ -24,6 +24,21 @@ public class DependsOnTest extends CheckerTest {
     }
 
     @Test
+    void dependsOnResourceArray() {
+        var res = eval("""
+                schema vm {}
+                
+                resource vm first { }
+                resource vm second { }
+                
+                @dependsOn([vm.first, vm.second])
+                resource vm something {}
+                
+                """);
+
+    }
+
+    @Test
     void dependsOnString() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
