@@ -1,12 +1,13 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.SystemType;
+import io.kite.TypeChecker.Types.ValueType;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;
@@ -21,14 +22,7 @@ public class MaxLengthDecorator extends DecoratorChecker {
         super(MAX_LENGTH, decorator(List.of(ValueType.Number), Set.of(
                 DecoratorType.Target.INPUT,
                 DecoratorType.Target.OUTPUT
-        )));
-    }
-
-    @Override
-    protected boolean isAllowedOn(TypeIdentifier literal) {
-        Type type = literal.getType();
-        SystemType kind = type.getKind();
-        return kind == SystemType.STRING || literal instanceof ArrayTypeIdentifier;
+        )),Set.of(SystemType.STRING, SystemType.ARRAY));
     }
 
     @Override

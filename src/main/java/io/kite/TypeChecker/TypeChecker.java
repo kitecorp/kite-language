@@ -46,6 +46,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(MinValueDecorator.MIN_VALUE, new MinValueDecorator());
         this.decoratorInfoMap.put(MaxValueDecorator.MAX_VALUE, new MaxValueDecorator());
         this.decoratorInfoMap.put(AllowedDecorator.ALLOWED, new AllowedDecorator());
+        this.decoratorInfoMap.put(DependsOnDecorator.DEPENDS_ON, new DependsOnDecorator());
     }
 
     private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
@@ -855,7 +856,7 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(AnnotationDeclaration declaration) {
         var decoratorInfo = decoratorInfoMap.get(declaration.name());
         if (decoratorInfo == null) {
-            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" is unknown").toString();
+            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" decorator is unknown").toString();
             throw new TypeError(message);
         }
         if (shouldNotProvideArgs(declaration, decoratorInfo.getType())) {

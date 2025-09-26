@@ -1,12 +1,14 @@
 package io.kite.TypeChecker.Types;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public final class DecoratorType extends Type {
     private List<Type> params;
     private Set<Target> targets;

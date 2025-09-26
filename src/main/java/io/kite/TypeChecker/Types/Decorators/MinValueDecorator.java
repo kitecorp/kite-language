@@ -1,11 +1,13 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.SystemType;
+import io.kite.TypeChecker.Types.Type;
+import io.kite.TypeChecker.Types.ValueType;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;
@@ -17,17 +19,11 @@ public class MinValueDecorator extends DecoratorChecker {
     public static final String MIN_VALUE = "minValue";
 
     public MinValueDecorator() {
-        super(MIN_VALUE, decorator(List.of(ValueType.Number), Set.of(
-                DecoratorType.Target.INPUT,
-                DecoratorType.Target.OUTPUT
-        )));
-    }
-
-    @Override
-    protected boolean isAllowedOn(TypeIdentifier literal) {
-        Type type = literal.getType();
-        SystemType kind = type.getKind();
-        return kind == SystemType.NUMBER;
+        super(MIN_VALUE, decorator(List.of(ValueType.Number),
+                Set.of(
+                        DecoratorType.Target.INPUT,
+                        DecoratorType.Target.OUTPUT
+                )), Set.of(SystemType.NUMBER));
     }
 
     @Override
@@ -35,14 +31,14 @@ public class MinValueDecorator extends DecoratorChecker {
         validateNumber(declaration, 0, 999999);
 
         switch (declaration.getTarget()) {
-            case InputDeclaration input -> extracted(input.getType());
-            case OutputDeclaration output -> extracted(output.getType());
+            case InputDeclaration input -> extracted(input.targetType());
+            case OutputDeclaration output -> extracted(output.targetType());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         }
         return null;
     }
 
-    private void extracted(TypeIdentifier identifier) {
+    private void extracted(Type identifier) {
         if (!isAllowedOn(identifier)) {
             String message = Ansi.ansi()
                     .fgYellow()
@@ -50,7 +46,7 @@ public class MinValueDecorator extends DecoratorChecker {
                     .reset()
                     .a(" is only valid for numbers but it is applied to: ")
                     .fgBlue()
-                    .a(identifier.getType().getValue())
+                    .a(identifier.getValue())
                     .toString();
             throw new TypeError(message);
         }
