@@ -5,7 +5,10 @@ import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parser.Expressions.MemberExpression;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.ArrayType;
+import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.ReferenceType;
+import io.kite.Visitors.SyntaxPrinter;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;
@@ -15,34 +18,37 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class DependsOnDecorator extends DecoratorChecker {
     public static final String DEPENDS_ON = "dependsOn";
+    private SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
 
     public DependsOnDecorator() {
         super(DEPENDS_ON, decorator(
                 List.of(ArrayType.ARRAY_TYPE, ReferenceType.Resource),
                 Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
-        ), Set.of(SystemType.RESOURCE, SystemType.COMPONENT));
+        ), Set.of());
     }
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        argValidation(declaration);
+        validateMissingArgs(declaration); // validate decorator arguments
 
-        if (declaration.getArgs() instanceof ArrayExpression arrayExpression) {
-            for (Expression item : arrayExpression.getItems()) {
-                extracted(declaration);
-            }
-        } else if (declaration.getValue() instanceof MemberExpression memberExpression) {
-            extracted(declaration);
-        }
+        validateArgsType(declaration);
 
         return null;
     }
 
-    private void extracted(AnnotationDeclaration declaration) {
-        throwTypeErrorForInvalidArgument(declaration.getTarget().targetType());
+    private void validateArgsType(AnnotationDeclaration declaration) {
+        if (declaration.getArgs() instanceof ArrayExpression arrayExpression) {
+            for (Expression item : arrayExpression.getItems()) {
+                if (!(item instanceof MemberExpression memberExpression)) {
+                    throwErrorForInvalidArgument(declaration);
+                }
+            }
+        } else if (!(declaration.getValue() instanceof MemberExpression memberExpression)) {
+            throwErrorForInvalidArgument(declaration);
+        }
     }
 
-    private void argValidation(AnnotationDeclaration declaration) {
+    private void validateMissingArgs(AnnotationDeclaration declaration) {
         if (declaration.getObject() != null) {
             String message = Ansi.ansi()
                     .fgYellow()
@@ -62,17 +68,16 @@ public class DependsOnDecorator extends DecoratorChecker {
         }
     }
 
-    private void throwTypeErrorForInvalidArgument(Type typeIdentifier) {
-        if (!isAllowedOn(typeIdentifier)) {
-            String message = Ansi.ansi()
-                    .fgYellow()
-                    .a("@").a(getName())
-                    .reset()
-                    .a(" is only valid for resource and component references or arrays of resources and components. Applied to: ")
-                    .fgBlue()
-                    .a(typeIdentifier.getValue())
-                    .toString();
-            throw new TypeError(message);
-        }
+    private void throwErrorForInvalidArgument(AnnotationDeclaration typeIdentifier) {
+        String visit = syntaxPrinter.visit(typeIdentifier.getValue()).toString();
+        String message = Ansi.ansi()
+                .fgYellow()
+                .a("@").a(getName())
+                .reset()
+                .a(" must reference a resource or a component but it references: ")
+                .fgBlue()
+                .a(visit)
+                .toString();
+        throw new TypeError(message);
     }
 }
