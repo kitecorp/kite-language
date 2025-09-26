@@ -904,6 +904,7 @@ public class Parser {
                 case StringLiteral literal -> annotation(name, literal);
                 case BooleanLiteral literal -> annotation(name, literal);
                 case NumberLiteral literal -> annotation(name, literal);
+                case MemberExpression expression -> annotation(name, expression);
                 case null -> annotation(name);
                 default -> throw new IllegalStateException("Unexpected value: " + statement);
             };
@@ -912,6 +913,9 @@ public class Parser {
     }
 
     private Expression AnnotationArgs() {
+        if (IsLookAheadAfterUntil(Dot,  CloseParenthesis, Identifier)) {
+            return MemberExpression();
+        }
         return switch (lookAhead().type()) {
             case OpenBrackets -> ArrayExpression();
             case Identifier -> Identifier();

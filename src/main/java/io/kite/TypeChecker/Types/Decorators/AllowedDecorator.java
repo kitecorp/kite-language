@@ -1,6 +1,5 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
@@ -21,17 +20,9 @@ public class AllowedDecorator extends DecoratorChecker {
     public static final String ALLOWED = "allowed";
 
     public AllowedDecorator() {
-        super(ALLOWED, decorator(List.of(ArrayType.ARRAY_TYPE, ObjectType.INSTANCE, ValueType.Number, ValueType.String), Set.of(
-                DecoratorType.Target.INPUT
-        )));
-    }
-
-    @Override
-    protected boolean isAllowedOn(TypeIdentifier literal) {
-        return literal instanceof ArrayTypeIdentifier
-               || literal.getType().getKind() == SystemType.STRING
-               || literal.getType().getKind() == SystemType.OBJECT
-               || literal.getType().getKind() == SystemType.NUMBER;
+        super(ALLOWED, decorator(List.of(ArrayType.ARRAY_TYPE, ObjectType.INSTANCE, ValueType.Number, ValueType.String),
+                Set.of(DecoratorType.Target.INPUT)),
+                Set.of(SystemType.STRING, SystemType.OBJECT, SystemType.NUMBER, SystemType.ARRAY));
     }
 
     @Override

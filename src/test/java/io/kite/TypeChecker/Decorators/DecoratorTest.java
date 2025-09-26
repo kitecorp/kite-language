@@ -1,6 +1,7 @@
-package io.kite.TypeChecker;
+package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.AnyType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

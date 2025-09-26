@@ -1,12 +1,11 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.BooleanLiteral;
-import io.kite.Frontend.Parse.Literals.NumberLiteral;
-import io.kite.Frontend.Parse.Literals.StringLiteral;
-import io.kite.Frontend.Parse.Literals.TypeIdentifier;
+import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.SystemType;
+import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import org.fusesource.jansi.Ansi;
 
@@ -17,16 +16,26 @@ import java.util.Set;
 public abstract class DecoratorChecker {
     private final String name;
     private final DecoratorType type;
+    private final Set<SystemType> allowedOn;
 
-    public DecoratorChecker(String name, DecoratorType type) {
+    public DecoratorChecker(String name, DecoratorType type, Set<SystemType> allowedOn) {
         this.name = name;
         this.type = type;
+        this.allowedOn = allowedOn;
     }
 
     public abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
-    protected boolean isAllowedOn(TypeIdentifier literal) {
-        return true;
+    protected boolean isAllowedOn(TypeIdentifier type) {
+        return type instanceof ArrayTypeIdentifier || isAllowedOn(type.getType());
+    }
+
+    protected boolean isAllowedOn(Type type) {
+        return isAllowedOn(type.getKind());
+    }
+
+    protected boolean isAllowedOn(SystemType type) {
+        return allowedOn.contains(type);
     }
 
     public Object validate(AnnotationDeclaration declaration, Object... args) {

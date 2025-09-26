@@ -5,7 +5,10 @@ import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.SystemType;
+import io.kite.TypeChecker.Types.Type;
+import io.kite.TypeChecker.Types.ValueType;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;
@@ -17,10 +20,12 @@ public class MaxValueDecorator extends DecoratorChecker {
     public static final String MAX_VALUE = "maxValue";
 
     public MaxValueDecorator() {
-        super(MAX_VALUE, decorator(List.of(ValueType.Number), Set.of(
-                DecoratorType.Target.INPUT,
-                DecoratorType.Target.OUTPUT
-        )));
+        super(MAX_VALUE, decorator(List.of(ValueType.Number),
+                        Set.of(
+                                DecoratorType.Target.INPUT,
+                                DecoratorType.Target.OUTPUT
+                        )),
+                Set.of(SystemType.NUMBER));
     }
 
     @Override

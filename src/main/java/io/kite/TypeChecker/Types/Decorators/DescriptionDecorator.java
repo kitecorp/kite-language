@@ -1,7 +1,6 @@
 package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.StringLiteral;
-import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.ValueType;
@@ -18,7 +17,8 @@ public class DescriptionDecorator extends DecoratorChecker {
     public static final String DESCRIPTION = "description";
 
     public DescriptionDecorator() {
-        super(DESCRIPTION, decorator(List.of(ValueType.String), Set.of(
+        super(DESCRIPTION, decorator(List.of(ValueType.String),
+                Set.of(
                         Target.RESOURCE,
                         Target.COMPONENT,
                         Target.INPUT,
@@ -27,7 +27,8 @@ public class DescriptionDecorator extends DecoratorChecker {
                         Target.SCHEMA,
                         Target.SCHEMA_PROPERTY,
                         Target.FUN
-                ))
+                )),
+                Set.of()
         );
     }
 
@@ -62,8 +63,4 @@ public class DescriptionDecorator extends DecoratorChecker {
         }
     }
 
-    @Override
-    protected boolean isAllowedOn(TypeIdentifier literal) {
-        return true;
-    }
 }

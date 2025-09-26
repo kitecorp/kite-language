@@ -14,7 +14,7 @@ public class CountDecorator extends DecoratorChecker {
     public static final String COUNT = "count";
 
     public CountDecorator() {
-        super(COUNT, decorator(List.of(ValueType.Number), Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)));
+        super(COUNT, decorator(List.of(ValueType.Number), Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)), Set.of());
     }
 
     @Override
