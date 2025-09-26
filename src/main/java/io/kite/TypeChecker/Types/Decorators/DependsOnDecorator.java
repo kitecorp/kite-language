@@ -39,8 +39,9 @@ public class DependsOnDecorator extends DecoratorChecker {
     private void validateArgsType(AnnotationDeclaration declaration) {
         if (declaration.getArgs() instanceof ArrayExpression arrayExpression) {
             for (Expression item : arrayExpression.getItems()) {
-                if (!(item instanceof MemberExpression memberExpression)) {
-                    throwErrorForInvalidArgument(declaration);
+                if (item instanceof MemberExpression memberExpression) {
+                } else {
+                    throwErrorForInvalidArgument(item);
                 }
             }
         } else if (!(declaration.getValue() instanceof MemberExpression memberExpression)) {
@@ -68,8 +69,8 @@ public class DependsOnDecorator extends DecoratorChecker {
         }
     }
 
-    private void throwErrorForInvalidArgument(AnnotationDeclaration typeIdentifier) {
-        String visit = syntaxPrinter.visit(typeIdentifier.getValue()).toString();
+    private void throwErrorForInvalidArgument(Expression typeIdentifier) {
+        String visit = syntaxPrinter.visit(typeIdentifier);
         String message = Ansi.ansi()
                 .fgYellow()
                 .a("@").a(getName())
