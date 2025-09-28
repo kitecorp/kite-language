@@ -125,6 +125,10 @@ public class ResourceValue {
         return !getDependencies().isEmpty();
     }
 
+    public void addDependency(Set<String> dependencies) {
+        getDependencies().addAll(dependencies);
+    }
+
     public record Data(String name, Map<String, Object> args) {
     }
 

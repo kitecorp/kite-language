@@ -35,6 +35,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private Object index;
     private Set<AnnotationDeclaration> annotations;
     private Boolean counted;
+    private Set<String> dependencies;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -73,6 +74,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
         copy.isEvaluating = expression.isEvaluating;
         return copy;
     }
+
     public static ResourceExpression resource(boolean existing,
                                               Identifier type,
                                               Expression name,
@@ -176,5 +178,9 @@ public final class ResourceExpression extends Statement implements DeferredObser
 
     public boolean hasIndex() {
         return index != null;
+    }
+
+    public boolean hasDependencies() {
+        return dependencies != null && !dependencies.isEmpty();
     }
 }

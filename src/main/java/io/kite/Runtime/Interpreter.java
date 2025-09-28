@@ -104,6 +104,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decoratorInterpreter.put("description", new DescriptionDecorator());
         this.decoratorInterpreter.put("sensitive", new SensitiveDecorator());
         this.decoratorInterpreter.put("count", new CountDecorator());
+        this.decoratorInterpreter.put("dependsOn", new DependsOnDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -591,6 +592,9 @@ public final class Interpreter implements Visitor<Object> {
             // init any kind of new resource
             installedSchema.initInstance(resourceName(resource), res);
             resource.setValue(res);
+            if (resource.hasDependencies()) {
+                res.addDependency(resource.getDependencies());
+            }
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));
         }
