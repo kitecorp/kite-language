@@ -6,8 +6,10 @@ import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
+import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.TypeChecker;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,7 +40,7 @@ public class DependsOnTests extends RuntimeTest {
 
     @Test
     void dependsOnSingleResource() {
-        eval("""
+        var res = (ResourceValue) eval("""
                 schema vm { string name }
                 
                 resource vm first { }
@@ -48,6 +50,8 @@ public class DependsOnTests extends RuntimeTest {
                 
                 }
                 """);
+        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
+        System.out.println(res);
     }
 
 
