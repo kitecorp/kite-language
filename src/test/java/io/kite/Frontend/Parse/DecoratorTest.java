@@ -371,13 +371,35 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void decoratorMissingClosingParanthesis() {
-        var actual = (Program) parse("""
+        parse("""
                 schema square { 
                    @annotation(importable Vm x =1
                 }
                 """);
         Assertions.assertTrue(ParserErrors.hadErrors());
         Assertions.assertEquals("Expected token ) but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
+    }
+
+    @Test
+    void decoratorMissingClosingBracesBrackets() {
+        parse("""
+                schema square { 
+                   @annotation([importable Vm x =1
+                }
+                """);
+        Assertions.assertTrue(ParserErrors.hadErrors());
+        Assertions.assertEquals("Expected token ] but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
+    }
+
+    @Test
+    void decoratorMissingClosingBracket() {
+        parse("""
+                schema square { 
+                   @annotation([importable) Vm x =1
+                }
+                """);
+        Assertions.assertTrue(ParserErrors.hadErrors());
+        Assertions.assertEquals("Expected token ] but it was ')'", ParserErrors.getErrors().getFirst().getMessage());
     }
 
 

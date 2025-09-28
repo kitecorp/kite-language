@@ -4,7 +4,6 @@ import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parser.errors.ErrorList;
 import io.kite.Frontend.Parser.errors.ParseError;
-import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -12,14 +11,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ParserErrors {
-    private static boolean hadRuntimeError = false;
     @Getter
     private static final List<ParseError> errors = new ArrayList<>();
-
-    public static void runtimeError(RuntimeError error) {
-        System.err.printf("%s\n[line %d]%n", error.getMessage(), error.getToken().line());
-        hadRuntimeError = true;
-    }
 
     public static ParseError error(String message, Token token, TokenType type) {
         ParseError parseError = ParseError.builder()

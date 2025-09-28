@@ -103,7 +103,7 @@ public class Parser {
     }
 
     private static void logParseError(ParseError parseError) {
-        var message = MessageFormat.format("{0}{1}", parseError.getMessage(), parseError.getActual().raw());
+        var message = MessageFormat.format("Parsing error: {0}", parseError.getMessage());
         System.out.println(Ansi.ansi().fgRed().a(message).reset().toString());
     }
 
@@ -985,7 +985,7 @@ public class Parser {
             if (IsLookAheadAfter(Identifier, Identifier)) { // param has type, parse it. If it doesn't the TypeChecker will throw an exception
                 type = typeParser.identifier();
             } else { // enforce parameter type type
-                throw ParserErrors.error("Type type expected for parameter: ", lookAhead(), lookAhead().type());
+                throw ParserErrors.error("Type expected for parameter: ", lookAhead(), lookAhead().type());
             }
             var symbol = SymbolIdentifier();
             return param(symbol, type);
@@ -1605,7 +1605,7 @@ public class Parser {
     }
 
     public Token eat(TokenType... type) {
-        return iterator.eat("Expected token %s but it was '%s'".formatted(Arrays.toString(type).replaceAll("\\]?\\[?", ""), lookAhead().raw()), type);
+        return iterator.eat("Expected token %s but it was '%s'".formatted(type[0].getField(), lookAhead().raw()), type);
     }
 
     public Token eatIf(TokenType... type) {
