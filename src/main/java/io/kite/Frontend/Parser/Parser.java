@@ -900,9 +900,7 @@ public class Parser {
             eat(OpenParenthesis);
             var statement = AnnotationArgs();
             eatWhitespace();
-//            if (IsLookAhead(CloseParenthesis)) {
             eat(CloseParenthesis);
-//            }
             return switch (statement) {
                 case ArrayExpression identifier -> annotation(name, identifier);
                 case ObjectExpression expression -> annotation(name, expression);
