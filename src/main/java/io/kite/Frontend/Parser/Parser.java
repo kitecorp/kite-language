@@ -472,8 +472,10 @@ public class Parser {
         if (IsLookAhead(CloseBraces)) { // ? { } => eat } & return the block
             eat(CloseBraces, "Object must end with } but it is: " + getIterator().getCurrent());
         }
-        if (IsLookAhead(CloseParenthesis)) {
-            eat(CloseParenthesis);
+        if (blockContext == BlockContext.OBJECT) {
+            if (IsLookAhead(CloseParenthesis)) {
+                eat(CloseParenthesis);
+            }
         }
 
         return res;
@@ -897,9 +899,10 @@ public class Parser {
         if (IsLookAhead(OpenParenthesis)) {
             eat(OpenParenthesis);
             var statement = AnnotationArgs();
-            if (IsLookAhead(CloseParenthesis)) {
-                eat(CloseParenthesis);
-            }
+            eatWhitespace();
+//            if (IsLookAhead(CloseParenthesis)) {
+            eat(CloseParenthesis);
+//            }
             return switch (statement) {
                 case ArrayExpression identifier -> annotation(name, identifier);
                 case ObjectExpression expression -> annotation(name, expression);
@@ -1318,7 +1321,12 @@ public class Parser {
                 eat(lookAhead().type());
                 yield Literal();
             }
-            case OpenBraces, Object -> ObjectDeclaration();
+            case OpenBraces, Object -> {
+                blockContext = BlockContext.OBJECT;
+                var res = ObjectDeclaration();
+                blockContext = null;
+                yield res;
+            }
             case OpenBrackets -> ArrayExpression();
             case Identifier -> Identifier();
             default -> throw new IllegalStateException("Unexpected value: " + lookAhead().type());
