@@ -51,9 +51,26 @@ public class DependsOnTests extends RuntimeTest {
                 }
                 """);
         Assertions.assertTrue(res.getDependencies().contains("vm.first"));
-        System.out.println(res);
+        log.warn(res.getDependencies());
     }
 
+    @Test
+    void dependsOnMultipleResources() {
+        var res = (ResourceValue) eval("""
+                schema vm { string name }
+                
+                resource vm first { }
+                resource vm main { }
+                
+                @dependsOn([vm.first, vm.main])
+                resource vm second {
+                
+                }
+                """);
+        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
+        Assertions.assertTrue(res.getDependencies().contains("vm.main"));
+        log.warn(res.getDependencies());
+    }
 
 
 }
