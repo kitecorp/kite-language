@@ -743,7 +743,7 @@ public class Parser {
      * We return an expression because it can be a Literal or an Identifier (variable name)
      */
     private Expression ArrayItem() {
-        if (IsLookAheadAfterUntil(Dot, CloseParenthesis, Identifier)) {
+        if (IsLookAheadAfterUntil(Dot, List.of(Comma, CloseBrackets), Identifier)) {
             return MemberExpression();
         }
         return switch (lookAhead().type()) {
@@ -916,7 +916,7 @@ public class Parser {
     }
 
     private Expression AnnotationArgs() {
-        if (IsLookAheadAfterUntil(Dot, List.of(OpenBrackets,CloseParenthesis), Identifier)) {
+        if (IsLookAheadAfterUntil(Dot, List.of(OpenBrackets, CloseParenthesis), Identifier)) {
             return MemberExpression();
         }
         return switch (lookAhead().type()) {
