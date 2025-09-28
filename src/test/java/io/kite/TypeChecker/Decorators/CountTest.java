@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("TypeChecker Annotation")
-public class DecoratorTest extends CheckerTest {
+@DisplayName("@count decorator")
+public class CountTest extends CheckerTest {
 
     @Test
     void decoratorSensitive() {
