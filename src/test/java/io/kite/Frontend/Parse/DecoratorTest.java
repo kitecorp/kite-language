@@ -402,5 +402,16 @@ public class DecoratorTest extends ParserTest {
         Assertions.assertEquals("Expected token ] but it was ')'", ParserErrors.getErrors().getFirst().getMessage());
     }
 
+    @Test
+    void decoratorMissingParanthesis() {
+        parse("""
+                schema square { 
+                   @annotation([importable] Vm x =1
+                }
+                """);
+        Assertions.assertTrue(ParserErrors.hadErrors());
+        Assertions.assertEquals("Expected token ) but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
+    }
+
 
 }
