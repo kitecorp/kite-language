@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @Log4j2
 @DisplayName("Parser annotations")
-public class AnnotationTest extends ParserTest {
+public class DecoratorTest extends ParserTest {
 
     @Test
     void annotationOutput() {
