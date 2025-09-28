@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Factory;
+import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -366,6 +367,16 @@ public class DecoratorTest extends ParserTest {
                 )
         );
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void decoratorMissingClosingParanthesis() {
+        var actual = (Program) parse("""
+                schema square { 
+                   @annotation(importable Vm x =1
+                }
+                """);
+        Assertions.assertTrue(ParserErrors.hadErrors());
     }
 
 
