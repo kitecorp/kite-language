@@ -1,0 +1,48 @@
+package io.kite.TypeChecker.Decorators;
+
+import io.kite.Base.CheckerTest;
+import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.AnyType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@DisplayName("@sensitive decorator")
+public class SensitiveTest extends CheckerTest {
+
+    @Test
+    void decoratorSensitive() {
+        var res = eval("""
+                @sensitive
+                output any something = null""");
+
+        assertEquals(AnyType.INSTANCE, res);
+    }
+
+    @Test
+    void decoratorSensitiveInvalidArgs() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @sensitive(2)
+                output any something = null
+                """));
+    }
+
+    @Test
+    void decoratorSensitiveInvalidElement() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @sensitive
+                var x = 2"""));
+    }
+
+    @Test
+    void decoratorUnkown() {
+        assertThrows(TypeError.class, () -> eval("""
+                @sensitiveUnknown
+                output any something = null"""));
+
+    }
+
+}
