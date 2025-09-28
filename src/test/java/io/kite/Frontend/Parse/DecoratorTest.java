@@ -377,6 +377,7 @@ public class DecoratorTest extends ParserTest {
                 }
                 """);
         Assertions.assertTrue(ParserErrors.hadErrors());
+        Assertions.assertEquals("Expected token ) but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
     }
 
 
