@@ -932,18 +932,13 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
-//        try {
         var decorator = decoratorInterpreter.get(expression.name());
         if (decorator != null) {
             decorator.execute(this, expression);
         } else {
             log.warn("Unknown decorator: {}", expression.name());
         }
-//        } catch (Exception e) {
-//            System.out.println("Decorator error! " + e.getMessage());
-//            throw e;
-//        }
-        return expression.getValue();
+        return expression.getValue() == null ? expression.getArgs() : expression.getValue();
     }
 
     @Override
