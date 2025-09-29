@@ -89,7 +89,30 @@ public class DependsOnTests extends RuntimeTest {
                 
                 resource vm third { }
                 """);
-        var res = ((SchemaValue)interpreter.getEnv().get("vm")).getInstances().get("second");
+        var res = ((SchemaValue) interpreter.getEnv().get("vm")).getInstances().get("second");
+        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
+        Assertions.assertTrue(res.getDependencies().contains("vm.main"));
+        Assertions.assertTrue(res.getDependencies().contains("vm.third"));
+        log.warn(res.getDependencies());
+    }
+
+    @Test
+    void dependsOnCycle() {
+        eval("""
+                schema vm { string name }
+                
+                resource vm first { }
+                resource vm main { }
+                
+                @dependsOn([vm.first, vm.main, vm.third])
+                resource vm second {
+                
+                }
+                
+                @dependsOn(vm.second)
+                resource vm third { }
+                """);
+        var res = ((SchemaValue) interpreter.getEnv().get("vm")).getInstances().get("second");
         Assertions.assertTrue(res.getDependencies().contains("vm.first"));
         Assertions.assertTrue(res.getDependencies().contains("vm.main"));
         Assertions.assertTrue(res.getDependencies().contains("vm.third"));

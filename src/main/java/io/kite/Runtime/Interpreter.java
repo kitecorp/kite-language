@@ -587,14 +587,11 @@ public final class Interpreter implements Visitor<Object> {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting());
+        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting(), resource.getDependencies());
         try {
             // init any kind of new resource
             installedSchema.initInstance(resourceName(resource), res);
             resource.setValue(res);
-            if (resource.hasDependencies()) {
-                res.addDependency(resource.getDependencies());
-            }
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));
         }
@@ -606,20 +603,26 @@ public final class Interpreter implements Visitor<Object> {
         resource.setEvaluating(false);
         for (Statement it : resource.getArguments()) {
             var result = executeBlock(it, instance.getProperties());
-            if (result instanceof Deferred deferred) {
-                instance.addDependency(deferred.resource());
+            switch (result) {
+                case Deferred deferred -> {
+                    instance.addDependency(deferred.resource());
 
-                CycleDetection.detect(instance);
+                    CycleDetection.detect(instance);
 
-                resource.setEvaluated(false);
+                    resource.setEvaluated(false);
 
-                deferredObservable.addObserver(resource, deferred);
-            } else if (result instanceof Dependency dependency) {
-                instance.addDependency(dependency.resource().getName());
+                    deferredObservable.addObserver(resource, deferred);
+                }
+                case Dependency dependency -> {
+                    instance.addDependency(dependency.resource().getName());
 
-                CycleDetection.detect(instance);
+                    CycleDetection.detect(instance);
+                }
+                case null, default -> {
+                }
             }
         }
+
         if (resource.isEvaluated()) {
             // if not fully evaluated, doesn't make sense to notify observers(resources that depend on this resource)
             deferredObservable.notifyObservers(this, resourceName(resource));
