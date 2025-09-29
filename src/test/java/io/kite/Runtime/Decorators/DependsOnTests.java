@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Values.ResourceValue;
+import io.kite.Runtime.Values.SchemaValue;
 import io.kite.TypeChecker.TypeChecker;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -72,5 +73,27 @@ public class DependsOnTests extends RuntimeTest {
         log.warn(res.getDependencies());
     }
 
+
+    @Test
+    void dependsOnMultipleResourcesLateinit() {
+        eval("""
+                schema vm { string name }
+                
+                resource vm first { }
+                resource vm main { }
+                
+                @dependsOn([vm.first, vm.main, vm.third])
+                resource vm second {
+                
+                }
+                
+                resource vm third { }
+                """);
+        var res = ((SchemaValue)interpreter.getEnv().get("vm")).getInstances().get("second");
+        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
+        Assertions.assertTrue(res.getDependencies().contains("vm.main"));
+        Assertions.assertTrue(res.getDependencies().contains("vm.third"));
+        log.warn(res.getDependencies());
+    }
 
 }
