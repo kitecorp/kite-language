@@ -35,15 +35,19 @@ public class ResourceValue {
     }
 
     public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema) {
-        this.name = name;
-        this.properties = parent;
-        this.schema = schema;
-        existing = Boolean.FALSE;
+        this(name, parent, schema, Boolean.FALSE);
     }
 
     public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema, boolean existing) {
-        this(name, parent, schema);
+        this(name, parent, schema, existing, null);
+    }
+
+    public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema, boolean existing, Set<String> dependencies) {
+        this.name = name;
+        this.schema = schema;
+        this.properties = parent;
         this.existing = existing;
+        this.dependencies = dependencies;
     }
 
     public boolean isExisting() {
