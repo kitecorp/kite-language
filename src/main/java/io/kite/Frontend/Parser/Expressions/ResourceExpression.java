@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -35,7 +36,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private Object index;
     private Set<AnnotationDeclaration> annotations;
     private Boolean counted;
-    private Set<String> dependencies;
+    private Set<Expression> dependencies = Set.of();
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -72,6 +73,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
         copy.value = expression.value;
         copy.isEvaluated = expression.isEvaluated;
         copy.isEvaluating = expression.isEvaluating;
+        copy.dependencies = expression.dependencies;
         return copy;
     }
 
@@ -182,5 +184,16 @@ public final class ResourceExpression extends Statement implements DeferredObser
 
     public boolean hasDependencies() {
         return dependencies != null && !dependencies.isEmpty();
+    }
+
+    public void addDependency(Expression resource) {
+        dependencies().add(resource);
+    }
+
+    public Set<Expression> dependencies() {
+        if (dependencies == null) {
+            this.dependencies = new HashSet<>();
+        }
+        return dependencies;
     }
 }
