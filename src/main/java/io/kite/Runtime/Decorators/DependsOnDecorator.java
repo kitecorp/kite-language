@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Just sets the dependencies list and does nothing more. Actual evaluation and cycle detection will happen in the interpreter
  */
-public class DependsOnDecorator extends NumberDecorator {
+public class DependsOnDecorator extends DecoratorInterpreter {
 
     public DependsOnDecorator() {
         super("dependsOn");

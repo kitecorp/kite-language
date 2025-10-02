@@ -105,6 +105,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decoratorInterpreter.put("sensitive", new SensitiveDecorator());
         this.decoratorInterpreter.put("count", new CountDecorator());
         this.decoratorInterpreter.put("dependsOn", new DependsOnDecorator());
+        this.decoratorInterpreter.put("allowed", new AllowedDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
