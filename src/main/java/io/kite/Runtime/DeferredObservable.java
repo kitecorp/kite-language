@@ -56,11 +56,7 @@ public class DeferredObservable {
     }
 
     public void addObserver(DeferredObserverValue resource, Deferred deferred) {
-        var observers = deferredResources.get(deferred.resource());
-        if (observers == null) {
-            observers = new HashSet<>();
-            deferredResources.put(deferred.resource(), observers);
-        }
+        var observers = deferredResources.computeIfAbsent(deferred.resource(), k -> new HashSet<>());
         observers.add(resource);
     }
 }
