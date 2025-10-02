@@ -194,6 +194,26 @@ public class DependsOnTests extends RuntimeTest {
     }
 
     @Test
+    void dependsOnCycleFirstArraySecondArrayMultipleLateResources() {
+        Assertions.assertThrows(CycleException.class, () -> eval("""
+                schema vm { string name }
+                
+                
+                
+                @dependsOn([vm.first, vm.main, vm.third])
+                resource vm second {
+                
+                }
+                
+                @dependsOn([vm.second, vm.main])
+                resource vm third { }
+                
+                resource vm first { }
+                resource vm main { }
+                """));
+    }
+
+    @Test
     void dependsOnCycleSingleArray() {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
