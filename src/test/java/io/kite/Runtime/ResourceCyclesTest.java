@@ -382,11 +382,12 @@ public class ResourceCyclesTest extends RuntimeTest {
                     number maxCount=0
                     number minCount=1
                 }
-                resource  main vm {
+                
+                resource vm main  {
                     name = "main"
                     maxCount = vm.dep1.maxCount
                 }
-                resource  dep1 vm {
+                resource vm dep1 {
                     name = "dep1"
                     maxCount = vm.main.maxCount
                 }
