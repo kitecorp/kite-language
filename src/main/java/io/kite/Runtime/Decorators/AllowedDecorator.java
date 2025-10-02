@@ -35,7 +35,7 @@ public class AllowedDecorator extends DecoratorInterpreter {
             if (value instanceof List<?> list) {
                 validateArrayValue(list, allowedValues);
             } else {
-                throwValueNotAllowed(value, allowedValues);
+                validateArrayValue(List.of(value), allowedValues);
             }
         }
 

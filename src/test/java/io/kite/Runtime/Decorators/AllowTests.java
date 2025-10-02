@@ -1,6 +1,7 @@
 package io.kite.Runtime.Decorators;
 
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,11 +19,27 @@ public class AllowTests extends DecoratorTests {
     }
 
     @Test
+    void decoratorAllowThrow() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed(["hello"])
+                input string something = "bye"
+                """));
+    }
+
+    @Test
     void decoratorAllowNumber() {
         eval("""
                 @allowed([10, 20])
                 input number something = 20
                 """);
+    }
+
+    @Test
+    void decoratorAllowNumberThrow() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed([10, 20])
+                input number something = 30
+                """));
     }
 
     @Test
@@ -34,11 +51,27 @@ public class AllowTests extends DecoratorTests {
     }
 
     @Test
+    void decoratorAllowStringsArrayThrow() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed(["hello", "world"])
+                input string[] something = ["world", "hello","!"]
+                """));
+    }
+
+    @Test
     void decoratorAllowNumberArray() {
         eval("""
                 @allowed([10, 20])
                 input number[] something = [10, 20]
                 """);
+    }
+
+    @Test
+    void decoratorAllowNumberArrayThrow() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed([10, 20])
+                input number[] something = [10, 20, 30]
+                """));
     }
 
 }
