@@ -10,20 +10,6 @@ import org.junit.jupiter.api.Test;
 public class AllowedTest extends CheckerTest {
 
     @Test
-    void decoratorAllowMissingNumber() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                @allowed
-                input string something"""));
-    }
-
-    @Test
-    void decoratorAllow() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                @allowed(10)
-                input string something"""));
-    }
-
-    @Test
     void decoratorAllowStrings() {
         eval("""
                 @allowed(["hello", "world"])
@@ -49,6 +35,20 @@ public class AllowedTest extends CheckerTest {
         eval("""
                 @allowed([10, 20])
                 input number[] something""");
+    }
+
+    @Test
+    void decoratorAllowMissingNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed
+                input string something"""));
+    }
+
+    @Test
+    void decoratorAllow() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed(10)
+                input string something"""));
     }
 
     @Test
