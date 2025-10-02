@@ -544,13 +544,14 @@ public final class Interpreter implements Visitor<Object> {
         var typeEnvironment = installedSchema.getEnvironment();
         setResourceName(resource);
         try {
+            ResourceValue value;
             if (resource.isEvaluating()) {
                 // notifying an existing resource that it's dependencies were satisfied else create a new resource
-                return detectCycle(resource, resource.getValue());
+                value = resource.getValue();
             } else {
-                ResourceValue instance = initResource(resource, installedSchema, typeEnvironment);
-                return detectCycle(resource, instance);
+                value = initResource(resource, installedSchema, typeEnvironment);
             }
+            return detectCycle(resource, value);
         } finally {
             contextStacks.pop();
         }
@@ -587,7 +588,7 @@ public final class Interpreter implements Visitor<Object> {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting(), resource.getDependencies());
+        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting());
         try {
             // init any kind of new resource
             installedSchema.initInstance(resourceName(resource), res);
@@ -603,24 +604,12 @@ public final class Interpreter implements Visitor<Object> {
         resource.setEvaluating(false);
         for (Statement it : resource.getArguments()) {
             var result = executeBlock(it, instance.getProperties());
-            switch (result) {
-                case Deferred deferred -> {
-                    instance.addDependency(deferred.resource());
+            detectCycle(resource, instance, result);
+        }
 
-                    CycleDetection.detect(instance);
-
-                    resource.setEvaluated(false);
-
-                    deferredObservable.addObserver(resource, deferred);
-                }
-                case Dependency dependency -> {
-                    instance.addDependency(dependency.resource().getName());
-
-                    CycleDetection.detect(instance);
-                }
-                case null, default -> {
-                }
-            }
+        for (Expression it : resource.getDependencies()) {
+            var result = executeBlock(it, env);
+            detectCycle(resource, instance, result);
         }
 
         if (resource.isEvaluated()) {
@@ -628,6 +617,32 @@ public final class Interpreter implements Visitor<Object> {
             deferredObservable.notifyObservers(this, resourceName(resource));
         }
         return instance;
+    }
+
+    private void detectCycle(ResourceExpression resource, ResourceValue instance, Object it) {
+        switch (it) {
+            case Deferred deferred -> {
+                instance.addDependency(deferred.resource());
+
+                CycleDetection.detect(instance);
+
+                resource.setEvaluated(false);
+
+                deferredObservable.addObserver(resource, deferred);
+            }
+            case Dependency dependency -> {
+                instance.addDependency(dependency.resource().getName());
+
+                CycleDetection.detect(instance);
+            }
+            case ResourceValue resourceValue -> { // used by @dependsOn
+                instance.addDependency(resourceValue.getName());
+
+                CycleDetection.detect(instance);
+            }
+            case null, default -> {
+            }
+        }
     }
 
     @Override

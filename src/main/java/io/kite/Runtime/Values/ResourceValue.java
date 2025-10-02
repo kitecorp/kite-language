@@ -12,6 +12,9 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 public class ResourceValue {
+    /**
+     * Replace with Set or List
+     */
     private Environment<Object> properties;
     @Setter
     @Getter

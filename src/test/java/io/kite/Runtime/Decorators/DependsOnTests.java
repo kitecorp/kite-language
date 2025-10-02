@@ -4,6 +4,7 @@ import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.Parser;
+import io.kite.Runtime.CycleException;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Values.ResourceValue;
@@ -51,7 +52,7 @@ public class DependsOnTests extends RuntimeTest {
                 
                 }
                 """);
-        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
+        Assertions.assertTrue(res.getDependencies().contains("first"));
         log.warn(res.getDependencies());
     }
 
@@ -68,8 +69,8 @@ public class DependsOnTests extends RuntimeTest {
                 
                 }
                 """);
-        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
-        Assertions.assertTrue(res.getDependencies().contains("vm.main"));
+        Assertions.assertTrue(res.getDependencies().contains("first"));
+        Assertions.assertTrue(res.getDependencies().contains("main"));
         log.warn(res.getDependencies());
     }
 
@@ -90,15 +91,15 @@ public class DependsOnTests extends RuntimeTest {
                 resource vm third { }
                 """);
         var res = ((SchemaValue) interpreter.getEnv().get("vm")).getInstances().get("second");
-        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
-        Assertions.assertTrue(res.getDependencies().contains("vm.main"));
-        Assertions.assertTrue(res.getDependencies().contains("vm.third"));
+        Assertions.assertTrue(res.getDependencies().contains("first"));
+        Assertions.assertTrue(res.getDependencies().contains("main"));
+        Assertions.assertTrue(res.getDependencies().contains("third"));
         log.warn(res.getDependencies());
     }
 
     @Test
     void dependsOnCycle() {
-        eval("""
+        Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
                 
                 resource vm first { }
@@ -111,12 +112,7 @@ public class DependsOnTests extends RuntimeTest {
                 
                 @dependsOn(vm.second)
                 resource vm third { }
-                """);
-        var res = ((SchemaValue) interpreter.getEnv().get("vm")).getInstances().get("second");
-        Assertions.assertTrue(res.getDependencies().contains("vm.first"));
-        Assertions.assertTrue(res.getDependencies().contains("vm.main"));
-        Assertions.assertTrue(res.getDependencies().contains("vm.third"));
-        log.warn(res.getDependencies());
+                """));
     }
 
 }

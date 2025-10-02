@@ -21,14 +21,9 @@ public class DependsOnDecorator extends NumberDecorator {
     @Override
     public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
         if (declaration.getValue() instanceof MemberExpression member) {
-            return registerDependency(declaration, Set.of(printer.visit(member)));
+            return registerDependency(declaration, Set.of(member));
         } else if (declaration.getArgs() != null) {
-            var set = new HashSet<String>();
-            for (Expression item : declaration.getArgs().getItems()) {
-                if (item instanceof MemberExpression memberExpression) {
-                    set.add(printer.visit(memberExpression));
-                }
-            }
+            var set = new HashSet<>(declaration.getArgs().getItems());
             registerDependency(declaration, set);
             return set;
         }
@@ -36,7 +31,7 @@ public class DependsOnDecorator extends NumberDecorator {
         return null;
     }
 
-    private @NotNull Set<String> registerDependency(AnnotationDeclaration declaration, Set<String> visit) {
+    private @NotNull Set<Expression> registerDependency(AnnotationDeclaration declaration, Set<Expression> visit) {
         var resource = (ResourceExpression) declaration.getTarget();
         resource.setDependencies(visit);
         return resource.getDependencies();
