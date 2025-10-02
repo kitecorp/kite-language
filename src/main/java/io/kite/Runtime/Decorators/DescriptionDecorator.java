@@ -12,8 +12,8 @@ public class DescriptionDecorator extends NumberDecorator {
     @Override
     public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
         if (declaration.getValue() instanceof StringLiteral literal) {
-            String value = literal.getValue();
-            System.out.println(value);
+            String value = interpreter.getPrinter().visit(literal);
+//            System.out.println(value);
             return value;
         }
         return null;
