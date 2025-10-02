@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("@miValue @maxValue")
-public class MiMaxValueTest extends CheckerTest {
+public class MinMaxValueTest extends CheckerTest {
 
 
     @Test
