@@ -5,14 +5,15 @@ import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parser.Expressions.MemberExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Runtime.Interpreter;
-import io.kite.Visitors.SyntaxPrinter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Just sets the dependencies list and does nothing more. Actual evaluation and cycle detection will happen in the interpreter
+ */
 public class DependsOnDecorator extends NumberDecorator {
-    private SyntaxPrinter printer = new SyntaxPrinter();
 
     public DependsOnDecorator() {
         super("dependsOn");
