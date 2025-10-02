@@ -607,7 +607,7 @@ public final class Interpreter implements Visitor<Object> {
             detectCycle(resource, instance, result);
         }
 
-        for (Expression it : resource.getDependencies()) {
+        for (Expression it : resource.getDependencies()) { // dependencies set during decorator evaluation
             var result = executeBlock(it, env);
             detectCycle(resource, instance, result);
         }
