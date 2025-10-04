@@ -1,12 +1,10 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.BooleanLiteral;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
-import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.Frontend.Parser.Expressions.ArrayExpression;
-import io.kite.Frontend.Parser.Expressions.Expression;
-import io.kite.Frontend.Parser.Expressions.InputDeclaration;
+import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.*;
@@ -38,6 +36,8 @@ public class AllowedDecorator extends DecoratorChecker {
                 switch (item) {
                     case StringLiteral literal -> expectTargetType(declaration, ValueType.String, AnyType.INSTANCE);
                     case NumberLiteral literal -> expectTargetType(declaration, ValueType.Number, AnyType.INSTANCE);
+                    case BooleanLiteral literal -> expectTargetType(declaration, ValueType.Boolean, AnyType.INSTANCE);
+                    case ObjectExpression literal -> expectTargetType(declaration, ObjectType.INSTANCE, AnyType.INSTANCE);
                     default -> throw new IllegalStateException("Unexpected value: " + item);
                 }
             }
