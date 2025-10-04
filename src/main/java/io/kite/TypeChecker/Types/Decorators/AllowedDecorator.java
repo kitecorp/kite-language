@@ -94,6 +94,14 @@ public class AllowedDecorator extends DecoratorChecker {
                     .a(" does not accept empty array arguments")
                     .toString();
             throw new TypeError(message);
+        } else if (declaration.getArgs().getItems().size() > 256) {
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(getName())
+                    .reset()
+                    .a(" does not accept more than 256 array arguments")
+                    .toString();
+            throw new TypeError(message);
         }
     }
 
