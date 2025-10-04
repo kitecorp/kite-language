@@ -99,6 +99,14 @@ public class AllowedTests extends DecoratorTests {
     }
 
     @Test
+    void decoratorAllowObjectComplexArray() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed([{ env: 'dev' }])
+                input object something = { env: 'prod', region: 'us-east-1' }
+                """));
+    }
+
+    @Test
     void decoratorAllowObjectKeyArray() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
                 @allowed([{ env: 'dev' }])
