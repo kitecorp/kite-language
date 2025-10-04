@@ -83,6 +83,30 @@ public class AllowedTests extends DecoratorTests {
     }
 
     @Test
+    void decoratorAllowObject() {
+        eval("""
+                @allowed([{ env: 'dev' }])
+                input object something = { env: 'dev' }
+                """);
+    }
+
+    @Test
+    void decoratorAllowObjectValueArray() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed([{ env: 'dev' }])
+                input object something = { env: 'prod' }
+                """));
+    }
+
+    @Test
+    void decoratorAllowObjectKeyArray() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @allowed([{ env: 'dev' }])
+                input object something = { main: 'dev' }
+                """));
+    }
+
+    @Test
     void decoratorAllowNumberArrayThrow() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
                 @allowed([10, 20])
