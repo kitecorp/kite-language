@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 @Log4j2
 @DisplayName("@allowed decorator")
-public class AllowTests extends DecoratorTests {
+public class AllowedTests extends DecoratorTests {
 
 
     @Test
