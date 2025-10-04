@@ -22,9 +22,17 @@ public class AllowedDecorator extends DecoratorChecker {
     private SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
 
     public AllowedDecorator() {
-        super(ALLOWED, decorator(List.of(ArrayType.ARRAY_TYPE, ObjectType.INSTANCE, ValueType.Number, ValueType.String),
+        super(ALLOWED, decorator(
+                        List.of(ArrayType.ARRAY_TYPE,
+                                ObjectType.INSTANCE,
+                                ValueType.Number,
+                                ValueType.String
+                        ),
                         Set.of(DecoratorType.Target.INPUT)),
-                Set.of(SystemType.STRING, SystemType.OBJECT, SystemType.NUMBER, SystemType.ARRAY));
+                Set.of(SystemType.STRING,
+                        SystemType.OBJECT,
+                        SystemType.NUMBER,
+                        SystemType.ARRAY));
     }
 
     @Override
@@ -37,7 +45,8 @@ public class AllowedDecorator extends DecoratorChecker {
                     case StringLiteral literal -> expectTargetType(declaration, ValueType.String, AnyType.INSTANCE);
                     case NumberLiteral literal -> expectTargetType(declaration, ValueType.Number, AnyType.INSTANCE);
                     case BooleanLiteral literal -> expectTargetType(declaration, ValueType.Boolean, AnyType.INSTANCE);
-                    case ObjectExpression literal -> expectTargetType(declaration, ObjectType.INSTANCE, AnyType.INSTANCE);
+                    case ObjectExpression literal ->
+                            expectTargetType(declaration, ObjectType.INSTANCE, AnyType.INSTANCE);
                     default -> throw new IllegalStateException("Unexpected value: " + item);
                 }
             }
