@@ -24,37 +24,6 @@ public class AllowedTest extends CheckerTest {
     }
 
     @Test
-    void decoratorAllowNumberAny() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                @allowed([10, 20])
-                input any something"""));
-        // throws because explicit type is any and implicit type is missing
-    }
-
-    @Test
-    void decoratorAllowStringAny() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                @allowed(['hello', 'world'])
-                input any something"""));
-        // throws because explicit type is any and implicit type is missing
-    }
-
-    @Test
-    void decoratorAllowBooleanAny() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                @allowed([true, false])
-                input any something"""));
-        // throws because explicit type is any and implicit type is missing
-    }
-    @Test
-    void decoratorAllowObjectAny() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                @allowed([{env: dev}])
-                input any something"""));
-        // throws because explicit type is any and implicit type is missing
-    }
-
-    @Test
     void decoratorAllowStringsArray() {
         eval("""
                 @allowed(["hello", "world"])
@@ -130,5 +99,38 @@ public class AllowedTest extends CheckerTest {
                 @allowed(-10)
                 input string something"""));
     }
+
+
+    @Test
+    void decoratorAllowNumberAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed([10, 20])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+
+    @Test
+    void decoratorAllowStringAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed(['hello', 'world'])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+
+    @Test
+    void decoratorAllowBooleanAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed([true, false])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+    @Test
+    void decoratorAllowObjectAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed([{env: dev}])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+
 
 }
