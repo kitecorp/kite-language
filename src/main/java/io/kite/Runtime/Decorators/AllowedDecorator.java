@@ -3,7 +3,6 @@ package io.kite.Runtime.Decorators;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
-import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.Runtime.Interpreter;
 import io.kite.Visitors.SyntaxPrinter;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,6 @@ public class AllowedDecorator extends DecoratorInterpreter {
         var value = declaration.getTarget();
         return switch (value) {
             case InputDeclaration input -> interpreter.visit(input);
-            case OutputDeclaration outputDeclaration -> interpreter.visit(outputDeclaration);
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }

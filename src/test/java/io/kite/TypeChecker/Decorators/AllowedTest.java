@@ -24,6 +24,14 @@ public class AllowedTest extends CheckerTest {
     }
 
     @Test
+    void decoratorAllowNumberAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed([10, 20])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+
+    @Test
     void decoratorAllowStringsArray() {
         eval("""
                 @allowed(["hello", "world"])
