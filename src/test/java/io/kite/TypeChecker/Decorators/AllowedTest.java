@@ -32,6 +32,22 @@ public class AllowedTest extends CheckerTest {
     }
 
     @Test
+    void decoratorAllowStringAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed(['hello', 'world'])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+
+    @Test
+    void decoratorAllowBooleanAny() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @allowed([true, false])
+                input any something"""));
+        // throws because explicit type is any and implicit type is missing
+    }
+
+    @Test
     void decoratorAllowStringsArray() {
         eval("""
                 @allowed(["hello", "world"])

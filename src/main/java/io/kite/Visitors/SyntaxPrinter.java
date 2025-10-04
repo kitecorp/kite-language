@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 
 
@@ -81,9 +80,21 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(InputDeclaration expression) {
         if (expression.hasInit()) {
-            return format("input {0} {1} = {2}", visit(expression.getType()), visit(expression.getId()), visit(expression.getInit()));
+            return ansi.fgMagenta().a("input ")
+                    .a(visit(expression.getType()))
+                    .a(" ")
+                    .fgDefault()
+                    .a(visit(expression.getId()))
+                    .a(" = ")
+                    .a(visit(expression.getInit()))
+                    .toString();
         } else {
-            return format("input {0} {1}", visit(expression.getType()), visit(expression.getId()));
+            return ansi.fgMagenta().a("input ")
+                    .a(visit(expression.getType()))
+                    .a(" ")
+                    .fgDefault()
+                    .a(visit(expression.getId()))
+                    .toString();
         }
     }
 
