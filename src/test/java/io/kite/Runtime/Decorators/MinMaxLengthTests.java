@@ -92,22 +92,10 @@ public class MinMaxLengthTests extends DecoratorTests {
     }
 
     @Test
-    void outputSensitive() {
+    void outputMinLengthArray() {
         eval("""
-                @sensitive
-                output string something = "a"
-                """);
-    }
-
-    @Test
-    void outputCount() {
-        eval("""
-                schema vm { string name }
-                
-                @count(2)
-                resource vm main {
-                   
-                }
+                @minLength(0)
+                output string[] something = []
                 """);
     }
 
