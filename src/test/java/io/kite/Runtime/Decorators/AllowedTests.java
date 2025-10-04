@@ -67,6 +67,14 @@ public class AllowedTests extends DecoratorTests {
     }
 
     @Test
+    void decoratorAllowBooleansArray() {
+        eval("""
+                @allowed([true, false])
+                input boolean[] something = [true, false]
+                """);
+    }
+
+    @Test
     void decoratorAllowNumberArrayThrow() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
                 @allowed([10, 20])

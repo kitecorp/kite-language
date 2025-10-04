@@ -14,6 +14,7 @@ import org.fusesource.jansi.Ansi;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
@@ -42,11 +43,11 @@ public class AllowedDecorator extends DecoratorChecker {
         if (declaration.getArgs() instanceof ArrayExpression arrayExpression) {
             for (Expression item : arrayExpression.getItems()) {
                 switch (item) {
-                    case StringLiteral literal -> expectTargetType(declaration, ValueType.String, AnyType.INSTANCE);
-                    case NumberLiteral literal -> expectTargetType(declaration, ValueType.Number, AnyType.INSTANCE);
-                    case BooleanLiteral literal -> expectTargetType(declaration, ValueType.Boolean, AnyType.INSTANCE);
+                    case StringLiteral literal -> expectTargetType(declaration, ValueType.String);
+                    case NumberLiteral literal -> expectTargetType(declaration, ValueType.Number);
+                    case BooleanLiteral literal -> expectTargetType(declaration, ValueType.Boolean);
                     case ObjectExpression literal ->
-                            expectTargetType(declaration, ObjectType.INSTANCE, AnyType.INSTANCE);
+                            expectTargetType(declaration, ObjectType.INSTANCE);
                     default -> throw new IllegalStateException("Unexpected value: " + item);
                 }
             }
@@ -62,9 +63,9 @@ public class AllowedDecorator extends DecoratorChecker {
 
     private void expectTargetType(AnnotationDeclaration declaration, Type... string) {
         var types = new HashSet<>(Set.of(string));
-        types.add(AnyType.INSTANCE);
+//        types.add(AnyType.INSTANCE);
         if (!types.contains(declaration.getTarget().targetType())) {
-            throwTypeErrorForInvalidArgument(declaration, types);
+            throwTypeErrorForInvalidArgument(declaration, types.stream().map(Type::getValue).collect(Collectors.toSet()));
         }
     }
 
@@ -96,7 +97,7 @@ public class AllowedDecorator extends DecoratorChecker {
         }
     }
 
-    private void throwTypeErrorForInvalidArgument(AnnotationDeclaration declaration, Set<Type> types) {
+    private void throwTypeErrorForInvalidArgument(AnnotationDeclaration declaration, Set<String> types) {
         Annotatable target = declaration.getTarget();
         var string = switch (target) {
             case InputDeclaration input -> syntaxPrinter.visit(input);
@@ -113,6 +114,7 @@ public class AllowedDecorator extends DecoratorChecker {
                 .a(" is of type ")
                 .fgBlue()
                 .a(target.targetType().getValue())
+                .fgDefault()
                 .toString();
         throw new TypeError(message);
     }
@@ -130,6 +132,7 @@ public class AllowedDecorator extends DecoratorChecker {
                         .fgDefault()
                         .a(" in expression: ")
                         .a(syntaxPrinter.visit(input))
+                        .fgDefault()
                         .toString();
                 throw new TypeError(message);
             }
