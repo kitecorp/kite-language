@@ -16,6 +16,9 @@ import java.util.Set;
 public abstract class DecoratorChecker {
     private final String name;
     private final DecoratorType type;
+    /**
+     * the types that we apply the annotation on. ex: input <type> name
+     */
     private final Set<SystemType> allowedOn;
 
     public DecoratorChecker(String name, DecoratorType type, Set<SystemType> allowedOn) {
