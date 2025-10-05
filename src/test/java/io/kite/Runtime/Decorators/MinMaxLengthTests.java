@@ -125,4 +125,38 @@ public class MinMaxLengthTests extends DecoratorTests {
         );
     }
 
+    @Test
+    void outputMaxLengthArray() {
+        eval("""
+                @maxLength(0)
+                output string[] something = []
+                """);
+    }
+
+    @Test
+    void outputMaxLengthArrayThrows() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxLength(1)
+                output string[] something = ["hi","bob"]
+                """)
+        );
+    }
+
+    @Test
+    void outputMaxLengthArrayNumber() {
+        eval("""
+                @maxLength(0)
+                output number[] something = []
+                """);
+    }
+
+    @Test
+    void outputMaxLengthArrayNumberThrows() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @maxLength(2)
+                output number[] something = [10,20,30]
+                """)
+        );
+    }
+
 }

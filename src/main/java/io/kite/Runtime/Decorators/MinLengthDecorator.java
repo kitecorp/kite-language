@@ -16,12 +16,12 @@ public class MinLengthDecorator extends NumberDecorator {
         super("minLength");
     }
 
-    private static String illegalArgumentMsg(Object value, int list, Interpreter interpreter, AnnotationDeclaration declaration) {
+    private static String illegalArgumentMsg(Object value, int len, Interpreter interpreter, AnnotationDeclaration declaration) {
         String msg = Ansi.ansi()
                 .a("Provided value ")
                 .a(value)
                 .a(" with length ")
-                .a(list)
+                .a(len)
                 .a(" is below the minimum length in expression: \n")
                 .a(interpreter.getPrinter().visit(declaration))
                 .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
