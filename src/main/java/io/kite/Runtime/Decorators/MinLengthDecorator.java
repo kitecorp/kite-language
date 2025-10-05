@@ -9,41 +9,59 @@ import io.kite.Runtime.Interpreter;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 
+import java.util.List;
+
 public class MinLengthDecorator extends NumberDecorator {
     public MinLengthDecorator() {
         super("minLength");
     }
 
+    private static String illegalArgumentMsg(Object value, int list, Interpreter interpreter, AnnotationDeclaration declaration) {
+        String msg = Ansi.ansi()
+                .a("Provided value ")
+                .a(value)
+                .a(" with length ")
+                .a(list)
+                .a(" is below the minimum length in expression: \n")
+                .a(interpreter.getPrinter().visit(declaration))
+                .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
+                .reset()
+                .toString();
+        return msg;
+    }
+
     @Override
     public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> extracted(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> extracted(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> checkExplicitType(interpreter, declaration, output.getInit());
+            case InputDeclaration input -> checkExplicitType(interpreter, declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private String extracted(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
-        var stringValue = (String) interpreter.visit(expression);
+    private Object checkExplicitType(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
         var minArg = extractSingleNumericArg(declaration);
-
-
         ensureFinite(minArg);
 
-        if (StringUtils.length(stringValue) < minArg.intValue()) {
-            String msg = Ansi.ansi()
-                    .a("Provided value ")
-                    .a(stringValue)
-                    .a(" with length ")
-                    .a(StringUtils.length(stringValue))
-                    .a(" is below the minimum length in expression: \n")
-                    .a(interpreter.getPrinter().visit(declaration))
-                    .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
-                    .reset()
-                    .toString();
-            throw new IllegalArgumentException(msg);
+        var value = interpreter.visit(expression);
+        switch (value) {
+            case String string -> {
+                if (StringUtils.length(string) < minArg.intValue()) {
+                    String msg = illegalArgumentMsg(value, StringUtils.length(string), interpreter, declaration);
+                    throw new IllegalArgumentException(msg);
+                }
+                return string;
+            }
+            case List<?> list -> {
+                if (list.size() < minArg.intValue()) {
+                    String msg = illegalArgumentMsg(value, list.size(), interpreter, declaration);
+                    throw new IllegalArgumentException(msg);
+                }
+                return list;
+            }
+            case null, default ->  throw new IllegalStateException("Unexpected value: " + value);
         }
-        return stringValue;
+
     }
 
 

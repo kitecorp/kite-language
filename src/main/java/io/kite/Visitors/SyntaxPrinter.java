@@ -131,6 +131,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             case Boolean booleanValue ->
                     Ansi.ansi().fgCyan().a(visit(booleanValue.booleanValue())).fgDefault().toString();
             case String stringValue -> Ansi.ansi().fgGreen().a('"').a(visit(stringValue)).a('"').fgDefault().toString();
+            case ArrayExpression arrayExpression -> visit(arrayExpression);
             case List list -> list.stream().map(this::visit).collect(Collectors.joining(", ", "[", "]"));
             case Map<?, ?> map ->
                     map.entrySet().stream().map(e -> visit(e.getKey()) + ": " + visit(e.getValue())).collect(Collectors.joining(", ", "{", "}"));
