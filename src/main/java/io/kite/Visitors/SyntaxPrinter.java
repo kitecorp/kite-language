@@ -20,7 +20,7 @@ import static java.util.Objects.requireNonNull;
 
 public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Getter
-    private Ansi ansi = Ansi.ansi(50)
+    private final Ansi ansi = Ansi.ansi(50)
             .reset()
             .eraseScreen();
 
@@ -195,10 +195,9 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         if (expression.isEmpty()) {
             return "{ }";
         }
-        String builder = expression.getProperties().stream()
+        return expression.getProperties().stream()
                 .map(this::visit)
                 .collect(Collectors.joining(",\n", "{\n ", " \n}"));
-        return builder;
     }
 
     @Override
