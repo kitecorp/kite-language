@@ -99,4 +99,13 @@ public class MinMaxLengthTests extends DecoratorTests {
                 """);
     }
 
+    @Test
+    void outputMinLengthArrayThrows() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @minLength(2)
+                output string[] something = ["hi"]
+                """)
+        );
+    }
+
 }
