@@ -9,9 +9,25 @@ import io.kite.Runtime.Interpreter;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 
+import java.util.List;
+
 public class MaxLengthDecorator extends NumberDecorator {
     public MaxLengthDecorator() {
         super("maxLength");
+    }
+
+    private static String illegalArgumentMsg(Object value, int len, Interpreter interpreter, AnnotationDeclaration declaration) {
+        String msg = Ansi.ansi()
+                .a("Provided value ")
+                .a(value)
+                .a(" with length ")
+                .a(len)
+                .a(" is above the maximum length in expression: \n")
+                .a(interpreter.getPrinter().visit(declaration))
+                .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
+                .reset()
+                .toString();
+        throw new IllegalArgumentException(msg);
     }
 
     @Override
@@ -23,28 +39,28 @@ public class MaxLengthDecorator extends NumberDecorator {
         };
     }
 
-    private String extracted(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
-        var stringValue = (String) interpreter.visit(expression);
+    private Object extracted(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
         var minArg = extractSingleNumericArg(declaration);
-
-
         ensureFinite(minArg);
 
-        if (StringUtils.length(stringValue) > minArg.intValue()) {
-            String msg = Ansi.ansi()
-                    .a("Provided value ")
-                    .a(stringValue)
-                    .a(" with length ")
-                    .a(StringUtils.length(stringValue))
-                    .a(" is above the maximum length in expression: \n")
-                    .a(interpreter.getPrinter().visit(declaration))
-                    .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
-                    .reset()
-                    .toString();
-            throw new IllegalArgumentException(msg);
+        var value = interpreter.visit(expression);
+        switch (value) {
+            case String string -> {
+                if (StringUtils.length(string) > minArg.intValue()) {
+                    String msg = illegalArgumentMsg(value, StringUtils.length(string), interpreter, declaration);
+                    throw new IllegalArgumentException(msg);
+                }
+                return string;
+            }
+            case List<?> list -> {
+                if (list.size() > minArg.intValue()) {
+                    String msg = illegalArgumentMsg(value, list.size(), interpreter, declaration);
+                    throw new IllegalArgumentException(msg);
+                }
+                return list;
+            }
+            case null, default -> throw new IllegalStateException("Unexpected value: " + value);
         }
-        return stringValue;
     }
-
 
 }
