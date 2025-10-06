@@ -16,10 +16,10 @@ import java.util.Set;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class MaxLengthDecorator extends DecoratorChecker {
-    public static final String MAX_LENGTH = "maxLength";
+    public static final String NAME = "maxLength";
 
     public MaxLengthDecorator() {
-        super(MAX_LENGTH, decorator(List.of(ValueType.Number), Set.of(
+        super(NAME, decorator(List.of(ValueType.Number), Set.of(
                 DecoratorType.Target.INPUT,
                 DecoratorType.Target.OUTPUT
         )),Set.of(SystemType.STRING, SystemType.ARRAY));

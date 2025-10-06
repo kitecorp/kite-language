@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class AllowedDecorator extends DecoratorChecker {
-    public static final String ALLOWED = "allowed";
+    public static final String NAME = "allowed";
     private SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
 
     public AllowedDecorator() {
-        super(ALLOWED, decorator(
+        super(NAME, decorator(
                         List.of(ArrayType.ARRAY_TYPE,
                                 ObjectType.INSTANCE,
                                 ValueType.Number,

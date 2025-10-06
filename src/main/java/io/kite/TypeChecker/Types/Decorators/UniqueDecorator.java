@@ -3,7 +3,6 @@ package io.kite.TypeChecker.Types.Decorators;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
-import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -14,15 +13,15 @@ import java.util.Set;
 
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
-public class NonEmptyDecorator extends DecoratorChecker {
+public class UniqueDecorator extends DecoratorChecker {
 
-    public static final String NAME = "nonEmpty";
+    public static final String NAME = "unique";
 
-    public NonEmptyDecorator() {
+    public UniqueDecorator() {
         super(NAME, decorator(List.of(),
                         Set.of(DecoratorType.Target.INPUT)
                 ),
-                Set.of(SystemType.STRING, SystemType.ARRAY)
+                Set.of(SystemType.ARRAY)
         );
     }
 
@@ -31,10 +30,6 @@ public class NonEmptyDecorator extends DecoratorChecker {
         switch (declaration.getTarget()) {
             case InputDeclaration input -> {
                 isAllowedOnType(input.getType());
-                // todo: maybe check if init == null and print an error?
-            }
-            case OutputDeclaration output -> {
-                isAllowedOnType(output.getType());
                 // todo: maybe check if init == null and print an error?
             }
             default -> {
@@ -57,9 +52,9 @@ public class NonEmptyDecorator extends DecoratorChecker {
                         .fgYellow()
                         .a("@").a(getName())
                         .reset()
-                        .a(" is only valid for strings and arrays. Applied to: ")
+                        .a(" is only valid for arrays. Applied to: ")
                         .fgBlue()
-                        .a(literal.getType())
+                        .a(literal.getType().getValue())
                         .toString();
                 throw new TypeError(message);
             }

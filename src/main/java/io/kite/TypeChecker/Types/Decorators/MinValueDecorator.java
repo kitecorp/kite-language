@@ -16,10 +16,10 @@ import java.util.Set;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class MinValueDecorator extends DecoratorChecker {
-    public static final String MIN_VALUE = "minValue";
+    public static final String NAME = "minValue";
 
     public MinValueDecorator() {
-        super(MIN_VALUE, decorator(List.of(ValueType.Number),
+        super(NAME, decorator(List.of(ValueType.Number),
                 Set.of(
                         DecoratorType.Target.INPUT,
                         DecoratorType.Target.OUTPUT

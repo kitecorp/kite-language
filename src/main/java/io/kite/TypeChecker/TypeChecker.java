@@ -38,16 +38,17 @@ public final class TypeChecker implements Visitor<Type> {
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
         this.decoratorInfoMap = new HashMap<>();
-        this.decoratorInfoMap.put(SensitiveDecorator.SENSITIVE, new SensitiveDecorator());
-        this.decoratorInfoMap.put(CountDecorator.COUNT, new CountDecorator());
-        this.decoratorInfoMap.put(DescriptionDecorator.DESCRIPTION, new DescriptionDecorator());
-        this.decoratorInfoMap.put(MaxLengthDecorator.MAX_LENGTH, new MaxLengthDecorator());
-        this.decoratorInfoMap.put(MinLengthDecorator.MIN_LENGTH, new MinLengthDecorator());
-        this.decoratorInfoMap.put(MinValueDecorator.MIN_VALUE, new MinValueDecorator());
-        this.decoratorInfoMap.put(MaxValueDecorator.MAX_VALUE, new MaxValueDecorator());
-        this.decoratorInfoMap.put(AllowedDecorator.ALLOWED, new AllowedDecorator());
-        this.decoratorInfoMap.put(DependsOnDecorator.DEPENDS_ON, new DependsOnDecorator());
-        this.decoratorInfoMap.put(NonEmptyDecorator.NON_EMPTY, new NonEmptyDecorator());
+        this.decoratorInfoMap.put(SensitiveDecorator.NAME, new SensitiveDecorator());
+        this.decoratorInfoMap.put(CountDecorator.NAME, new CountDecorator());
+        this.decoratorInfoMap.put(DescriptionDecorator.NAME, new DescriptionDecorator());
+        this.decoratorInfoMap.put(MaxLengthDecorator.NAME, new MaxLengthDecorator());
+        this.decoratorInfoMap.put(MinLengthDecorator.NAME, new MinLengthDecorator());
+        this.decoratorInfoMap.put(MinValueDecorator.NAME, new MinValueDecorator());
+        this.decoratorInfoMap.put(MaxValueDecorator.NAME, new MaxValueDecorator());
+        this.decoratorInfoMap.put(AllowedDecorator.NAME, new AllowedDecorator());
+        this.decoratorInfoMap.put(DependsOnDecorator.NAME, new DependsOnDecorator());
+        this.decoratorInfoMap.put(NonEmptyDecorator.NAME, new NonEmptyDecorator());
+        this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
     }
 
     private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
@@ -867,7 +868,7 @@ public final class TypeChecker implements Visitor<Type> {
 
         decoratorInfo.validate(declaration);
 
-        if (!decoratorInfo.targets().contains(declaration.targetType())) {
+        if (!decoratorInfo.isOnValidTarget(declaration.getTarget())) {
             var ansi = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset()
                     .a(" can only be used on: ")
                     .fgMagenta()

@@ -2,6 +2,7 @@ package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -113,4 +114,7 @@ public abstract class DecoratorChecker {
         return longValue;
     }
 
+    public boolean isOnValidTarget(Annotatable target) {
+        return targets().contains(target.getTarget());
+    }
 }

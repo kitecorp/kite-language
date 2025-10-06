@@ -14,10 +14,10 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class DescriptionDecorator extends DecoratorChecker {
 
-    public static final String DESCRIPTION = "description";
+    public static final String NAME = "description";
 
     public DescriptionDecorator() {
-        super(DESCRIPTION, decorator(List.of(ValueType.String),
+        super(NAME, decorator(List.of(ValueType.String),
                 Set.of(
                         Target.RESOURCE,
                         Target.COMPONENT,
