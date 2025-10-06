@@ -17,12 +17,13 @@ public class UniqueDecorator extends DecoratorInterpreter {
     }
 
     private static String illegalArgumentMsg(Object value, Interpreter interpreter, AnnotationDeclaration declaration) {
+        var printer = interpreter.getPrinter();
         String msg = Ansi.ansi()
                 .a("Provided list ")
                 .a(value)
                 .a(" has duplicate elements:\n")
-                .a(interpreter.getPrinter().visit(declaration))
-                .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
+                .a(printer.visit(declaration))
+                .a(printer.visit((Statement) declaration.getTarget()))
                 .reset()
                 .toString();
         return msg;
