@@ -80,6 +80,42 @@ public class UniqueTests extends DecoratorTests {
                 [33m@unique[m
                 [m[2J[35minput [34mnumber[][39m [39msomething = [1, 1][m""", err.getMessage());
     }
+    @Test
+    void uniqueAnyArrayEmpty() {
+        eval("""
+                @unique
+                input any[] something = []
+                """);
+    }
+
+    @Test
+    void uniqueAnyArray() {
+        eval("""
+                @unique
+                input any[] something = [10]
+                """);
+    }
+
+    @Test
+    void uniqueAnyArrayMultiple() {
+        eval("""
+                @unique
+                input any[] something = [1,2,3]
+                """);
+    }
+
+    @Test
+    void uniqueAnyArrayError() {
+        var err = Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @unique
+                input any[] something = [1,1]
+                """)
+        );
+        Assertions.assertEquals("""
+                Provided list [1, 1] has duplicate elements:
+                [33m@unique[m
+                [m[2J[35minput [34many[][39m [39msomething = [1, 1][m""", err.getMessage());
+    }
 
 
 }
