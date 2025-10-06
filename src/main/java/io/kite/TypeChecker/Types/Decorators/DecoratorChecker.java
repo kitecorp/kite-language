@@ -30,6 +30,10 @@ public abstract class DecoratorChecker {
 
     public abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
+    public boolean validateAfterInit(AnnotationDeclaration declaration) {
+        return false;
+    }
+
     protected boolean isAllowedOn(TypeIdentifier type) {
         return type instanceof ArrayTypeIdentifier || isAllowedOn(type.getType());
     }
