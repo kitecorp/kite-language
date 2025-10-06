@@ -16,10 +16,10 @@ import java.util.Set;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class MinLengthDecorator extends DecoratorChecker {
-    public static final String MIN_LENGTH = "minLength";
+    public static final String NAME = "minLength";
 
     public MinLengthDecorator() {
-        super(MIN_LENGTH, decorator(List.of(ValueType.Number), Set.of(
+        super(NAME, decorator(List.of(ValueType.Number), Set.of(
                 DecoratorType.Target.INPUT,
                 DecoratorType.Target.OUTPUT
         )), Set.of(SystemType.STRING, SystemType.ARRAY));

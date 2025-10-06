@@ -17,11 +17,11 @@ import java.util.Set;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class DependsOnDecorator extends DecoratorChecker {
-    public static final String DEPENDS_ON = "dependsOn";
+    public static final String NAME = "dependsOn";
     private SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
 
     public DependsOnDecorator() {
-        super(DEPENDS_ON, decorator(
+        super(NAME, decorator(
                 List.of(ArrayType.ARRAY_TYPE, ReferenceType.Resource),
                 Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
         ), Set.of());

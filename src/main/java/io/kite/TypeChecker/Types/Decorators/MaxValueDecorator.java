@@ -17,10 +17,10 @@ import java.util.Set;
 import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class MaxValueDecorator extends DecoratorChecker {
-    public static final String MAX_VALUE = "maxValue";
+    public static final String NAME = "maxValue";
 
     public MaxValueDecorator() {
-        super(MAX_VALUE, decorator(List.of(ValueType.Number),
+        super(NAME, decorator(List.of(ValueType.Number),
                         Set.of(
                                 DecoratorType.Target.INPUT,
                                 DecoratorType.Target.OUTPUT
