@@ -116,6 +116,54 @@ public class UniqueTests extends DecoratorTests {
                 [33m@unique[m
                 [m[2J[35minput [34many[][39m [39msomething = [1, 1][m""", err.getMessage());
     }
+    @Test
+    void uniqueObjectArrayEmpty() {
+        eval("""
+                @unique
+                input object[] something = []
+                """);
+    }
+
+    @Test
+    void uniqueObjectArrayEmptyObject() {
+        eval("""
+                @unique
+                input object[] something = [{}]
+                """);
+    }
+
+    @Test
+    void uniqueObjectArray() {
+        eval("""
+                @unique
+                input object[] something = [{env: 'prod'}]
+                """);
+    }
+
+    @Test
+    void uniqueObjectArrayMultiple() {
+        eval("""
+                @unique
+                input object[] something = [{env: 'prod'}, {env: 'dev'}]
+                """);
+    }
+
+    @Test
+    void uniqueObjectArrayError() {
+        var err = Assertions.assertThrows(IllegalArgumentException.class, () -> eval("""
+                @unique
+                input object[] something = [{env: 'prod'}, {env: 'prod'}]
+                """)
+        );
+        Assertions.assertEquals("""
+               Provided list [{env=prod}, {env=prod}] has duplicate elements:
+               [33m@unique[m
+               [m[2J[35minput [34mobject[][39m [39msomething = [{
+                "env": "prod"\s
+               }, {
+                "env": "prod"\s
+               }][m""", err.getMessage());
+    }
 
 
 }
