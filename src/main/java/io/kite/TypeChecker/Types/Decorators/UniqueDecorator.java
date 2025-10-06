@@ -29,14 +29,8 @@ public class UniqueDecorator extends DecoratorChecker {
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         switch (declaration.getTarget()) {
-            case InputDeclaration input -> {
-                isAllowedOnType(input.getType());
-                // todo: maybe check if init == null and print an error?
-            }
-            case OutputDeclaration input -> {
-                isAllowedOnType(input.getType());
-                // todo: maybe check if init == null and print an error?
-            }
+            case InputDeclaration input -> isAllowedOnType(input.getType());
+            case OutputDeclaration input -> isAllowedOnType(input.getType());
             default -> {
                 String message = Ansi.ansi()
                         .fgYellow()
@@ -49,6 +43,25 @@ public class UniqueDecorator extends DecoratorChecker {
         }
         return null;
     }
+
+
+//    @Override
+//    public boolean validateAfterInit(AnnotationDeclaration declaration) {
+//        switch (declaration.getTarget()){
+//            case InputDeclaration inputDeclaration -> {
+//                if (!inputDeclaration.hasInit()) {
+//                    throw new TypeError("Missing init for unique input");
+//                }
+//            }
+//            case OutputDeclaration outputDeclaration -> {
+//                if (!outputDeclaration.hasInit()) {
+//                    throw new TypeError("Missing init for unique output");
+//                }
+//            }
+//            default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
+//        }
+//        return true;
+//    }
 
     private void isAllowedOnType(TypeIdentifier input) {
         if (input instanceof TypeIdentifier literal) {
