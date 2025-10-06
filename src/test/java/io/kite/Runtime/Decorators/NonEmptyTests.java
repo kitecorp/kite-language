@@ -43,10 +43,18 @@ public class NonEmptyTests extends DecoratorTests {
     }
 
     @Test
-    void nonEmptyArray() {
+    void nonEmptyStringArray() {
         eval("""
                 @nonEmpty
                 input string[] something = ["hello"]
+                """);
+    }
+
+    @Test
+    void nonEmptyBooleanArray() {
+        eval("""
+                @nonEmpty
+                input boolean[] something = [true]
                 """);
     }
 
@@ -55,6 +63,30 @@ public class NonEmptyTests extends DecoratorTests {
         eval("""
                 @nonEmpty
                 input number[] something = [10]
+                """);
+    }
+
+    @Test
+    void nonEmptyArrayAnyNumber() {
+        eval("""
+                @nonEmpty
+                input any[] something = [10]
+                """);
+    }
+
+    @Test
+    void nonEmptyArrayAnyString() {
+        eval("""
+                @nonEmpty
+                input any[] something = ["hello"]
+                """);
+    }
+
+    @Test
+    void nonEmptyArrayObject() {
+        eval("""
+                @nonEmpty
+                input object[] something = [{env: 'prod'}]
                 """);
     }
 
