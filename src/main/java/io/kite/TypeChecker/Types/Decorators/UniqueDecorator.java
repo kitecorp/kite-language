@@ -3,6 +3,7 @@ package io.kite.TypeChecker.Types.Decorators;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
+import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -19,7 +20,7 @@ public class UniqueDecorator extends DecoratorChecker {
 
     public UniqueDecorator() {
         super(NAME, decorator(List.of(),
-                        Set.of(DecoratorType.Target.INPUT)
+                        Set.of(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT)
                 ),
                 Set.of(SystemType.ARRAY)
         );
@@ -29,6 +30,10 @@ public class UniqueDecorator extends DecoratorChecker {
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         switch (declaration.getTarget()) {
             case InputDeclaration input -> {
+                isAllowedOnType(input.getType());
+                // todo: maybe check if init == null and print an error?
+            }
+            case OutputDeclaration input -> {
                 isAllowedOnType(input.getType());
                 // todo: maybe check if init == null and print an error?
             }

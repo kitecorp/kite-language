@@ -10,6 +10,14 @@ import org.junit.jupiter.api.Test;
 public class UniqueTest extends CheckerTest {
 
     @Test
+    void uniqueInvalidArgs() {
+        var error = Assertions.assertThrows(TypeError.class, () -> eval("""
+                @unique(10)
+                input string something"""));
+        Assertions.assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+    }
+
+    @Test
     void uniqueString() {
         var error = Assertions.assertThrows(TypeError.class, () -> eval("""
                 @unique
