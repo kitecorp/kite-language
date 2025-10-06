@@ -117,4 +117,10 @@ public abstract class DecoratorChecker {
     public boolean isOnValidTarget(Annotatable target) {
         return targets().contains(target.getTarget());
     }
+
+    public boolean hasValidArguments(AnnotationDeclaration declaration) {
+        return type.getParams().isEmpty() &&
+               (declaration.getValue() != null || declaration.getObject() != null ||
+                declaration.getArgs() != null && !declaration.getArgs().isEmpty());
+    }
 }

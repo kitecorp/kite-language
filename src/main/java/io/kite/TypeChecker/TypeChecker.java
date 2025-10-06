@@ -51,12 +51,6 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
     }
 
-    private static boolean shouldNotProvideArgs(AnnotationDeclaration declaration, DecoratorType decoratorInfo) {
-        return decoratorInfo.getParams().isEmpty() &&
-               (declaration.getValue() != null || declaration.getObject() != null ||
-                declaration.getArgs() != null && !declaration.getArgs().isEmpty());
-    }
-
     @Override
     public Type visit(Program program) {
         Type type = ValueType.Null;
@@ -861,8 +855,8 @@ public final class TypeChecker implements Visitor<Type> {
             var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" decorator is unknown").toString();
             throw new TypeError(message);
         }
-        if (shouldNotProvideArgs(declaration, decoratorInfo.getType())) {
-            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any parameters and must not have any value or object").toString();
+        if (decoratorInfo.hasValidArguments(declaration)) {
+            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any arguments").toString();
             throw new TypeError(message);
         }
 
