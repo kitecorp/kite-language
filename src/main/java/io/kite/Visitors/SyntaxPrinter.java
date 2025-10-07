@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -234,6 +235,12 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         } else if (expression.getObject() != null) {
             ansi.a("(")
                     .a(visit(expression.getObject()))
+                    .fgYellow()
+                    .a(")");
+        } else if (expression.getNamedArgs() != null) {
+            Stream<String> stringStream = expression.getNamedArgs().entrySet().stream().map(e -> visit(e.getKey()) + " = " + visit(e.getValue()));
+            ansi.a("(")
+                    .a(stringStream.collect(Collectors.joining(", ")))
                     .fgYellow()
                     .a(")");
         }

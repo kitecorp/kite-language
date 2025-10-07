@@ -1,0 +1,57 @@
+package io.kite.TypeChecker.Types.Decorators;
+
+import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.TypeChecker.TypeError;
+import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.SystemType;
+import org.fusesource.jansi.Ansi;
+
+import java.util.List;
+import java.util.Set;
+
+import static io.kite.TypeChecker.Types.DecoratorType.decorator;
+
+public class ValidateDecorator extends DecoratorChecker {
+    public static final String NAME = "validate";
+
+    public ValidateDecorator() {
+        super(NAME, decorator(List.of(),
+                        Set.of(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT)
+                ),
+                Set.of(SystemType.ARRAY, SystemType.STRING)
+        );
+    }
+
+    @Override
+    public Object validate(AnnotationDeclaration declaration, List<Object> args) {
+        var namedArgs = declaration.getNamedArgs();
+        if (namedArgs == null || namedArgs.isEmpty()) {
+            throw new TypeError("Missing %s arguments!".formatted(Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString()));
+        }
+        if (namedArgs.get("regex") == null) {
+            throw new TypeError("regex argument is required for %s".formatted(Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString()));
+        }
+        return null;
+    }
+
+
+//    @Override
+//    public boolean validateAfterInit(AnnotationDeclaration declaration) {
+//        switch (declaration.getTarget()){
+//            case InputDeclaration inputDeclaration -> {
+//                if (!inputDeclaration.hasInit()) {
+//                    throw new TypeError("Missing init for unique input");
+//                }
+//            }
+//            case OutputDeclaration outputDeclaration -> {
+//                if (!outputDeclaration.hasInit()) {
+//                    throw new TypeError("Missing init for unique output");
+//                }
+//            }
+//            default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
+//        }
+//        return true;
+//    }
+
+
+}
