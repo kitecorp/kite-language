@@ -43,6 +43,15 @@ public class ValidateDecorator extends DecoratorChecker {
         return null;
     }
 
+
+    @Override
+    public boolean hasArguments(AnnotationDeclaration declaration) {
+        return declaration.getValue() != null
+               || declaration.getObject() != null
+               || declaration.getArgs() != null && !declaration.getArgs().isEmpty()
+               || declaration.getNamedArgs() != null && declaration.getNamedArgs().isEmpty();
+    }
+
     private String validateFormatting() {
         return Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString();
     }
