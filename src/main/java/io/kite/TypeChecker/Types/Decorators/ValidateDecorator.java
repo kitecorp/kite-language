@@ -1,6 +1,8 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -29,8 +31,11 @@ public class ValidateDecorator extends DecoratorChecker {
         if (namedArgs == null || namedArgs.isEmpty()) {
             throw new TypeError("Missing %s arguments!".formatted(validateFormatting()));
         }
-        if (namedArgs.get("regex") == null) {
+        Expression regex = namedArgs.get("regex");
+        if (regex == null) {
             throw new TypeError("regex argument is required for %s".formatted(validateFormatting()));
+        } else if (!(regex instanceof StringLiteral)) {
+            throw new TypeError("regex argument must be a string literal for %s".formatted(validateFormatting()));
         }
         if (!isAllowedOn(declaration.getTarget().targetType())) {
             throw new TypeError("%s is not allowed on %s".formatted(validateFormatting(), declaration.getTarget().targetType().getValue()));
