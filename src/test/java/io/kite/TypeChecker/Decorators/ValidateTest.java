@@ -53,6 +53,17 @@ public class ValidateTest extends CheckerTest {
     }
 
     @Test
+    void validateInvalidRegex() {
+        var error = Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @validate(regex=1000)
+                        input string something"""
+                )
+        );
+        Assertions.assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+    }
+
+    @Test
     void validateBoolean() {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
