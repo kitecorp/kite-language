@@ -45,77 +45,89 @@ public class ValidateTest extends CheckerTest {
     void validateNumber() {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
-                        @validate(regex="^[a-z0-9-]+$", flags="i", message="Use letters, numbers, dashes")
+                        @validate(regex="^[a-z0-9-]+$")
                         input number something"""
                 )
         );
-        Assertions.assertEquals("\u001B[33m@validate\u001B[m is only valid for arrays. Applied to: \u001B[34mnumber", error.getMessage());
+        Assertions.assertEquals("\u001B[33m@validate\u001B[m is not allowed on number", error.getMessage());
     }
 
     @Test
     void validateBoolean() {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
-                        @validate
+                        @validate(regex="^[a-z0-9-]+$")
                         input boolean something""")
         );
-        Assertions.assertEquals("\u001B[33m@validate\u001B[m is only valid for arrays. Applied to: \u001B[34mboolean", error.getMessage());
+        Assertions.assertEquals("\u001B[33m@validate\u001B[m is not allowed on boolean", error.getMessage());
     }
 
     @Test
     void validateAny() {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
-                        @validate
+                        @validate(regex="^[a-z0-9-]+$")
                         input any something""")
         );
-        Assertions.assertEquals("\u001B[33m@validate\u001B[m is only valid for arrays. Applied to: \u001B[34many", error.getMessage());
+        Assertions.assertEquals("\u001B[33m@validate\u001B[m is not allowed on any", error.getMessage());
     }
 
     @Test
     void validateObject() {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
-                        @validate
+                        @validate(regex="^[a-z0-9-]+$")
                         input object something""")
         );
-        Assertions.assertEquals("\u001B[33m@validate\u001B[m is only valid for arrays. Applied to: \u001B[34mobject", error.getMessage());
+        Assertions.assertEquals("\u001B[33m@validate\u001B[m is not allowed on object", error.getMessage());
     }
 
     @Test
     void validateStringArray() {
         eval("""
-                @validate
+                @validate(regex="^[a-z0-9-]+$")
                 input string[] something""");
     }
 
 
     @Test
     void validateNumberArray() {
-        eval("""
-                @validate
-                input number[] something""");
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @validate(regex="^[a-z0-9-]+$")
+                        input number[] something"""
+                )
+        );
     }
 
     @Test
     void validateBooleanArray() {
-        eval("""
-                @validate
-                input boolean[] something""");
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @validate(regex="^[a-z0-9-]+$")
+                        input boolean[] something"""
+                )
+        );
     }
 
     @Test
     void validateAnyArray() {
-        eval("""
-                @validate
-                input any[] something""");
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @validate(regex="^[a-z0-9-]+$")
+                        input any[] something"""
+                )
+        );
     }
 
     @Test
     void validateObjectArray() {
-        eval("""
-                @validate
-                input object[] something""");
+        Assertions.assertThrows(TypeError.class, () ->
+                eval("""
+                        @validate(regex="^[a-z0-9-]+$")
+                        input object[] something"""
+                )
+        );
     }
 
 }
