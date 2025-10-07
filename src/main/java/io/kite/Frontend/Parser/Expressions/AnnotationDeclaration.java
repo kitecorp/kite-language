@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Map;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(staticName = "annotation")
@@ -15,7 +17,8 @@ public final class AnnotationDeclaration extends Expression {
     private Identifier name;
     private Object value;
     private ArrayExpression args; // for positional args [1,2,3]; ['dev','env']
-    private ObjectExpression object; // for named args
+    private ObjectExpression object; // for object args
+    private Map<String, Expression> namedArgs;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Annotatable target;
@@ -51,6 +54,11 @@ public final class AnnotationDeclaration extends Expression {
         this();
         this.name = name;
         this.value = value;
+    }
+    private AnnotationDeclaration(Identifier name, Map<String, Expression> namedArgs) {
+        this();
+        this.name = name;
+        this.namedArgs = namedArgs;
     }
 
     private AnnotationDeclaration(Identifier name) {
@@ -111,6 +119,10 @@ public final class AnnotationDeclaration extends Expression {
     }
 
     public static AnnotationDeclaration annotation(Identifier name, Object value) {
+        return new AnnotationDeclaration(name, value);
+    }
+
+    public static AnnotationDeclaration annotation(Identifier name, Map<String, Expression> value) {
         return new AnnotationDeclaration(name, value);
     }
 

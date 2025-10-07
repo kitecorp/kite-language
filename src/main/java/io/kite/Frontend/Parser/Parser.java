@@ -145,7 +145,7 @@ public class Parser {
                 continue;
             }
 
-            var annotations = AnnotationDeclaration();// extract the annotations
+            var annotations = DecoratorDeclaration();// extract the annotations
             annotations.forEach(annotation -> statementList.add(ExpressionStatement.expressionStatement(annotation)));
 
             Statement statement = Declaration(annotations);
@@ -851,7 +851,7 @@ public class Parser {
     }
 
     private SchemaProperty SchemaProperty() {
-        var annotations = AnnotationDeclaration();
+        var annotations = DecoratorDeclaration();
 
         var type = TypeIdentifier();
         var id = Identifier();
@@ -873,27 +873,30 @@ public class Parser {
     }
 
     /**
-     * Annotation
-     * : '@' Identifier ( '(' ArgList ')' )?
+     * Decorator            := '@' Identifier ( '(' ArgList ')' )?
+     * ; ArgList            := Arg (',' Arg)* ','?        // allow trailing comma optional
+     * ; Arg                := NamedArg | PositionalArg
+     * ; NamedArg           := Identifier "=" Exprssion
+     * ; PositionalArg      := Expression
      * ;
      */
-    private Set<AnnotationDeclaration> AnnotationDeclaration() {
+    private Set<AnnotationDeclaration> DecoratorDeclaration() {
         if (!IsLookAhead(AT)) return Set.of(); //efficient empty set
 
-        return AnnotationList();
+        return DecoratorList();
     }
 
-    private Set<AnnotationDeclaration> AnnotationList() {
+    private Set<AnnotationDeclaration> DecoratorList() {
         var set = new HashSet<AnnotationDeclaration>(1, 1.0f);
         while (IsLookAhead(AT) && !IsLookAhead(EOF, NewLine)) {
-            var annotation = getAnnotationDeclarations();
+            var annotation = DecoratorDeclarations();
             set.add(annotation);
             eatWhitespace();
         }
         return set;
     }
 
-    private AnnotationDeclaration getAnnotationDeclarations() {
+    private AnnotationDeclaration DecoratorDeclarations() {
         eat(AT);
         var name = Identifier();
         if (IsLookAhead(OpenParenthesis)) {
@@ -909,6 +912,7 @@ public class Parser {
                 case BooleanLiteral literal -> annotation(name, literal);
                 case NumberLiteral literal -> annotation(name, literal);
                 case MemberExpression expression -> annotation(name, expression);
+                case Map<?,?> map -> annotation(name, map);
                 case null -> annotation(name);
                 default -> throw new IllegalStateException("Unexpected value: " + statement);
             };
@@ -916,13 +920,31 @@ public class Parser {
         return annotation(name);
     }
 
-    private Expression AnnotationArgs() {
-        if (IsLookAheadAfterUntil(Dot, List.of(OpenBrackets, CloseParenthesis), Identifier)) {
-            return MemberExpression();
-        }
+    private Object AnnotationArgs() {
+        var map = new HashMap<String, Expression>();
+        do {
+            eatWhitespace();
+
+            if (IsLookAhead(CloseParenthesis)) break;
+
+            var argument = AnnotationArgument();
+            if (IsLookAhead(Equal) && argument instanceof Identifier identifier) {
+                eat(Equal);
+                map.put(identifier.string(), AnnotationArgument());
+            } else {
+                return argument;
+            }
+        } while (IsLookAhead(Comma) && eat(Comma) != null);
+        return map;
+    }
+
+    private Expression AnnotationArgument() {
         return switch (lookAhead().type()) {
             case OpenBrackets -> ArrayExpression();
-            case Identifier -> Identifier();
+            case Identifier -> {
+                if (IsLookAhead(Dot)) yield MemberExpression();
+                yield Identifier();
+            }
             case OpenBraces -> ObjectDeclaration();
             case True, False, Number, String -> {
                 eat();
