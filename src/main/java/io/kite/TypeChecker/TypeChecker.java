@@ -355,12 +355,16 @@ public final class TypeChecker implements Visitor<Type> {
         if (expression.getType().getType().getKind() != t1.getKind()) {
             expression.getType().setType(t1);
         }
-        // invoke annotations that implement after init checking
-        for (AnnotationDeclaration annotation : expression.getAnnotations()) {
-            var res = decoratorInfoMap.get(annotation.getName().string());
-            res.validateAfterInit(annotation);
-        }
+        onFinalAnnotations(expression.getAnnotations());
         return t1;
+    }
+
+    private void onFinalAnnotations(Set<AnnotationDeclaration> list) {
+        // invoke annotations that implement after init checking
+        for (var annotation : list) {
+            var res = decoratorInfoMap.get(annotation.getName().string());
+            res.onFinal(annotation);
+        }
     }
 
     @Override
@@ -386,6 +390,7 @@ public final class TypeChecker implements Visitor<Type> {
         if (expression.getType().getType().getKind() != t1.getKind()) {
             expression.getType().setType(t1);
         }
+        onFinalAnnotations(expression.getAnnotations());
         return t1;
     }
 
