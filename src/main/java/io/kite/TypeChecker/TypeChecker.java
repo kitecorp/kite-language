@@ -49,6 +49,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(DependsOnDecorator.NAME, new DependsOnDecorator());
         this.decoratorInfoMap.put(NonEmptyDecorator.NAME, new NonEmptyDecorator());
         this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
+        this.decoratorInfoMap.put(ValidateDecorator.NAME, new ValidateDecorator());
     }
 
     @Override
@@ -865,20 +866,8 @@ public final class TypeChecker implements Visitor<Type> {
             var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" decorator is unknown").toString();
             throw new TypeError(message);
         }
-        if (decoratorInfo.hasValidArguments(declaration)) {
-            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any arguments").toString();
-            throw new TypeError(message);
-        }
 
         decoratorInfo.validate(declaration);
-
-        if (!decoratorInfo.isOnValidTarget(declaration.getTarget())) {
-            var ansi = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset()
-                    .a(" can only be used on: ")
-                    .fgMagenta()
-                    .a(decoratorInfo.targetString()).reset();
-            throw new TypeError(ansi.toString());
-        }
 
         return decoratorInfo.getType();
     }

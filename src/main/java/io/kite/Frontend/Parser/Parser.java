@@ -912,7 +912,7 @@ public class Parser {
                 case BooleanLiteral literal -> annotation(name, literal);
                 case NumberLiteral literal -> annotation(name, literal);
                 case MemberExpression expression -> annotation(name, expression);
-                case Map<?,?> map -> annotation(name, map);
+                case Map<?,?> map -> annotation(name, (Map<String, Expression>) map);
                 case null -> annotation(name);
                 default -> throw new IllegalStateException("Unexpected value: " + statement);
             };
@@ -942,7 +942,7 @@ public class Parser {
         return switch (lookAhead().type()) {
             case OpenBrackets -> ArrayExpression();
             case Identifier -> {
-                if (IsLookAhead(Dot)) yield MemberExpression();
+                if (IsLookAheadAfter(Identifier, Dot)) yield MemberExpression();
                 yield Identifier();
             }
             case OpenBraces -> ObjectDeclaration();

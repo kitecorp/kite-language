@@ -1,7 +1,6 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
-import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Factory;
@@ -125,14 +124,16 @@ public class DecoratorTest extends ParserTest {
                 schema Backend { string name = 0 }
                 """);
 
+        var version = annotation("version");
+        var annotation1 = annotation("annotation");
         var program = Factory.program(
-                expressionStatement(annotation("version")),
-                expressionStatement(annotation("annotation")),
+                expressionStatement(annotation1),
+                expressionStatement(version),
                 schema(
                         id("Backend"),
                         List.of(schemaProperty(type("string"), "name", 0)),
-                        annotation("annotation"),
-                        annotation("version")
+                        annotation1,
+                        version
                 )
         );
         Assertions.assertEquals(program, res);
@@ -267,7 +268,7 @@ public class DecoratorTest extends ParserTest {
                 @annotation(regex="^[a-z0-9-]+$")
                 component Backend api { }
                 """);
-        AnnotationDeclaration annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$")));
+        var annotation = annotation("annotation",  Map.of("regex", string("^[a-z0-9-]+$")));
         var program = Factory.program(
                 expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));

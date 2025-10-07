@@ -7,6 +7,7 @@ import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.SyntaxPrinter;
 import lombok.Data;
 import org.fusesource.jansi.Ansi;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 
 @Data
 public abstract class DecoratorChecker {
+    protected final SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
     private final String name;
     private final DecoratorType type;
     /**
@@ -28,7 +30,43 @@ public abstract class DecoratorChecker {
         this.allowedOn = allowedOn;
     }
 
-    public abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
+    protected abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
+
+    public Object validate(AnnotationDeclaration declaration, Object... args) {
+        if (hasValidArguments(declaration)) {
+            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any arguments").toString();
+            throw new TypeError(message);
+        }
+
+//        throwIfNotAllowedOnType(declaration.getTarget().targetType());
+
+
+        var res = validate(declaration, List.of(args));
+
+        if (!isOnValidTarget(declaration.getTarget())) {
+            var ansi = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset()
+                    .a(" can only be used on: ")
+                    .fgMagenta()
+                    .a(targetString()).reset();
+            throw new TypeError(ansi.toString());
+        }
+
+        return res;
+    }
+
+    private void throwIfNotAllowedOnType(Type type) {
+        if (!isAllowedOn(type)) {
+            String message = Ansi.ansi()
+                    .fgYellow()
+                    .a("@").a(getName())
+                    .reset()
+                    .a(" is only valid for arrays. Applied to: ")
+                    .fgBlue()
+                    .a(type.getValue())
+                    .toString();
+            throw new TypeError(message);
+        }
+    }
 
     public boolean onFinal(AnnotationDeclaration declaration) {
         return false;
@@ -39,15 +77,11 @@ public abstract class DecoratorChecker {
     }
 
     protected boolean isAllowedOn(Type type) {
-        return isAllowedOn(type.getKind());
+        return type.getKind() == SystemType.ARRAY || isAllowedOn(type.getKind());
     }
 
     protected boolean isAllowedOn(SystemType type) {
         return allowedOn.contains(type);
-    }
-
-    public Object validate(AnnotationDeclaration declaration, Object... args) {
-        return validate(declaration, List.of(args));
     }
 
     public Set<DecoratorType.Target> targets() {
@@ -124,7 +158,9 @@ public abstract class DecoratorChecker {
 
     public boolean hasValidArguments(AnnotationDeclaration declaration) {
         return type.getParams().isEmpty() &&
-               (declaration.getValue() != null || declaration.getObject() != null ||
-                declaration.getArgs() != null && !declaration.getArgs().isEmpty());
+               (declaration.getValue() != null
+                || declaration.getObject() != null
+                || declaration.getArgs() != null && !declaration.getArgs().isEmpty()
+                || declaration.getNamedArgs() != null && declaration.getNamedArgs().isEmpty());
     }
 }

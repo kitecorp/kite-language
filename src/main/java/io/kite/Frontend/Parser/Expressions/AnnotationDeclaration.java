@@ -32,9 +32,15 @@ public final class AnnotationDeclaration extends Expression {
         this.args = args;
     }
 
-    private AnnotationDeclaration(String name, Object value) {
+    private AnnotationDeclaration(String name, Expression value) {
         this();
         this.name = Identifier.id(name);
+        this.value = value;
+    }
+
+    private AnnotationDeclaration(Identifier name, Expression value) {
+        this();
+        this.name = name;
         this.value = value;
     }
 
@@ -50,11 +56,7 @@ public final class AnnotationDeclaration extends Expression {
         this.args = value;
     }
 
-    private AnnotationDeclaration(Identifier name, Object value) {
-        this();
-        this.name = name;
-        this.value = value;
-    }
+
     private AnnotationDeclaration(Identifier name, Map<String, Expression> namedArgs) {
         this();
         this.name = name;
@@ -106,7 +108,11 @@ public final class AnnotationDeclaration extends Expression {
         return new AnnotationDeclaration(name, Identifier.id(args));
     }
 
-    public static AnnotationDeclaration annotation(String name, Object value) {
+    public static AnnotationDeclaration annotation(String name, Expression value) {
+        return new AnnotationDeclaration(name, value);
+    }
+
+    public static AnnotationDeclaration annotation(Identifier name, Expression value) {
         return new AnnotationDeclaration(name, value);
     }
 
@@ -118,12 +124,12 @@ public final class AnnotationDeclaration extends Expression {
         return new AnnotationDeclaration(name, value);
     }
 
-    public static AnnotationDeclaration annotation(Identifier name, Object value) {
+    public static AnnotationDeclaration annotation(Identifier name, Map<String, Expression> value) {
         return new AnnotationDeclaration(name, value);
     }
 
-    public static AnnotationDeclaration annotation(Identifier name, Map<String, Expression> value) {
-        return new AnnotationDeclaration(name, value);
+    public static AnnotationDeclaration annotation(String name, Map<String, Expression> value) {
+        return new AnnotationDeclaration(Identifier.id(name), value);
     }
 
     public static AnnotationDeclaration annotation(String name, Identifier args) {
