@@ -33,7 +33,7 @@ public abstract class DecoratorChecker {
     protected abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
     public Object validate(AnnotationDeclaration declaration, Object... args) {
-        if (hasValidArguments(declaration)) {
+        if (hasArguments(declaration)) {
             var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any arguments").toString();
             throw new TypeError(message);
         }
@@ -156,7 +156,7 @@ public abstract class DecoratorChecker {
         return targets().contains(target.getTarget());
     }
 
-    public boolean hasValidArguments(AnnotationDeclaration declaration) {
+    protected boolean hasArguments(AnnotationDeclaration declaration) {
         return type.getParams().isEmpty() &&
                (declaration.getValue() != null
                 || declaration.getObject() != null
