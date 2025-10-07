@@ -30,7 +30,7 @@ public abstract class DecoratorChecker {
 
     public abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
-    public boolean validateAfterInit(AnnotationDeclaration declaration) {
+    public boolean onFinal(AnnotationDeclaration declaration) {
         return false;
     }
 
