@@ -25,13 +25,21 @@ public class ValidateDecorator extends DecoratorChecker {
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         var namedArgs = declaration.getNamedArgs();
+
         if (namedArgs == null || namedArgs.isEmpty()) {
-            throw new TypeError("Missing %s arguments!".formatted(Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString()));
+            throw new TypeError("Missing %s arguments!".formatted(validateFormatting()));
         }
         if (namedArgs.get("regex") == null) {
-            throw new TypeError("regex argument is required for %s".formatted(Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString()));
+            throw new TypeError("regex argument is required for %s".formatted(validateFormatting()));
+        }
+        if (!isAllowedOn(declaration.getTarget().targetType())) {
+            throw new TypeError("%s is not allowed on %s".formatted(validateFormatting(), declaration.getTarget().targetType().getValue()));
         }
         return null;
+    }
+
+    private String validateFormatting() {
+        return Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString();
     }
 
 
