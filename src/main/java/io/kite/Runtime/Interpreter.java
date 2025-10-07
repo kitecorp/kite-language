@@ -52,6 +52,7 @@ public final class Interpreter implements Visitor<Object> {
     private final Deque<ContextStack> contextStacks;
     @Getter
     private final List<OutputDeclaration> outputs;
+    @Getter
     private final Map<String, DecoratorInterpreter> decoratorInterpreter;
     @Getter
     private final List<RuntimeException> errors;
@@ -108,6 +109,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decoratorInterpreter.put("allowed", new AllowedDecorator());
         this.decoratorInterpreter.put("nonEmpty", new NonEmptyDecorator());
         this.decoratorInterpreter.put("unique", new UniqueDecorator());
+        this.decoratorInterpreter.put("validate", new ValidateDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -959,7 +961,17 @@ public final class Interpreter implements Visitor<Object> {
         } else {
             log.warn("Unknown decorator: {}", expression.name());
         }
-        return expression.getValue() == null ? expression.getArgs() : expression.getValue();
+        if (expression.getValue() != null) {
+            return expression.getValue();
+        } else if (expression.getArgs() != null) {
+            return expression.getArgs();
+        } else if (expression.getNamedArgs() != null) {
+            return expression.getNamedArgs();
+        } else if (expression.getObject() != null) {
+            return expression.getObject();
+        } else {
+            return NullValue.of();
+        }
     }
 
     @Override

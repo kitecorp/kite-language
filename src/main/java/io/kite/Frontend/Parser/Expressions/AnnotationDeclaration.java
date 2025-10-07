@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parser.Expressions;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.Types.DecoratorType;
 import lombok.AllArgsConstructor;
@@ -143,6 +144,11 @@ public final class AnnotationDeclaration extends Expression {
 
     public DecoratorType.Target targetType() {
         return target.getTarget();
+    }
+
+    public String getStringArg(String key) {
+        var obj = namedArgs.get(key);
+        return (obj instanceof StringLiteral lit) ? lit.getValue() : null;
     }
 
 }
