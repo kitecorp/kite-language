@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.Frontend.Parser.Factory;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static io.kite.Frontend.Parse.Literals.BooleanLiteral.bool;
@@ -256,6 +258,88 @@ public class DecoratorTest extends ParserTest {
                 expressionStatement(annotation("annotation", objectExpression())),
                 component("Backend", "api", block(),
                         annotation("annotation", objectExpression())));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationNamedFields() {
+        var res = parse("""
+                @annotation(regex="^[a-z0-9-]+$")
+                component Backend api { }
+                """);
+        AnnotationDeclaration annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$")));
+        var program = Factory.program(
+                expressionStatement(annotation),
+                component("Backend", "api", block(), annotation));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationNamedMultipleFieldsNumber() {
+        var res = parse("""
+                @annotation(regex="^[a-z0-9-]+$", flags = 1)
+                component Backend api { }
+                """);
+        var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", number(1)));
+        var program = Factory.program(
+                expressionStatement(annotation),
+                component("Backend", "api", block(), annotation));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationNamedMultipleFieldsString() {
+        var res = parse("""
+                @annotation(regex="^[a-z0-9-]+$", flags = "m")
+                component Backend api { }
+                """);
+        var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", string("m")));
+        var program = Factory.program(
+                expressionStatement(annotation),
+                component("Backend", "api", block(), annotation));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationNamedMultipleFieldsBoolean() {
+        var res = parse("""
+                @annotation(regex="^[a-z0-9-]+$", flags = true)
+                component Backend api { }
+                """);
+        var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", bool(true)));
+        var program = Factory.program(
+                expressionStatement(annotation),
+                component("Backend", "api", block(), annotation));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationNamedMultipleFieldsNumberArray() {
+        var res = parse("""
+                @annotation(regex="^[a-z0-9-]+$", flags = [1,2,3])
+                component Backend api { }
+                """);
+        var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", ArrayExpression.array(number(1), number(2), number(3))));
+        var program = Factory.program(
+                expressionStatement(annotation),
+                component("Backend", "api", block(), annotation));
+        Assertions.assertEquals(program, res);
+    }
+
+    @Test
+    void annotationNamedMultipleFieldsNumberArrayLastComa() {
+        var res = parse("""
+                @annotation(
+                    regex = "^[a-z0-9-]+$", 
+                    flags = [1,2,3], 
+                    
+                )
+                component Backend api { }
+                """);
+        var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", ArrayExpression.array(number(1), number(2), number(3))));
+        var program = Factory.program(
+                expressionStatement(annotation),
+                component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
 
