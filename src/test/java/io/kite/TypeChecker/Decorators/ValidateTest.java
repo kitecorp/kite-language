@@ -13,7 +13,8 @@ public class ValidateTest extends CheckerTest {
     void validateInvalidArgs() {
         var error = Assertions.assertThrows(TypeError.class, () -> eval("""
                 @validate(10)
-                input string something"""));
+                input string something"""
+        ));
         Assertions.assertEquals("\u001B[33m@validate\u001B[m must not have any arguments", error.getMessage());
     }
 
@@ -21,7 +22,8 @@ public class ValidateTest extends CheckerTest {
     void validateMissingArgs() {
         var error = Assertions.assertThrows(TypeError.class, () -> eval("""
                 @validate
-                input string something"""));
+                input string something"""
+        ));
         Assertions.assertEquals("Missing \u001B[33m@validate\u001B[m arguments!", error.getMessage());
     }
 
@@ -29,7 +31,8 @@ public class ValidateTest extends CheckerTest {
     void validateString() {
         eval("""
                 @validate(regex="^[a-z0-9-]+$", flags="i", message="Use letters, numbers, dashes")
-                input string something""");
+                input string something"""
+        );
     }
 
     @Test
@@ -37,7 +40,8 @@ public class ValidateTest extends CheckerTest {
         Assertions.assertThrows(TypeError.class, () ->
                 eval("""
                         @validate(flags="i", message="Use letters, numbers, dashes")
-                        input string something""")
+                        input string something"""
+                )
         );
     }
 
@@ -68,7 +72,8 @@ public class ValidateTest extends CheckerTest {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
                         @validate(regex="^[a-z0-9-]+$")
-                        input boolean something""")
+                        input boolean something"""
+                )
         );
         Assertions.assertEquals("\u001B[33m@validate\u001B[m is not allowed on boolean", error.getMessage());
     }
@@ -78,7 +83,8 @@ public class ValidateTest extends CheckerTest {
         var error = Assertions.assertThrows(TypeError.class, () ->
                 eval("""
                         @validate(regex="^[a-z0-9-]+$")
-                        input any something""")
+                        input any something"""
+                )
         );
         Assertions.assertEquals("\u001B[33m@validate\u001B[m is not allowed on any", error.getMessage());
     }
@@ -97,7 +103,8 @@ public class ValidateTest extends CheckerTest {
     void validateStringArray() {
         eval("""
                 @validate(regex="^[a-z0-9-]+$")
-                input string[] something""");
+                input string[] something"""
+        );
     }
 
 
