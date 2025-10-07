@@ -53,7 +53,7 @@ public final class Interpreter implements Visitor<Object> {
     @Getter
     private final List<OutputDeclaration> outputs;
     @Getter
-    private final Map<String, DecoratorInterpreter> decoratorInterpreter;
+    private final Map<String, DecoratorInterpreter> decorators;
     @Getter
     private final List<RuntimeException> errors;
     @Getter
@@ -71,7 +71,7 @@ public final class Interpreter implements Visitor<Object> {
         this.callstack = new ArrayDeque<>();
         this.contextStacks = new ArrayDeque<>();
         this.errors = new ArrayList<>();
-        this.decoratorInterpreter = new HashMap<>();
+        this.decorators = new HashMap<>();
 
         this.env.setName("interpreter");
         this.env.init("null", NullValue.of());
@@ -98,18 +98,18 @@ public final class Interpreter implements Visitor<Object> {
         this.env.init("date", new DateFunction());
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
 
-        this.decoratorInterpreter.put("minValue", new MinValueDecorator());
-        this.decoratorInterpreter.put("maxValue", new MaxValueDecorator());
-        this.decoratorInterpreter.put("maxLength", new MaxLengthDecorator());
-        this.decoratorInterpreter.put("minLength", new MinLengthDecorator());
-        this.decoratorInterpreter.put("description", new DescriptionDecorator());
-        this.decoratorInterpreter.put("sensitive", new SensitiveDecorator());
-        this.decoratorInterpreter.put("count", new CountDecorator());
-        this.decoratorInterpreter.put("dependsOn", new DependsOnDecorator());
-        this.decoratorInterpreter.put("allowed", new AllowedDecorator());
-        this.decoratorInterpreter.put("nonEmpty", new NonEmptyDecorator());
-        this.decoratorInterpreter.put("unique", new UniqueDecorator());
-        this.decoratorInterpreter.put("validate", new ValidateDecorator());
+        this.decorators.put("minValue", new MinValueDecorator());
+        this.decorators.put("maxValue", new MaxValueDecorator());
+        this.decorators.put("maxLength", new MaxLengthDecorator());
+        this.decorators.put("minLength", new MinLengthDecorator());
+        this.decorators.put("description", new DescriptionDecorator());
+        this.decorators.put("sensitive", new SensitiveDecorator());
+        this.decorators.put("count", new CountDecorator());
+        this.decorators.put("dependsOn", new DependsOnDecorator());
+        this.decorators.put("allowed", new AllowedDecorator());
+        this.decorators.put("nonEmpty", new NonEmptyDecorator());
+        this.decorators.put("unique", new UniqueDecorator());
+        this.decorators.put("validate", new ValidateDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -955,7 +955,7 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
-        var decorator = decoratorInterpreter.get(expression.name());
+        var decorator = decorators.get(expression.name());
         if (decorator != null) {
             decorator.execute(this, expression);
         } else {
