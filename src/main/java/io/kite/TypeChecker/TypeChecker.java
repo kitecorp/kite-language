@@ -25,6 +25,7 @@ import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class TypeChecker implements Visitor<Type> {
+    @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
     @Getter
@@ -50,6 +51,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(NonEmptyDecorator.NAME, new NonEmptyDecorator());
         this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
         this.decoratorInfoMap.put(ValidateDecorator.NAME, new ValidateDecorator());
+        this.decoratorInfoMap.put(ProviderDecorator.NAME, new ProviderDecorator(this));
     }
 
     @Override
