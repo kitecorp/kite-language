@@ -1,4 +1,4 @@
-package io.kite.Runtime.Providers;
+package io.kite.Runtime.Decorators;
 
 import java.util.Set;
 

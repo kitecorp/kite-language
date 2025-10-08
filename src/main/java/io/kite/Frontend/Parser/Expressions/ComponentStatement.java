@@ -6,7 +6,7 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
-import io.kite.Runtime.Providers.SupportsProviders;
+import io.kite.Runtime.Decorators.SupportsProviders;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.Type;

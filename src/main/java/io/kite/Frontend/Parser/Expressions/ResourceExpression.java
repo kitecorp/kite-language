@@ -8,7 +8,7 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.Interpreter;
-import io.kite.Runtime.Providers.SupportsProviders;
+import io.kite.Runtime.Decorators.SupportsProviders;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.DecoratorType;
