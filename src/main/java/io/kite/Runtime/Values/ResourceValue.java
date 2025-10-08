@@ -1,17 +1,17 @@
 package io.kite.Runtime.Values;
 
 import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.Providers.SupportsProviders;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
-public class ResourceValue {
+public class ResourceValue implements SupportsProviders {
     /**
      * Replace with Set or List
      */
@@ -23,6 +23,7 @@ public class ResourceValue {
     @Getter
     private String name;
     private Set<String> dependencies;
+    private Set<String> providers;
 
     /**
      * indicate if the cloud resource
@@ -30,39 +31,28 @@ public class ResourceValue {
     private Boolean existing;
 
     public ResourceValue() {
+        this(null, null, null, false, null, null);
     }
 
     public ResourceValue(String name, Environment<Object> parent) {
+        this(name, parent, null, false, null, null);
+    }
+
+    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema) {
+        this(name, parent, schema, false, null, null);
+    }
+
+    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, boolean existing) {
+        this(name, parent, schema, existing, null, null);
+    }
+
+    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, boolean existing, Set<String> dependencies, Set<String> providers) {
         this.name = name;
         this.properties = parent;
-    }
-
-    public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema) {
-        this(name, parent, schema, Boolean.FALSE);
-    }
-
-    public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema, boolean existing) {
-        this(name, parent, schema, existing, null);
-    }
-
-    public ResourceValue(String name, Environment parent, @NonNull SchemaValue schema, boolean existing, Set<String> dependencies) {
-        this.name = name;
         this.schema = schema;
-        this.properties = parent;
         this.existing = existing;
         this.dependencies = dependencies;
-    }
-
-    public boolean isExisting() {
-        return existing != null && existing;
-    }
-
-    public Boolean getExisting() {
-        return existing;
-    }
-
-    public void setExisting(boolean existing) {
-        this.existing = existing;
+        this.providers = providers;
     }
 
     public static Object of(String string) {
@@ -75,6 +65,18 @@ public class ResourceValue {
 
     public static ResourceValue of(String string, Environment environment, SchemaValue schema) {
         return new ResourceValue(string, environment, schema);
+    }
+
+    public boolean isExisting() {
+        return existing != null && existing;
+    }
+
+    public Boolean getExisting() {
+        return existing;
+    }
+
+    public void setExisting(boolean existing) {
+        this.existing = existing;
     }
 
     public Object argVal(String name) {
@@ -136,7 +138,17 @@ public class ResourceValue {
         getDependencies().addAll(dependencies);
     }
 
-    public record Data(String name, Map<String, Object> args) {
+    @Override
+    public Set<String> getProviders() {
+        if (providers == null) {
+            this.providers = new HashSet<>();
+        }
+        return providers;
+    }
+
+    @Override
+    public void addProvider(String provider) {
+        providers.add(provider);
     }
 
     public Environment getProperties() {
