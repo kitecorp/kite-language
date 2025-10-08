@@ -32,9 +32,10 @@ public class ValidateDecorator extends DecoratorChecker {
             throw new TypeError("Missing %s arguments!".formatted(validateFormatting()));
         }
         Expression regex = namedArgs.get("regex");
-        if (regex == null) {
-            throw new TypeError("regex argument is required for %s".formatted(validateFormatting()));
-        } else if (!(regex instanceof StringLiteral)) {
+        Expression preset = namedArgs.get("preset");
+        if (regex == null && preset == null) {
+            throw new TypeError("regex argument or preset argument is required for %s".formatted(validateFormatting()));
+        } else if (!(regex instanceof StringLiteral) && !(preset instanceof StringLiteral)) {
             throw new TypeError("regex argument must be a string literal for %s".formatted(validateFormatting()));
         }
         if (!isAllowedOn(declaration.getTarget().targetType())) {
