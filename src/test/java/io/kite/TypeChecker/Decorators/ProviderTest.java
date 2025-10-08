@@ -17,6 +17,34 @@ public class ProviderTest extends CheckerTest {
     }
 
     @Test
+    void providerEmpty() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @provider()
+                resource vm something {}"""));
+    }
+
+    @Test
+    void providerEmptyList() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @provider([])
+                resource vm something {}"""));
+    }
+
+    @Test
+    void providerEmptyString() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @provider("")
+                resource vm something {}"""));
+    }
+
+    @Test
+    void providerEmptyStringArray() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                @provider(["aws",10])
+                resource vm something {}"""));
+    }
+
+    @Test
     void providerNumber() {
         Assertions.assertThrows(TypeError.class, () ->
                 eval("""
