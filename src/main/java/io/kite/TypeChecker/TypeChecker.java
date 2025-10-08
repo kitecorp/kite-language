@@ -52,6 +52,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
         this.decoratorInfoMap.put(ValidateDecorator.NAME, new ValidateDecorator());
         this.decoratorInfoMap.put(ProviderDecorator.NAME, new ProviderDecorator(this));
+        this.decoratorInfoMap.put(TagsDecorator.NAME, new TagsDecorator(this));
     }
 
     @Override

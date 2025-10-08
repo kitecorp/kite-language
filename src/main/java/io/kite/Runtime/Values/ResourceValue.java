@@ -1,7 +1,9 @@
 package io.kite.Runtime.Values;
 
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Decorators.ProviderSupport;
+import io.kite.Runtime.Decorators.Tags;
+import io.kite.Runtime.Decorators.TagsSupport;
+import io.kite.Runtime.Environment.Environment;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +13,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
-public class ResourceValue implements ProviderSupport {
+public class ResourceValue implements ProviderSupport, TagsSupport {
     /**
      * Replace with Set or List
      */
@@ -29,6 +31,7 @@ public class ResourceValue implements ProviderSupport {
      * indicate if the cloud resource
      */
     private Boolean existing;
+    private Tags tags;
 
     public ResourceValue() {
         this(null, null, null, false, null, null);
@@ -147,6 +150,11 @@ public class ResourceValue implements ProviderSupport {
     }
 
     @Override
+    public void setProviders(Set<String> providers) {
+        this.providers = providers;
+    }
+
+    @Override
     public void addProvider(String provider) {
         providers.add(provider);
     }
@@ -160,7 +168,15 @@ public class ResourceValue implements ProviderSupport {
     }
 
     @Override
-    public void setProviders(Set<String> providers) {
-        this.providers = providers;
+    public Tags getTags() {
+        if (tags == null) {
+            this.tags = new Tags();
+        }
+        return tags;
+    }
+
+    @Override
+    public void setTag(Tags tags) {
+        this.tags = tags;
     }
 }
