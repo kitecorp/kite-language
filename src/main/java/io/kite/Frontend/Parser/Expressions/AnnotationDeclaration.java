@@ -148,7 +148,9 @@ public final class AnnotationDeclaration extends Expression {
 
     public String getStringArg(String key) {
         var obj = namedArgs.get(key);
-        return (obj instanceof StringLiteral lit) ? lit.getValue() : null;
+        return switch (obj) {
+            case StringLiteral lit -> lit.getValue();
+            case null, default -> null;
+        };
     }
-
 }

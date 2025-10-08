@@ -19,6 +19,12 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class ValidateDecorator extends DecoratorInterpreter {
+    // Preset patterns are already anchored and complete.
+    private static final Map<String, String> PRESETS = Map.of(
+            "dns_label", "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$",
+            "rfc1123", "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$",
+            "kebab", "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    );
     @Getter
     private final Map<String, Pattern> CACHE = new HashMap<>();
     private final Interpreter interpreter;
@@ -155,16 +161,25 @@ public class ValidateDecorator extends DecoratorInterpreter {
     public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
         checkTargetType(declaration);
         // 2) Args: regex (required), flags (optional), message (optional)
+        String preset = declaration.getStringArg("preset");
         String regex = declaration.getStringArg("regex");
-        if (StringUtils.isBlank(regex)) {
-            throw new TypeError("@validate requires a non-empty 'regex' argument");
+        if (StringUtils.isBlank(regex) && StringUtils.isBlank(preset)) {
+            throw new IllegalArgumentException("@validate requires a non-empty 'regex' argument or a preset");
+        } else if (StringUtils.isNotBlank(preset) && StringUtils.isNotBlank(regex)) {
+            throw new IllegalArgumentException("@validate: use either 'preset' or 'regex', not both");
         }
+
         int flagBits = parseFlags(getFlagsArg(declaration)); // "i", "im", or ["i","m"]
         String message = declaration.getStringArg("message");
 
         // Compile or fetch cached (key = regex+'\u0000'+flagBits)
-        Pattern pattern = CACHE.computeIfAbsent(regex + '\u0000' + flagBits, k -> compileStrict(regex, flagBits));
-
+        Pattern pattern;
+        if (preset != null) {
+            pattern = presetPattern(preset, flagBits);
+        } else {
+            // User regex: enforce full match by anchoring if needed.
+            pattern = CACHE.computeIfAbsent(regex + '\u0000' + flagBits, k -> compileStrict(regex, flagBits));
+        }
         // 3) Type compatibility (string or string[])
         var declaredType = declaration.getTarget().targetType(); // your way of getting the type
         if (!isStringOrStringArray(declaredType)) {
@@ -182,6 +197,16 @@ public class ValidateDecorator extends DecoratorInterpreter {
         // 5) Register runtime validation hook for final resolved value
 //        interpreter.onFinalize(target, value ->
 //                validateValueOrArray(declaration, pattern, message, value));
+    }
+
+    private @NotNull Pattern presetPattern(String preset, int flagBits) {
+        Pattern pattern;
+        String rx = PRESETS.get(preset);
+        if (rx == null) throw new IllegalArgumentException("Unknown @validate preset: " + preset);
+        // Presets are complete; compile as-is with flags.
+        pattern = CACHE.computeIfAbsent("preset\0" + preset + "\0" + flagBits,
+                k -> compileStrict(rx, flagBits));
+        return pattern;
     }
 
 }

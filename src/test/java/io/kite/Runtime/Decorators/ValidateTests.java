@@ -1,6 +1,5 @@
 package io.kite.Runtime.Decorators;
 
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
@@ -35,6 +34,15 @@ public class ValidateTests extends DecoratorTests {
                 input string something = "Bucket"
                 """));
         assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39msomething = \"Bucket\"`. Invalid value: \"Bucket\"", err.getMessage());
+    }
+
+    @Test
+    void presetAndRegexAreMutuallyExclusive() {
+        var err = assertThrows(IllegalArgumentException.class, () -> eval("""
+                @validate(regex="^[a-z0-9-]+$", preset="dns_label")
+                input string something = "Bucket"
+                """));
+        assertEquals("@validate: use either 'preset' or 'regex', not both", err.getMessage());
     }
 
     @Test
@@ -97,7 +105,7 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void validate_simple_ok() {
+    void validateSimpleOk() {
         eval("""
                     @validate(regex="^[a-z0-9-]+$")
                     input string name = "api-01"
@@ -105,7 +113,7 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void validate_simple_fail() {
+    void validateSimpleFail() {
         assertThrows(IllegalArgumentException.class, () -> eval("""
                     @validate(regex="^[a-z0-9-]+$")
                     input string name = "Api_01"
@@ -113,7 +121,7 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void validate_flags_caseInsensitive_ok() {
+    void validateFlagsCaseInsensitiveOk() {
         eval("""
                     @validate(regex="^[a-z0-9-]+$", flags="i")
                     input string name = "Api-01"
@@ -121,7 +129,7 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void validate_array_all_ok() {
+    void validateArrayAllOk() {
         eval("""
                     @validate(regex="^env-[a-z]+$")
                     input string[] names = ["env-dev","env-prod"]
@@ -129,7 +137,7 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void validate_array_points_to_offender() {
+    void validateArrayPointsToOffender() {
         var ex = assertThrows(IllegalArgumentException.class, () -> eval("""
                     @validate(regex="^env-[a-z]+$")
                     input string[] names = ["env-dev","prod"]
@@ -139,11 +147,62 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void validate_invalid_regex_rejected_early() {
+    void validateInvalidRegexRejectedEarly() {
         assertThrows(ParseError.class, () -> eval("""
                     @validate(regex="(unclosed")
                     input string name
                 """));
+    }
+
+    @Test
+    void presetDnsLabelEdges() {
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                    @validate(preset="dns_label")
+                    input string name = "-api"   // leading dash
+                """));
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                    @validate(preset="dns_label")
+                    input string name = "api-"   // trailing dash
+                """));
+    }
+
+    @Test
+    void presetRfc1123SubdomainOk() {
+        eval("""
+                    @validate(preset="rfc1123")
+                    input string host = "a.b-c.example-01.com"
+                """);
+    }
+
+    @Test
+    void presetRfc1123Over253Fails() {
+        String longHost = "a.".repeat(127) + "a"; // >253 total
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                    @validate(preset="rfc1123")
+                    input string host = "%s"
+                """.formatted(longHost)));
+    }
+
+    @Test
+    void presetKebabOkAndNoDoubleDash() {
+        eval("""
+                    @validate(preset="kebab")
+                    input string svc = "api-v2"
+                """);
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                    @validate(preset="kebab")
+                    input string svc = "api--v2"
+                """));
+    }
+
+
+    @Test
+    void presetArrayElementsChecked() {
+        var ex = assertThrows(IllegalArgumentException.class, () -> eval("""
+                    @validate(preset="dns_label")
+                    input string[] names = ["ok", "Bad"]
+                """));
+        assertTrue(ex.getMessage().contains("index 1"));
     }
 
 //    @Test
