@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeChecker;
+import io.kite.Visitors.PlainTheme;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -25,6 +26,7 @@ public class DecoratorTests extends RuntimeTest {
         this.typeChecker = new TypeChecker();
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(global);
+        this.interpreter.getPrinter().setTheme(new PlainTheme());
     }
 
 

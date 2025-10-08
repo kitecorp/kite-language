@@ -31,8 +31,9 @@ public class NonEmptyTests extends DecoratorTests {
                 """));
         Assertions.assertEquals("""
                 Provided value   with length 1 is empty:\s
-                [33m@nonEmpty[m
-                [m[2J[35minput [34mstring[39m [39msomething = [32m" "[39m[m""".trim(), err.getMessage());
+                @nonEmpty
+                input string something = " "
+                """.trim(), err.getMessage());
     }
 
     @Test

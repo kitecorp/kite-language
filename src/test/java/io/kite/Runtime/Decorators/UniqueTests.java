@@ -40,8 +40,8 @@ public class UniqueTests extends DecoratorTests {
         );
         Assertions.assertEquals("""
                 Provided list [hello, hello] has duplicate elements:
-                [33m@unique[m
-                [m[2J[35minput [34mstring[][39m [39msomething = [[32m"hello"[39m, [32m"hello"[39m][m""", err.getMessage());
+                @unique
+                input string[] something = ["hello", "hello"]""", err.getMessage());
     }
 
     @Test
@@ -77,8 +77,8 @@ public class UniqueTests extends DecoratorTests {
         );
         Assertions.assertEquals("""
                 Provided list [1, 1] has duplicate elements:
-                [33m@unique[m
-                [m[2J[35minput [34mnumber[][39m [39msomething = [1, 1][m""", err.getMessage());
+                @unique
+                input number[] something = [1, 1]""", err.getMessage());
     }
     @Test
     void uniqueAnyArrayEmpty() {
@@ -111,10 +111,11 @@ public class UniqueTests extends DecoratorTests {
                 input any[] something = [1,1]
                 """)
         );
+        System.out.println(err.getMessage());
         Assertions.assertEquals("""
                 Provided list [1, 1] has duplicate elements:
-                [33m@unique[m
-                [m[2J[35minput [34many[][39m [39msomething = [1, 1][m""", err.getMessage());
+                @unique
+                input any[] something = [1, 1]""", err.getMessage());
     }
     @Test
     void uniqueObjectArrayEmpty() {
@@ -155,14 +156,15 @@ public class UniqueTests extends DecoratorTests {
                 input object[] something = [{env: 'prod'}, {env: 'prod'}]
                 """)
         );
+        System.out.println(err.getMessage());
         Assertions.assertEquals("""
                 Provided list [{env=prod}, {env=prod}] has duplicate elements:
-                [33m@unique[m
-                [m[2J[35minput [34mobject[][39m [39msomething = [{
-                 [32m"env"[39m: [32m"prod"[39m\s
+                @unique
+                input object[] something = [{
+                 "env": "prod"\s
                 }, {
-                 [32m"env"[39m: [32m"prod"[39m\s
-                }][m""", err.getMessage());
+                 "env": "prod"\s
+                }]""", err.getMessage());
     }
 
 

@@ -7,29 +7,26 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.TypeChecker.Types.UnionType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.fusesource.jansi.Ansi;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
 
-@NoArgsConstructor
 public non-sealed class SyntaxPrinter implements Visitor<String> {
-    @Getter
-    private final Ansi ansi = Ansi.ansi(50)
-            .reset()
-            .eraseScreen();
-    private boolean colorise = true;
+    @Setter
+    private  Theme theme;
 
-    public SyntaxPrinter(boolean colorise) {
-        this.colorise = colorise;
+    public SyntaxPrinter() {
+        this(new JansiTheme());
+    }
+
+    public SyntaxPrinter(Theme colorise) {
+        this.theme = colorise;
     }
 
     private static @NotNull String formatParameter(ParameterIdentifier it) {
@@ -37,14 +34,6 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             return it.getName().string();
         }
         return it.getName().string() + " :" + it.getType().string();
-    }
-
-    private static String colorizeType(String t) {
-        return Ansi.ansi()
-                .fgBlue()
-                .a(t)
-                .fgDefault()
-                .toString();
     }
 
     public String print(Expression expr) {
@@ -88,61 +77,45 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(InputDeclaration expression) {
         if (expression.hasInit()) {
-            return ansi.fgMagenta().a("input ")
-                    .a(visit(expression.getType()))
-                    .a(" ")
-                    .fgDefault()
-                    .a(visit(expression.getId()))
-                    .a(" = ")
-                    .a(visit(expression.getInit()))
-                    .toString();
+            return theme.kw("input ")
+                   + visit(expression.getType())
+                   + " "
+                   + visit(expression.getId())
+                   + " = "
+                   + visit(expression.getInit());
         } else {
-            return ansi.fgMagenta().a("input ")
-                    .a(visit(expression.getType()))
-                    .a(" ")
-                    .fgDefault()
-                    .a(visit(expression.getId()))
-                    .toString();
+            return theme.kw("input ")
+                   + visit(expression.getType())
+                   + " "
+                   + visit(expression.getId());
         }
     }
 
     @Override
     public String visit(OutputDeclaration expression) {
-        // 2) Build once, applying styles based on flags
-        var ansi = Ansi.ansi();
-
-        ansi.fgMagenta().a("output ").reset()
-                .a(visit(expression.getType())).a(" ")
-                .a(visit(expression.getId())).a(" = ");
-
+        var head = theme.kw("output ") + visit(expression.getType()) + " " + visit(expression.getId()) + " = ";
         if (expression.isSensitive()) {
-            // mask, don’t print the actual value
-            ansi.fgBrightBlack().a(Ansi.Attribute.ITALIC)
-                    .a("<sensitive value>")
-                    .reset();
-        } else {
-            ansi.a(visit(expression.resolvedValue()));
+            return head + theme.normal("<sensitive value>") + "\n";
         }
-
-        ansi.a("\n").reset();
-        return ansi.toString();
+        return head + visit(expression.resolvedValue()) + "\n";
     }
 
     public Object visit(Object value) {
         return switch (value) {
-            case NumberLiteral numberLiteral -> Ansi.ansi().fgCyan().a(visit(numberLiteral)).fgDefault().toString();
-            case StringLiteral stringLiteral -> Ansi.ansi().fgCyan().a(visit(stringLiteral)).fgDefault().toString();
-            case BooleanLiteral booleanLiteral -> Ansi.ansi().fgCyan().a(visit(booleanLiteral)).fgDefault().toString();
-            case Integer integer -> Ansi.ansi().fgCyan().a(visit(integer.intValue())).fgDefault().toString();
-            case Double doubleValue -> Ansi.ansi().fgCyan().a(visit(doubleValue.doubleValue())).fgDefault().toString();
-            case Float floatValue -> Ansi.ansi().fgCyan().a(visit(floatValue.floatValue())).fgDefault().toString();
-            case Boolean booleanValue ->
-                    Ansi.ansi().fgCyan().a(visit(booleanValue.booleanValue())).fgDefault().toString();
-            case String stringValue -> Ansi.ansi().fgGreen().a('"').a(visit(stringValue)).a('"').fgDefault().toString();
-            case ArrayExpression arrayExpression -> visit(arrayExpression);
-            case List list -> list.stream().map(this::visit).collect(Collectors.joining(", ", "[", "]"));
-            case Map<?, ?> map ->
-                    map.entrySet().stream().map(e -> visit(e.getKey()) + ": " + visit(e.getValue())).collect(Collectors.joining(", ", "{", "}"));
+            case NumberLiteral n -> visit(n);
+            case StringLiteral s -> visit(s);
+            case BooleanLiteral b -> visit(b);
+            case Integer i -> theme.num(String.valueOf(i));
+            case Double d -> theme.num(String.valueOf(d));
+            case Float f -> theme.num(String.valueOf(f));
+            case Boolean z -> theme.bool(String.valueOf(z));
+            case String s -> theme.string("\"" + s + "\"");
+            case ArrayExpression a -> visit(a);
+            case List list -> list.stream().map(this::visit)
+                    .collect(Collectors.joining(", ", "[", "]"));
+            case Map<?, ?> map -> map.entrySet().stream()
+                    .map(e -> visit(e.getKey()) + ": " + visit(e.getValue()))
+                    .collect(Collectors.joining(", ", "{", "}"));
             case null, default -> value;
         };
     }
@@ -224,38 +197,22 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
-    public String visit(AnnotationDeclaration expression) {
-        var ansi = Ansi.ansi()
-                .fgYellow()
-                .a("@")
-                .a(visit(expression.getName()));
-        if (expression.getArgs() != null) {
-            ansi.fgDefault()
-                    .a("(")
-                    .a(visit(expression.getArgs()))
-                    .fgDefault()
-                    .a(")");
-        } else if (expression.getValue() != null) {
-            ansi.fgDefault()
-                    .a("(")
-                    .a(visit(expression.getValue()).toString())
-                    .fgDefault()
-                    .a(")");
-        } else if (expression.getObject() != null) {
-            ansi.fgDefault()
-                    .a("(")
-                    .a(visit(expression.getObject()))
-                    .fgDefault()
-                    .a(")");
-        } else if (expression.getNamedArgs() != null) {
-            Stream<String> stringStream = expression.getNamedArgs().entrySet().stream().map(e -> visit(e.getKey()) + " = " + visit(e.getValue()));
-            ansi.fgDefault()
-                    .a("(")
-                    .a(stringStream.collect(Collectors.joining(", ")))
-                    .fgDefault()
-                    .a(")");
+    public String visit(AnnotationDeclaration e) {
+        var name = theme.decorator("@" + e.getName().string());
+        String args = null;
+
+        if (e.getArgs() != null) {
+            args = "(" + visit(e.getArgs()) + ")";
+        } else if (e.getValue() != null) {
+            args = "(" + visit(e.getValue()) + ")";
+        } else if (e.getObject() != null) {
+            args = "(" + visit(e.getObject()) + ")";
+        } else if (e.getNamedArgs() != null) {
+            args = "(" + e.getNamedArgs().entrySet().stream()
+                    .map(x -> visit(x.getKey()) + " = " + visit(x.getValue()))
+                    .collect(Collectors.joining(", ")) + ")";
         }
-        return ansi.reset().toString();
+        return args == null ? name : name + args;
     }
 
     @Override
@@ -299,10 +256,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Override
     public String visit(Type type) {
         return switch (type) {
-            case ArrayType arrayType -> visit(arrayType.getType()) + "[]";
-            case UnionType unionType ->
-                    unionType.getTypes().stream().map(this::visit).collect(Collectors.joining(" | "));
-            default -> type.getValue();
+            case ArrayType at -> theme.type(at.getType().getValue() + "[]");
+            case UnionType ut -> theme.type(ut.getTypes()
+                    .stream().map(this::visit)
+                    .collect(Collectors.joining(" | ")));
+            default -> theme.type(type.getValue());
         };
     }
 
@@ -390,36 +348,31 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(ResourceExpression expression) {
-        return Ansi.ansi()
-                .fgMagenta().a("resource ")
-                .fgBlue().a(visit(expression.getType())).a(" ")
-                .fgDefault().a(visit(expression.getName())).a(" {\n")
-                .a(visit(expression.getBlock()))
-                .a("}\n")
-                .toString();
+        return theme.kw("resource ") +
+               theme.type(visit(expression.getType())) + " " +
+               visit(expression.getName()) + " {\n" +
+               visit(expression.getBlock()) +
+               "}\n";
     }
 
     @Override
     public String visit(NumberLiteral expression) {
-        if (expression.getVal() == null) {
-            return "null";
-        }
-        return expression.getVal().toString();
+        return expression.getVal() == null ? "null" : theme.num(expression.getVal().toString());
     }
 
     @Override
     public String visit(BooleanLiteral expression) {
-        return expression.getVal().toString();
+        return theme.bool(expression.getVal().toString());
     }
 
     @Override
     public String visit(Identifier expression) {
         return switch (expression) {
-            case ParameterIdentifier parameterIdentifier -> colorizeType(formatParameter(parameterIdentifier));
-            case ArrayTypeIdentifier arrayTypeIdentifier -> colorizeType(visit(arrayTypeIdentifier.getType()));
-            case TypeIdentifier identifier -> colorizeType(identifier.string());
+            case ParameterIdentifier p -> theme.type(formatParameter(p));
+            case ArrayTypeIdentifier a -> theme.type(visit(a.getType()));
+            case TypeIdentifier t -> theme.type(t.string());
             case null -> null;
-            default -> expression.string();
+            default -> theme.identifier(expression.string());
         };
     }
 
@@ -435,11 +388,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(StringLiteral expression) {
-        if (colorise) {
-            return Ansi.ansi().fgGreen().a("\"").a(expression.getValue()).a("\"").fgDefault().toString();
-        } else {
-            return "\"" + expression.getValue() + "\"";
-        }
+        return theme.string("\"" + expression.getValue() + "\"");
     }
 
     @Override

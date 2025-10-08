@@ -27,7 +27,6 @@ public class NonEmptyDecorator extends NumberDecorator {
                 .a(interpreter.getPrinter().visit(declaration))
                 .a("\n")
                 .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
-                .reset()
                 .toString();
         return msg;
     }

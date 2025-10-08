@@ -24,7 +24,7 @@ public class ValidateTests extends DecoratorTests {
                 @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
                 input string something = "bucket."
                 """));
-        assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39msomething = \u001B[32m\"bucket.\"\u001B[39m`. Invalid value: \"bucket.\"", err.getMessage());
+        assertEquals("Use letters, numbers, dashes for `input string something = \"bucket.\"`. Invalid value: \"bucket.\"", err.getMessage());
     }
 
     @Test
@@ -33,7 +33,7 @@ public class ValidateTests extends DecoratorTests {
                 @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
                 input string something = "Bucket"
                 """));
-        assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39msomething = \u001B[32m\"Bucket\"\u001B[39m`. Invalid value: \"Bucket\"", err.getMessage());
+        assertEquals("Use letters, numbers, dashes for `input string something = \"Bucket\"`. Invalid value: \"Bucket\"", err.getMessage());
     }
 
     @Test

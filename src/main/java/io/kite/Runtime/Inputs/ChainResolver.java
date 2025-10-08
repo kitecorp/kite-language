@@ -9,6 +9,7 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.PlainTheme;
 import io.kite.Visitors.SyntaxPrinter;
 import io.kite.Visitors.Visitor;
 import org.apache.commons.lang3.BooleanUtils;
@@ -24,7 +25,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     private final Tokenizer tokenizer;
     private final Parser parser;
     private List<InputResolver> resolvers;
-    private SyntaxPrinter printer = new SyntaxPrinter(false);
+    private SyntaxPrinter printer = new SyntaxPrinter(new PlainTheme());
 
     public ChainResolver() {
         this.resolvers = List.of(
