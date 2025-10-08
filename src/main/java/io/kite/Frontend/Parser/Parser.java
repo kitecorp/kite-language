@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static io.kite.Frontend.Lexer.TokenType.*;
 import static io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier.arrayType;
@@ -82,6 +83,7 @@ import static java.text.MessageFormat.format;
 @Log4j2
 public class Parser {
     public static final String VAL_NOT_INITIALISED = "val \"%s\" must be initialized";
+    private static Pattern objectKeyRegex = Pattern.compile("^[a-z0-9][a-z0-9_.-]{0,62}$");
     public TypeParser typeParser = new TypeParser(this);
     private ParserIterator iterator;
     private Program program = new Program();
@@ -112,6 +114,10 @@ public class Parser {
             annotationDeclaration.setTarget(res);
         }
         return res;
+    }
+
+    private static boolean validObjectKey(String string) {
+        return objectKeyRegex.matcher(string).matches();
     }
 
     private void setTokens(List<Token> tokens) {
@@ -912,7 +918,7 @@ public class Parser {
                 case BooleanLiteral literal -> annotation(name, literal);
                 case NumberLiteral literal -> annotation(name, literal);
                 case MemberExpression expression -> annotation(name, expression);
-                case Map<?,?> map -> annotation(name, (Map<String, Expression>) map);
+                case Map<?, ?> map -> annotation(name, (Map<String, Expression>) map);
                 case null -> annotation(name);
                 default -> throw new IllegalStateException("Unexpected value: " + statement);
             };
@@ -1175,9 +1181,8 @@ public class Parser {
     }
 
     private RuntimeException Error(Token token, String message) {
-        return ParserErrors.error(message, token);
+        return ParserErrors.error(message, token, token.type());
     }
-
 
     /**
      * AdditiveExpression
@@ -1353,7 +1358,6 @@ public class Parser {
         };
         return param;
     }
-
 
     /**
      * ComponentDeclaration
@@ -1532,7 +1536,11 @@ public class Parser {
         return switch (lookAhead().type()) {
             case String -> {
                 var id = eat(String);
-                yield new StringLiteral(id.value().toString());
+                String string = id.value().toString();
+                if (validObjectKey(string)) {
+                    yield new StringLiteral(string);
+                }
+                throw Error("Invalid key format: `%s`. Keys must be alphanumeric.".formatted(string));
             }
             case Identifier -> {
                 var id = eat(Identifier);
@@ -1542,7 +1550,8 @@ public class Parser {
                 eat();
                 yield ObjectKeyIdentifier();
             }
-            default -> throw new RuntimeException("Unexpected token type: %s. Keys can only be strings or identifiers ".formatted(lookAhead().type()));
+            default ->
+                    throw new RuntimeException("Unexpected token type: %s. Keys can only be strings or identifiers ".formatted(lookAhead().type()));
         };
     }
 
