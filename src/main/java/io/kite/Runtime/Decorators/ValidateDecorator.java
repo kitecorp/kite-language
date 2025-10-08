@@ -19,11 +19,62 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class ValidateDecorator extends DecoratorInterpreter {
-    // Preset patterns are already anchored and complete.
-    private static final Map<String, String> PRESETS = Map.of(
-            "dns_label", "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$",
-            "rfc1123", "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$",
-            "kebab", "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    // Preset patterns are fully anchored and intended for FULL matches.
+    private static final Map<String, String> PRESETS = Map.ofEntries(
+            // --- your existing ones ---
+            Map.entry("dns_label", "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"),
+            Map.entry("rfc1123", "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$"),
+            Map.entry("kebab", "^[a-z0-9]+(?:-[a-z0-9]+)*$"),
+
+            // --- core identifiers ---
+            Map.entry("identifier", "^[A-Za-z_][A-Za-z0-9_]*$"),
+            Map.entry("lower_snake", "^[a-z][a-z0-9_]*$"),
+            Map.entry("upper_snake", "^[A-Z][A-Z0-9_]*$"),
+            Map.entry("camel", "^[a-z]+(?:[A-Z][a-z0-9]*)*$"),
+            Map.entry("pascal", "^[A-Z][A-Za-z0-9]*$"),
+
+            // --- host / url / path ---
+            // Note: 'hostname' allows upper/lower; use flags="i" if you prefer lowercase-only behavior.
+            Map.entry("hostname", "^(?=.{1,253}$)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*$"),
+            Map.entry("uri_path", "^/([A-Za-z0-9._~!$&'()*+,;=:@/\\-]*)$"),
+
+            // --- tokens / ids ---
+            Map.entry("uuid", "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"),
+            Map.entry("hex", "^[0-9a-fA-F]+$"),
+            Map.entry("sha256", "^[A-Fa-f0-9]{64}$"),
+            Map.entry("base64", "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"),
+
+            // --- user/app inputs ---
+            Map.entry("email", "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"),
+            Map.entry("url", "^(https?|ftp)://[^\\s/$.?#].[^\\s]*$"),
+            Map.entry("ipv4", "^(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)){3}$"),
+            // IPv6 (compressed/expanded forms). Yes, it’s large; it’s the practical standard pattern.
+            Map.entry("ipv6",
+                    "^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,7}:)|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4})|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,5}(:[0-9A-Fa-f]{1,4}){1,2})|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,4}(:[0-9A-Fa-f]{1,4}){1,3})|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,3}(:[0-9A-Fa-f]{1,4}){1,4})|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,2}(:[0-9A-Fa-f]{1,4}){1,5})|" +
+                    "([0-9A-Fa-f]{1,4}:((:[0-9A-Fa-f]{1,4}){1,6}))|" +
+                    "(:(:([0-9A-Fa-f]{1,4}){1,7}|:))|" +
+                    "(fe80:(:[0-9A-Fa-f]{0,4}){0,4}%[0-9A-Za-z]{1,})|" +
+                    "(::(ffff(:0{1,4}){0,1}:){0,1}" +
+                    "((25[0-5]|(2[0-4]|1{0,1}[0-9])?[0-9])\\.){3,3}" +
+                    "(25[0-5]|(2[0-4]|1{0,1}[0-9])?[0-9]))|" +
+                    "(([0-9A-Fa-f]{1,4}:){1,4}:" +
+                    "((25[0-5]|(2[0-4]|1{0,1}[0-9])?[0-9])\\.){3,3}" +
+                    "(25[0-5]|(2[0-4]|1{0,1}[0-9])?[0-9])))$"
+            ),
+
+            // --- cloud / infra shapes ---
+            Map.entry("arn", "^arn:(aws|aws-cn|aws-us-gov):[a-z0-9-]+:[a-z0-9-]*:\\d{12}:.+$"),
+            Map.entry("gcp_resource", "^projects/[A-Za-z0-9._-]+/.+$"),
+            Map.entry("azure_id", "^/subscriptions/[0-9a-fA-F-]+/resourceGroups/.+$"),
+            Map.entry("s3_bucket", "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$"),
+            Map.entry("docker_image", "^[a-z0-9]+(?:[._-][a-z0-9]+)*(?:/[a-z0-9]+(?:[._-][a-z0-9]+)*)*$"),
+            Map.entry("semver", "^v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$")
     );
     @Getter
     private final Map<String, Pattern> CACHE = new HashMap<>();
