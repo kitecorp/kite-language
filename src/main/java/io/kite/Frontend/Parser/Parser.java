@@ -479,7 +479,7 @@ public class Parser {
             eat(CloseBraces, "Object must end with } but it is: " + getIterator().getCurrent());
         }
         if (blockContext == BlockContext.OBJECT) {
-            if (IsLookAhead(CloseParenthesis)) {
+            if (IsLookAhead(CloseParenthesis) && contextStack.peek() != ContextStack.Decorator) {
                 eat(CloseParenthesis);
             }
         }
@@ -894,22 +894,26 @@ public class Parser {
 
     private Set<AnnotationDeclaration> DecoratorList() {
         var set = new HashSet<AnnotationDeclaration>(1, 1.0f);
+        blockContext = BlockContext.OBJECT;
         while (IsLookAhead(AT) && !IsLookAhead(EOF, NewLine)) {
             var annotation = DecoratorDeclarations();
             set.add(annotation);
             eatWhitespace();
         }
+        blockContext = null;
         return set;
     }
 
     private AnnotationDeclaration DecoratorDeclarations() {
         eat(AT);
+        contextStack.push(ContextStack.Decorator);
         var name = Identifier();
         if (IsLookAhead(OpenParenthesis)) {
             eat(OpenParenthesis);
             var statement = AnnotationArgs();
             eatWhitespace();
             eat(CloseParenthesis);
+            contextStack.pop();
             return switch (statement) {
                 case ArrayExpression identifier -> annotation(name, identifier);
                 case ObjectExpression expression -> annotation(name, expression);
@@ -923,6 +927,7 @@ public class Parser {
                 default -> throw new IllegalStateException("Unexpected value: " + statement);
             };
         }
+        contextStack.pop();
         return annotation(name);
     }
 
@@ -1348,7 +1353,7 @@ public class Parser {
             }
             case OpenBraces, Object -> {
                 blockContext = BlockContext.OBJECT;
-                var res = ObjectDeclaration();
+                var res = ObjectExpression();
                 blockContext = null;
                 yield res;
             }
