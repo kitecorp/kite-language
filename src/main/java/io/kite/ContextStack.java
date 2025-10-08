@@ -5,5 +5,6 @@ public enum ContextStack {
     If,
     Schema,
     Resource,
+    Decorator,
 
 }
