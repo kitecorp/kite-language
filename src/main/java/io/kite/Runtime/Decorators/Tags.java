@@ -14,22 +14,22 @@ import java.util.Set;
 @NoArgsConstructor
 public class Tags {
     private Set<String> tags;
-    private Map<String, Object> tagsWithValue;
+    private Map<String, String> tagsMap;
 
     public Tags(Set<String> tags) {
         this.tags = tags;
     }
 
-    public Tags(Map<String, Object> tagsWithValue) {
-        this.tagsWithValue = tagsWithValue;
+    public Tags(Map<String, String> tagsWithValue) {
+        this.tagsMap = tagsWithValue;
     }
 
     public void addTag(String tag) {
         getTags().add(tag);
     }
 
-    public void addTag(String tag, Object value) {
-        getTagsWithValue().put(tag, value);
+    public void addTag(String tag, String value) {
+        getTagsMap().put(tag, value);
     }
 
     public Set<String> getTags() {
@@ -39,10 +39,17 @@ public class Tags {
         return tags;
     }
 
-    public Map<String, Object> getTagsWithValue() {
-        if (tagsWithValue == null) {
-            tagsWithValue = new HashMap<>();
+    public Map<String, String> getTagsMap() {
+        if (tagsMap == null) {
+            tagsMap = new HashMap<>();
         }
-        return tagsWithValue;
+        return tagsMap;
+    }
+
+    public static Tags tags(String... tags) {
+        return new Tags(Set.of(tags));
+    }
+    public static Tags tags(Map<String, String> tags) {
+        return new Tags(tags);
     }
 }

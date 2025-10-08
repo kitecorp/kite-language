@@ -6,20 +6,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.Map;
+
+import static io.kite.Runtime.Decorators.Tags.tags;
 
 @Log4j2
 @DisplayName("@tags")
 public class TagsTests extends DecoratorTests {
 
-    @Test
-    void tagsValidString() {
-        var res = (ResourceValue) eval("""
-                schema vm {}
-                @tags("networking")
-                resource vm something {}""");
-        Assertions.assertEquals(new Tags(Set.of("networking")), res.getTags());
-    }
 
     @Test
     void tagsValidStringArray() {
@@ -27,16 +21,46 @@ public class TagsTests extends DecoratorTests {
                 schema vm {}
                 @tags(["networking", "loadbalancer"])
                 resource vm something {}""");
-        Assertions.assertEquals(Set.of("networking", "loadbalancer"), res.getProviders());
+        Assertions.assertEquals(tags("networking", "loadbalancer"), res.getTags());
     }
 
     @Test
     void tagsDuplicateDedupeSilently() {
         var res = (ResourceValue) eval("""
                 schema vm {}
-                @provider(["aws:core", "aws:extended"])
+                @tags(["aws:core", "aws:extended"])
                 resource vm something {}""");
-        Assertions.assertEquals(Set.of("aws"), res.getProviders());
+        Assertions.assertEquals(tags("aws:core", "aws:extended"), res.getTags());
+    }
+
+    @Test
+    void tagsValidString() {
+        var res = (ResourceValue) eval("""
+                schema vm {}
+                @tags("aws")
+                resource vm something {}""");
+        Assertions.assertEquals(tags("aws"), res.getTags());
+    }
+
+    @Test
+    void tagsValidObjectArray() {
+        var res = (ResourceValue) eval("""
+                schema vm {}
+                @tags({ env: "prod", cloud: "azure" })
+                resource vm something {}""");
+        Assertions.assertEquals(tags(Map.of("env", "prod", "cloud", "azure")), res.getTags());
+    }
+
+    @Test
+    void tagsValidObject() {
+        var res = (ResourceValue) eval("""
+                schema vm {}
+                @tags({
+                    env: "prod", 
+                    cloud: "azure"
+                })
+                resource vm something {}""");
+        Assertions.assertEquals(tags(Map.of("env", "prod", "cloud", "azure")), res.getTags());
     }
 
 }
