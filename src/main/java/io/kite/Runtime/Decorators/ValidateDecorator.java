@@ -21,14 +21,15 @@ import java.util.regex.PatternSyntaxException;
 public class ValidateDecorator extends DecoratorInterpreter {
     @Getter
     private final Map<String, Pattern> CACHE = new HashMap<>();
-    private Interpreter interpreter;
+    private final Interpreter interpreter;
 
-    public ValidateDecorator() {
+    public ValidateDecorator(Interpreter interpreter) {
         super("validate");
+        this.interpreter = interpreter;
     }
 
     private static boolean isStringOrStringArray(Type t) {
-        return t.getKind() == SystemType.STRING || (t.getKind() == SystemType.ARRAY);
+        return t.getKind() == SystemType.STRING || t.getKind() == SystemType.ARRAY;
     }
 
     private static Object getFlagsArg(AnnotationDeclaration decl) {
@@ -83,7 +84,7 @@ public class ValidateDecorator extends DecoratorInterpreter {
         }
     }
 
-    private Pattern compileStrict(String userRegex, int flags) {
+    private static Pattern compileStrict(String userRegex, int flags) {
         // Enforce FULL match by wrapping, unless user already anchored both ends
         String rx = userRegex;
         boolean anchoredStart = rx.startsWith("^");
@@ -139,9 +140,7 @@ public class ValidateDecorator extends DecoratorInterpreter {
     }
 
     private RuntimeException fail(AnnotationDeclaration decl, String custom, String offending, int index) {
-        String base = (custom != null && !custom.isBlank())
-                ? custom
-                : "@validate failed";
+        String base = (custom != null && !custom.isBlank()) ? custom : "@validate failed";
         String where = (index >= 0) ? (" at index " + index) : "";
         String name = switch (decl.getTarget()) {
             case InputDeclaration declaration -> interpreter.getPrinter().visit(declaration);
@@ -154,7 +153,6 @@ public class ValidateDecorator extends DecoratorInterpreter {
 
     @Override
     public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
-        this.interpreter = interpreter;
         checkTargetType(declaration);
         // 2) Args: regex (required), flags (optional), message (optional)
         String regex = declaration.getStringArg("regex");
