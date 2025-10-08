@@ -3,7 +3,6 @@ package io.kite.Runtime.Decorators;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Runtime.Interpreter;
-import io.kite.Runtime.Providers.SupportsProviders;
 
 import java.util.List;
 import java.util.Set;
