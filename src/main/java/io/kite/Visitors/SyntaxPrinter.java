@@ -19,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 
 public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Setter
-    private  Theme theme;
+    private Theme theme;
 
     public SyntaxPrinter() {
         this(new JansiTheme());
@@ -42,16 +42,25 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(BinaryExpression expression) {
-        return visit(expression.getLeft()) + " " + expression.getOperator() + " " + visit(expression.getRight());
+        return visit(expression.getLeft())
+               + " "
+               + theme.kw(expression.getOperator().toString())
+               + " "
+               + visit(expression.getRight());
     }
 
     @Override
     public String visit(UnionTypeStatement expression) {
-        return "type " + visit(requireNonNull(expression.getName())) + " = " +
-               expression.getExpressions()
+        return theme.kw("type ")
+               + visit(requireNonNull(expression.getName()))
+               + " "
+               + theme.punctuation("=")
+               + " "
+               + expression.getExpressions()
                        .stream()
                        .map(this::visit)
-                       .reduce((a, b) -> a + " | " + b).orElse("");
+                       .reduce((a, b) -> a + " " + theme.punctuation("|") + " " + b)
+                       .orElse("");
     }
 
     @Override
@@ -60,8 +69,12 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         var args = expression.getArguments()
                 .stream()
                 .map(this::visit)
-                .collect(Collectors.joining(","));
-        return callName + "(" + args + ")";
+                .collect(Collectors.joining(theme.punctuation(",")));
+
+        return callName
+               + theme.punctuation("(")
+               + args
+               + theme.punctuation(")");
     }
 
     @Override
@@ -122,15 +135,27 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(LogicalExpression expression) {
-        return "(" + visit(expression.getLeft()) + " " + expression.getOperator().toString() + " " + visit(expression.getRight()) + ")";
+        return theme.punctuation("(")
+               + visit(expression.getLeft())
+               + " "
+               + theme.kw(expression.getOperator().toString())
+               + " "
+               + visit(expression.getRight())
+               + theme.punctuation(")");
     }
 
     @Override
     public String visit(MemberExpression expression) {
         if (expression.isComputed()) {
-            return visit(expression.getObject()) + "[" + visit(expression.getProperty()) + "]";
+            return visit(expression.getObject())
+                   + theme.punctuation("[")
+                   + visit(expression.getProperty())
+                   + theme.punctuation("]");
         }
-        return visit(expression.getObject()) + "." + visit(expression.getProperty());
+
+        return visit(expression.getObject())
+               + theme.punctuation(".")
+               + visit(expression.getProperty());
     }
 
     @Override
@@ -145,15 +170,20 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(VarDeclaration expression) {
-        var var = new StringBuilder("var ");
-        if (expression.hasType()) {
-            var.append(visit(expression.getType())).append(" ");
-        }
-        var.append(expression.getId().string());
+        var builder = new StringBuilder();
+
+        builder.append(theme.kw("var "))
+                .append(expression.hasType() ? visit(expression.getType()) + " " : "")
+                .append(theme.identifier(expression.getId().string()));
+
         if (expression.hasInit()) {
-            var.append(" = ").append(visit(expression.getInit()));
+            builder.append(" ")
+                    .append(theme.punctuation("="))
+                    .append(" ")
+                    .append(visit(expression.getInit()));
         }
-        return var.toString();
+
+        return builder.toString();
     }
 
     @Override
@@ -271,14 +301,18 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(FunctionDeclaration statement) {
-        return "fun " +
-               statement.getName().string() +
-               "("
-               + statement.getParams().stream().map(SyntaxPrinter::formatParameter).collect(Collectors.joining(","))
-               + ") "
-               + "{ \n"
+        return theme.kw("fun ")
+               + theme.identifier(statement.getName().string())
+               + theme.punctuation("(")
+               + statement.getParams().stream()
+                       .map(SyntaxPrinter::formatParameter)
+                       .collect(Collectors.joining(theme.punctuation(",")))
+               + theme.punctuation(") {")
+               + "\n"
                + visit(statement.getBody())
-               + "\n} \n";
+               + "\n"
+               + theme.punctuation("}")
+               + "\n";
     }
 
     @Override
@@ -288,10 +322,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(VarStatement statement) {
-        return "var " + statement.getDeclarations()
-                .stream()
-                .map(this::visit)
-                .collect(Collectors.joining(","));
+        return theme.kw("var ")
+               + statement.getDeclarations()
+                       .stream()
+                       .map(this::visit)
+                       .collect(Collectors.joining(theme.punctuation(",")));
     }
 
     @Override
@@ -326,9 +361,15 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(WhileStatement statement) {
-        return "while (" + visit(statement.getTest()) + ") {\n"
+        return theme.kw("while")
+               + theme.punctuation(" (")
+               + visit(statement.getTest())
+               + theme.punctuation(") {")
+               + "\n"
                + visit(statement.getBody())
-               + "\n}\n";
+               + "\n"
+               + theme.punctuation("}")
+               + "\n";
     }
 
     @Override
@@ -338,23 +379,30 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(SchemaDeclaration statement) {
-        var builder = new StringBuilder("schema ");
-        builder.append(visit(statement.getName()));
-        builder.append(" {\n");
+        var builder = new StringBuilder();
+
+        builder.append(theme.kw("schema "))
+                .append(visit(statement.getName()))
+                .append(theme.punctuation(" {"))
+                .append("\n");
+
         for (SchemaProperty property : statement.getProperties()) {
-            builder.append("\t");
-            builder.append(visit(property.type()));
-            builder.append(" ");
-            builder.append(property.name());
-            builder.append("\n");
+            builder.append("\t")
+                    .append(visit(property.type()))
+                    .append(" ")
+                    .append(theme.identifier(property.name()))
+                    .append("\n");
         }
-        builder.append("}\n");
+
+        builder.append(theme.punctuation("}"))
+                .append("\n");
+
         return builder.toString();
     }
 
     @Override
     public String visit(ReturnStatement statement) {
-        return "return " + visit(statement.getArgument());
+        return theme.kw("return ") + visit(statement.getArgument());
     }
 
     @Override
@@ -389,12 +437,14 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(NullLiteral expression) {
-        return "null";
+        return theme.kw("null");
     }
 
     @Override
     public String visit(ObjectLiteral expression) {
-        return "%s: %s".formatted(visit(expression.getKey()), visit(expression.getValue()));
+        return visit(expression.getKey())
+               + theme.punctuation(": ")
+               + visit(expression.getValue());
     }
 
     @Override
@@ -423,15 +473,18 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         return null;
     }
 
-    private String parenthesize(String name, Expression... exprs) {
-        StringBuilder builder = new StringBuilder();
+    private String parenthesize(String name, Expression... expressions) {
+        var builder = new StringBuilder();
 
-        builder.append("(").append(name);
-        for (Expression expr : exprs) {
-            builder.append(" ");
-            builder.append(visit(expr));
+        builder.append(theme.punctuation("("))
+                .append(theme.kw(name));
+
+        for (Expression expression : expressions) {
+            builder.append(" ")
+                    .append(visit(expression));
         }
-        builder.append(")");
+
+        builder.append(theme.punctuation(")"));
 
         return builder.toString();
     }
