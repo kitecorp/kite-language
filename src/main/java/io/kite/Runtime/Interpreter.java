@@ -109,7 +109,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decorators.put("allowed", new AllowedDecorator());
         this.decorators.put("nonEmpty", new NonEmptyDecorator());
         this.decorators.put("unique", new UniqueDecorator());
-        this.decorators.put("validate", new ValidateDecorator());
+        this.decorators.put("validate", new ValidateDecorator(this));
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
