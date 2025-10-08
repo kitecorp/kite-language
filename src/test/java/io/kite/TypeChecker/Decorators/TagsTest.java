@@ -10,54 +10,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("@tags")
 public class TagsTest extends CheckerTest {
 
-    @Test
-    void tags() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                schema vm {}
-                @tags
-                resource vm something {}"""));
-    }
-
-    @Test
-    void tagsEmpty() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                schema vm {}
-                @tags()
-                resource vm something {}"""));
-    }
-
-    @Test
-    void tagsEmptyList() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                schema vm {}
-                @tags([])
-                resource vm something {}"""));
-    }
-
-    @Test
-    void tagsEmptyString() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                schema vm {}
-                @tags("")
-                resource vm something {}"""));
-    }
-
-    @Test
-    void tagsEmptyStringArray() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                schema vm {}
-                @tags(["aws",10])
-                resource vm something {}"""));
-    }
-
-    @Test
-    void tagsNumber() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
-                schema vm {}
-                @tags(10)
-                resource vm something {}"""
-        ));
-    }
 
     @Test
     void tagsValidString() {
@@ -92,6 +44,56 @@ public class TagsTest extends CheckerTest {
                     "cloud": "azure"
                 })
                 resource vm something {}""");
+    }
+
+    @Test
+    void tags() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags
+                resource vm something {}"""));
+    }
+
+    @Test
+    void tagsEmpty() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags()
+                resource vm something {}"""));
+    }
+
+    @Test
+    void tagsEmptyList() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags([])
+                resource vm something {}"""));
+    }
+
+    @Test
+    void tagsEmptyString() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags("")
+                resource vm something {}"""));
+    }
+
+
+    @Test
+    void tagsEmptyStringArray() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags(["aws",10])
+                resource vm something {}"""));
+    }
+
+    @Test
+    void tagsNumber() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags(10)
+                resource vm something {}"""
+        ));
     }
 
     @Test
