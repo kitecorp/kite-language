@@ -40,8 +40,8 @@ public class TagsTest extends CheckerTest {
         eval("""
                 schema vm {}
                 @tags({
-                    "env": "prod", 
-                    "cloud": "azure"
+                    env: "prod", 
+                    cloud: "azure"
                 })
                 resource vm something {}""");
     }
