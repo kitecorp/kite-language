@@ -8,6 +8,7 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.Interpreter;
+import io.kite.Runtime.Providers.SupportsProviders;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.DecoratorType;
@@ -24,7 +25,9 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor(staticName = "resource")
-public final class ResourceExpression extends Statement implements DeferredObserverValue, Annotatable, CountAnnotatable {
+public final class ResourceExpression
+        extends Statement
+        implements DeferredObserverValue, Annotatable, CountAnnotatable, SupportsProviders {
     private Identifier type;
     @Nullable
     private Expression name;
@@ -37,6 +40,7 @@ public final class ResourceExpression extends Statement implements DeferredObser
     private Set<AnnotationDeclaration> annotations;
     private Boolean counted;
     private Set<Expression> dependencies = Set.of();
+    private Set<String> providers;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -195,5 +199,18 @@ public final class ResourceExpression extends Statement implements DeferredObser
             this.dependencies = new HashSet<>();
         }
         return dependencies;
+    }
+
+    @Override
+    public Set<String> getProviders() {
+        if (providers == null) {
+            this.providers = new HashSet<>();
+        }
+        return providers;
+    }
+
+    @Override
+    public void addProvider(String provider) {
+        getProviders().add(provider);
     }
 }

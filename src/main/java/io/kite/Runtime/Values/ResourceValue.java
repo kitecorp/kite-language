@@ -159,4 +159,8 @@ public class ResourceValue implements SupportsProviders {
         this.properties = properties;
     }
 
+    @Override
+    public void setProviders(Set<String> providers) {
+        this.providers = providers;
+    }
 }
