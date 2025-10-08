@@ -110,6 +110,7 @@ public final class Interpreter implements Visitor<Object> {
         this.decorators.put("nonEmpty", new NonEmptyDecorator());
         this.decorators.put("unique", new UniqueDecorator());
         this.decorators.put("validate", new ValidateDecorator(this));
+        this.decorators.put("provider", new ProviderDecorator());
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
@@ -556,6 +557,7 @@ public final class Interpreter implements Visitor<Object> {
             } else {
                 value = initResource(resource, installedSchema, typeEnvironment);
             }
+            value.setProviders(resource.getProviders());
             return detectCycle(resource, value);
         } finally {
             contextStacks.pop();
