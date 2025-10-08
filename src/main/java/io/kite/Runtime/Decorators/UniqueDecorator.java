@@ -25,7 +25,6 @@ public class UniqueDecorator extends DecoratorInterpreter {
                 .a(printer.visit(declaration))
                 .a("\n")
                 .a(printer.visit((Statement) declaration.getTarget()))
-                .reset()
                 .toString();
         return msg;
     }
