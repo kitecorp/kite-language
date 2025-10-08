@@ -303,14 +303,25 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
-    public String visit(IfStatement statement) {
-        var string = new StringBuilder().append("if ").append(visit(statement.getTest())).append("{\n").append(visit(statement.getConsequent())).append("\n}\n");
-        if (statement.hasElse()) {
-            string.append(" else {\n")
-                    .append(visit(statement.getAlternate()))
-                    .append("\n}\n");
+    public String visit(IfStatement s) {
+        var sb = new StringBuilder();
+
+        sb.append(theme.kw("if "))
+                .append(visit(s.getTest()))
+                .append(theme.punctuation("{")).append("\n")
+                .append(visit(s.getConsequent())).append("\n")
+                .append(theme.punctuation("}")).append("\n");
+
+        if (s.hasElse()) {
+            sb.append(" ")
+                    .append(theme.kw("else"))
+                    .append(" ")
+                    .append(theme.punctuation("{")).append("\n")
+                    .append(visit(s.getAlternate())).append("\n")
+                    .append(theme.punctuation("}")).append("\n");
         }
-        return string.toString();
+
+        return sb.toString();
     }
 
     @Override
