@@ -8,6 +8,7 @@ import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -50,10 +51,18 @@ public class TagsDecorator extends DecoratorChecker {
             }
         } else if (declaration.getObject() != null) {
             for (ObjectLiteral property : declaration.getObject().getProperties()) {
-                if (!(property.getKey() instanceof StringLiteral literal)) {
+                if (property.getKey() instanceof StringLiteral literal) {
+                    if (StringUtils.isBlank(literal.getValue())) {
+                        throwInvalidArgument(declaration, literal);
+                    }
+                } else {
                     throwInvalidArgument(declaration, property.getKey());
                 }
-                if (!(property.getValue() instanceof StringLiteral literal)) {
+                if (property.getValue() instanceof StringLiteral literal) {
+                    if (StringUtils.isBlank(literal.getValue())) {
+                        throwInvalidArgument(declaration, literal);
+                    }
+                } else {
                     throwInvalidArgument(declaration, property.getValue());
                 }
             }
