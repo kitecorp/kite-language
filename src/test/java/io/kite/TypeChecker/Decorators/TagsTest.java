@@ -88,4 +88,28 @@ public class TagsTest extends CheckerTest {
                 resource vm something {}""");
     }
 
+    @Test
+    void tagsInValidObjectMultiLine() {
+        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+                schema vm {}
+                @tags({
+                    "env": 10, 
+                    "cloud": "azure"
+                })
+                resource vm something {}""")
+        );
+    }
+
+    @Test
+    void tagsInValidObjectMultiLineBool() {
+        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+                schema vm {}
+                @tags({
+                    "env": true, 
+                    "cloud": "azure"
+                })
+                resource vm something {}""")
+        );
+    }
+
 }

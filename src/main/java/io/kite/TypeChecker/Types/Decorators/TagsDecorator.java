@@ -51,7 +51,10 @@ public class TagsDecorator extends DecoratorChecker {
         } else if (declaration.getObject() != null) {
             for (ObjectLiteral property : declaration.getObject().getProperties()) {
                 if (!(property.getKey() instanceof StringLiteral literal)) {
-                    throwInvalidArgument(declaration, property);
+                    throwInvalidArgument(declaration, property.getKey());
+                }
+                if (!(property.getValue() instanceof StringLiteral literal)) {
+                    throwInvalidArgument(declaration, property.getValue());
                 }
             }
         }
@@ -59,7 +62,7 @@ public class TagsDecorator extends DecoratorChecker {
     }
 
     private void throwInvalidArgument(AnnotationDeclaration declaration, Object value) {
-        throw new TypeError("%s has invalid argument `%s`".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(value)));
+        throw new TypeError("%s has invalid argument: %s".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(value)));
     }
 
     private void throwIfInvalidArgs(AnnotationDeclaration declaration) {

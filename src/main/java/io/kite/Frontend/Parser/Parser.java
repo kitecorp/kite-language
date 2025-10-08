@@ -1542,7 +1542,7 @@ public class Parser {
                 eat();
                 yield ObjectKeyIdentifier();
             }
-            default -> throw new RuntimeException("Unexpected token type: " + lookAhead().type());
+            default -> throw new RuntimeException("Unexpected token type: %s. Keys can only be strings or identifiers ".formatted(lookAhead().type()));
         };
     }
 
