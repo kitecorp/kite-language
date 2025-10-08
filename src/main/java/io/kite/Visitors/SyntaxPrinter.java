@@ -223,25 +223,29 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
                 .a("@")
                 .a(visit(expression.getName()));
         if (expression.getArgs() != null) {
-            ansi.a("(")
+            ansi.fgDefault()
+                    .a("(")
                     .a(visit(expression.getArgs()))
-                    .fgYellow()
+                    .fgDefault()
                     .a(")");
         } else if (expression.getValue() != null) {
-            ansi.a("(")
+            ansi.fgDefault()
+                    .a("(")
                     .a(visit(expression.getValue()).toString())
-                    .fgYellow()
+                    .fgDefault()
                     .a(")");
         } else if (expression.getObject() != null) {
-            ansi.a("(")
+            ansi.fgDefault()
+                    .a("(")
                     .a(visit(expression.getObject()))
-                    .fgYellow()
+                    .fgDefault()
                     .a(")");
         } else if (expression.getNamedArgs() != null) {
             Stream<String> stringStream = expression.getNamedArgs().entrySet().stream().map(e -> visit(e.getKey()) + " = " + visit(e.getValue()));
-            ansi.a("(")
+            ansi.fgDefault()
+                    .a("(")
                     .a(stringStream.collect(Collectors.joining(", ")))
-                    .fgYellow()
+                    .fgDefault()
                     .a(")");
         }
         return ansi.reset().toString() + "\n";
