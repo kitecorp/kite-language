@@ -10,5 +10,4 @@ module kite.io {
     requires java.desktop;
     requires jdk.compiler;
     requires org.fusesource.jansi;
-    requires kite.io;
 }
