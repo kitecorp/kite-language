@@ -83,7 +83,7 @@ import static java.text.MessageFormat.format;
 @Log4j2
 public class Parser {
     public static final String VAL_NOT_INITIALISED = "val \"%s\" must be initialized";
-    private static Pattern objectKeyRegex = Pattern.compile("^[a-z0-9][a-z0-9_.-]{0,62}$");
+    private static Pattern objectKeyRegex = Pattern.compile("^(?:[a-z0-9][a-z0-9_.-]{0,62}|\\$\\{?[a-zA-Z_][a-zA-Z0-9_.-]*\\}?)$");
     public TypeParser typeParser = new TypeParser(this);
     private ParserIterator iterator;
     private Program program = new Program();

@@ -25,6 +25,7 @@ public class NonEmptyDecorator extends NumberDecorator {
                 .a(len)
                 .a(" is empty: \n")
                 .a(interpreter.getPrinter().visit(declaration))
+                .a("\n")
                 .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
                 .reset()
                 .toString();

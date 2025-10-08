@@ -23,6 +23,7 @@ public class UniqueDecorator extends DecoratorInterpreter {
                 .a(value)
                 .a(" has duplicate elements:\n")
                 .a(printer.visit(declaration))
+                .a("\n")
                 .a(printer.visit((Statement) declaration.getTarget()))
                 .reset()
                 .toString();

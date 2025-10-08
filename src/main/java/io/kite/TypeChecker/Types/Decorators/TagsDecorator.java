@@ -31,7 +31,7 @@ public class TagsDecorator extends DecoratorChecker {
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         var value = declaration.getValue();
-        if (value == null && (declaration.getArgs() != null && declaration.getArgs().isEmpty()) && declaration.getObject() == null) {
+        if (value == null && (declaration.getArgs() == null || declaration.getArgs().isEmpty()) && declaration.getObject() == null) {
             throwIfInvalidArgs(declaration);
         }
 

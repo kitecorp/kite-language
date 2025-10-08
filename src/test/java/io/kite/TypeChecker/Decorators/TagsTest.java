@@ -13,6 +13,7 @@ public class TagsTest extends CheckerTest {
     @Test
     void tags() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
                 @tags
                 resource vm something {}"""));
     }
@@ -20,6 +21,7 @@ public class TagsTest extends CheckerTest {
     @Test
     void tagsEmpty() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
                 @tags()
                 resource vm something {}"""));
     }
@@ -27,6 +29,7 @@ public class TagsTest extends CheckerTest {
     @Test
     void tagsEmptyList() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
                 @tags([])
                 resource vm something {}"""));
     }
@@ -34,6 +37,7 @@ public class TagsTest extends CheckerTest {
     @Test
     void tagsEmptyString() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
                 @tags("")
                 resource vm something {}"""));
     }
@@ -41,17 +45,18 @@ public class TagsTest extends CheckerTest {
     @Test
     void tagsEmptyStringArray() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
                 @tags(["aws",10])
                 resource vm something {}"""));
     }
 
     @Test
     void tagsNumber() {
-        Assertions.assertThrows(TypeError.class, () ->
-                eval("""
-                        @tags(10)
-                        resource vm something {}""")
-        );
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @tags(10)
+                resource vm something {}"""
+        ));
     }
 
     @Test
@@ -117,6 +122,15 @@ public class TagsTest extends CheckerTest {
     }
 
     @Test
+    void tagsInValidObjectNestedValue() {
+        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+                schema vm {}
+                @tags({ "env": { "season": "prod"} })
+                resource vm something {}""")
+        );
+    }
+
+    @Test
     void tagsInValidObjectEmptyValue() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
                 schema vm {}
@@ -124,6 +138,7 @@ public class TagsTest extends CheckerTest {
                 resource vm something {}""")
         );
     }
+
     @Test
     void tagsInValidKeyFormatMinus() {
         var error = Assertions.assertThrows(ParseError.class, () -> eval("""
