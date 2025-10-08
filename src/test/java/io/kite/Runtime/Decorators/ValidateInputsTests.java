@@ -27,7 +27,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
                 input string region
                 """));
-        assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39mregion = \"bucket.\"`. Invalid value: \"bucket.\"", err.getMessage());
+        assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39mregion = \u001B[32m\"bucket.\"\u001B[39m`. Invalid value: \"bucket.\"", err.getMessage());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
                 input string region 
                 """));
-        assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39mregion = \"Bucket\"`. Invalid value: \"Bucket\"", err.getMessage());
+        assertEquals("Use letters, numbers, dashes for `\u001B[m\u001B[2J\u001B[35minput \u001B[34mstring\u001B[39m \u001B[39mregion = \u001B[32m\"Bucket\"\u001B[39m`. Invalid value: \"Bucket\"", err.getMessage());
     }
 
     @Test
