@@ -6,7 +6,7 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
-import io.kite.Runtime.Decorators.SupportsProviders;
+import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.Type;
@@ -25,7 +25,7 @@ import java.util.Set;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public final class ComponentStatement extends Statement implements Annotatable, CountAnnotatable, SupportsProviders {
+public final class ComponentStatement extends Statement implements Annotatable, CountAnnotatable, ProviderSupport {
     private PluginIdentifier type;
     /**
      * When missing it will be a component type. When present it will be an initialization

@@ -2,7 +2,7 @@ package io.kite.Runtime.Decorators;
 
 import java.util.Set;
 
-public interface SupportsProviders {
+public interface ProviderSupport {
     Set<String> getProviders();
 
     void setProviders(Set<String> providers);
