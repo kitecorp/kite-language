@@ -28,16 +28,18 @@ public class ProviderDecorator extends DecoratorChecker {
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         var value = declaration.getValue();
-        if (value !=null) {
-            if (value instanceof StringLiteral literal && literal.getValue().isEmpty()) {
-                throw new TypeError("@provider must have a non-empty string as argument or an array of strings");
+        if (value != null) {
+            if (value instanceof StringLiteral literal) {
+                if (literal.getValue().isEmpty()) {
+                    throw new TypeError("@provider must have a non-empty string as argument or an array of strings");
+                }
             } else {
-                throw new TypeError("Invalid argument in  " + typeChecker.getPrinter().visit(declaration));
+                throw new TypeError("%s has invalid argument `%s`".formatted(typeChecker.getPrinter().visit(declaration),typeChecker.getPrinter().visit(value)));
             }
         } else if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
             for (Expression item : declaration.getArgs().getItems()) {
                 if (!(item instanceof StringLiteral literal)) {
-                    throw new TypeError("Invalid argument in  " + typeChecker.getPrinter().visit(declaration));
+                    throw new TypeError("%s has invalid argument `%s`".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(item)));
                 }
             }
         }
@@ -50,8 +52,7 @@ public class ProviderDecorator extends DecoratorChecker {
     @Override
     public boolean hasArguments(AnnotationDeclaration declaration) {
         return declaration.getValue() == null
-               && declaration.getArgs() == null
-               && declaration.getArgs().isEmpty();
+               && (declaration.getArgs() == null || declaration.getArgs().isEmpty());
     }
 
 }

@@ -248,7 +248,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
                     .fgDefault()
                     .a(")");
         }
-        return ansi.reset().toString() + "\n";
+        return ansi.reset().toString();
     }
 
     @Override
