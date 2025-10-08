@@ -34,7 +34,7 @@ public class ParserErrors {
 
     public static ErrorList error(String message, Token tokens, TokenType... type) {
         var list = new ArrayList<ParseError>(type.length);
-        for (var it : type) {
+        for (TokenType it : type) {
             list.add(error(message, tokens, it));
         }
         return ErrorList.builder().errors(list).build();

@@ -1,6 +1,7 @@
 package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
+import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.TypeChecker.TypeError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -78,7 +79,7 @@ public class TagsTest extends CheckerTest {
     }
 
     @Test
-    void tagsValidObjectMultiLine() {
+    void tagsValidObject() {
         eval("""
                 schema vm {}
                 @tags({
@@ -89,7 +90,7 @@ public class TagsTest extends CheckerTest {
     }
 
     @Test
-    void tagsInValidObjectMultiLine() {
+    void tagsInValidObject() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
                 schema vm {}
                 @tags({ "env": 10 })
@@ -98,7 +99,7 @@ public class TagsTest extends CheckerTest {
     }
 
     @Test
-    void tagsInValidObjectMultiLineBool() {
+    void tagsInValidObjectBool() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
                 schema vm {}
                 @tags({ "env": true })
@@ -107,7 +108,7 @@ public class TagsTest extends CheckerTest {
     }
 
     @Test
-    void tagsInValidObjectMultiLineEmptyKey() {
+    void tagsInValidObjectEmptyKey() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
                 schema vm {}
                 @tags({ "": "prod" })
@@ -116,12 +117,21 @@ public class TagsTest extends CheckerTest {
     }
 
     @Test
-    void tagsInValidObjectMultiLineEmptyValue() {
+    void tagsInValidObjectEmptyValue() {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
                 schema vm {}
                 @tags({ "env": "" })
                 resource vm something {}""")
         );
+    }
+    @Test
+    void tagsInValidKeyFormatMinus() {
+        var error = Assertions.assertThrows(ParseError.class, () -> eval("""
+                schema vm {}
+                @tags({ "env stage": "prod" })
+                resource vm something {}""")
+        );
+        Assertions.assertEquals("Invalid key format: `env stage`. Keys must be alphanumeric.", error.getMessage());
     }
 
 }
