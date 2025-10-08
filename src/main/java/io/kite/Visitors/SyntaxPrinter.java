@@ -8,6 +8,7 @@ import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.TypeChecker.Types.UnionType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,11 +20,17 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 
+@NoArgsConstructor
 public non-sealed class SyntaxPrinter implements Visitor<String> {
     @Getter
     private final Ansi ansi = Ansi.ansi(50)
             .reset()
             .eraseScreen();
+    private boolean colorise = true;
+
+    public SyntaxPrinter(boolean colorise) {
+        this.colorise = colorise;
+    }
 
     private static @NotNull String formatParameter(ParameterIdentifier it) {
         if (it.getType() == null || it.getType().getType() == null) {
@@ -428,7 +435,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
 
     @Override
     public String visit(StringLiteral expression) {
-        return "\"" + expression.getValue() + "\"";
+        if (colorise) {
+            return Ansi.ansi().fgGreen().a("\"").a(expression.getValue()).a("\"").fgDefault().toString();
+        } else {
+            return "\"" + expression.getValue() + "\"";
+        }
     }
 
     @Override

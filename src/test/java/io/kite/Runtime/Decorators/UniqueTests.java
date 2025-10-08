@@ -41,7 +41,7 @@ public class UniqueTests extends DecoratorTests {
         Assertions.assertEquals("""
                 Provided list [hello, hello] has duplicate elements:
                 [33m@unique[m
-                [m[2J[35minput [34mstring[][39m [39msomething = ["hello", "hello"][m""", err.getMessage());
+                [m[2J[35minput [34mstring[][39m [39msomething = [[32m"hello"[39m, [32m"hello"[39m][m""", err.getMessage());
     }
 
     @Test
@@ -156,13 +156,13 @@ public class UniqueTests extends DecoratorTests {
                 """)
         );
         Assertions.assertEquals("""
-               Provided list [{env=prod}, {env=prod}] has duplicate elements:
-               [33m@unique[m
-               [m[2J[35minput [34mobject[][39m [39msomething = [{
-                "env": "prod"\s
-               }, {
-                "env": "prod"\s
-               }][m""", err.getMessage());
+                Provided list [{env=prod}, {env=prod}] has duplicate elements:
+                [33m@unique[m
+                [m[2J[35minput [34mobject[][39m [39msomething = [{
+                 [32m"env"[39m: [32m"prod"[39m\s
+                }, {
+                 [32m"env"[39m: [32m"prod"[39m\s
+                }][m""", err.getMessage());
     }
 
 

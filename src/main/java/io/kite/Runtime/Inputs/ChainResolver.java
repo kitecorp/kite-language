@@ -24,7 +24,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
     private final Tokenizer tokenizer;
     private final Parser parser;
     private List<InputResolver> resolvers;
-    private SyntaxPrinter printer = new SyntaxPrinter();
+    private SyntaxPrinter printer = new SyntaxPrinter(false);
 
     public ChainResolver() {
         this.resolvers = List.of(
