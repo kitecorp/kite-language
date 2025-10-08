@@ -15,13 +15,13 @@ public class ProviderDecorator extends DecoratorInterpreter {
 
     @Override
     public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
-        if (declaration.getTarget() instanceof SupportsProviders supportsProviders) {
+        if (declaration.getTarget() instanceof ProviderSupport providerSupport) {
             if (declaration.getArgs() != null && !declaration.getArgs().getItems().isEmpty()) {
                 var providers = (List<String>) interpreter.visit(declaration.getArgs());
-                supportsProviders.setProviders(Set.copyOf(providers));
+                providerSupport.setProviders(Set.copyOf(providers));
             } else if (declaration.getValue() != null && declaration.getValue() instanceof StringLiteral literal) {
                 var provider = (String) interpreter.visit(literal);
-                supportsProviders.addProvider(provider);
+                providerSupport.addProvider(provider);
             }
 //            supportsProviders.addProvider();
         } else {

@@ -1,7 +1,7 @@
 package io.kite.Runtime.Values;
 
 import io.kite.Runtime.Environment.Environment;
-import io.kite.Runtime.Decorators.SupportsProviders;
+import io.kite.Runtime.Decorators.ProviderSupport;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +11,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
-public class ResourceValue implements SupportsProviders {
+public class ResourceValue implements ProviderSupport {
     /**
      * Replace with Set or List
      */
