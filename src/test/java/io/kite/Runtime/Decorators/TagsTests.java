@@ -3,11 +3,13 @@ package io.kite.Runtime.Decorators;
 import io.kite.Runtime.Values.ResourceValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 @Log4j2
+@DisplayName("@tags")
 public class TagsTests extends DecoratorTests {
 
     @Test

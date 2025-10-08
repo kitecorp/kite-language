@@ -197,7 +197,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             return "{ }";
         }
         return expression.getProperties().stream()
-                .map(this::visit)
+                .map(expression1 -> visit(expression1))
                 .collect(Collectors.joining(",\n", "{\n ", " \n}"));
     }
 
