@@ -7,6 +7,8 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
+import io.kite.Runtime.Decorators.Tags;
+import io.kite.Runtime.Decorators.TagsSupport;
 import io.kite.Runtime.Interpreter;
 import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.Runtime.Values.DeferredObserverValue;
@@ -27,7 +29,7 @@ import java.util.Set;
 @AllArgsConstructor(staticName = "resource")
 public final class ResourceExpression
         extends Statement
-        implements DeferredObserverValue, Annotatable, CountAnnotatable, ProviderSupport {
+        implements DeferredObserverValue, Annotatable, CountAnnotatable, ProviderSupport, TagsSupport {
     private Identifier type;
     @Nullable
     private Expression name;
@@ -41,6 +43,7 @@ public final class ResourceExpression
     private Boolean counted;
     private Set<Expression> dependencies = Set.of();
     private Set<String> providers;
+    private Tags tags;
 
     private ResourceExpression() {
         this.name = new SymbolIdentifier();
@@ -212,5 +215,18 @@ public final class ResourceExpression
     @Override
     public void addProvider(String provider) {
         getProviders().add(provider);
+    }
+
+    @Override
+    public Tags getTags() {
+        if (tags == null) {
+            this.tags = new Tags();
+        }
+        return tags;
+    }
+
+    @Override
+    public void setTag(Tags tags) {
+        this.tags = tags;
     }
 }
