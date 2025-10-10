@@ -63,7 +63,7 @@ public class DependsOnTests extends DecoratorTests {
                 
                 resource vm third { }
                 """);
-        var res = ((SchemaValue) interpreter.getEnv().get("vm")).getInstances().get("second");
+        var res = ((SchemaValue) interpreter.getEnv().get("vm")).findInstance("second");
         Assertions.assertTrue(res.getDependencies().contains("first"));
         Assertions.assertTrue(res.getDependencies().contains("main"));
         Assertions.assertTrue(res.getDependencies().contains("third"));

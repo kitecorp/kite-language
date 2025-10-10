@@ -27,7 +27,7 @@ public class IfResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -51,7 +51,7 @@ public class IfResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -78,7 +78,7 @@ public class IfResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -101,7 +101,7 @@ public class IfResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -122,7 +122,7 @@ public class IfResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
