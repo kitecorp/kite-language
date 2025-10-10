@@ -10,9 +10,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.LinkedHashMap;
 
 @Data
 public class SchemaValue {
@@ -22,21 +20,12 @@ public class SchemaValue {
     private final Environment environment;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private final LinkedList<ResourceValue> instances;
-    /**
-     * used to do quick(constant time) checks if a resource is already created in.
-     * Useful in for loops ex: for i in ['item', 'item'] should throw duplicate error
-     * Alternative is to iterate the list of instances in linear time
-     */
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private final Set<String> instanceNames;
+    private final LinkedHashMap<String, ResourceValue> instances;
     private final String type;
 
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
         this.type = type.string();
-        this.instances = new LinkedList<>();
-        this.instanceNames = new HashSet<>();
+        this.instances = new LinkedHashMap<>();
         this.environment = environment;
         this.environment.init(INSTANCES, instances);
     }
@@ -87,24 +76,17 @@ public class SchemaValue {
         return environment.init(name, value);
     }
 
-    public boolean initInstance(ResourceValue instance) {
-        var contains = this.instanceNames.add(instance.name());
-        if (!contains){
+    public ResourceValue initInstance(ResourceValue instance) {
+        var contains = this.instances.containsKey(instance.name()); // todo performance tip: replace contains with put only
+        if (contains) {
             throw new DeclarationExistsException(">" + instance.name() + "< already exists in schema");
         }
-        return this.instances.add(instance);
+        return this.instances.put(instance.name(), instance);
     }
 
     @Nullable
     public ResourceValue getInstance(String name) {
-        if (!instanceNames.contains(name)) return null;
-
-        for (ResourceValue instance : instances) {
-            if (instance.name().equals(name)) {
-                return instance;
-            }
-        }
-        return null;
+        return instances.get(name);
     }
 
     @Nullable
