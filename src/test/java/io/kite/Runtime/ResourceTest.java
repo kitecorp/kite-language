@@ -50,7 +50,7 @@ public class ResourceTest extends RuntimeTest {
         assertEquals("vm", schema.getType());
 
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertNotNull(resource);
         assertEquals("main", resource.getName());
@@ -79,14 +79,14 @@ public class ResourceTest extends RuntimeTest {
         assertEquals("vm", schema.getType());
 
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals("first", resource.argVal("name"));
         assertEquals(1, resource.argVal("maxCount"));
 
-        var second = schema.getInstances().get("second");
+        var second = schema.findInstance("second");
 
         assertNotNull(second);
         assertEquals("second", second.getName());
@@ -123,7 +123,7 @@ public class ResourceTest extends RuntimeTest {
         log.warn(res);
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertEquals(2, resource.getProperties().lookup("x"));
     }
@@ -143,7 +143,7 @@ public class ResourceTest extends RuntimeTest {
         log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertEquals(2, resource.getProperties().lookup("x"));
     }
@@ -163,7 +163,7 @@ public class ResourceTest extends RuntimeTest {
         log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertEquals(2, resource.getProperties().lookup("x"));
         assertTrue(resource.isExisting());
@@ -186,7 +186,7 @@ public class ResourceTest extends RuntimeTest {
         log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
         assertSame(2, resource.getProperties().get("x"));
         // make sure main's x has been changed
         assertEquals(2, resource.getProperties().get("x"));
@@ -234,7 +234,7 @@ public class ResourceTest extends RuntimeTest {
         log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         // default x in schema remains the same
         assertEquals(2, schema.getEnvironment().get("x"));
@@ -259,7 +259,7 @@ public class ResourceTest extends RuntimeTest {
         log.warn((res));
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
     }
@@ -279,7 +279,7 @@ public class ResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -301,7 +301,7 @@ public class ResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -323,7 +323,7 @@ public class ResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource = schema.getInstances().get("main");
+        var resource = schema.findInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);

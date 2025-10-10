@@ -3,14 +3,16 @@ package io.kite.Runtime.Values;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Environment.IEnvironment;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 @Data
 public class SchemaValue {
@@ -20,12 +22,21 @@ public class SchemaValue {
     private final Environment environment;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private final Environment<ResourceValue> instances;
+    private final LinkedList<ResourceValue> instances;
+    /**
+     * used to do quick(constant time) checks if a resource is already created in.
+     * Useful in for loops ex: for i in ['item', 'item'] should throw duplicate error
+     * Alternative is to iterate the list of instances in linear time
+     */
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private final Set<String> instanceNames;
     private final String type;
 
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
         this.type = type.string();
-        this.instances = new Environment<>(environment);
+        this.instances = new LinkedList<>();
+        this.instanceNames = new HashSet<>();
         this.environment = environment;
         this.environment.init(INSTANCES, instances);
     }
@@ -76,16 +87,28 @@ public class SchemaValue {
         return environment.init(name, value);
     }
 
-    public Object initInstance(String name, Object instance) {
-        return this.instances.init(name, instance);
+    public boolean initInstance(ResourceValue instance) {
+        var contains = this.instanceNames.add(instance.name());
+        if (!contains){
+            throw new DeclarationExistsException(">" + instance.name() + "< already exists in schema");
+        }
+        return this.instances.add(instance);
     }
 
+    @Nullable
     public ResourceValue getInstance(String name) {
-        return instances.get(name);
+        if (!instanceNames.contains(name)) return null;
+
+        for (ResourceValue instance : instances) {
+            if (instance.name().equals(name)) {
+                return instance;
+            }
+        }
+        return null;
     }
 
-    public ResourceValue getInstanceOrElseGet(String name, Supplier<? extends ResourceValue> supplier) {
-        return Optional.ofNullable(instances.get(name)).orElseGet(supplier);
+    @Nullable
+    public ResourceValue findInstance(String instanceName) {
+        return getInstance(instanceName);
     }
-
 }

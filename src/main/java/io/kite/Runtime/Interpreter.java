@@ -115,11 +115,11 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
-        if (schemaValue.getInstances().get(name) == null) {
+        if (schemaValue.getInstance(name) == null) {
             // if instance was not installed yet -> it will be installed later so we return a deferred object
             return new Deferred(schemaValue, name);
         } else {
-            return schemaValue.getInstances().lookup(name);
+            return schemaValue.getInstance(name);
         }
     }
 
@@ -600,7 +600,7 @@ public final class Interpreter implements Visitor<Object> {
         var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting());
         try {
             // init any kind of new resource
-            installedSchema.initInstance(resourceName(resource), res);
+            installedSchema.initInstance(res);
             resource.setValue(res);
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));

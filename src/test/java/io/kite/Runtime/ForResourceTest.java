@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,8 +35,8 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource0 = schema.getInstances().get("main[0]");
-        var resource1 = schema.getInstances().get("main[1]");
+        var resource0 = schema.findInstance("main[0]");
+        var resource1 = schema.findInstance("main[1]");
 
         assertInstanceOf(ResourceValue.class, resource0);
         assertInstanceOf(ResourceValue.class, resource1);
@@ -62,13 +63,13 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource0 = schema.getInstances().get("main[0]");
-        var resource1 = schema.getInstances().get("main[1]");
+        var resource0 = schema.findInstance("main[0]");
+        var resource1 = schema.findInstance("main[1]");
         assertInstanceOf(ResourceValue.class, resource0);
         assertInstanceOf(ResourceValue.class, resource1);
 
-        var second0 = schema.getInstances().get("second[0]");
-        var second1 = schema.getInstances().get("second[1]");
+        var second0 = schema.findInstance("second[0]");
+        var second1 = schema.findInstance("second[1]");
         assertInstanceOf(ResourceValue.class, second0);
         assertInstanceOf(ResourceValue.class, second1);
     }
@@ -84,7 +85,7 @@ public class ForResourceTest extends RuntimeTest {
                       }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("5", schema.getInstances().get("main[5]").get("name"));
+        assertEquals("5", schema.findInstance("main[5]").get("name"));
     }
 
     @Test
@@ -111,8 +112,8 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("dev", schema.getInstances().get("main[0]").get("name"));
-        assertEquals("prod", schema.getInstances().get("main[1]").get("name"));
+        assertEquals("dev", schema.findInstance("main[0]").get("name"));
+        assertEquals("prod", schema.findInstance("main[1]").get("name"));
     }
 
     @Test
@@ -124,8 +125,8 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("prod", schema.getInstances().get("main[\"prod\"]").get("name"));
-        assertEquals("test", schema.getInstances().get("main[\"test\"]").get("name"));
+        assertEquals("prod", schema.findInstance("main[\"prod\"]").get("name"));
+        assertEquals("test", schema.findInstance("main[\"test\"]").get("name"));
     }
 
     @Test
@@ -151,7 +152,7 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("inner", schema.getInstances().get("main[0]").get("name"));
+        assertEquals("inner", schema.findInstance("main[0]").get("name"));
     }
 
     @Test
@@ -164,8 +165,8 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("x", schema.getInstances().get("main[0]").get("name"));
-        assertEquals("y", schema.getInstances().get("main[1]").get("name"));
+        assertEquals("x", schema.findInstance("main[0]").get("name"));
+        assertEquals("y", schema.findInstance("main[1]").get("name"));
     }
 
     @Test
@@ -178,8 +179,8 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("vpc-0", schema.getInstances().get("cidr[0]").get("name"));
-        assertEquals("vpc-1", schema.getInstances().get("cidr[1]").get("name"));
+        assertEquals("vpc-0", schema.findInstance("cidr[0]").get("name"));
+        assertEquals("vpc-1", schema.findInstance("cidr[1]").get("name"));
     }
 
     @Test
@@ -205,7 +206,7 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("prod", schema.getInstances().get("main[\"prod\"]").get("name"));
+        assertEquals("prod", schema.findInstance("main[\"prod\"]").get("name"));
         // Optionally assert col’s contents if your runtime exposes it
     }
 
@@ -239,8 +240,8 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("0-0", schema.getInstances().get("main[0]").get("name"));
-        assertEquals("0-1", schema.getInstances().get("main[1]").get("name"));
+        assertEquals("0-0", schema.findInstance("main[0]").get("name"));
+        assertEquals("0-1", schema.findInstance("main[1]").get("name"));
     }
 
 
@@ -257,7 +258,7 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("X-M-0", schema.getInstances().get("main[0]").get("name"));
+        assertEquals("X-M-0", schema.findInstance("main[0]").get("name"));
     }
 
     @Test
@@ -270,10 +271,10 @@ public class ForResourceTest extends RuntimeTest {
                   }
                 """);
         var schema = (SchemaValue) global.get("vm");
-        assertEquals("a-0", schema.getInstances().get("""
+        assertEquals("a-0", schema.findInstance("""
                 main["a"]"""
                 .trim()).get("name"));
-        assertEquals("c-2", schema.getInstances().get("""
+        assertEquals("c-2", schema.findInstance("""
                 main["c"]
                 """.trim()).get("name"));
     }
@@ -295,8 +296,8 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var resource0 = schema.getInstances().get("main[0]");
-        var resource1 = schema.getInstances().get("main[1]");
+        var resource0 = schema.findInstance("main[0]");
+        var resource1 = schema.findInstance("main[1]");
 
         assertInstanceOf(ResourceValue.class, resource0);
         assertInstanceOf(ResourceValue.class, resource1);
@@ -324,8 +325,8 @@ public class ForResourceTest extends RuntimeTest {
         assertNotNull(schema);
         assertEquals(2, schema.getInstances().size());
 
-        assertEquals("prod-0", schema.getInstances().get("main[0]").get("name"));
-        assertEquals("prod-1", schema.getInstances().get("main[1]").get("name"));
+        assertEquals("prod-0", schema.findInstance("main[0]").get("name"));
+        assertEquals("prod-1", schema.findInstance("main[1]").get("name"));
     }
 
 
@@ -353,12 +354,10 @@ public class ForResourceTest extends RuntimeTest {
         assertNotNull(schema);
 //        assertEquals(4, schema.getArrays().size());
 
-        var vpcs = schema.getInstances();
-        var cidr = schema.getInstances();
-        ResourceValue actualValue = vpcs.get("vpc[0]");
+        ResourceValue actualValue = schema.findInstance("vpc[0]");
         assertInstanceOf(ResourceValue.class, actualValue);
-        ResourceValue cidr0 = cidr.get("cidr[0]");
-        ResourceValue cidr1 = cidr.get("cidr[1]");
+        ResourceValue cidr0 = schema.findInstance("cidr[0]");
+        ResourceValue cidr1 = schema.findInstance("cidr[1]");
         assertInstanceOf(ResourceValue.class, cidr1);
         assertEquals("prod-0", cidr0.get("name"));
         assertEquals("prod-1", cidr1.get("name"));
@@ -390,12 +389,10 @@ public class ForResourceTest extends RuntimeTest {
         assertNotNull(schema);
 //        assertEquals(4, schema.getArrays().size());
 
-        var vpcs = schema.getInstances();
-        var cidr = schema.getInstances();
-        ResourceValue actualValue = vpcs.get("vpc[0]");
-        assertInstanceOf(ResourceValue.class, actualValue);
-        ResourceValue cidr0 = cidr.get("cidr[0]");
-        ResourceValue cidr1 = cidr.get("cidr[1]");
+        ResourceValue vpc0 = schema.findInstance("vpc[0]");
+        assertInstanceOf(ResourceValue.class, vpc0);
+        ResourceValue cidr0 = schema.findInstance("cidr[0]");
+        ResourceValue cidr1 = schema.findInstance("cidr[1]");
         assertEquals("prod-0", cidr0.get("name"));
         assertEquals("prod-1", cidr1.get("name"));
     }
@@ -447,8 +444,8 @@ public class ForResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("main[0]").get("name"));
-        assertEquals("prod", arrays.get("main[1]").get("name"));
+        assertEquals("prod", schema.findInstance("main[0]").get("name"));
+        assertEquals("prod", schema.findInstance("main[1]").get("name"));
     }
 
     @Test
@@ -474,9 +471,9 @@ public class ForResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("""
+        assertEquals("prod", schema.findInstance("""
                 main["prod"]""").get("name"));
-        assertEquals("prod", arrays.get("""
+        assertEquals("prod", schema.findInstance("""
                 main["test"]""").get("name"));
     }
 
@@ -502,9 +499,9 @@ public class ForResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("""
+        assertEquals("prod", schema.findInstance("""
                 main["prod"]""").get("name"));
-        assertEquals("prod", arrays.get("""
+        assertEquals("prod", schema.findInstance("""
                 main["test"]""").get("name"));
     }
 
@@ -530,9 +527,9 @@ public class ForResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("""
+        assertEquals("prod", schema.findInstance("""
                 main["prod"]""").get("name"));
-        assertEquals("test", arrays.get("""
+        assertEquals("test", schema.findInstance("""
                 main["test"]""").get("name"));
     }
 
@@ -555,13 +552,13 @@ public class ForResourceTest extends RuntimeTest {
 
         var arrays = schema.getInstances();
         assertEquals(2, arrays.size());
-        assertEquals("prod", arrays.get("""
+        assertEquals("prod", schema.findInstance("""
                 main["prod"]
                 """.trim()).get("name"));
-        assertEquals("main[\"prod\"]", arrays.get("""
+        assertEquals("main[\"prod\"]", schema.findInstance("""
                 main["prod"]
                 """.trim()).getName());
-        assertEquals("test", arrays.get("""
+        assertEquals("test", schema.findInstance("""
                 main["test"]
                 """.trim()).get("name"));
     }
@@ -587,8 +584,8 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var videos = schema.getInstances().get("videos");
-        var photos = schema.getInstances().get("photos");
+        var videos = schema.findInstance("videos");
+        var photos = schema.findInstance("photos");
 
         Assertions.assertNotNull(videos);
         Assertions.assertNotNull(photos);
@@ -617,8 +614,8 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = (SchemaValue) global.get("vm");
 
-        var videos = schema.getInstances().get("videos");
-        var photos = schema.getInstances().get("photos");
+        var videos = schema.findInstance("videos");
+        var photos = schema.findInstance("photos");
 
         Assertions.assertNotNull(videos);
         Assertions.assertNotNull(photos);
@@ -639,11 +636,12 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("amazon", new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
-        map.put("bmw", new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
-        assertEquals(map, schemaValue.getInstances().getVariables());
+        var list = List.of(
+                new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue),
+                new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue)
+        );
+        assertEquals(list, schemaValue.getInstances());
     }
 
     @Test
@@ -665,7 +663,7 @@ public class ForResourceTest extends RuntimeTest {
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
         map.put("main-amazon", new ResourceValue("main-amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
         map.put("main-bmw", new ResourceValue("main-bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
-        assertEquals(map, schemaValue.getInstances().getVariables());
+        assertEquals(map, schemaValue.getInstances());
     }
 
     @Test
@@ -680,12 +678,13 @@ public class ForResourceTest extends RuntimeTest {
                   name     = 'name-${index}'
                 }
                 """);
-        var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("photos[1]", new ResourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
-        map.put("photos[2]", new ResourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
-        map.put("photos[3]", new ResourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));
-        assertEquals(map, schemaValue.getInstances().getVariables());
+        var map = List.of(
+                new ResourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue),
+                new ResourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue),
+                new ResourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue)
+        );
+        assertEquals(map, schemaValue.getInstances());
     }
 
     @Test
@@ -701,11 +700,12 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("photos[\"hello\"]", new ResourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue));
-        map.put("photos[\"world\"]", new ResourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue));
-        assertEquals(map, schemaValue.getInstances().getVariables());
+        var list = List.of(
+                new ResourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue),
+                new ResourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue)
+        );
+        assertEquals(list, schemaValue.getInstances());
     }
 
 
