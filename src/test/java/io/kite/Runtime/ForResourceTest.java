@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -636,12 +635,11 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
+        var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        var list = List.of(
-                new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue),
-                new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue)
-        );
-        assertEquals(list, schemaValue.getInstances());
+        map.put("amazon", new ResourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
+        map.put("bmw", new ResourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
+        assertEquals(map, schemaValue.getInstances());
     }
 
     @Test
@@ -678,12 +676,11 @@ public class ForResourceTest extends RuntimeTest {
                   name     = 'name-${index}'
                 }
                 """);
+        var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        var map = List.of(
-                new ResourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue),
-                new ResourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue),
-                new ResourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue)
-        );
+        map.put("photos[1]", new ResourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
+        map.put("photos[2]", new ResourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
+        map.put("photos[3]", new ResourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));
         assertEquals(map, schemaValue.getInstances());
     }
 
@@ -700,12 +697,11 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
+        var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        var list = List.of(
-                new ResourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue),
-                new ResourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue)
-        );
-        assertEquals(list, schemaValue.getInstances());
+        map.put("photos[\"hello\"]", new ResourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue));
+        map.put("photos[\"world\"]", new ResourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue));
+        assertEquals(map, schemaValue.getInstances());
     }
 
 
