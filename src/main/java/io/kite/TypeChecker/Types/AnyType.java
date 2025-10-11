@@ -21,4 +21,9 @@ public final class AnyType extends ReferenceType {
         super(SystemType.ANY, env);
     }
 
+    public AnyType(@Nullable Object object) {
+        super(SystemType.ANY, null);
+        this.any = object;
+    }
+
 }

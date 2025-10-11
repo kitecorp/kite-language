@@ -4,6 +4,8 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.CycleDetectionSupport;
+import io.kite.Runtime.Values.Deferred;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
@@ -28,9 +30,9 @@ public final class TypeChecker implements Visitor<Type> {
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
+    private final Map<String, DecoratorChecker> decoratorInfoMap;
     @Getter
     private TypeEnvironment env;
-    private final Map<String, DecoratorChecker> decoratorInfoMap;
 
     public TypeChecker() {
         this(new TypeEnvironment());
@@ -414,8 +416,14 @@ public final class TypeChecker implements Visitor<Type> {
             // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
             // Since that environment points to the parent(type env) it will also find the properties
             return switch (value) {
-                case SchemaType schemaType -> // vm.main -> if user references the schema we search for the instances of those schemas
-                        schemaType.getInstances().lookup(resourceName.string());
+                case SchemaType schemaType -> {// vm.main -> if user references the schema we search for the instances of those schemas
+                    var res = CycleDetectionSupport.propertyOrDeferred(schemaType.getInstances().getVariables(), resourceName.string());
+                    if (res instanceof Deferred deferred) {
+                        yield new AnyType(deferred);
+                    } else {
+                        yield (Type) res;
+                    }
+                }
                 case ResourceType iEnvironment -> {
                     try {
                         yield iEnvironment.lookup(resourceName.string());
@@ -424,7 +432,7 @@ public final class TypeChecker implements Visitor<Type> {
                     }
                 }
                 case ObjectType objectType -> accessMemberType(expression, resourceName.string(), objectType);
-                case null, default -> null;
+                case null, default -> value;
             };
             // else it could be a resource or any other type like a NumericLiteral or something else
         } else if (expression.getProperty() instanceof StringLiteral stringLiteral) {
@@ -894,6 +902,19 @@ public final class TypeChecker implements Visitor<Type> {
     public Type visit(AssignmentExpression expression) {
         var varType = visit(expression.getLeft());
         var valueType = visit(expression.getRight());
+        /*
+         todo when a resource property is deferred through implicit dependency we skip
+          any type checking here because the type of the property is not yet known. We would need to evaluate the dependency
+          resource first and then validate the property type by revisiting this resource.
+          but for now, I don't care since the dependency cycle and value is done in the interpreter.
+          if the language becomes popular, we should consider doing this type checking as well instead of just skipping it.
+          ex:
+          resource vm main { a = second.a }  // references a resource not evaluated yet so we must deferr evaluation
+          resource vm main { a = "second" }
+        */
+        if (valueType instanceof AnyType any && any.getAny() instanceof Deferred deferred) {
+            return any;
+        }
         var expected = expect(valueType, varType, expression);
         switch (expression.getLeft()) {
             case SymbolIdentifier symbolIdentifier ->

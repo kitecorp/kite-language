@@ -36,12 +36,13 @@ import java.util.stream.Collectors;
 
 import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
 import static io.kite.Runtime.CycleDetection.topologySort;
+import static io.kite.Runtime.CycleDetectionSupport.propertyOrDeferred;
 import static io.kite.Runtime.interpreter.OperatorComparator.compare;
 import static io.kite.Utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
 
 @Log4j2
-public final class Interpreter implements Visitor<Object>, CycleDetectionSupport {
+public final class Interpreter implements Visitor<Object> {
     private final Deque<Callstack> callstack;
 
     @Getter

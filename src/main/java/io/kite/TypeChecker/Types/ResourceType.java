@@ -15,7 +15,7 @@ public final class ResourceType extends ReferenceType {
     private final String name;
 
     public ResourceType(String name, SchemaType schema, @Nullable TypeEnvironment env) {
-        super(ReferenceType.Resource.getValue());
+        super(SystemType.RESOURCE);
         this.name = name;
         this.schema = schema;
         this.environment = env;

@@ -123,7 +123,7 @@ public class ResourceTest extends CheckerTest {
                 schema vm {
                     string name
                     number maxCount = 0
-                    boolean enabled  = true
+                    boolean enabled = true
                 }
                 resource vm second {
                     name     = "second"
