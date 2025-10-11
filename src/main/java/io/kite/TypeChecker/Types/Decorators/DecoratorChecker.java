@@ -68,7 +68,7 @@ public abstract class DecoratorChecker {
         }
     }
 
-    public boolean onFinal(AnnotationDeclaration declaration) {
+    public boolean onTargetEvaluated(AnnotationDeclaration declaration) {
         return false;
     }
 

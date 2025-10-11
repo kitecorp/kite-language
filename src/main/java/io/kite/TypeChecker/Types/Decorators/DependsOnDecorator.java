@@ -7,7 +7,7 @@ import io.kite.Frontend.Parser.Expressions.MemberExpression;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.ArrayType;
 import io.kite.TypeChecker.Types.DecoratorType;
-import io.kite.TypeChecker.Types.ReferenceType;
+import io.kite.TypeChecker.Types.ResourceType;
 import io.kite.Visitors.SyntaxPrinter;
 import org.fusesource.jansi.Ansi;
 
@@ -22,7 +22,7 @@ public class DependsOnDecorator extends DecoratorChecker {
 
     public DependsOnDecorator() {
         super(NAME, decorator(
-                List.of(ArrayType.ARRAY_TYPE, ReferenceType.Resource),
+                List.of(ArrayType.ARRAY_TYPE, ResourceType.INSTANCE),
                 Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
         ), Set.of());
     }

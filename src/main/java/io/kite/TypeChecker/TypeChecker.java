@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.CycleDetectionSupport;
 import io.kite.Runtime.Values.Deferred;
 import io.kite.Runtime.exceptions.InvalidInitException;
@@ -42,7 +43,7 @@ public final class TypeChecker implements Visitor<Type> {
         this.env = environment;
         this.decoratorInfoMap = new HashMap<>();
         this.decoratorInfoMap.put(SensitiveDecorator.NAME, new SensitiveDecorator());
-        this.decoratorInfoMap.put(CountDecorator.NAME, new CountDecorator());
+        this.decoratorInfoMap.put(CountDecorator.NAME, new CountDecorator(this));
         this.decoratorInfoMap.put(DescriptionDecorator.NAME, new DescriptionDecorator());
         this.decoratorInfoMap.put(MaxLengthDecorator.NAME, new MaxLengthDecorator());
         this.decoratorInfoMap.put(MinLengthDecorator.NAME, new MinLengthDecorator());
@@ -335,7 +336,7 @@ public final class TypeChecker implements Visitor<Type> {
 
     @Override
     public Type visit(ComponentStatement expression) {
-        return ReferenceType.Resource;
+        return ResourceType.INSTANCE;
     }
 
     @Override
@@ -369,7 +370,7 @@ public final class TypeChecker implements Visitor<Type> {
         // invoke annotations that implement after init checking
         for (var annotation : list) {
             var res = decoratorInfoMap.get(annotation.getName().string());
-            res.onFinal(annotation);
+            res.onTargetEvaluated(annotation);
         }
     }
 
@@ -679,6 +680,12 @@ public final class TypeChecker implements Visitor<Type> {
         var installedSchema = (SchemaType) env.lookup(resource.getType().string());
         if (installedSchema == null) {
             throw new InvalidInitException("Schema not found during " + resourceName(resource) + " initialization");
+        }
+        if (resource.targetType() instanceof CountAnnotatable annotatable) {
+            if (annotatable.counted()) {
+                annotatable.counted(null);
+                return installedSchema.getInstance(resourceName(resource));
+            }
         }
 
         var schemaEnv = installedSchema.getEnvironment();

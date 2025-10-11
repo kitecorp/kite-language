@@ -67,6 +67,6 @@ public final class SchemaDeclaration extends Statement implements Annotatable {
 
     @Override
     public Type targetType() {
-        return SchemaType.Schema;
+        return SchemaType.INSTANCE;
     }
 }
