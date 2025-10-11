@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.kite.Frontend.Parser.Statements.FunctionDeclaration.fun;
+import static io.kite.Runtime.CycleDetection.topologySort;
 import static io.kite.Runtime.interpreter.OperatorComparator.compare;
 import static io.kite.Utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
@@ -989,11 +990,21 @@ public final class Interpreter implements Visitor<Object> {
             for (Statement i : program.getBody()) {
                 lastEval = executeBlock(i, env);
             }
+            topologySortResources();
 
             return lastEval;
         } catch (RuntimeException e) {
             errors.add(e);
             throw e;
+        }
+    }
+
+    private void topologySortResources() {
+        for (Object value : env.getVariables().values()) {
+            if (value instanceof SchemaValue schemaValue) {
+                var res = topologySort(schemaValue.getInstances());
+                schemaValue.setInstances(res);
+            }
         }
     }
 

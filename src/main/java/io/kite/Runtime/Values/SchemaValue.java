@@ -6,6 +6,7 @@ import io.kite.Runtime.Environment.IEnvironment;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,8 @@ public class SchemaValue {
     private final Environment environment;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private final LinkedHashMap<String, ResourceValue> instances;
+    @Setter
+    private LinkedHashMap<String, ResourceValue> instances;
     private final String type;
 
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {

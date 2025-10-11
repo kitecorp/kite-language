@@ -3,8 +3,7 @@ package io.kite.Runtime;
 import io.kite.Runtime.Values.ResourceValue;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Log4j2
 public class CycleDetection {
@@ -56,6 +55,34 @@ public class CycleDetection {
 
         // Remove the resource from the active path after processing
         activePath.remove(resource.name());
+    }
+
+
+    /**
+     * Sorts the resources topologically by their dependencies.
+     */
+    static <R extends ResourceValue> LinkedHashMap<String, R> topologySort(LinkedHashMap<String, R> resources) {
+        LinkedHashMap<String, R> out = new LinkedHashMap<>(resources.size());
+        Set<String> seen = new HashSet<>();
+        for (var entry : resources.entrySet()) {
+            dfs(entry.getKey(), resources, seen, out);
+        }
+        return out;
+    }
+
+    private static <R extends ResourceValue> void dfs(
+            String name,
+            LinkedHashMap<String, R> resources,
+            Set<String> seen,
+            LinkedHashMap<String, R> out
+    ) {
+        if (!seen.add(name)) return;
+        R res = resources.get(name);
+        if (res == null) throw new IllegalStateException("Missing resource: " + name);
+        for (String dep : res.getDependencies()) {
+            dfs(dep, resources, seen, out);
+        }
+        out.put(name, res); // insertion order now reflects dependency order
     }
 
 }
