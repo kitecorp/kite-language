@@ -117,6 +117,44 @@ public class ResourceTest extends CheckerTest {
         assertEquals(ValueType.String, second.getProperty("name"));
         assertEquals(ValueType.Number, second.getProperty("maxCount"));
     }
+    @Test
+    void propertyAccessThroughOtherResourceReverseOrder() {
+        eval("""
+                schema vm {
+                    string name
+                    number maxCount = 0
+                    boolean enabled  = true
+                }
+                resource vm second {
+                    name     = "second"
+                    maxCount = vm.main.maxCount
+                }
+                
+                resource vm main {
+                    name     = "first"
+                    maxCount = 1
+                    enabled  = false
+                }
+                """);
+        var schema = (SchemaType) checker.getEnv().get("vm");
+
+        assertNotNull(schema);
+        assertEquals("vm", schema.getValue());
+
+        var resource = (ResourceType) schema.getInstances().lookup("main");
+        assertNotNull(resource);
+        assertEquals("main", resource.getName());
+        assertEquals(ValueType.String, resource.getProperty("name"));
+        assertEquals(ValueType.Number, resource.getProperty("maxCount"));
+        assertEquals(ValueType.Boolean, resource.getProperty("enabled"));
+
+        var second = (ResourceType) schema.getInstances().lookup("second");
+
+        assertNotNull(second);
+        assertEquals("second", second.getName());
+        assertEquals(ValueType.String, second.getProperty("name"));
+        assertEquals(ValueType.Number, second.getProperty("maxCount"));
+    }
 
     @Test
     @DisplayName("throw if a resource uses a field not defined in the schema")

@@ -41,7 +41,7 @@ import static io.kite.Utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
 
 @Log4j2
-public final class Interpreter implements Visitor<Object> {
+public final class Interpreter implements Visitor<Object>, CycleDetectionSupport {
     private final Deque<Callstack> callstack;
 
     @Getter
@@ -113,15 +113,6 @@ public final class Interpreter implements Visitor<Object> {
         this.decorators.put("validate", new ValidateDecorator(this));
         this.decorators.put("provider", new ProviderDecorator());
         this.decorators.put("tags", new TagsDecorator());
-    }
-
-    private static @Nullable Object getProperty(SchemaValue schemaValue, String name) {
-        if (schemaValue.getInstance(name) == null) {
-            // if instance was not installed yet -> it will be installed later so we return a deferred object
-            return new Deferred(schemaValue, name);
-        } else {
-            return schemaValue.getInstance(name);
-        }
     }
 
     private static void forInit(Environment<Object> forEnv, Identifier index, Object i) {
@@ -504,10 +495,10 @@ public final class Interpreter implements Visitor<Object> {
             case SchemaValue schemaValue -> {
                 if (ExecutionContextIn(ForStatement.class)) {
                     if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
-                        return getProperty(schemaValue, "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
+                        return propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
                     }
                 } else {
-                    return getProperty(schemaValue, propertyName);
+                    return propertyOrDeferred(schemaValue.getInstances(), propertyName);
                 }
             }
             case ResourceValue resourceValue -> {

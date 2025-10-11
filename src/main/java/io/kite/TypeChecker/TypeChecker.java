@@ -414,8 +414,8 @@ public final class TypeChecker implements Visitor<Type> {
             // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
             // Since that environment points to the parent(type env) it will also find the properties
             return switch (value) {
-                case SchemaType schemaValue -> // vm.main -> if user references the schema we search for the instances of those schemas
-                        schemaValue.getInstances().lookup(resourceName.string());
+                case SchemaType schemaType -> // vm.main -> if user references the schema we search for the instances of those schemas
+                        schemaType.getInstances().lookup(resourceName.string());
                 case ResourceType iEnvironment -> {
                     try {
                         yield iEnvironment.lookup(resourceName.string());

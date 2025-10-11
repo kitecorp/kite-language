@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Data
 public class SchemaValue {
@@ -22,7 +23,7 @@ public class SchemaValue {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Setter
-    private LinkedHashMap<String, ResourceValue> instances;
+    private Map<String, ResourceValue> instances;
     private final String type;
 
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
