@@ -24,6 +24,20 @@ public class DependsOnTest extends CheckerTest {
     }
 
     @Test
+    void dependsOnResourceReverse() {
+        var res = eval("""
+                schema vm {}
+                
+                @dependsOn(vm.something)
+                resource vm first { }
+                
+                resource vm something {}
+                
+                """);
+
+    }
+
+    @Test
     void dependsOnResourceArray() {
         var res = eval("""
                 schema vm {}
@@ -36,6 +50,20 @@ public class DependsOnTest extends CheckerTest {
                 
                 """);
 
+    }
+
+    @Test
+    void dependsOnResourceArrayReverse() {
+        var res = eval("""
+                schema vm {}
+                
+                @dependsOn([vm.second, vm.third])
+                resource vm first { }
+                resource vm second { }
+                
+                resource vm third {}
+                
+                """);
     }
 
     @Test
