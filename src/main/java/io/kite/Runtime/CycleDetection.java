@@ -61,8 +61,8 @@ public class CycleDetection {
     /**
      * Sorts the resources topologically by their dependencies.
      */
-    static <R extends ResourceValue> LinkedHashMap<String, R> topologySort(LinkedHashMap<String, R> resources) {
-        LinkedHashMap<String, R> out = new LinkedHashMap<>(resources.size());
+    static <R extends ResourceValue> LinkedHashMap<String, R> topologySort(Map<String, R> resources) {
+        var out = new LinkedHashMap<String, R>(resources.size());
         Set<String> seen = new HashSet<>();
         for (var entry : resources.entrySet()) {
             dfs(entry.getKey(), resources, seen, out);
@@ -70,12 +70,8 @@ public class CycleDetection {
         return out;
     }
 
-    private static <R extends ResourceValue> void dfs(
-            String name,
-            LinkedHashMap<String, R> resources,
-            Set<String> seen,
-            LinkedHashMap<String, R> out
-    ) {
+    private static <R extends ResourceValue> void dfs(String name, Map<String, R> resources,
+                                                      Set<String> seen, Map<String, R> out) {
         if (!seen.add(name)) return;
         R res = resources.get(name);
         if (res == null) throw new IllegalStateException("Missing resource: " + name);
