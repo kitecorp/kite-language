@@ -142,7 +142,7 @@ public final class AnnotationDeclaration extends Expression {
         return name.string();
     }
 
-    public DecoratorType.Target targetType() {
+    public DecoratorType.Target target() {
         return target.getTarget();
     }
 

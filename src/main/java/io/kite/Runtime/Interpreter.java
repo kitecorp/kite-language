@@ -22,8 +22,8 @@ import io.kite.Runtime.exceptions.*;
 import io.kite.Runtime.interpreter.OperatorComparator;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.StackVisitor;
 import io.kite.Visitors.SyntaxPrinter;
-import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.fusesource.jansi.Ansi;
@@ -42,16 +42,11 @@ import static io.kite.Utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
 
 @Log4j2
-public final class Interpreter implements Visitor<Object> {
-    private final Deque<Callstack> callstack;
-
+public final class Interpreter extends StackVisitor<Object> {
     @Getter
     private final SyntaxPrinter printer;
     private final DeferredObservable deferredObservable;
-    /**
-     * Used to track where are we in the execution of the program. Are we in an for statement? or in a Schema declaration? in a resource declaration?
-     */
-    private final Deque<ContextStack> contextStacks;
+
     @Getter
     private final List<OutputDeclaration> outputs;
     @Getter
@@ -70,8 +65,6 @@ public final class Interpreter implements Visitor<Object> {
         this.outputs = new ArrayList<>();
         this.printer = new SyntaxPrinter();
         this.deferredObservable = new DeferredObservable();
-        this.callstack = new ArrayDeque<>();
-        this.contextStacks = new ArrayDeque<>();
         this.errors = new ArrayList<>();
         this.decorators = new HashMap<>();
 
@@ -122,25 +115,6 @@ public final class Interpreter implements Visitor<Object> {
         }
     }
 
-    private boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
-        for (Callstack next : callstack) {
-            if (next.getClass().equals(forStatementClass)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Nullable
-    private Callstack ExecutionContext(Class<?> forStatementClass) {
-        for (Callstack next : callstack) {
-            if (next.getClass().equals(forStatementClass)) {
-                return next;
-            }
-        }
-        return null;
-    }
-
     @Override
     public Object visit(int expression) {
         return expression;
@@ -173,13 +147,9 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(@Nullable Statement statement) {
-        if (statement != null) {
-            callstack.push(statement);
-        }
-        var res = Visitor.super.visit(statement);
-        if (statement != null) {
-            callstack.pop();
-        }
+        push(statement);
+        var res = super.visit(statement);
+        pop(statement);
         return res;
     }
 
@@ -226,7 +196,7 @@ public final class Interpreter implements Visitor<Object> {
         if (expression.isInterpolated()) {
             // when doing string interpolation on a property assignment we should look in the parent environment
             // for the interpolated string not in the "properties/environment of the resource"
-            var hops = contextStacks.peek() == ContextStack.Resource ? 1 : 0;
+            var hops = peek(ContextStack.Resource) ? 1 : 0;
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
                 var value = env.lookup(interpolationVar, hops);
@@ -537,7 +507,7 @@ public final class Interpreter implements Visitor<Object> {
 //        if (callstack.peekLast() instanceof ForStatement) {
 //            resource = ResourceExpression.resource(resource);
 //        }
-        contextStacks.push(ContextStack.Resource);
+        push(ContextStack.Resource);
         // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
         var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
@@ -555,7 +525,7 @@ public final class Interpreter implements Visitor<Object> {
             value.setTag(resource.getTags());
             return detectCycle(resource, value);
         } finally {
-            contextStacks.pop();
+            pop(ContextStack.Resource);
         }
     }
 
@@ -563,7 +533,7 @@ public final class Interpreter implements Visitor<Object> {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
         }
-        if (contextStacks.contains(ContextStack.FUNCTION)) {
+        if (contextStackContains(ContextStack.FUNCTION)) {
             throw new InvalidInitException("Resource cannot be declared inside a function: " + printer.visit(resource));
         }
     }
@@ -685,7 +655,7 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(ForStatement statement) {
         try {
-            callstack.push(statement);
+           push(statement);
             if (statement.hasRange()) {
                 return ForWithRange(statement);
             } else if (statement.hasArray()) {
@@ -707,7 +677,7 @@ public final class Interpreter implements Visitor<Object> {
                 }
             }
         } finally {
-            callstack.pop();
+            pop(statement);
         }
         throw new OperationNotImplementedException("For statement not implemented");
     }
@@ -772,7 +742,7 @@ public final class Interpreter implements Visitor<Object> {
     @Override
     public Object visit(SchemaDeclaration expression) {
         var environment = new Environment<>(env);
-        contextStacks.push(ContextStack.Schema);
+        push(ContextStack.Schema);
 
         for (var property : expression.getProperties()) {
             switch (property.init()) {
@@ -780,7 +750,7 @@ public final class Interpreter implements Visitor<Object> {
                 case null, default -> environment.init(property.name(), visit(property.init()));
             }
         }
-        contextStacks.pop();
+        pop(ContextStack.Schema);
         var name = expression.getName();
         return env.init(name.string(), SchemaValue.of(name, environment)); // install the type into the global env
     }
@@ -913,7 +883,7 @@ public final class Interpreter implements Visitor<Object> {
     public Object visit(ValDeclaration expression) {
         String symbol = expression.getId().string();
         Object value = null;
-        if (contextStacks.peek() == ContextStack.Resource) {
+        if (super.peek(ContextStack.Resource)) {
             if (!expression.hasInit()) {
                 throw new InvalidInitException("Val type must be initialised: " + expression.getId().string() + " is null");
             }
@@ -1012,12 +982,12 @@ public final class Interpreter implements Visitor<Object> {
 
     @Override
     public Object visit(FunctionDeclaration declaration) {
-        contextStacks.push(ContextStack.FUNCTION);
+        push(ContextStack.FUNCTION);
         var name = declaration.getName();
         var params = declaration.getParams();
         var body = declaration.getBody();
         Object init = env.init(name.string(), FunValue.of(name, params, body, env));
-        contextStacks.pop();
+        pop(ContextStack.FUNCTION);
         return init;
     }
 
@@ -1041,18 +1011,14 @@ public final class Interpreter implements Visitor<Object> {
     }
 
     Object executeBlock(Expression expression, Environment<Object> environment) {
-        if (expression != null) {
-            callstack.push(expression);
-        }
+        super.push(expression);
         Environment<Object> previous = this.env;
         try {
             this.env = environment;
-            return Visitor.super.visit(expression);
+            return super.visit(expression);
         } finally {
             this.env = previous;
-            if (expression != null) {
-                callstack.pop();
-            }
+            super.pop(expression);
         }
     }
 

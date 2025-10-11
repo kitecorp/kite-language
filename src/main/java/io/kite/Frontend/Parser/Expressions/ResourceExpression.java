@@ -172,7 +172,7 @@ public final class ResourceExpression
 
     @Override
     public Type targetType() {
-        return ResourceType.Resource;
+        return ResourceType.INSTANCE;
     }
 
     @Override

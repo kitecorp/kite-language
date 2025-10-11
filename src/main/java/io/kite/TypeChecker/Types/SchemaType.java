@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class SchemaType extends ReferenceType {
-    public static final ReferenceType Schema = new ReferenceType(SystemType.RESOURCE);
+    public static final SchemaType INSTANCE = new SchemaType("empty");
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -21,6 +21,10 @@ public final class SchemaType extends ReferenceType {
     public SchemaType(String typeName, @Nullable TypeEnvironment env) {
         super(SystemType.SCHEMA, typeName, new TypeEnvironment(env));
         this.instances = new TypeEnvironment();
+    }
+
+    public SchemaType(String typeName) {
+        this(typeName, new TypeEnvironment());
     }
 
     public Type addInstance(@NotNull String fieldName, ResourceType type) {
