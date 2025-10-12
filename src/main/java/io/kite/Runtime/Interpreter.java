@@ -465,6 +465,9 @@ public final class Interpreter extends StackVisitor<Object> {
         switch (value) {
             case SchemaValue schemaValue -> {
                 if (ExecutionContextIn(ForStatement.class)) {
+                    /**
+                     * {@link ForResourceTest#dependsOnEarlyResource()} access computed property in for loop expression without the syntax
+                     */
                     if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
                         return propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
                     }
