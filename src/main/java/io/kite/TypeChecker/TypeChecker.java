@@ -41,6 +41,17 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     public TypeChecker(TypeEnvironment environment) {
         this.env = environment;
+        for (var value : ValueType.values()) {
+            env.init(value.getValue(), value);
+        }
+        for (var value : ReferenceType.values()) {
+            env.init(value.getValue(), value);
+        }
+        env.init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));
+        env.init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
+        env.init("print", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
+        env.init("println", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
+
         this.decoratorInfoMap = new HashMap<>();
         this.decoratorInfoMap.put(SensitiveDecorator.NAME, new SensitiveDecorator());
         this.decoratorInfoMap.put(CountDecorator.NAME, new CountDecorator(this));
@@ -316,7 +327,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         return actualType;
     }
 
-    private Type expect(Type actualType, Type expectedType, Statement actualVal, Expression expectedVal) {
+    private Type expect(Type actualType, Type expectedType, Statement actualVal) {
         if (actualType == ValueType.Null) {
             return expectedType;
         }
@@ -325,7 +336,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
         if (!Objects.equals(actualType, expectedType)) {
             // only evaluate printing if we need to
-            String string = "Expected type " + expectedType + " for value " + printer.visit(expectedVal) + " but got " + actualType + " in expression: " + printer.visit(actualVal);
+            String string = "Expected type " + printer.visit(expectedType) + " but got " + printer.visit(actualType) + " in expression: " + printer.visit(actualVal);
             throw new TypeError(string);
         }
         return actualType;
@@ -525,10 +536,12 @@ public final class TypeChecker extends StackVisitor<Type> {
     @Override
     public Type visit(FunctionDeclaration expression) {
         var params = convertParams(expression.getParams());
-        var funType = new FunType(params.values(), expression.getReturnType().getType());
+        var returnType = expression.getReturnType();
+
+        var funType = new FunType(params.values(), returnType.getType());
         env.init(expression.getName(), funType); // save function signature in env so that we're able to call it later to validate types
 
-        var actualReturn = validateBody(expression.getReturnType().getType(), expression.getBody(), params);
+        var actualReturn = validateBody(returnType.getType(), expression.getBody(), params);
         funType.setReturnType(actualReturn);
         return funType;
     }
@@ -564,7 +577,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var funEnv = new TypeEnvironment(env, collect);
         var actualReturnType = executeBlock(body, funEnv);
 
-        return expect(actualReturnType, returnType, body, returnType);
+        return expect(actualReturnType, returnType, body);
     }
 
     @Override
@@ -638,7 +651,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     @Override
     public Type visit(WhileStatement statement) {
         var condition = visit(statement.getTest());
-        expect(condition, ValueType.Boolean, statement, statement.getTest()); // condition should always be boolean
+        expect(condition, ValueType.Boolean, statement); // condition should always be boolean
         return visit(statement.getBody());
     }
 

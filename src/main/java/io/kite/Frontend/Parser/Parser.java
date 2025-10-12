@@ -129,6 +129,11 @@ public class Parser {
         return Program();
     }
 
+    public List<Statement> produceStatements(List<Token> tokens) {
+        setTokens(tokens);
+        return StatementList(EOF);
+    }
+
     private Program Program() {
         var statements = StatementList(EOF);
         program.setBody(statements);

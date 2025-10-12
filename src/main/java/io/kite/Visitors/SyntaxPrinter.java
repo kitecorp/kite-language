@@ -172,8 +172,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(VarDeclaration expression) {
         var builder = new StringBuilder();
 
-        builder.append(theme.kw("var "))
-                .append(expression.hasType() ? visit(expression.getType()) + " " : "")
+        builder.append(expression.hasType() ? visit(expression.getType()) + " " : "")
                 .append(theme.identifier(expression.getId().string()));
 
         if (expression.hasInit()) {
