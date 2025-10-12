@@ -4,6 +4,7 @@ import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.ComponentStatement;
 import io.kite.Frontend.Parser.Expressions.ResourceExpression;
 import io.kite.TypeChecker.TypeChecker;
+import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
 
@@ -28,7 +29,7 @@ public class CountDecorator extends DecoratorChecker {
         var body = switch (declaration.getTarget()) {
             case ResourceExpression expression -> expression;
             case ComponentStatement statement -> statement;
-            default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
+            default -> throw new TypeError("Unexpected value: " + declaration.getTarget());
         };
 
         return null;

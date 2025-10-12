@@ -84,7 +84,7 @@ public class CountTests extends DecoratorTests {
                 
                 @count(2)
                 resource vm second {
-                    name = vm.main[count].name
+                    name = vm.main.name
                 }
                 """);
         var vm = (SchemaValue) global.get("vm");
