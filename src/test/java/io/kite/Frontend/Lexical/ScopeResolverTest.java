@@ -2,6 +2,7 @@ package io.kite.Frontend.Lexical;
 
 import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.Base.RuntimeTest;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ class ScopeResolverTest extends RuntimeTest {
 
     @Test
     void varNameCollision() {
-        Assertions.assertThrows(ParseError.class, () -> resolve("""
+        Assertions.assertThrows(DeclarationExistsException.class, () -> resolve("""
                 {
                   var a = "first";
                   var a = "second";

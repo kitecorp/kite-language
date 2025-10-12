@@ -29,7 +29,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void empty() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                 
                 }
@@ -40,7 +40,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void singleProperty() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                    number   x  
                 }
@@ -54,7 +54,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void singlePropertyObject() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                    object   x  
                 }
@@ -71,7 +71,7 @@ public class SchemaTest extends CheckerTest {
     @DisplayName("single property object with properties checks if type was correctly parsed")
     void singlePropertyObjectWrontAssignment() {
         Assertions.assertThrows(TypeError.class, () -> {
-            checker.visit(src("""
+            checker.visit(parse("""
                     schema Vm {
                        object   x  = false
                     }
@@ -81,7 +81,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void singlePropertyInit() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                    number    x = 1
                 }
@@ -95,7 +95,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void objectInit() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                    object x = {
                      size: 1
@@ -112,7 +112,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void singlePropertyInitThrows() {
-        Assertions.assertThrows(TypeError.class, () -> checker.visit(src("""
+        Assertions.assertThrows(TypeError.class, () -> checker.visit(parse("""
                 schema Vm {
                    number  x   = true
                 }
@@ -121,7 +121,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void multipleProperty() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                    number x  
                    string y  
@@ -137,7 +137,7 @@ public class SchemaTest extends CheckerTest {
 
     @Test
     void multiplePropertyInit() {
-        var actual = checker.visit(src("""
+        var actual = checker.visit(parse("""
                 schema Vm {
                    number x   = 2
                    string y   = "test"

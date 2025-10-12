@@ -51,7 +51,7 @@ public class OutputTests extends RuntimeTest {
 
 
     protected Object eval(String source) {
-        program = src(source);
+        program = parse(source);
         scopeResolver.resolve(program);
         typeChecker.visit(program);
         return interpreter.visit(program);

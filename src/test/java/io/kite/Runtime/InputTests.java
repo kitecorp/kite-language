@@ -60,7 +60,7 @@ public abstract class InputTests extends RuntimeTest {
     protected abstract @NotNull ChainResolver getChainResolver();
 
     protected Object eval(String source) {
-        program = src(source);
+        program = parse(source);
         scopeResolver.resolve(program);
         chainResolver.visit(program);
         typeChecker.visit(program);

@@ -12,7 +12,7 @@ public class SrcTest extends RuntimeTest {
     }
 
     protected Object eval(String source) {
-        program = super.src(source);        // parse
+        program = super.parse(source);
         scopeResolver.resolve(program);          // resolve block scopes inconsistencies
         checker.visit(program);             // check types
         return interpreter.visit(program);  // interpret

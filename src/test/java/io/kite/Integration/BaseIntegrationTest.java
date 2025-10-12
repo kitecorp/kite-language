@@ -17,4 +17,11 @@ public class BaseIntegrationTest extends RuntimeTest {
     void cleanupChecker() {
         checker = null;
     }
+
+    @Override
+    protected Object eval(String source) {
+        program = super.parse(source);
+        return checker.visit(program);
+    }
+
 }
