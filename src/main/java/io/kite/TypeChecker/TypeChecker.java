@@ -12,8 +12,8 @@ import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.Types.*;
 import io.kite.TypeChecker.Types.Decorators.*;
+import io.kite.Visitors.StackVisitor;
 import io.kite.Visitors.SyntaxPrinter;
-import io.kite.Visitors.Visitor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import static java.text.MessageFormat.format;
 
 @Log4j2
-public final class TypeChecker implements Visitor<Type> {
+public final class TypeChecker extends StackVisitor<Type> {
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
@@ -70,7 +70,7 @@ public final class TypeChecker implements Visitor<Type> {
     @Override
     public Type visit(Expression expression) {
         try {
-            return Visitor.super.visit(expression);
+            return super.visit(expression);
         } catch (NotFoundException | TypeError exception) {
             log.error(exception.getMessage());
             throw exception;
@@ -146,12 +146,14 @@ public final class TypeChecker implements Visitor<Type> {
     }
 
     private Type executeBlock(Statement statement, TypeEnvironment environment) {
+        push(statement);
         TypeEnvironment previous = this.env;
         try {
             this.env = environment;
             return visit(statement);
         } finally {
             this.env = previous;
+            pop(statement);
         }
     }
 
