@@ -1,10 +1,6 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Lexer.Tokenizer;
-import io.kite.Frontend.Lexical.ScopeResolver;
-import io.kite.Frontend.Parser.Parser;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeChecker;
@@ -45,16 +41,9 @@ public abstract class InputTests extends RuntimeTest {
 
     @Override
     protected void init() {
-        this.global = new Environment<>();
-        this.global.setName("global");
-        this.parser = new Parser();
-        this.tokenizer = new Tokenizer();
+        super.init();
         this.typeChecker = new TypeChecker();
-        Environment<Object> inputs = new Environment<>(global);
-        inputs.setName("inputs");
         this.chainResolver = getChainResolver();
-        this.scopeResolver = new ScopeResolver();
-        this.interpreter = new Interpreter(global);
     }
 
     protected abstract @NotNull ChainResolver getChainResolver();

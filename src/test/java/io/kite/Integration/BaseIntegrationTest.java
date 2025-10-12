@@ -1,27 +1,31 @@
 package io.kite.Integration;
 
 import io.kite.Base.RuntimeTest;
+import io.kite.Runtime.Inputs.ChainResolver;
 import io.kite.TypeChecker.TypeChecker;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 public class BaseIntegrationTest extends RuntimeTest {
-    protected TypeChecker checker;
+    protected TypeChecker typeChecker;
+    protected ChainResolver chainResolver;
 
-    @BeforeEach
-    void setUpChecker() {
-        checker = new TypeChecker();
+    @Override
+    protected void init() {
+        super.init();
+        typeChecker = new TypeChecker();
+        chainResolver = new ChainResolver();
     }
 
     @AfterEach
     void cleanupChecker() {
-        checker = null;
+        typeChecker = null;
     }
 
-    @Override
     protected Object eval(String source) {
-        program = super.parse(source);
-        return checker.visit(program);
+        program = parse(source);
+        scopeResolver.resolve(program);
+        chainResolver.visit(program);
+        typeChecker.visit(program);
+        return interpreter.visit(program);
     }
-
 }

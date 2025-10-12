@@ -32,6 +32,12 @@ public class Environment<T> implements IEnvironment<T> {
         this.variables = new HashMap<>(8);
     }
 
+    public Environment(String name, @Nullable Environment<T> parent) {
+        this.parent = parent;
+        this.variables = new HashMap<>(8);
+        this.name = name;
+    }
+
     public Environment(@Nullable Environment<T> parent, Map<String, T> variables) {
         this(parent);
         this.variables.putAll(variables);
@@ -56,6 +62,10 @@ public class Environment<T> implements IEnvironment<T> {
 
     public Environment() {
         this(new HashMap<>());
+    }
+    public Environment(String name) {
+        this(new HashMap<>());
+        this.name = name;
     }
 
     public static <T> Environment<T> copyOfVariables(Environment<T> environment) {

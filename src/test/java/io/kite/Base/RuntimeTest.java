@@ -18,7 +18,7 @@ public class RuntimeTest {
     protected ScopeResolver scopeResolver;
     protected Program program;
     protected SyntaxPrinter printer = new SyntaxPrinter();
-    protected Environment<Object> global = new Environment<>();
+    protected Environment<Object> global;
 
     @BeforeEach
     void reset() {
@@ -27,7 +27,7 @@ public class RuntimeTest {
     }
 
     protected void init() {
-        global.setName("global");
+        this.global = new Environment<>("global");
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();
         this.scopeResolver = new ScopeResolver();
