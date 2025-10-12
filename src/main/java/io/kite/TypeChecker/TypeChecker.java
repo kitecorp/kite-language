@@ -464,7 +464,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             }
             return lookup;
         }
-        throw new OperationNotImplementedException("Membership expression not implemented for: " + expression.getObject());
+        throw new OperationNotImplementedException("Membership expression not implemented for: " + printer.visit(expression));
     }
 
     private @NotNull Type accessMemberType(MemberExpression expression, String resourceName, ObjectType objectType) {
