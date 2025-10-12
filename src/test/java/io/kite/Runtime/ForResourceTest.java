@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("For loop resources")
 public class ForResourceTest extends RuntimeTest {
     @Test
-    @DisplayName("Resolve var name using NO quotes string interpolation inside if statement")
+    @DisplayName("Resolve var name using inside a loop")
     void testForReturnsResourceNestedVar() {
         var res = eval("""
                 schema vm {
@@ -379,7 +379,6 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm cidr {
                       name     = vm.vpc.name
                     }
-                
                 }
                 """);
 

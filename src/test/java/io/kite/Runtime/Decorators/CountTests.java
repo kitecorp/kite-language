@@ -4,12 +4,14 @@ import io.kite.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
  * All the tests from print but with added sensitive values.
  */
 @Log4j2
+@DisplayName("TypeChecker @count")
 public class CountTests extends DecoratorTests {
 
     @Test
