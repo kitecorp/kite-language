@@ -26,8 +26,36 @@ public final class FunType extends Type {
         setValue(name());
     }
 
-    public static Object from(Collection<Type> params, Type type) {
+    public static FunType fun(Collection<Type> params, Type type) {
         return new FunType(params, type);
+    }
+
+    public static FunType fun(Type returnType, Type... params) {
+        return new FunType(List.of(params), returnType);
+    }
+
+    public static FunType fun(@NotBlank String symbol) {
+        var funSplit = StringUtils.split(symbol, "->");
+        Type returnType = null;
+        Collection<Type> paramsType = new ArrayList<>();
+        if (funSplit.length == 2) {
+            returnType = TypeFactory.fromString(funSplit[1]);
+            paramsType = typesBetweenParantheses(funSplit[0]);
+        } else if (funSplit.length == 1) {
+            paramsType = typesBetweenParantheses(funSplit[0]);
+        }
+        return new FunType(paramsType, returnType);
+    }
+
+    private static List<Type> typesBetweenParantheses(String funSplit) {
+        String substring = StringUtils.substringBetween(funSplit, "(", ")");
+        if (substring.isEmpty()) {
+            return List.of();
+        }
+        var split = substring.split(",");
+        return Arrays.stream(split)
+                .map(TypeFactory::fromString)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -79,31 +107,6 @@ public final class FunType extends Type {
 
     public String getName() {
         return name();
-    }
-
-
-    public static FunType valueOf(@NotBlank String symbol) {
-        var funSplit = StringUtils.split(symbol, "->");
-        Type returnType = null;
-        Collection<Type> paramsType = new ArrayList<>();
-        if (funSplit.length == 2) {
-            returnType = TypeFactory.fromString(funSplit[1]);
-            paramsType = typesBetweenParantheses(funSplit[0]);
-        } else if (funSplit.length == 1) {
-            paramsType = typesBetweenParantheses(funSplit[0]);
-        }
-        return new FunType(paramsType, returnType);
-    }
-
-    private static List<Type> typesBetweenParantheses(String funSplit) {
-        String substring = StringUtils.substringBetween(funSplit, "(", ")");
-        if (substring.isEmpty()) {
-            return List.of();
-        }
-        var split = substring.split(",");
-        return Arrays.stream(split)
-                .map(TypeFactory::fromString)
-                .collect(Collectors.toList());
     }
 
 }

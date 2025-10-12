@@ -3,9 +3,11 @@ package io.kite.Runtime;
 import io.kite.ContextStack;
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
+import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
 import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
@@ -53,6 +55,7 @@ public final class Interpreter extends StackVisitor<Object> {
     private final Map<String, DecoratorInterpreter> decorators;
     @Getter
     private final List<RuntimeException> errors;
+    Parser parser = new Parser();
     @Getter
     private Environment<Object> env;
 
@@ -199,8 +202,16 @@ public final class Interpreter extends StackVisitor<Object> {
             var hops = peek(ContextStack.Resource) ? 1 : 0;
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
-                var value = env.lookup(interpolationVar, hops);
-                values.add(value.toString());
+                if (interpolationVar.contains(".") || interpolationVar.contains("[")) { // complex interpolation ${vm.resourceName.property}
+                    var list = parser.produceStatements(new Tokenizer().tokenize(interpolationVar));
+                    for (Statement statement : list) {
+                        values.add(visit(statement).toString());
+                    }
+                } else { // normal variables ${variable}
+                    var value = env.lookup(interpolationVar, hops);
+                    values.add(value.toString());
+                }
+
             }
             return expression.getInterpolatedString(values);
         }
@@ -476,6 +487,13 @@ public final class Interpreter extends StackVisitor<Object> {
                 }
             }
             case ResourceValue resourceValue -> {
+                if (ExecutionContextIn(StringLiteral.class)) {
+                    /**
+                     * if doing complex string interpolation and try to access resource property
+                     * {@link io.kite.Integration.ResourceStringInterpolation#stringInterpolationMemberAccess()}
+                     * */
+                    return resourceValue.lookup(propertyName);
+                }
                 // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
                 // Since that environment points to the parent(type env) it will also find the properties
                 if (expression.getObject() instanceof MemberExpression memberExpression) {
@@ -658,7 +676,7 @@ public final class Interpreter extends StackVisitor<Object> {
     @Override
     public Object visit(ForStatement statement) {
         try {
-           push(statement);
+            push(statement);
             if (statement.hasRange()) {
                 return ForWithRange(statement);
             } else if (statement.hasArray()) {

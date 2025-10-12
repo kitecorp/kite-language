@@ -11,7 +11,7 @@ public class TypeFactory {
             if (fun != null) {
                 return fun;
             } else {
-                funStore.setFun(symbol, FunType.valueOf(symbol));
+                funStore.setFun(symbol, FunType.fun(symbol));
                 return funStore.getFun(symbol);
             }
         }
@@ -34,5 +34,9 @@ public class TypeFactory {
             }
         }
         return new ReferenceType(string);
+    }
+
+    public static Type add(FunType funType) {
+        return funStore.setFun(funType);
     }
 }

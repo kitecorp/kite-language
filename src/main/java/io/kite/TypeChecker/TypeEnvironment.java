@@ -33,13 +33,5 @@ public class TypeEnvironment extends Environment<Type> {
 
     public TypeEnvironment() {
         super();
-        for (var value : ValueType.values()) {
-            init(value.getValue(), value);
-        }
-        for (var value : ReferenceType.values()) {
-            init(value.getValue(), value);
-        }
-        init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));
-        init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
     }
 }
