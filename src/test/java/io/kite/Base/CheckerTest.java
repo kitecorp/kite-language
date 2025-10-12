@@ -23,7 +23,7 @@ public class CheckerTest extends ParserTest {
 
     @Override
     protected Object eval(String source) {
-        program = super.src(source);
+        program = super.parse(source);
         return checker.visit(program);
     }
 

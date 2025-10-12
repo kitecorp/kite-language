@@ -12,7 +12,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void incrementInt() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = 1
                     ++x
@@ -23,7 +23,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void decrementInt() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = 1
                     --x
@@ -34,7 +34,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void incrementDecimal() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = 1.1
                     ++x
@@ -45,7 +45,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void decrementDecimal() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = 1.1
                     --x
@@ -56,7 +56,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void unaryMinus() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = 1
                     -x
@@ -67,7 +67,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void unaryMinusDecimal() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = 1.5
                     -x
@@ -78,7 +78,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void notFalse() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = false
                     !x 
@@ -89,7 +89,7 @@ public class UnaryTest extends CheckerTest {
 
     @Test
     void notTrue() {
-        var res = checker.visit(src("""
+        var res = checker.visit(parse("""
                 {
                     var x = true
                     !x 

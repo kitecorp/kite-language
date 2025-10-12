@@ -5,6 +5,7 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.Visitor;
 import org.jetbrains.annotations.NotNull;
@@ -456,7 +457,7 @@ public final class ScopeResolver implements Visitor<Void> {
         Map<Identifier, Boolean> scope = scopes.peek();
 
         if (scope.containsKey(name)) {
-            throw ParserErrors.error("Already a variable with this name in this scope: " + name.string());
+            throw new DeclarationExistsException("Already a variable with this name in this scope: " + name.string());
         }
 
         scope.put(name, false);

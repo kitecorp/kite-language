@@ -105,7 +105,7 @@ public class FunTest extends RuntimeTest {
 
     @Test
     void funBodyOverlappingWithParam() {
-        Assertions.assertThrows(DeclarationExistsException.class, () -> interpret("""
+        Assertions.assertThrows(DeclarationExistsException.class, () -> eval("""
                 fun sqrt(number x){
                    var x = 3
                    x*x

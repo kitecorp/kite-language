@@ -41,13 +41,9 @@ public class RuntimeTest {
     }
 
     protected Object eval(String source) {
-        program = src(source);
+        program = parse(source);
         scopeResolver.resolve(program);
         return interpreter.visit(program);
-    }
-
-    protected Object interpret(String source) {
-        return interpreter.visit(parser.produceAST(tokenizer.tokenize(source)));
     }
 
     protected Object resolve(String source) {
@@ -55,11 +51,7 @@ public class RuntimeTest {
         return null;
     }
 
-    protected Object parse(String source) {
-        return parser.produceAST(tokenizer.tokenize(source));
-    }
-
-    protected Program src(String source) {
+    protected Program parse(String source) {
         return parser.produceAST(tokenizer.tokenize(source));
     }
 
