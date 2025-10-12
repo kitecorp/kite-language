@@ -425,44 +425,54 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(MemberExpression expression) {
-        if (expression.getProperty() instanceof SymbolIdentifier resourceName) {
-            var value = executeBlock(expression.getObject(), env);
-            // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
-            // Since that environment points to the parent(type env) it will also find the properties
-            return switch (value) {
-                case SchemaType schemaType -> {// vm.main -> if user references the schema we search for the instances of those schemas
-                    var res = CycleDetectionSupport.propertyOrDeferred(schemaType.getInstances().getVariables(), resourceName.string());
-                    if (res instanceof Deferred deferred) {
-                        yield new AnyType(deferred);
-                    } else {
-                        yield (Type) res;
+        switch (expression.getProperty()) {
+            case SymbolIdentifier resourceName -> {
+                var value = executeBlock(expression.getObject(), env);
+                // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
+                // Since that environment points to the parent(type env) it will also find the properties
+                return switch (value) {
+                    case SchemaType schemaType -> {// vm.main -> if user references the schema we search for the instances of those schemas
+                        var res = CycleDetectionSupport.propertyOrDeferred(schemaType.getInstances().getVariables(), resourceName.string());
+                        if (res instanceof Deferred deferred) {
+                            yield new AnyType(deferred);
+                        } else {
+                            yield (Type) res;
+                        }
+                    }
+                    case ResourceType resourceType -> {
+                        try {
+                            yield resourceType.lookup(resourceName.string());
+                        } catch (NotFoundException e) {
+                            throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
+                        }
+                    }
+                    case ObjectType objectType -> accessMemberType(expression, resourceName.string(), objectType);
+                    case null, default -> value;
+                };
+                // else it could be a resource or any other type like a NumericLiteral or something else
+            }
+            case StringLiteral stringLiteral -> {
+                var value = executeBlock(expression.getObject(), env);
+                switch (value) {
+                    case ObjectType objectType -> {
+                        return accessMemberType(expression, stringLiteral.getValue(), objectType);
+                    }
+                    case null, default -> {
                     }
                 }
-                case ResourceType resourceType -> {
-                    try {
-                        yield resourceType.lookup(resourceName.string());
-                    } catch (NotFoundException e) {
-                        throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
-                    }
+                Type lookup = env.lookup(stringLiteral.getValue());
+                if (lookup == null) {
+                    throw new TypeError("Property '" + stringLiteral.getValue() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
                 }
-                case ObjectType objectType -> accessMemberType(expression, resourceName.string(), objectType);
-                case null, default -> value;
-            };
-            // else it could be a resource or any other type like a NumericLiteral or something else
-        } else if (expression.getProperty() instanceof StringLiteral stringLiteral) {
-            var value = executeBlock(expression.getObject(), env);
-            switch (value) {
-                case ObjectType objectType -> {
-                    return accessMemberType(expression, stringLiteral.getValue(), objectType);
-                }
-                case null, default -> {
+                return lookup;
+            }
+            case NumberLiteral numberLiteral -> {
+                if (expression.isComputed()) {
+
                 }
             }
-            Type lookup = env.lookup(stringLiteral.getValue());
-            if (lookup == null) {
-                throw new TypeError("Property '" + stringLiteral.getValue() + "' not found on object: " + printer.visit(expression.getObject()) + " in expression: " + printer.visit(expression));
+            case null, default -> {
             }
-            return lookup;
         }
         throw new OperationNotImplementedException("Membership expression not implemented for: " + printer.visit(expression));
     }
