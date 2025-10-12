@@ -427,9 +427,9 @@ public final class TypeChecker extends StackVisitor<Type> {
                         yield (Type) res;
                     }
                 }
-                case ResourceType iEnvironment -> {
+                case ResourceType resourceType -> {
                     try {
-                        yield iEnvironment.lookup(resourceName.string());
+                        yield resourceType.lookup(resourceName.string());
                     } catch (NotFoundException e) {
                         throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
                     }

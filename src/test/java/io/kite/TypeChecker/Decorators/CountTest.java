@@ -42,7 +42,7 @@ public class CountTest extends CheckerTest {
                 
                 @count(2)
                 resource vm main {
-                    name = vm.something[count].name
+                    name = vm.something.name
                 }
                 """);
     }
@@ -59,7 +59,7 @@ public class CountTest extends CheckerTest {
                 
                 @count(2)
                 resource vm main {
-                    name = vm.something[count].name
+                    name = vm.something.name
                 }
                 """);
     }
