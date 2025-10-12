@@ -73,7 +73,7 @@ public class CountTests extends DecoratorTests {
     }
 
     @Test
-    void countResourceDependency() {
+    void countResourceDependencyImplicitIndex() {
         eval("""
                 schema vm { string name }
                 
