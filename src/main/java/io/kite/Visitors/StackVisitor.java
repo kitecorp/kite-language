@@ -2,7 +2,6 @@ package io.kite.Visitors;
 
 import io.kite.ContextStack;
 import io.kite.Frontend.Parser.Expressions.Callstack;
-import io.kite.Frontend.Parser.Statements.ForStatement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -20,7 +19,7 @@ public abstract non-sealed class StackVisitor<R> implements Visitor<R> {
         this.contextStacks = new ArrayDeque<>();
     }
 
-    protected boolean ExecutionContextIn(Class<ForStatement> forStatementClass) {
+    protected boolean ExecutionContextIn(Class<?> forStatementClass) {
         for (Callstack next : callstack) {
             if (next.getClass().equals(forStatementClass)) {
                 return true;

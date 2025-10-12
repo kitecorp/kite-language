@@ -71,6 +71,36 @@ public class CountTests extends DecoratorTests {
     }
 
     @Test
+    void countResourceDependency() {
+        eval("""
+                schema vm { string name }
+                
+                @count(2)
+                resource vm main {
+                    name = "main-${count}"
+                }
+                
+                @count(2)
+                resource vm second {
+                    name = vm.main[count].name
+                }
+                """);
+        var vm = (SchemaValue) global.get("vm");
+        var main0 = vm.getInstance("main[0]");
+        var main1 = vm.getInstance("main[1]");
+        Assertions.assertNotNull(main0);
+        Assertions.assertNotNull(main1);
+        Assertions.assertEquals("main-0", main0.get("name"));
+        Assertions.assertEquals("main-1", main1.get("name"));
+        var second0 = vm.getInstance("second[0]");
+        var second1 = vm.getInstance("second[1]");
+        Assertions.assertNotNull(second0);
+        Assertions.assertNotNull(second1);
+        Assertions.assertEquals("main-0", second0.get("name"));
+        Assertions.assertEquals("main-1", second1.get("name"));
+    }
+
+    @Test
     @Disabled("not implemented")
     void countComponent() {
         eval("""
