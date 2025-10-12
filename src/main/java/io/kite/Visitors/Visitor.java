@@ -5,7 +5,7 @@ import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
-import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.Runtime.Inputs.InputChainResolver;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public sealed interface Visitor<R>
-        permits ScopeResolver, ChainResolver, StackVisitor, SyntaxPrinter {
+        permits ScopeResolver, InputChainResolver, StackVisitor, SyntaxPrinter {
 
     default R visit(@Nullable Expression expr) {
         return switch (expr) {
