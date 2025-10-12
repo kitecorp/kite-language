@@ -20,4 +20,20 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
                         main()
                 """);
     }
+
+    @Test
+    void interpolationOfCount() {
+        var x = eval("""
+                    schema vm { string name; number size; }
+                
+                    @count(2)
+                    resource vm main {
+                        name = "main-property-${count}"
+                        size = 1
+                    }
+                
+                    var x = vm.main[0].name
+                """);
+        System.out.println(x);
+    }
 }
