@@ -467,9 +467,10 @@ public final class TypeChecker extends StackVisitor<Type> {
                 return lookup;
             }
             case NumberLiteral numberLiteral -> {
-                if (expression.isComputed()) {
-
+                if (expression.isComputed()) { // we just forward it again to the next call. Skip basically
+                    return executeBlock(expression.getObject(), env);
                 }
+                return executeBlock(expression.getObject(), env);
             }
             case null, default -> {
             }

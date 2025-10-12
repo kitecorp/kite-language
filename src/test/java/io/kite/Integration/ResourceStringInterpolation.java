@@ -1,5 +1,6 @@
 package io.kite.Integration;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ResourceStringInterpolation extends BaseIntegrationTest {
@@ -23,7 +24,7 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
 
     @Test
     void interpolationOfCount() {
-        var x = eval("""
+        eval("""
                     schema vm { string name; number size; }
                 
                     @count(2)
@@ -33,7 +34,9 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
                     }
                 
                     var x = vm.main[0].name
+                    var y = vm.main[1].name
                 """);
-        System.out.println(x);
+        Assertions.assertEquals("main-property-0", interpreter.getEnv().get("x"));
+        Assertions.assertEquals("main-property-1", interpreter.getEnv().get("y"));
     }
 }

@@ -175,7 +175,8 @@ public final class Interpreter extends StackVisitor<Object> {
         }
         try {
             return env.lookup(expression.string(), expression.getHops());
-        } catch (NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
+        } catch (
+                NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
             return env.lookup(expression.string(), 0);
         }
     }
@@ -475,10 +476,10 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(MemberExpression expression) {
-        var propertyName = getSymbolIdentifier(expression);
         var value = executeBlock(expression.getObject(), env);
         switch (value) {
             case SchemaValue schemaValue -> {
+                var propertyName = getSymbolIdentifier(expression);
                 if (ExecutionContextIn(ForStatement.class)) {
                     /**
                      * {@link ForResourceTest#dependsOnEarlyResource()} access computed property in for loop expression without the syntax
@@ -491,6 +492,7 @@ public final class Interpreter extends StackVisitor<Object> {
                 }
             }
             case ResourceValue resourceValue -> {
+                var propertyName = getSymbolIdentifier(expression);
                 if (ExecutionContextIn(StringLiteral.class)) {
                     /**
                      * if doing complex string interpolation and try to access resource property
@@ -506,7 +508,18 @@ public final class Interpreter extends StackVisitor<Object> {
                 return resourceValue.lookup(propertyName);
             }
             case Map<?, ?> map -> {
+                var propertyName = getSymbolIdentifier(expression);
                 return map.get(propertyName);
+            }
+            case Deferred deferred -> {
+                if (expression.isComputed()) {
+                    if (expression.getObject() instanceof MemberExpression memberExpression) {
+                    var key = executeBlock(expression.getProperty(), env);
+                        var x = deferred.resource() + "[" + key + "]"; // number or string
+                        memberExpression.setProperty(SymbolIdentifier.id(x));
+                        return visit(memberExpression);
+                    }
+                }
             }
             case null, default -> {
             }
