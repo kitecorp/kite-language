@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public non-sealed class ChainResolver extends InputResolver implements Visitor<Object> {
+public non-sealed class InputChainResolver extends InputResolver implements Visitor<Object> {
     private final Tokenizer tokenizer;
     private final Parser parser;
-    private List<InputResolver> resolvers;
-    private SyntaxPrinter printer = new SyntaxPrinter(new PlainTheme());
+    private final List<InputResolver> resolvers;
+    private final SyntaxPrinter printer = new SyntaxPrinter(new PlainTheme());
 
-    public ChainResolver() {
+    public InputChainResolver() {
         this.resolvers = List.of(
                 new InputsFilesResolver(),
                 new EnvResolver(),
@@ -37,7 +37,7 @@ public non-sealed class ChainResolver extends InputResolver implements Visitor<O
         this.parser = new Parser();
     }
 
-    public ChainResolver(List<InputResolver> resolvers) {
+    public InputChainResolver(List<InputResolver> resolvers) {
         this.resolvers = resolvers;
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();

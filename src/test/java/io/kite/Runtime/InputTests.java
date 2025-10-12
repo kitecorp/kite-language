@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.Runtime.Inputs.InputChainResolver;
 import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 @Log4j2
 public abstract class InputTests extends RuntimeTest {
-    private ChainResolver chainResolver;
+    private InputChainResolver inputChainResolver;
     private TypeChecker typeChecker;
 
     protected abstract void setInput(String input);
@@ -43,15 +43,15 @@ public abstract class InputTests extends RuntimeTest {
     protected void init() {
         super.init();
         this.typeChecker = new TypeChecker();
-        this.chainResolver = getChainResolver();
+        this.inputChainResolver = getChainResolver();
     }
 
-    protected abstract @NotNull ChainResolver getChainResolver();
+    protected abstract @NotNull InputChainResolver getChainResolver();
 
     protected Object eval(String source) {
         program = parse(source);
         scopeResolver.resolve(program);
-        chainResolver.visit(program);
+        inputChainResolver.visit(program);
         typeChecker.visit(program);
         return interpreter.visit(program);
     }

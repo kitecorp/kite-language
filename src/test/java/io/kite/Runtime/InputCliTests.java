@@ -1,6 +1,6 @@
 package io.kite.Runtime;
 
-import io.kite.Runtime.Inputs.ChainResolver;
+import io.kite.Runtime.Inputs.InputChainResolver;
 import io.kite.Runtime.Inputs.CliResolver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -46,8 +46,8 @@ public class InputCliTests extends InputTests {
     }
 
     @Override
-    protected @NotNull ChainResolver getChainResolver() {
-        return new ChainResolver(List.of(new CliResolver()));
+    protected @NotNull InputChainResolver getChainResolver() {
+        return new InputChainResolver(List.of(new CliResolver()));
     }
 
 
