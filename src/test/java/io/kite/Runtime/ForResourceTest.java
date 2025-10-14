@@ -474,6 +474,25 @@ public class ForResourceTest extends RuntimeTest {
         assertEquals("prod", schema.findInstance("""
                 main["test"]""").get("name"));
     }
+    @Test
+    @DisplayName("Print list of resources")
+    void printListOfResources() {
+        var res = eval("""
+                schema vm {
+                   string name
+                }
+                resource vm main {
+                      name     = "main"
+                }
+                resource vm second {
+                      name     = "second"
+                }
+                
+                for it in [vm.main, vm.second] {
+                    println(it)
+                }
+                """);
+    }
 
     @Test
     @DisplayName("Create multiple resources in a loop by string interpolation")
