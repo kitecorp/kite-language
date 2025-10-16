@@ -485,7 +485,20 @@ public final class Interpreter extends StackVisitor<Object> {
                      * {@link ForResourceTest#dependsOnEarlyResource()} access computed property in for loop expression without the syntax
                      */
                     if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
-                        return propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
+                        /**
+                         * in a loop (or @count) we try to access an equivalent resource without using the index.
+                         * If nothing is found we might access the resource that is not an array
+                         * {@link CountTests#countResourceDependencyIndex()}
+                         * */
+                        var res = propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
+                        if (res == null) {
+                            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+                        } else {
+                            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+//                            return res;
+                        }
+                    } else {
+                        return propertyOrDeferred(schemaValue.getInstances(), propertyName);
                     }
                 } else {
                     return propertyOrDeferred(schemaValue.getInstances(), propertyName);
@@ -514,7 +527,7 @@ public final class Interpreter extends StackVisitor<Object> {
             case Deferred deferred -> {
                 if (expression.isComputed()) {
                     if (expression.getObject() instanceof MemberExpression memberExpression) {
-                    var key = executeBlock(expression.getProperty(), env);
+                        var key = executeBlock(expression.getProperty(), env);
                         var x = deferred.resource() + "[" + key + "]"; // number or string
                         memberExpression.setProperty(SymbolIdentifier.id(x));
                         return visit(memberExpression);
