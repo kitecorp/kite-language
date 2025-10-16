@@ -12,6 +12,7 @@ public abstract sealed class Identifier extends Expression
     @Setter
     @Getter
     private Integer hops; // used to figure out the scope without creating extra classes
+    private Cardinality cardinality;
 
     public Identifier() {
     }
