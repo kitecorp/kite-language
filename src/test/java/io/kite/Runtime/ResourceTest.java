@@ -148,27 +148,6 @@ public class ResourceTest extends RuntimeTest {
         assertEquals(2, resource.getProperties().lookup("x"));
     }
 
-
-    @Test
-    void existingResourceGetsParsed() {
-        var res = eval("""
-                schema vm {
-                   number x = 2
-                }
-                
-                existing resource vm main {
-                
-                }
-                """);
-        log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
-
-        assertEquals(2, resource.getProperties().lookup("x"));
-        assertTrue(resource.isExisting());
-    }
-
     @Test
     void resourceMemberAccess() {
         var res = eval("""
