@@ -484,13 +484,13 @@ public final class Interpreter extends StackVisitor<Object> {
                     /**
                      * {@link ForResourceTest#dependsOnEarlyResource()} access computed property in for loop expression without the syntax
                      */
-                    if (ExecutionContext(ResourceExpression.class) instanceof ResourceExpression resourceExpression) {
+                    if (ExecutionContext(ResourceStatement.class) instanceof ResourceStatement resourceStatement) {
                         /**
                          * in a loop (or @count) we try to access an equivalent resource without using the index.
                          * If nothing is found we might access the resource that is not an array
                          * {@link CountTests#countResourceDependencyIndex()}
                          * */
-                        var res = propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceExpression.getIndex()));
+                        var res = propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceStatement.getIndex()));
                         if (res == null) {
                             return propertyOrDeferred(schemaValue.getInstances(), propertyName);
                         } else {
@@ -550,7 +550,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     @Override
-    public Object visit(ResourceExpression resource) {
+    public Object visit(ResourceStatement resource) {
         if (resource.counted()) {
             return resource;
         }
@@ -580,7 +580,7 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
-    private void validate(ResourceExpression resource) {
+    private void validate(ResourceStatement resource) {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
         }
@@ -589,7 +589,7 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
-    private void setResourceName(ResourceExpression resource) {
+    private void setResourceName(ResourceStatement resource) {
         if (ExecutionContext(ForStatement.class) instanceof ForStatement forStatement) {
             Object visit = visit(forStatement.getItem());
             switch (visit) {
@@ -607,11 +607,11 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
-    private ResourceValue initResource(ResourceExpression resource, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
+    private ResourceValue initResource(ResourceStatement resource, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.isExisting());
+        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.getExisting());
         try {
             // init any kind of new resource
             installedSchema.initInstance(res);
@@ -622,7 +622,7 @@ public final class Interpreter extends StackVisitor<Object> {
         return res;
     }
 
-    private ResourceValue detectCycle(ResourceExpression resource, ResourceValue instance) {
+    private ResourceValue detectCycle(ResourceStatement resource, ResourceValue instance) {
         resource.setEvaluated(true);
         resource.setEvaluating(false);
         for (Statement it : resource.getArguments()) {
@@ -642,7 +642,7 @@ public final class Interpreter extends StackVisitor<Object> {
         return instance;
     }
 
-    private void detectCycle(ResourceExpression resource, ResourceValue instance, Object it) {
+    private void detectCycle(ResourceStatement resource, ResourceValue instance, Object it) {
         switch (it) {
             case Deferred deferred -> {
                 instance.addDependency(deferred.resource());

@@ -2,7 +2,7 @@ package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
-import io.kite.Frontend.Parser.Expressions.ResourceExpression;
+import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Frontend.Parser.Factory;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
@@ -97,7 +97,7 @@ public class DecoratorTest extends ParserTest {
                 """);
         var program = program(
                 expressionStatement(annotation("annotation")),
-                ResourceExpression.resource(type("vm"), symbol("something"), Set.of(annotation("annotation")), block())
+                ResourceStatement.resource(type("vm"), symbol("something"), Set.of(annotation("annotation")), block())
         );
         Assertions.assertEquals(program, res);
     }

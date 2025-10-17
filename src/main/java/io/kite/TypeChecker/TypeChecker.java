@@ -697,7 +697,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     @Override
-    public Type visit(ResourceExpression resource) {
+    public Type visit(ResourceStatement resource) {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + resourceName(resource));
         }

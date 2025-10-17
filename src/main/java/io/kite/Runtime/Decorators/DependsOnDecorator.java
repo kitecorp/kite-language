@@ -3,7 +3,7 @@ package io.kite.Runtime.Decorators;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parser.Expressions.MemberExpression;
-import io.kite.Frontend.Parser.Expressions.ResourceExpression;
+import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Runtime.Interpreter;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class DependsOnDecorator extends DecoratorInterpreter {
     }
 
     private @NotNull Set<Expression> registerDependency(AnnotationDeclaration declaration, Set<Expression> visit) {
-        var resource = (ResourceExpression) declaration.getTarget();
+        var resource = (ResourceStatement) declaration.getTarget();
         resource.setDependencies(visit);
         return resource.getDependencies();
     }

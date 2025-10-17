@@ -192,7 +192,7 @@ public class Parser {
                     setTarget(annotations, res);
                     yield res;
                 }
-                case Existing, Resource -> {
+                case Resource -> {
                     var res = ResourceDeclaration(annotations);
                     setTarget(annotations, res);
                     yield res;
@@ -327,7 +327,7 @@ public class Parser {
         eatWhitespace();
 
         Statement body = null;
-        if (IsLookAhead(Resource, Existing)) {
+        if (IsLookAhead(Resource)) {
             body = ResourceDeclaration(Set.of());
         } else {
             body = ForBody();
@@ -1282,22 +1282,19 @@ public class Parser {
      * : '}'
      * ;
      */
-    private ResourceExpression ResourceDeclaration(Set<AnnotationDeclaration> annotations) {
+    private ResourceStatement ResourceDeclaration(Set<AnnotationDeclaration> annotations) {
         if (inContext(ContextStack.FUNCTION)) {
             throw ParserErrors.error("Resource type not allowed in function body: ", lookAhead(), lookAhead().type());
         }
-        boolean existing = false;
-        if (IsLookAhead(Existing)) {
-            eat(Existing);
-            existing = true;
-        }
+
         eat(Resource);
         var type = typeParser.TypeIdentifier();
         Expression name = resourceSymbol(type);
         contextStack.push(ContextStack.Resource);
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
         contextStack.pop();
-        return ResourceExpression.resource(annotations, existing, type, name, (BlockExpression) body);
+        boolean existing = annotations.contains(annotation("existing"));
+        return ResourceStatement.resource(annotations, existing, type, name, (BlockExpression) body);
     }
 
     private boolean inContext(ContextStack stack) {

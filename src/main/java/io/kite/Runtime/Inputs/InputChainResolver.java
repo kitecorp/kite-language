@@ -346,7 +346,7 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     }
 
     @Override
-    public Object visit(ResourceExpression expression) {
+    public Object visit(ResourceStatement expression) {
         return null;
     }
 }

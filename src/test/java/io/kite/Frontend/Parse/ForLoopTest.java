@@ -17,7 +17,7 @@ import static io.kite.Frontend.Parser.Expressions.ArrayExpression.array;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
-import static io.kite.Frontend.Parser.Expressions.ResourceExpression.resource;
+import static io.kite.Frontend.Parser.Expressions.ResourceStatement.resource;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;

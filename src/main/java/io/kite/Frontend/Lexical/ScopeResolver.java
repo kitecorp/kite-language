@@ -324,7 +324,7 @@ public final class ScopeResolver implements Visitor<Void> {
     }
 
     @Override
-    public Void visit(ResourceExpression expression) {
+    public Void visit(ResourceStatement expression) {
         beginScope();
         if (expression.getName() != null) {
             switch (expression.getName()){
