@@ -53,7 +53,7 @@ public sealed interface Visitor<R>
 
     default R visit(@Nullable Statement statement) {
         return switch (statement) {
-            case ResourceExpression resourceExpression -> visit(resourceExpression);
+            case ResourceStatement resourceStatement -> visit(resourceStatement);
             case Program program -> visit(program);
             case ExpressionStatement expressionStatement -> visit(expressionStatement);
             case ForStatement forStatement -> visit(forStatement);
@@ -169,9 +169,9 @@ public sealed interface Visitor<R>
      * An instance of a Schema is an Environment!
      * the 'parent' component of the instance environment is set to the class environment making class members accessible
      */
-    R visit(ResourceExpression expression);
+    R visit(ResourceStatement expression);
 
-    default String resourceName(ResourceExpression resource) {
+    default String resourceName(ResourceStatement resource) {
         var resourceName = switch (resource.getName()) {
             case SymbolIdentifier identifier -> identifier.string();
             case StringLiteral literal -> literal.getValue();

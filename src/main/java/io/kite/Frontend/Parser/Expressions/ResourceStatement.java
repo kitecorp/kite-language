@@ -7,10 +7,10 @@ import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
+import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.Runtime.Decorators.Tags;
 import io.kite.Runtime.Decorators.TagsSupport;
 import io.kite.Runtime.Interpreter;
-import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.DecoratorType;
@@ -27,7 +27,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor(staticName = "resource")
-public final class ResourceExpression
+public final class ResourceStatement
         extends Statement
         implements DeferredObserverValue, Annotatable, CountAnnotatable, ProviderSupport, TagsSupport {
     private Identifier type;
@@ -36,7 +36,7 @@ public final class ResourceExpression
     private BlockExpression block;
     private boolean isEvaluated;
     private boolean isEvaluating;
-    private boolean existing;
+    private Object existing;
     private ResourceValue value;
     private Object index;
     private Set<AnnotationDeclaration> annotations;
@@ -45,24 +45,24 @@ public final class ResourceExpression
     private Set<String> providers;
     private Tags tags;
 
-    private ResourceExpression() {
+    private ResourceStatement() {
         this.name = new SymbolIdentifier();
     }
 
-    private ResourceExpression(Identifier type, Identifier name, BlockExpression block) {
+    private ResourceStatement(Identifier type, Identifier name, BlockExpression block) {
         this(false, type, name, block);
     }
 
-    private ResourceExpression(Identifier type, Identifier name, Set<AnnotationDeclaration> annotations, BlockExpression block) {
+    private ResourceStatement(Identifier type, Identifier name, Set<AnnotationDeclaration> annotations, BlockExpression block) {
         this(false, type, name, block);
         this.annotations = annotations;
     }
 
-    private ResourceExpression(boolean existing, Identifier type, Identifier name, BlockExpression block) {
+    private ResourceStatement(Object existing, Identifier type, Identifier name, BlockExpression block) {
         this(existing, type, (Expression) name, block);
     }
 
-    private ResourceExpression(boolean existing, Identifier type, Expression name, BlockExpression block) {
+    private ResourceStatement(Object existing, Identifier type, Expression name, BlockExpression block) {
         this();
         this.type = type;
         this.name = name;
@@ -70,8 +70,8 @@ public final class ResourceExpression
         this.existing = existing;
     }
 
-    public static ResourceExpression resource(ResourceExpression expression) {
-        var copy = new ResourceExpression();
+    public static ResourceStatement resource(ResourceStatement expression) {
+        var copy = new ResourceStatement();
         copy.type = expression.getType();
         copy.name = expression.getName();
         copy.block = expression.getBlock();
@@ -84,16 +84,16 @@ public final class ResourceExpression
         return copy;
     }
 
-    public static ResourceExpression resource(boolean existing,
-                                              Identifier type,
-                                              Expression name,
-                                              BlockExpression block) {
-        return new ResourceExpression(existing, type, name, block);
+    public static ResourceStatement resource(Object existing,
+                                             Identifier type,
+                                             Expression name,
+                                             BlockExpression block) {
+        return new ResourceStatement(existing, type, name, block);
     }
 
     // Convenience: no-arg
     public static Statement resource() {
-        return new ResourceExpression();
+        return new ResourceStatement();
     }
 
     // Convenience: String inputs
@@ -125,28 +125,32 @@ public final class ResourceExpression
         return resource(false, type, (Expression) name, block);
     }
 
-    public static ResourceExpression resource(boolean existing,
-                                              TypeIdentifier type,
-                                              Identifier name,
-                                              BlockExpression block) {
+    public static ResourceStatement resource(boolean existing,
+                                             TypeIdentifier type,
+                                             Identifier name,
+                                             BlockExpression block) {
         return resource(existing, type, (Expression) name, block);
     }
 
     // With annotations + existing + TypeIdentifier + Expression name
-    public static ResourceExpression resource(Set<AnnotationDeclaration> annotations,
-                                              boolean existing,
-                                              TypeIdentifier type,
-                                              Expression name,
-                                              BlockExpression block) {
+    public static ResourceStatement resource(Set<AnnotationDeclaration> annotations,
+                                             boolean existing,
+                                             TypeIdentifier type,
+                                             Expression name,
+                                             BlockExpression block) {
         var res = resource(existing, type, name, block);
         res.setAnnotations(annotations);
         return res;
     }
 
+    public static ResourceStatement resource(String type, String main, BlockExpression block, AnnotationDeclaration... existing) {
+        return new ResourceStatement(TypeIdentifier.type(type), Identifier.id(main), Set.of(existing), block);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResourceExpression that)) return false;
+        if (!(o instanceof ResourceStatement that)) return false;
         if (!super.equals(o)) return false;
         return Objects.equals(getType(), that.getType()) && Objects.equals(getName(), that.getName()) && Objects.equals(getBlock(), that.getBlock());
     }

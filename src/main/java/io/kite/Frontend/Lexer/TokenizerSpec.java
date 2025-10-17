@@ -77,7 +77,6 @@ class TokenizerSpec {
             new Entry("^\\binit\\b", TokenType.Init),
             new Entry("^\\bthis\\b", TokenType.This),
             new Entry("^\\btype\\b", TokenType.Type),
-            new Entry("^\\bexisting\\b", TokenType.Existing),
             new Entry("^\\bresource\\b", TokenType.Resource),
             new Entry("^\\bschema\\b", TokenType.Schema),
             new Entry("^\\bcomponent\\b", TokenType.Component),

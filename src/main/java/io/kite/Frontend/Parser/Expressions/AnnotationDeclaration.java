@@ -12,7 +12,7 @@ import lombok.ToString;
 import java.util.Map;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = "name")
 @AllArgsConstructor(staticName = "annotation")
 public final class AnnotationDeclaration extends Expression {
     private Identifier name;
@@ -21,7 +21,6 @@ public final class AnnotationDeclaration extends Expression {
     private ObjectExpression object; // for object args
     private Map<String, Expression> namedArgs;
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Annotatable target;
 
     public AnnotationDeclaration() {

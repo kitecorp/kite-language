@@ -58,7 +58,6 @@ public enum TokenType {
 
     /******   IAC   *****/
     Resource("resource"),
-    Existing("existing"),
     Component("component"),
 
     /******   Visibility *****/
@@ -189,7 +188,6 @@ public enum TokenType {
             case "var" -> Var;
             case "input" -> Input;
             case "this" -> This;
-            case "existing" -> Existing;
             case "resource" -> Resource;
             case "public" -> Public;
             case "private" -> Private;

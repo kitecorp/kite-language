@@ -4,7 +4,7 @@ import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.SymbolIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.ComponentStatement;
-import io.kite.Frontend.Parser.Expressions.ResourceExpression;
+import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import io.kite.Frontend.Parser.Statements.ForStatement;
 import io.kite.Frontend.Parser.Statements.Statement;
@@ -24,7 +24,7 @@ public class CountDecorator extends NumberDecorator {
         var numberLiteral = (NumberLiteral) declaration.getValue();
         var count = (Integer) interpreter.visit(numberLiteral);
         Statement body = switch (declaration.getTarget()) {
-            case ResourceExpression expression -> expression;
+            case ResourceStatement expression -> expression;
             case ComponentStatement statement -> statement;
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };

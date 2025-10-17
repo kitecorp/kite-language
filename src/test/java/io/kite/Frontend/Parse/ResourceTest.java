@@ -1,13 +1,17 @@
 package io.kite.Frontend.Parse;
 
+import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.Frontend.Parser.Expressions.AnnotationDeclaration.annotation;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.kite.Frontend.Parser.Expressions.ResourceExpression.resource;
-import static io.kite.Frontend.Parser.Factory.*;
+import static io.kite.Frontend.Parser.Expressions.ResourceStatement.resource;
+import static io.kite.Frontend.Parser.Factory.member;
+import static io.kite.Frontend.Parser.Factory.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,13 +50,18 @@ public class ResourceTest extends ParserTest {
     @Test
     void existingResourceWithAssignment() {
         var res = parse("""
-                    existing resource vm main { 
+                    @existing
+                    resource vm main { 
                         name = "main" 
                     }
                 """);
-        var expected = program(resource(true, "vm", "main", block(
-                assign("name", "main")
-        )));
+        AnnotationDeclaration existing = annotation("existing");
+        var expected = program(
+                        ExpressionStatement.expressionStatement(existing),
+                        resource("vm", "main", block(
+                                assign("name", "main")
+                        ), existing)
+        );
         assertEquals(expected, res);
         log.info(res);
     }

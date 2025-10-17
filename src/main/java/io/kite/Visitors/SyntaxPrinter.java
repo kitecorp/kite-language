@@ -405,7 +405,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
-    public String visit(ResourceExpression expression) {
+    public String visit(ResourceStatement expression) {
         return theme.kw("resource ") +
                theme.type(visit(expression.getType())) + " " +
                visit(expression.getName()) + " {\n" +
