@@ -187,9 +187,9 @@ public class ForResourceTest extends RuntimeTest {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                   schema vm { string name }
                   for i in 0..1 {
-                    resource vm a {  name = vm.b[i].name }  // a -> b
+                    resource vm a {  name = vm.b.name }  // a -> b
                 
-                    resource vm b { name = vm.a[i].name }  // b -> a
+                    resource vm b { name = vm.a.name }  // b -> a
                   }
                 """));
     }
