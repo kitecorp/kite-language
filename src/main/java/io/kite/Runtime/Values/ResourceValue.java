@@ -34,11 +34,11 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     private Tags tags;
 
     public ResourceValue() {
-        this(null, null, null, false, null, null);
+        this(null, null, null, null, null, null);
     }
 
     public ResourceValue(String name, Environment<Object> parent) {
-        this(name, parent, null, false, null, null);
+        this(name, parent, null, null, null, null);
     }
 
     public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema) {
