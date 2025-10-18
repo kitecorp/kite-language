@@ -2,10 +2,10 @@ package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
+import io.kite.Visitors.SyntaxPrinter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -16,15 +16,15 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class ExistingDecorator extends DecoratorChecker {
     public static final String NAME = "existing";
-    private final TypeChecker typeChecker;
+    private final SyntaxPrinter printer;
 
-    public ExistingDecorator(TypeChecker typeChecker) {
+    public ExistingDecorator(SyntaxPrinter syntaxPrinter) {
         super(NAME, decorator(
                         List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE)
                 ), Set.of()
         );
-        this.typeChecker = typeChecker;
+        this.printer = syntaxPrinter;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ExistingDecorator extends DecoratorChecker {
                 }
                 var ref = ImportParsers.detect(literal.getValue());
                 if (ref == null) {
-                    throw new TypeError("%s has invalid argument: %s".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(value)));
+                    throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
                 }
 
             }
@@ -80,7 +80,7 @@ public class ExistingDecorator extends DecoratorChecker {
                 }
                 var ref = ImportParsers.detect(string);
                 if (ref == null) {
-                    throw new TypeError("%s has invalid argument: %s".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(value)));
+                    throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
                 }
             }
             default -> throwInvalidArgument(declaration, value);
@@ -90,11 +90,11 @@ public class ExistingDecorator extends DecoratorChecker {
     }
 
     private void throwInvalidArgument(AnnotationDeclaration declaration, Object value) {
-        throw new TypeError("%s has invalid argument: %s".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(value)));
+        throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
     }
 
     private void throwIfInvalidArgs(AnnotationDeclaration declaration) {
-        throw new TypeError("%s must have a non-empty string as argument".formatted(typeChecker.getPrinter().visit(declaration)));
+        throw new TypeError("%s must have a non-empty string as argument".formatted(printer.visit(declaration)));
     }
 
     public static final class ImportParsers {
