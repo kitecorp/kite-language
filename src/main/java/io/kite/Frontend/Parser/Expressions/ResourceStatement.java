@@ -134,7 +134,7 @@ public final class ResourceStatement
 
     // With annotations + existing + TypeIdentifier + Expression name
     public static ResourceStatement resource(Set<AnnotationDeclaration> annotations,
-                                             boolean existing,
+                                             Object existing,
                                              TypeIdentifier type,
                                              Expression name,
                                              BlockExpression block) {

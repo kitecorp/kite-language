@@ -491,11 +491,10 @@ public final class Interpreter extends StackVisitor<Object> {
                          * {@link CountTests#countResourceDependencyIndex()}
                          * */
                         var res = propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceStatement.getIndex()));
-                        if (res == null) {
-                            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+                        if (res != null) {
+                            return res;
                         } else {
                             return propertyOrDeferred(schemaValue.getInstances(), propertyName);
-//                            return res;
                         }
                     } else {
                         return propertyOrDeferred(schemaValue.getInstances(), propertyName);
