@@ -4,10 +4,10 @@ import io.kite.Frontend.Parse.Literals.ObjectLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
-import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
+import io.kite.Visitors.SyntaxPrinter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -17,15 +17,15 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class TagsDecorator extends DecoratorChecker {
     public static final String NAME = "tags";
-    private final TypeChecker typeChecker;
+    private final SyntaxPrinter printer;
 
-    public TagsDecorator(TypeChecker typeChecker) {
+    public TagsDecorator(SyntaxPrinter printer) {
         super(NAME, decorator(
                         List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
                 ), Set.of()
         );
-        this.typeChecker = typeChecker;
+        this.printer = printer;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class TagsDecorator extends DecoratorChecker {
     }
 
     private void throwInvalidArgument(AnnotationDeclaration declaration, Object value) {
-        throw new TypeError("%s has invalid argument: %s".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(value)));
+        throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
     }
 
     private void throwIfInvalidArgs(AnnotationDeclaration declaration) {
-        throw new TypeError("%s must have a non-empty string as argument or an array of strings or an object".formatted(typeChecker.getPrinter().visit(declaration)));
+        throw new TypeError("%s must have a non-empty string as argument or an array of strings or an object".formatted(printer.visit(declaration)));
     }
 }

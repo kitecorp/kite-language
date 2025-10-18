@@ -3,10 +3,10 @@ package io.kite.TypeChecker.Types.Decorators;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
-import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
+import io.kite.Visitors.SyntaxPrinter;
 
 import java.util.List;
 import java.util.Set;
@@ -15,14 +15,14 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class ProviderDecorator extends DecoratorChecker {
     public static final String NAME = "provider";
-    private final TypeChecker typeChecker;
+    private final SyntaxPrinter printer;
 
-    public ProviderDecorator(TypeChecker typeChecker) {
+    public ProviderDecorator(SyntaxPrinter printer) {
         super(NAME, decorator(List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
                 ), Set.of()
         );
-        this.typeChecker = typeChecker;
+        this.printer = printer;
     }
 
     @Override
@@ -34,12 +34,12 @@ public class ProviderDecorator extends DecoratorChecker {
                     throw new TypeError("@provider must have a non-empty string as argument or an array of strings");
                 }
             } else {
-                throw new TypeError("%s has invalid argument `%s`".formatted(typeChecker.getPrinter().visit(declaration),typeChecker.getPrinter().visit(value)));
+                throw new TypeError("%s has invalid argument `%s`".formatted(printer.visit(declaration), printer.visit(value)));
             }
         } else if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
             for (Expression item : declaration.getArgs().getItems()) {
                 if (!(item instanceof StringLiteral literal)) {
-                    throw new TypeError("%s has invalid argument `%s`".formatted(typeChecker.getPrinter().visit(declaration), typeChecker.getPrinter().visit(item)));
+                    throw new TypeError("%s has invalid argument `%s`".formatted(printer.visit(declaration), printer.visit(item)));
                 }
             }
         }
