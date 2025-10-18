@@ -13,6 +13,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class ResourceValue implements ProviderSupport, TagsSupport {
     /**
      * Replace with Set or List
@@ -32,10 +33,6 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
      */
     private Object existing;
     private Tags tags;
-
-    public ResourceValue() {
-        this(null, null, null, null, null, null);
-    }
 
     public ResourceValue(String name, Environment<Object> parent) {
         this(name, parent, null, null, null, null);
