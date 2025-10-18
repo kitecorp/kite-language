@@ -173,7 +173,7 @@ public class ForResourceTest extends RuntimeTest {
         eval("""
                   schema vm { string name }
                   for i in 0..2 {
-                    resource vm cidr { name = vm.vpc[i].name }
+                    resource vm cidr { name = vm.vpc.name }
                     resource vm vpc  { name = 'vpc-$i' }
                   }
                 """);
