@@ -492,6 +492,10 @@ public final class Interpreter extends StackVisitor<Object> {
                          * */
                         var res = propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceStatement.getIndex()));
                         if (res != null) {
+                            if (res instanceof Deferred deferred
+                                && propertyOrDeferred(schemaValue.getInstances(), propertyName) instanceof ResourceValue resourceValue) {
+                                return resourceValue;
+                            }
                             return res;
                         } else {
                             return propertyOrDeferred(schemaValue.getInstances(), propertyName);
