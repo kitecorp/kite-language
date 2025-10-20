@@ -31,7 +31,9 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     /**
      * indicate if the cloud resource
      */
-    private Object existing;
+    @Setter
+    @Getter
+    private String existing;
     private Tags tags;
 
     public ResourceValue(String name, Environment<Object> parent) {
@@ -42,11 +44,11 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
         this(name, parent, schema, null, null, null);
     }
 
-    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, Object existing) {
+    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, String existing) {
         this(name, parent, schema, existing, null, null);
     }
 
-    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, Object existing, Set<String> dependencies, Set<String> providers) {
+    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, String existing, Set<String> dependencies, Set<String> providers) {
         this.name = name;
         this.properties = parent;
         this.schema = schema;
@@ -69,14 +71,6 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
 
     public boolean isExisting() {
         return existing != null;
-    }
-
-    public Object getExisting() {
-        return existing;
-    }
-
-    public void setExisting(boolean existing) {
-        this.existing = existing;
     }
 
     public Object argVal(String name) {

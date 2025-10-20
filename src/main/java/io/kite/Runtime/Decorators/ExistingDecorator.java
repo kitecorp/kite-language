@@ -24,6 +24,7 @@ public class ExistingDecorator extends DecoratorInterpreter {
                 resource.setExisting(string.getValue());
                 return resource.getExisting();
             }
+            throw new IllegalStateException("%s Value must be a string literal".formatted(printer.visit(declaration)));
         }
         return null;
     }
