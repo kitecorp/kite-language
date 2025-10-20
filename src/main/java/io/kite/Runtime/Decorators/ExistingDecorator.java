@@ -25,7 +25,8 @@ public class ExistingDecorator extends DecoratorInterpreter {
                 return resource.getExisting();
             }
             throw new IllegalStateException("%s Value must be a string literal".formatted(printer.visit(declaration)));
+        } else {
+            throw new IllegalStateException("Unexpected target for %s: ".formatted(printer.visit(declaration)));
         }
-        return null;
     }
 }
