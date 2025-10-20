@@ -8,13 +8,16 @@ import java.util.List;
 import java.util.Set;
 
 public class ProviderDecorator extends DecoratorInterpreter {
-    public ProviderDecorator() {
+    private final Interpreter interpreter;
+
+    public ProviderDecorator(Interpreter interpreter) {
         super("provider");
+        this.interpreter = interpreter;
     }
 
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         if (declaration.getTarget() instanceof ProviderSupport providerSupport) {
             if (declaration.getArgs() != null && !declaration.getArgs().getItems().isEmpty()) {
                 var providers = (List<String>) interpreter.visit(declaration.getArgs());

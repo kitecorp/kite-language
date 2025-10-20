@@ -9,20 +9,20 @@ import io.kite.Runtime.Interpreter;
 import org.fusesource.jansi.Ansi;
 
 public class MaxValueDecorator extends NumberDecorator {
-    public MaxValueDecorator() {
-        super("maxValue");
+    public MaxValueDecorator(Interpreter interpreter) {
+        super("maxValue", interpreter);
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> extracted(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> extracted(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> extracted(declaration, output.getInit());
+            case InputDeclaration input -> extracted(declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private Number extracted(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
+    private Number extracted(AnnotationDeclaration declaration, Expression expression) {
         var numberValue = (Number) interpreter.visit(expression);
         var minArg = extractSingleNumericArg(declaration);
 

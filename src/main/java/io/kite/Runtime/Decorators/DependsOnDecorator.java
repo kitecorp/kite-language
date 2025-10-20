@@ -4,7 +4,6 @@ import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parser.Expressions.MemberExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceStatement;
-import io.kite.Runtime.Interpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -20,7 +19,7 @@ public class DependsOnDecorator extends DecoratorInterpreter {
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         if (declaration.getValue() instanceof MemberExpression member) {
             return registerDependency(declaration, Set.of(member));
         } else if (declaration.getArgs() != null) {

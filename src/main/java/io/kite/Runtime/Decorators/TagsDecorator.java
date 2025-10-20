@@ -9,13 +9,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class TagsDecorator extends DecoratorInterpreter {
-    public TagsDecorator() {
+    private final Interpreter interpreter;
+
+    public TagsDecorator(Interpreter interpreter) {
         super("tags");
+        this.interpreter = interpreter;
     }
 
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         if (declaration.getTarget() instanceof TagsSupport tagsSupport) {
             if (declaration.getArgs() != null && !declaration.getArgs().getItems().isEmpty()) {
                 var tags = (List<String>) interpreter.visit(declaration.getArgs());

@@ -10,20 +10,20 @@ import org.fusesource.jansi.Ansi;
 
 public class MinValueDecorator extends NumberDecorator {
 
-    public MinValueDecorator() {
-        super("minValue");
+    public MinValueDecorator(Interpreter interpreter) {
+        super("minValue", interpreter);
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> extracted(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> extracted(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> extracted(declaration, output.getInit());
+            case InputDeclaration input -> extracted(declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private Number extracted(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
+    private Number extracted(AnnotationDeclaration declaration, Expression expression) {
         var numberValue = (Number) interpreter.visit(expression);
         var minArg = extractSingleNumericArg(declaration);
 

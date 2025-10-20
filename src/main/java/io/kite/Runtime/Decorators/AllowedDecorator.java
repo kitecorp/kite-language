@@ -11,13 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AllowedDecorator extends DecoratorInterpreter {
-    private SyntaxPrinter printer = new SyntaxPrinter();
+    private final SyntaxPrinter printer;
+    private final Interpreter interpreter;
 
-    public AllowedDecorator() {
+    public AllowedDecorator(Interpreter interpreter) {
         super("allowed");
+        this.printer = interpreter.getPrinter();
+        this.interpreter = interpreter;
     }
 
-    private static Object throwValueNotAllowed(Interpreter interpreter, AnnotationDeclaration declaration) {
+    private Object throwValueNotAllowed(AnnotationDeclaration declaration) {
         var value = declaration.getTarget();
         return switch (value) {
             case InputDeclaration input -> interpreter.visit(input);
@@ -26,10 +29,10 @@ public class AllowedDecorator extends DecoratorInterpreter {
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         if (declaration.getArgs() != null) {
-            var value = throwValueNotAllowed(interpreter, declaration);
-            var allowedValues = getAllowedValues(interpreter, declaration);
+            var value = throwValueNotAllowed(declaration);
+            var allowedValues = getAllowedValues(declaration);
             if (value instanceof List<?> list) {
                 validateArrayValue(list, allowedValues);
             } else {
@@ -49,7 +52,7 @@ public class AllowedDecorator extends DecoratorInterpreter {
         }
     }
 
-    private static @NotNull ArrayList<Object> getAllowedValues(Interpreter interpreter, AnnotationDeclaration declaration) {
+    private @NotNull ArrayList<Object> getAllowedValues(AnnotationDeclaration declaration) {
         var values = new ArrayList<>(declaration.getArgs().getItems().size());
         for (Expression item : declaration.getArgs().getItems()) {
             var visited = interpreter.visit(item);
