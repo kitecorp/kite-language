@@ -110,6 +110,7 @@ public final class Interpreter extends StackVisitor<Object> {
         this.decorators.put("validate", new ValidateDecorator(this));
         this.decorators.put("provider", new ProviderDecorator(this));
         this.decorators.put("tags", new TagsDecorator(this));
+        this.decorators.put("existing", new ExistingDecorator(printer));
     }
 
     private static void forInit(Environment<Object> forEnv, Identifier index, Object i) {
@@ -1088,4 +1089,8 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
+    public ResourceValue getResource(String schema, String resource) {
+        var schemaValue = (SchemaValue) getEnv().lookup(schema);
+        return schemaValue.getInstances().get(resource);
+    }
 }
