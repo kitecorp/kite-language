@@ -36,37 +36,21 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     private String existing;
     private Tags tags;
 
-    public ResourceValue(String name, Environment<Object> parent) {
-        this(name, parent, null, null, null, null);
+    public static ResourceValue resourceValue(String name, Environment<Object> resourceEnv, SchemaValue installedSchema, String existing) {
+        return ResourceValue.builder()
+                .name(name)
+                .schema(installedSchema)
+                .existing(existing)
+                .properties(resourceEnv)
+                .build();
     }
 
-    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema) {
-        this(name, parent, schema, null, null, null);
-    }
-
-    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, String existing) {
-        this(name, parent, schema, existing, null, null);
-    }
-
-    public ResourceValue(String name, Environment<Object> parent, @NonNull SchemaValue schema, String existing, Set<String> dependencies, Set<String> providers) {
-        this.name = name;
-        this.properties = parent;
-        this.schema = schema;
-        this.existing = existing;
-        this.dependencies = dependencies;
-        this.providers = providers;
-    }
-
-    public static Object of(String string) {
-        return ResourceValue.of(string, new Environment());
-    }
-
-    public static ResourceValue of(String string, Environment environment) {
-        return new ResourceValue(string, environment);
-    }
-
-    public static ResourceValue of(String string, Environment environment, SchemaValue schema) {
-        return new ResourceValue(string, environment, schema);
+    public static <T> ResourceValue resourceValue(String name, Environment<Object> properties, SchemaValue schemaValue) {
+        return ResourceValue.builder()
+                .name(name)
+                .schema(schemaValue)
+                .properties(properties)
+                .build();
     }
 
     public boolean isExisting() {

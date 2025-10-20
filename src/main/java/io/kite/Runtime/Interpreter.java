@@ -615,7 +615,7 @@ public final class Interpreter extends StackVisitor<Object> {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = new ResourceValue(resourceName(resource), resourceEnv, installedSchema, resource.getExisting());
+        var res = ResourceValue.resourceValue(resourceName(resource), resourceEnv, installedSchema, resource.getExisting());
         try {
             // init any kind of new resource
             installedSchema.initInstance(res);
