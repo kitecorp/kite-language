@@ -1293,13 +1293,7 @@ public class Parser {
         contextStack.push(ContextStack.Resource);
         var body = BlockExpression("Expect '{' after resource name.", "Expect '}' after resource body.");
         contextStack.pop();
-        Object existing = null;
-        for (var annotation : annotations) {
-            if (annotation.getName().string().equals("existing")) {
-                existing = annotation.getValue();
-            }
-        }
-        return ResourceStatement.resource(annotations, existing, type, name, (BlockExpression) body);
+        return ResourceStatement.resource(annotations, type, name, (BlockExpression) body);
     }
 
     private boolean inContext(ContextStack stack) {
