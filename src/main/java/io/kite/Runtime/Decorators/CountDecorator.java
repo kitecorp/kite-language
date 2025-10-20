@@ -15,12 +15,12 @@ import org.apache.commons.lang3.Range;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 
 public class CountDecorator extends NumberDecorator {
-    public CountDecorator() {
-        super("count");
+    public CountDecorator(Interpreter interpreter) {
+        super("count", interpreter);
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         var numberLiteral = (NumberLiteral) declaration.getValue();
         var count = (Integer) interpreter.visit(numberLiteral);
         Statement body = switch (declaration.getTarget()) {

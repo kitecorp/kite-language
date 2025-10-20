@@ -12,34 +12,35 @@ import org.fusesource.jansi.Ansi;
 import java.util.List;
 
 public class MaxLengthDecorator extends NumberDecorator {
-    public MaxLengthDecorator() {
-        super("maxLength");
+
+    public MaxLengthDecorator(Interpreter interpreter) {
+        super("maxLength", interpreter);
     }
 
-    private static String illegalArgumentMsg(Object value, int len, Interpreter interpreter, AnnotationDeclaration declaration) {
+    private  String illegalArgumentMsg(Object value, int len, AnnotationDeclaration declaration) {
         String msg = Ansi.ansi()
                 .a("Provided value ")
                 .a(value)
                 .a(" with length ")
                 .a(len)
                 .a(" is above the maximum length in expression: \n")
-                .a(interpreter.getPrinter().visit(declaration))
-                .a(interpreter.getPrinter().visit((Statement) declaration.getTarget()))
+                .a(printer.visit(declaration))
+                .a(printer.visit((Statement) declaration.getTarget()))
                 .reset()
                 .toString();
         throw new IllegalArgumentException(msg);
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> extracted(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> extracted(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> extracted( declaration, output.getInit());
+            case InputDeclaration input -> extracted( declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private Object extracted(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
+    private Object extracted(AnnotationDeclaration declaration, Expression expression) {
         var minArg = extractSingleNumericArg(declaration);
         ensureFinite(minArg);
 
@@ -47,14 +48,14 @@ public class MaxLengthDecorator extends NumberDecorator {
         switch (value) {
             case String string -> {
                 if (StringUtils.length(string) > minArg.intValue()) {
-                    String msg = illegalArgumentMsg(value, StringUtils.length(string), interpreter, declaration);
+                    String msg = illegalArgumentMsg(value, StringUtils.length(string),  declaration);
                     throw new IllegalArgumentException(msg);
                 }
                 return string;
             }
             case List<?> list -> {
                 if (list.size() > minArg.intValue()) {
-                    String msg = illegalArgumentMsg(value, list.size(), interpreter, declaration);
+                    String msg = illegalArgumentMsg(value, list.size(),  declaration);
                     throw new IllegalArgumentException(msg);
                 }
                 return list;

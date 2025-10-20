@@ -3,14 +3,21 @@ package io.kite.Runtime.Decorators;
 import io.kite.Frontend.Parse.Literals.Literal;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeError;
+import io.kite.Visitors.SyntaxPrinter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public abstract class NumberDecorator extends DecoratorInterpreter {
-    public NumberDecorator(String name) {
+    protected Interpreter interpreter;
+    protected SyntaxPrinter printer;
+
+    public NumberDecorator(String name, Interpreter interpreter) {
         super(name);
+        this.interpreter = interpreter;
+        this.printer = interpreter.getPrinter();
     }
 
     protected static int compareNumbers(Number a, Number b) {

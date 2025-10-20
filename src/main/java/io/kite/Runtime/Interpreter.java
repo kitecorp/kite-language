@@ -96,20 +96,20 @@ public final class Interpreter extends StackVisitor<Object> {
         this.env.init("date", new DateFunction());
 //        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
 
-        this.decorators.put("minValue", new MinValueDecorator());
-        this.decorators.put("maxValue", new MaxValueDecorator());
-        this.decorators.put("maxLength", new MaxLengthDecorator());
-        this.decorators.put("minLength", new MinLengthDecorator());
-        this.decorators.put("description", new DescriptionDecorator());
+        this.decorators.put("minValue", new MinValueDecorator(this));
+        this.decorators.put("maxValue", new MaxValueDecorator(this));
+        this.decorators.put("maxLength", new MaxLengthDecorator(this));
+        this.decorators.put("minLength", new MinLengthDecorator(this));
+        this.decorators.put("description", new DescriptionDecorator(printer));
         this.decorators.put("sensitive", new SensitiveDecorator());
-        this.decorators.put("count", new CountDecorator());
+        this.decorators.put("count", new CountDecorator(this));
         this.decorators.put("dependsOn", new DependsOnDecorator());
-        this.decorators.put("allowed", new AllowedDecorator());
-        this.decorators.put("nonEmpty", new NonEmptyDecorator());
-        this.decorators.put("unique", new UniqueDecorator());
+        this.decorators.put("allowed", new AllowedDecorator(this));
+        this.decorators.put("nonEmpty", new NonEmptyDecorator(this));
+        this.decorators.put("unique", new UniqueDecorator(this));
         this.decorators.put("validate", new ValidateDecorator(this));
-        this.decorators.put("provider", new ProviderDecorator());
-        this.decorators.put("tags", new TagsDecorator());
+        this.decorators.put("provider", new ProviderDecorator(this));
+        this.decorators.put("tags", new TagsDecorator(this));
     }
 
     private static void forInit(Environment<Object> forEnv, Identifier index, Object i) {
@@ -978,7 +978,7 @@ public final class Interpreter extends StackVisitor<Object> {
     public Object visit(AnnotationDeclaration expression) {
         var decorator = decorators.get(expression.name());
         if (decorator != null) {
-            decorator.execute(this, expression);
+            decorator.execute(expression);
         } else {
             log.warn("Unknown decorator: {}", expression.name());
         }

@@ -13,11 +13,11 @@ import java.text.MessageFormat;
 import java.util.List;
 
 public class NonEmptyDecorator extends NumberDecorator {
-    public NonEmptyDecorator() {
-        super("nonEmpty");
+    public NonEmptyDecorator(Interpreter interpreter) {
+        super("nonEmpty", interpreter);
     }
 
-    private static String illegalArgumentMsg(Object value, int len, Interpreter interpreter, AnnotationDeclaration declaration) {
+    private String illegalArgumentMsg(Object value, int len, AnnotationDeclaration declaration) {
         String msg = Ansi.ansi()
                 .a("Provided value ")
                 .a(value)
@@ -32,27 +32,27 @@ public class NonEmptyDecorator extends NumberDecorator {
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> checkExplicitType(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> checkExplicitType(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> checkExplicitType(declaration, output.getInit());
+            case InputDeclaration input -> checkExplicitType(declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private Object checkExplicitType(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
+    private Object checkExplicitType(AnnotationDeclaration declaration, Expression expression) {
         var value = interpreter.visit(expression);
         switch (value) {
             case String string -> {
                 if (StringUtils.isBlank(string)) {
-                    String msg = illegalArgumentMsg(value, StringUtils.length(string), interpreter, declaration);
+                    String msg = illegalArgumentMsg(value, StringUtils.length(string), declaration);
                     throw new IllegalArgumentException(msg);
                 }
                 return string;
             }
             case List<?> list -> {
                 if (list.isEmpty()) {
-                    String msg = illegalArgumentMsg(value, list.size(), interpreter, declaration);
+                    String msg = illegalArgumentMsg(value, list.size(), declaration);
                     throw new IllegalArgumentException(msg);
                 }
                 return list;

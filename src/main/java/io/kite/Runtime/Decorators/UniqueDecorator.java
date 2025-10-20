@@ -6,18 +6,23 @@ import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Runtime.Interpreter;
+import io.kite.Visitors.SyntaxPrinter;
 import org.fusesource.jansi.Ansi;
 
 import java.text.MessageFormat;
 import java.util.List;
 
 public class UniqueDecorator extends DecoratorInterpreter {
-    public UniqueDecorator() {
+    private final SyntaxPrinter printer;
+    private final Interpreter interpreter;
+
+    public UniqueDecorator(Interpreter interpreter) {
         super("unique");
+        this.printer = interpreter.getPrinter();
+        this.interpreter = interpreter;
     }
 
-    private static String illegalArgumentMsg(Object value, Interpreter interpreter, AnnotationDeclaration declaration) {
-        var printer = interpreter.getPrinter();
+    private String illegalArgumentMsg(Object value, AnnotationDeclaration declaration) {
         String msg = Ansi.ansi()
                 .a("Provided list ")
                 .a(value)
@@ -30,26 +35,26 @@ public class UniqueDecorator extends DecoratorInterpreter {
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> checkExplicitType(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> checkExplicitType(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> checkExplicitType(declaration, output.getInit());
+            case InputDeclaration input -> checkExplicitType(declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private Object checkExplicitType(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
+    private Object checkExplicitType(AnnotationDeclaration declaration, Expression expression) {
         var value = interpreter.visit(expression);
         switch (value) {
             case List<?> list -> {
                 var uniqueList = list.stream().distinct().toList();
                 if (uniqueList.size() != list.size()) {
-                    throw new IllegalArgumentException(illegalArgumentMsg(value, interpreter, declaration));
+                    throw new IllegalArgumentException(illegalArgumentMsg(value, declaration));
                 }
                 return list;
             }
             case null, default ->
-                    throw new IllegalArgumentException(MessageFormat.format("Unexpected value `{0}` in expression: {1}", value, interpreter.getPrinter().visit(declaration)));
+                    throw new IllegalArgumentException(MessageFormat.format("Unexpected value `{0}` in expression: {1}", value, printer.visit(declaration)));
         }
 
     }

@@ -209,7 +209,7 @@ public class ValidateDecorator extends DecoratorInterpreter {
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         checkTargetType(declaration);
         // 2) Args: regex (required), flags (optional), message (optional)
         String preset = declaration.getStringArg("preset");

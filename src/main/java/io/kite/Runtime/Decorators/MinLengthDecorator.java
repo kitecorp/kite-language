@@ -12,8 +12,8 @@ import org.fusesource.jansi.Ansi;
 import java.util.List;
 
 public class MinLengthDecorator extends NumberDecorator {
-    public MinLengthDecorator() {
-        super("minLength");
+    public MinLengthDecorator(Interpreter interpreter) {
+        super("minLength", interpreter);
     }
 
     private static String illegalArgumentMsg(Object value, int len, Interpreter interpreter, AnnotationDeclaration declaration) {
@@ -31,15 +31,15 @@ public class MinLengthDecorator extends NumberDecorator {
     }
 
     @Override
-    public Object execute(Interpreter interpreter, AnnotationDeclaration declaration) {
+    public Object execute(AnnotationDeclaration declaration) {
         return switch (declaration.getTarget()) {
-            case OutputDeclaration output -> checkExplicitType(interpreter, declaration, output.getInit());
-            case InputDeclaration input -> checkExplicitType(interpreter, declaration, input.getInit());
+            case OutputDeclaration output -> checkExplicitType(declaration, output.getInit());
+            case InputDeclaration input -> checkExplicitType(declaration, input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
 
-    private Object checkExplicitType(Interpreter interpreter, AnnotationDeclaration declaration, Expression expression) {
+    private Object checkExplicitType(AnnotationDeclaration declaration, Expression expression) {
         var minArg = extractSingleNumericArg(declaration);
         ensureFinite(minArg);
 
