@@ -533,26 +533,27 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     private @NotNull Type accessMemberType(MemberExpression expression, String resourceName, ObjectType objectType) {
-        Type lookup = objectType.getProperty(resourceName);
-        if (lookup != null) {
+        Type directProperty = objectType.getProperty(resourceName);
+        if (directProperty != null) {
             // found the property in the object:
             // var a = "a"
             // var b = "b"
             // var c = 0
             // var x = { a: 1 } ; x.a is found
-            return lookup;
+            return directProperty;
         }
+
         try {
             // if property was not found check if is a variable declared in a higher scope
-            var storedType = objectType.lookup(resourceName);
+            var variableType = objectType.lookup(resourceName);
+
             // if we found the var type, we know it's value so we try to access the member of the object using the variable value
             // x[a] -> x["a"] works only with strings
-            return switch (storedType) {
-                // if we found the var type, we know it's value so we try to access the member of the object using the variable value
-                // x[a] -> x["a"] works only with strings
-                case StringType stringType -> objectType.lookup(stringType.getString());
-                case null, default -> throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
-            };
+            if (variableType instanceof StringType stringType) {
+                return objectType.lookup(stringType.getString());
+            }
+
+            throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
         } catch (RuntimeException e) {
             throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
         }
