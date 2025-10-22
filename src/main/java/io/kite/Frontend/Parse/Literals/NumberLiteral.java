@@ -4,8 +4,6 @@ import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.text.DecimalFormat;
-
 /*
  * NumericLiteral
  *      : NUMBER
@@ -14,7 +12,6 @@ import java.text.DecimalFormat;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NumberLiteral extends Literal {
-    private static DecimalFormat df = new DecimalFormat("#######.#######");
     private Number value;
 
     private NumberLiteral() {
@@ -37,7 +34,7 @@ public class NumberLiteral extends Literal {
     }
 
     private void setNumber(double value) {
-        this.value = Double.valueOf(df.format(value));
+        this.value = value;
     }
 
     private void setNumber(int value) {
