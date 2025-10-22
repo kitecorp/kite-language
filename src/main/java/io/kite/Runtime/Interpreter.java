@@ -177,7 +177,8 @@ public final class Interpreter extends StackVisitor<Object> {
         }
         try {
             return env.lookup(expression.string(), expression.getHops());
-        } catch (NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
+        } catch (
+                NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
             return env.lookup(expression.string(), 0);
         }
     }
@@ -208,7 +209,7 @@ public final class Interpreter extends StackVisitor<Object> {
             var hops = peek(ContextStack.Resource) ? 1 : 0;
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
-                if (StringUtils.containsAny(".","[")) { // complex interpolation ${vm.resourceName.property}
+                if (StringUtils.containsAny(".", "[")) { // complex interpolation ${vm.resourceName.property}
                     var list = parser.produceStatements(new Tokenizer().tokenize(interpolationVar));
                     for (Statement statement : list) {
                         values.add(visit(statement).toString());
@@ -464,70 +465,79 @@ public final class Interpreter extends StackVisitor<Object> {
     @Override
     public Object visit(MemberExpression expression) {
         var value = executeBlock(expression.getObject(), env);
-        switch (value) {
-            case SchemaValue schemaValue -> {
-                var propertyName = getSymbolIdentifier(expression);
-                if (ExecutionContextIn(ForStatement.class)) {
-                    /**
-                     * {@link ForResourceTest#dependsOnEarlyResource()} access computed property in for loop expression without the syntax
-                     */
-                    if (ExecutionContext(ResourceStatement.class) instanceof ResourceStatement resourceStatement) {
-                        /**
-                         * in a loop (or @count) we try to access an equivalent resource without using the index.
-                         * If nothing is found we might access the resource that is not an array
-                         * {@link CountTests#countResourceDependencyIndex()}
-                         * */
-                        var res = propertyOrDeferred(schemaValue.getInstances(), "%s[%s]".formatted(propertyName, resourceStatement.getIndex()));
-                        if (res != null) {
-                            if (res instanceof Deferred deferred
-                                && propertyOrDeferred(schemaValue.getInstances(), propertyName) instanceof ResourceValue resourceValue) {
-                                return resourceValue;
-                            }
-                            return res;
-                        } else {
-                            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
-                        }
-                    } else {
-                        return propertyOrDeferred(schemaValue.getInstances(), propertyName);
-                    }
-                } else {
-                    return propertyOrDeferred(schemaValue.getInstances(), propertyName);
-                }
-            }
-            case ResourceValue resourceValue -> {
-                var propertyName = getSymbolIdentifier(expression);
-                if (ExecutionContextIn(StringLiteral.class)) {
-                    /**
-                     * if doing complex string interpolation and try to access resource property
-                     * {@link io.kite.Integration.ResourceStringInterpolation#stringInterpolationMemberAccess()}
-                     * */
-                    return resourceValue.lookup(propertyName);
-                }
-                // when retrieving the type of a resource, we first check the "instances" field for existing resources initialised there
-                // Since that environment points to the parent(type env) it will also find the properties
-                if (expression.getObject() instanceof MemberExpression memberExpression) {
-                    return new Dependency(resourceValue, resourceValue.lookup(propertyName));
-                }
-                return resourceValue.lookup(propertyName);
-            }
-            case Map<?, ?> map -> {
-                var propertyName = getSymbolIdentifier(expression);
-                return map.get(propertyName);
-            }
-            case Deferred deferred -> {
-                if (expression.isComputed()) {
-                    if (expression.getObject() instanceof MemberExpression memberExpression) {
-                        var key = executeBlock(expression.getProperty(), env);
-                        var x = deferred.resource() + "[" + key + "]"; // number or string
-                        memberExpression.setProperty(SymbolIdentifier.id(x));
-                        return visit(memberExpression);
-                    }
-                }
-            }
-            case null, default -> {
-            }
+
+        return switch (value) {
+            case SchemaValue schemaValue -> visitSchemaMember(expression, schemaValue);
+            case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
+            case Map<?, ?> map -> visitMapMember(expression, map);
+            case Deferred deferred -> visitDeferredMember(expression, deferred);
+            case null, default -> value;
+        };
+    }
+
+    private Object visitSchemaMember(MemberExpression expression, SchemaValue schemaValue) {
+        var propertyName = getSymbolIdentifier(expression);
+
+        if (!ExecutionContextIn(ForStatement.class)) {
+            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
         }
-        return value;
+
+        // Access computed property in for loop expression without the syntax
+        // See: ForResourceTest#dependsOnEarlyResource()
+        if (!(ExecutionContext(ResourceStatement.class) instanceof ResourceStatement resourceStatement)) {
+            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+        }
+
+        // In a loop (or @count) we try to access an equivalent resource without using the index
+        // If nothing is found we might access the resource that is not an array
+        // See: CountTests#countResourceDependencyIndex()
+        var indexedProperty = "%s[%s]".formatted(propertyName, resourceStatement.getIndex());
+        var indexedResource = propertyOrDeferred(schemaValue.getInstances(), indexedProperty);
+
+        if (indexedResource == null) {
+            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+        }
+
+        if (indexedResource instanceof Deferred
+            && propertyOrDeferred(schemaValue.getInstances(), propertyName) instanceof ResourceValue resourceValue) {
+            return resourceValue;
+        }
+
+        return indexedResource;
+    }
+
+    private Object visitResourceMember(MemberExpression expression, ResourceValue resourceValue) {
+        var propertyName = getSymbolIdentifier(expression);
+
+        // If doing complex string interpolation and trying to access resource property
+        // See: ResourceStringInterpolation#stringInterpolationMemberAccess()
+        if (ExecutionContextIn(StringLiteral.class)) {
+            return resourceValue.lookup(propertyName);
+        }
+
+        var propertyValue = resourceValue.lookup(propertyName);
+
+        // When retrieving the type of a resource through member expression, return a Dependency
+        if (expression.getObject() instanceof MemberExpression) {
+            return new Dependency(resourceValue, propertyValue);
+        }
+
+        return propertyValue;
+    }
+
+    private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
+        var propertyName = getSymbolIdentifier(expression);
+        return map.get(propertyName);
+    }
+
+    private Object visitDeferredMember(MemberExpression expression, Deferred deferred) {
+        if (expression.isComputed() && expression.getObject() instanceof MemberExpression memberExpression) {
+            var key = executeBlock(expression.getProperty(), env);
+            var computedProperty = deferred.resource() + "[" + key + "]";
+            memberExpression.setProperty(SymbolIdentifier.id(computedProperty));
+            return visit(memberExpression);
+        }
+        return deferred;
     }
 
     private @NotNull String getSymbolIdentifier(MemberExpression expression) {
