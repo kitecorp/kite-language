@@ -28,6 +28,7 @@ import io.kite.Visitors.StackVisitor;
 import io.kite.Visitors.SyntaxPrinter;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -207,7 +208,7 @@ public final class Interpreter extends StackVisitor<Object> {
             var hops = peek(ContextStack.Resource) ? 1 : 0;
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
-                if (interpolationVar.contains(".") || interpolationVar.contains("[")) { // complex interpolation ${vm.resourceName.property}
+                if (StringUtils.containsAny(".","[")) { // complex interpolation ${vm.resourceName.property}
                     var list = parser.produceStatements(new Tokenizer().tokenize(interpolationVar));
                     for (Statement statement : list) {
                         values.add(visit(statement).toString());
