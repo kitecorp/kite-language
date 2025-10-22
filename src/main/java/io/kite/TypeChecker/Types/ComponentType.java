@@ -16,7 +16,9 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
     private final SchemaType schema;
     @Getter
     private final String name;
-    private Boolean counted = null;
+    @Getter
+    @Setter
+    private boolean counted;
 
     public ComponentType(String name, SchemaType schema, @Nullable TypeEnvironment env) {
         super(SystemType.COMPONENT);
@@ -29,16 +31,4 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
         this("resource", SchemaType.INSTANCE, null);
     }
 
-    @Override
-    public Boolean counted() {
-        if (counted == null) {
-            this.counted = Boolean.FALSE;
-        }
-        return counted;
-    }
-
-    @Override
-    public void counted(Boolean counted) {
-        this.counted = counted;
-    }
 }

@@ -555,7 +555,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(ResourceStatement resource) {
-        if (resource.counted()) {
+        if (resource.isCounted()) {
             return resource;
         }
         validate(resource);
