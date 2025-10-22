@@ -5,7 +5,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public sealed class ReferenceType extends Type permits AnyType, ArrayType, ObjectType, ResourceType, SchemaType, UnionType {
+public sealed class ReferenceType
+        extends Type
+        permits AnyType, ArrayType, ComponentType, ObjectType, ResourceType, SchemaType, UnionType {
 
     @Getter
     protected TypeEnvironment environment;
@@ -22,6 +24,7 @@ public sealed class ReferenceType extends Type permits AnyType, ArrayType, Objec
         super(typeName);
         this.environment = environment;
     }
+
     public ReferenceType(SystemType typeName, String name, TypeEnvironment environment) {
         super(typeName);
         this.setValue(name);
