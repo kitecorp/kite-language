@@ -7,7 +7,7 @@ public class StringType extends ValueType {
     private String string;
 
     public StringType(String string) {
-        super(String.toString());
+        super(SystemType.STRING);
         this.string = string;
     }
 
