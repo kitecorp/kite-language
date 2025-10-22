@@ -27,6 +27,10 @@ import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class TypeChecker extends StackVisitor<Type> {
+    private static final List<SystemType> NUMERIC_OPS = List.of(SystemType.NUMBER);
+    private static final List<SystemType> ADDITIVE_OPS = List.of(SystemType.NUMBER, SystemType.STRING);
+    private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
+    private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
     @Getter
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
@@ -220,10 +224,10 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     private List<SystemType> allowTypes(String op) {
         return switch (op) {
-            case "+" -> List.of(SystemType.NUMBER, SystemType.STRING); // allow addition for numbers and string
-            case "-", "/", "*", "%" -> List.of(SystemType.NUMBER);
-            case "==", "!=" -> List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
-            case "<=", "<", ">", ">=" -> List.of(SystemType.NUMBER, SystemType.BOOLEAN);
+            case "+" -> ADDITIVE_OPS;
+            case "-", "/", "*", "%" -> NUMERIC_OPS;
+            case "==", "!=" -> EQUALITY_OPS;
+            case "<=", "<", ">", ">=" -> COMPARISON_OPS;
             default -> throw new TypeError("Unknown operator " + op);
         };
     }
@@ -239,7 +243,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         if (expectedType == ValueType.Null) {
             return actualType;
         }
-        if (expectedType != null && Objects.equals(actualType.getValue(), expectedType.getValue())) {
+        if (expectedType != null && Objects.equals(actualType, expectedType)) {
             return expectArray(actualType, expectedType, expectedVal);
         }
         if (expectedType == null) return actualType;
@@ -259,26 +263,49 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
-        if (actualType instanceof ArrayType actualArray && expectedType instanceof ArrayType expectedArrayType) {
-            if (expectedArrayType.isType(AnyType.INSTANCE)) {
-                return expectedArrayType; // skip type checking for any type
-            }
+        if (!(actualType instanceof ArrayType actualArray)) {
+            return handleNonArrayActual(actualType, expectedType, expectedVal);
+        }
 
-            if (actualArray.getType() == null && expectedArrayType.getType() != null) { // reassign an empty array
-                return expectedArrayType;
-            } else if (actualArray.getType() != null && expectedArrayType.getType() == null) {
-                // when we pass expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
-                // ArrayType.ARRAY_TYPE is just array of unkown type so we just want to check that it's an array and don't care about the types of items inside it
-                return actualType;
-            } else if (expectedArrayType.getType() instanceof UnionType union) {
-                return expect(actualArray.getType(), union, expectedVal);
-            } else if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
-                String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                        expectedArrayType.getType().getValue(), actualArray.getType(), printer.visit(expectedVal));
-                throw new TypeError(string);
-            }
+        if (!(expectedType instanceof ArrayType expectedArrayType)) {
             return expectedType;
-        } else if (expectedType instanceof ArrayType expectedArrayType) {
+        }
+
+        // Skip type checking for any type
+        if (expectedArrayType.isType(AnyType.INSTANCE)) {
+            return expectedArrayType;
+        }
+
+        // Reassign an empty array
+        if (actualArray.getType() == null && expectedArrayType.getType() != null) {
+            return expectedArrayType;
+        }
+
+        // Check if it's an array without caring about element types (e.g., ArrayType.ARRAY_TYPE)
+        if (actualArray.getType() != null && expectedArrayType.getType() == null) {
+            return actualType;
+        }
+
+        // Handle union types
+        if (expectedArrayType.getType() instanceof UnionType union) {
+            return expect(actualArray.getType(), union, expectedVal);
+        }
+
+        // Validate element type compatibility
+        if (!Objects.equals(actualArray.getType().getKind(), expectedArrayType.getType().getKind())) {
+            throw new TypeError(format(
+                    "Expected type `{0}` but got `{1}` in expression: {2}",
+                    expectedArrayType.getType().getValue(),
+                    actualArray.getType(),
+                    printer.visit(expectedVal)
+            ));
+        }
+
+        return expectedType;
+    }
+
+    private Type handleNonArrayActual(Type actualType, Type expectedType, Expression expectedVal) {
+        if (expectedType instanceof ArrayType expectedArrayType) {
             expect(actualType, expectedArrayType.getType(), expectedVal);
             return expectedArrayType;
         }
@@ -354,29 +381,35 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(InputDeclaration expression) {
-        var t1 = visit(expression.getType());
-        // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
+        var declaredType = visit(expression.getType());
+
+        if (expression.getInit() != null) {
+            validateInitializer(expression, declaredType);
+        }
+
+        // Update InputDeclaration type if it differs (important for reference types set by parser)
+        if (expression.getType().getType().getKind() != declaredType.getKind()) {
+            expression.getType().setType(declaredType);
+        }
+
+        onFinalAnnotations(expression.getAnnotations());
+        return declaredType;
+    }
+
+    private void validateInitializer(InputDeclaration expression, Type declaredType) {
         switch (expression.getInit()) {
             case ArrayExpression arrayExpression -> {
                 if (expression.getType() instanceof ArrayTypeIdentifier arrayTypeIdentifier) {
                     arrayExpression.setType(arrayTypeIdentifier);
                 }
-                var t2 = visit(arrayExpression);
-                expect(t2, t1, expression.getInit());
-            }
-            case null -> {
-
+                var initType = visit(arrayExpression);
+                expect(initType, declaredType, expression.getInit());
             }
             default -> {
-                var t2 = visit(expression.getInit());
-                expect(t2, t1, expression.getInit());
+                var initType = visit(expression.getInit());
+                expect(initType, declaredType, expression.getInit());
             }
         }
-        if (expression.getType().getType().getKind() != t1.getKind()) {
-            expression.getType().setType(t1);
-        }
-        onFinalAnnotations(expression.getAnnotations());
-        return t1;
     }
 
     private void onFinalAnnotations(Set<AnnotationDeclaration> list) {
@@ -389,29 +422,35 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(OutputDeclaration expression) {
-        var t1 = visit(expression.getType());
-        // update inputDeclaration Type because the old type was set by the parser and could be wrong, especially for reference types
+        var declaredType = visit(expression.getType());
+
+        if (expression.getInit() != null) {
+            validateInitializer(expression, declaredType);
+        }
+
+        // Update OutputDeclaration type if it differs (important for reference types set by parser)
+        if (expression.getType().getType().getKind() != declaredType.getKind()) {
+            expression.getType().setType(declaredType);
+        }
+
+        onFinalAnnotations(expression.getAnnotations());
+        return declaredType;
+    }
+
+    private void validateInitializer(OutputDeclaration expression, Type declaredType) {
         switch (expression.getInit()) {
             case ArrayExpression arrayExpression -> {
                 if (expression.getType() instanceof ArrayTypeIdentifier arrayTypeIdentifier) {
                     arrayExpression.setType(arrayTypeIdentifier);
                 }
-                var t2 = visit(arrayExpression);
-                expect(t2, t1, expression.getInit());
-            }
-            case null -> {
-
+                var initType = visit(arrayExpression);
+                expect(initType, declaredType, expression.getInit());
             }
             default -> {
-                var t2 = visit(expression.getInit());
-                expect(t2, t1, expression.getInit());
+                var initType = visit(expression.getInit());
+                expect(initType, declaredType, expression.getInit());
             }
         }
-        if (expression.getType().getType().getKind() != t1.getKind()) {
-            expression.getType().setType(t1);
-        }
-        onFinalAnnotations(expression.getAnnotations());
-        return t1;
     }
 
     @Override
