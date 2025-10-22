@@ -16,7 +16,6 @@ import io.kite.Visitors.StackVisitor;
 import io.kite.Visitors.SyntaxPrinter;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -801,7 +800,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             } else {
                 expect(implicitType, explicitType, expression);
             }
-            if (StringUtils.equals(implicitType.getValue(), ObjectType.INSTANCE.getValue())) {
+            if (implicitType.getKind() == ObjectType.INSTANCE.getKind()) {
                 // when it's an object implicit type is the object + all of it's env variable types { name: string }
                 // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
                 return env.init(var, implicitType);
@@ -809,8 +808,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             return env.init(var, explicitType);
         } else if (implicitType == ValueType.Null) {
             throw new TypeError("Explicit type type required for: " + printer.visit(expression));
-        }
-        if (Objects.equals(implicitType.getValue(), ValueType.String.getValue())) {
+        } else if (Objects.equals(implicitType, ValueType.String)) {
             // member assignment like val x = a.b.c
             if (init instanceof StringLiteral stringLiteral) {
                 // only needed when val is string because this val could be used to access a member on an object
