@@ -14,7 +14,7 @@ import lombok.Data;
 import java.util.Set;
 
 @AllArgsConstructor(staticName = "schemaProperty")
-@Data(staticConstructor = "schemaProperty")
+@Data
 public class SchemaProperty implements Annotatable {
     private TypeIdentifier type;
     private Identifier identifier;
