@@ -240,25 +240,24 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     private Type expect(Type actualType, Type expectedType, Expression expectedVal) {
-        if (expectedType == ValueType.Null) {
+        // Null expected type means accept any actual type
+        if (expectedType == null || expectedType == ValueType.Null) {
             return actualType;
         }
-        if (expectedType != null && Objects.equals(actualType, expectedType)) {
+
+        // Types match exactly
+        if (Objects.equals(actualType, expectedType)) {
             return expectArray(actualType, expectedType, expectedVal);
         }
-        if (expectedType == null) return actualType;
 
         return switch (expectedType.getKind()) {
             case ARRAY -> expectArray(actualType, expectedType, expectedVal);
             case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
-            case ANY ->
-                    actualType; // just return the type of the actual value since we don't care what is declared in code
-            case null, default -> {
-                // only evaluate printing if we need to
-                String string = format("Expected type `{0}` but got `{1}` in expression: {2}",
-                        expectedType, actualType, printer.visit(expectedVal));
-                throw new TypeError(string);
-            }
+            case ANY -> actualType; // Accept any actual type without validation
+            case null, default -> throw new TypeError(format(
+                    "Expected type `{0}` but got `{1}` in expression: {2}",
+                    expectedType, actualType, printer.visit(expectedVal)
+            ));
         };
     }
 
