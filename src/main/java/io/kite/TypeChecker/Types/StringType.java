@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public class StringType extends ValueType {
     @Getter
-    private String string;
+    private final String string;
 
     public StringType(String string) {
         super(SystemType.STRING);
