@@ -698,56 +698,69 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ResourceStatement resource) {
+        validateResourceName(resource);
+
+        var installedSchema = lookupSchema(resource);
+
+        if (isCountedResource(resource)) {
+            return installedSchema.getInstance(resourceName(resource));
+        }
+
+        var resourceEnv = createResourceEnvironment(installedSchema, resource);
+        validateResourceProperties(resourceEnv, installedSchema, resource);
+
+        var resourceType = new ResourceType(resourceName(resource), installedSchema, resourceEnv);
+        installedSchema.addInstance(resourceName(resource), resourceType);
+
+        return resourceType;
+    }
+
+    private void validateResourceName(ResourceStatement resource) {
         if (resource.getName() == null) {
             throw new InvalidInitException("Resource does not have a name: " + resourceName(resource));
         }
+    }
+
+    private SchemaType lookupSchema(ResourceStatement resource) {
         // SchemaValue already installed globally when evaluating a SchemaDeclaration.
         // This means the schema must be declared before the resource
         var installedSchema = (SchemaType) env.lookup(resource.getType().string());
         if (installedSchema == null) {
             throw new InvalidInitException("Schema not found during " + resourceName(resource) + " initialization");
         }
-        if (resource.targetType() instanceof CountAnnotatable annotatable) {
-            if (annotatable.isCounted()) {
-                annotatable.setCounted(false);
-                return installedSchema.getInstance(resourceName(resource));
-            }
-        }
+        return installedSchema;
+    }
 
+    /**
+     * Method used for the @counted decorator. Once we evaluate the resource using the @counted we don't need
+     * to initialise again when the ast reaches the resource declaration.
+     */
+    private boolean isCountedResource(ResourceStatement resource) {
+        if (resource.targetType() instanceof CountAnnotatable annotatable && annotatable.isCounted()) {
+            annotatable.setCounted(false);
+            return true;
+        }
+        return false;
+    }
+
+    private TypeEnvironment createResourceEnvironment(SchemaType installedSchema, ResourceStatement resource) {
         var schemaEnv = installedSchema.getEnvironment();
-        // clone/inherit all default properties from schema properties to the new resource
+        // Clone/inherit all default properties from schema properties to the new resource
         var resourceEnv = new TypeEnvironment(schemaEnv, schemaEnv.getVariables());
-        // init resource environment with values defined by the user
+        // Init resource environment with values defined by the user
         executeBlock(resource.getArguments(), resourceEnv);
-        // validate each property in the resource that matches the type defined in the schema
+        return resourceEnv;
+    }
+
+    private void validateResourceProperties(TypeEnvironment resourceEnv, SchemaType installedSchema, ResourceStatement resource) {
+        // Validate each property in the resource matches the type defined in the schema
         for (var argument : resourceEnv.getVariables().entrySet()) {
             if (!Objects.equals(installedSchema.getProperty(argument.getKey()), argument.getValue())) {
-                throw new InvalidInitException("Property type mismatch for " + argument.getKey() + " in:\n " + printer.visit(resource));
+                throw new InvalidInitException(
+                        "Property type mismatch for " + argument.getKey() + " in:\n " + printer.visit(resource)
+                );
             }
         }
-
-
-        var resourceType = new ResourceType(resourceName(resource), installedSchema, resourceEnv);
-        installedSchema.addInstance(resourceName(resource), resourceType);
-
-        return resourceType;
-//        try {
-//            Type init = installedSchema.getProperty("init");
-//            if (init != null) {
-//                var args = new ArrayList<>();
-//                for (Statement it : resource.getArguments()) {
-//                    var objectRuntimeValue = executeBlock(it, resourceEnv);
-//                    args.add(objectRuntimeValue);
-//                }
-//                FunType initType = (FunType) init;
-//            } else {
-//            }
-//            var res = installedSchema.initInstance(resourceName(resource), ResourceValue.of(resourceName(resource), resourceEnv, installedSchema));
-//            engine.process(installedSchema.typeString(), resourceEnv.getVariables());
-//        } catch (NotFoundException e) {
-//            throw new NotFoundException("Field '%s' not found on resource '%s'".formatted(e.getObjectNotFound(), expression.name()),e);
-//            throw e;
-//        }
     }
 
     @Override
