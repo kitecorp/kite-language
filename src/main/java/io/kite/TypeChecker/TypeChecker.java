@@ -792,33 +792,38 @@ public final class TypeChecker extends StackVisitor<Type> {
      */
     private Type initType(Expression expression, Expression init, TypeIdentifier typeIdentifier, String var) {
         var implicitType = visit(init);
-        if (typeIdentifier != null) { // val type name
-            var explicitType = visit(typeIdentifier);
-            if (explicitType instanceof UnionType unionType) {
-                var unionType1 = expect(implicitType, unionType, expression);
-                return env.init(var, unionType1);
-            } else {
-                expect(implicitType, explicitType, expression);
-            }
-            if (implicitType.getKind() == ObjectType.INSTANCE.getKind()) {
-                // when it's an object implicit type is the object + all of it's env variable types { name: string }
-                // so we must use the implicit evaluation of the object. Explicit one is just an empty object initialised once
-                return env.init(var, implicitType);
-            }
-            return env.init(var, explicitType);
-        } else if (implicitType == ValueType.Null) {
-            throw new TypeError("Explicit type type required for: " + printer.visit(expression));
-        } else if (Objects.equals(implicitType, ValueType.String)) {
-            // member assignment like val x = a.b.c
-            if (init instanceof StringLiteral stringLiteral) {
-                // only needed when val is string because this val could be used to access a member on an object
-                return env.init(var, new StringType(stringLiteral.getValue()));
-            } else {
-                return env.init(var, visit(init)); // x[key] we need to find value of variable key so we store it here
-            }
-        } else {
-            return env.init(var, implicitType);
+
+        if (typeIdentifier != null) {
+            return initWithExplicitType(expression, typeIdentifier, var, implicitType);
         }
+
+        if (implicitType == ValueType.Null) {
+            throw new TypeError("Explicit type required for: " + printer.visit(expression));
+        }
+
+        if (Objects.equals(implicitType, ValueType.String) && init instanceof StringLiteral stringLiteral) {
+            return env.init(var, new StringType(stringLiteral.getValue()));
+        }
+
+        return env.init(var, implicitType);
+    }
+
+    private Type initWithExplicitType(Expression expression, TypeIdentifier typeIdentifier, String var, Type implicitType) {
+        var explicitType = visit(typeIdentifier);
+
+        if (explicitType instanceof UnionType unionType) {
+            var resolvedType = expect(implicitType, unionType, expression);
+            return env.init(var, resolvedType);
+        }
+
+        expect(implicitType, explicitType, expression);
+
+        // Use implicit type for objects to preserve environment variable types
+        var typeToInit = implicitType.getKind() == ObjectType.INSTANCE.getKind()
+                ? implicitType
+                : explicitType;
+
+        return env.init(var, typeToInit);
     }
 
     @Override
