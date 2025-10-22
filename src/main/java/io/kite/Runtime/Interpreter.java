@@ -826,56 +826,52 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(UnaryExpression expression) {
-        Object operator = expression.getOperator();
-        if (operator instanceof String op) {
-            return switch (op) {
-                case "++" -> {
-                    Object res = executeBlock(expression.getValue(), env);
-                    switch (res) {
-                        case Integer integer -> {
-                            yield 1 + integer;
-                        }
-                        case Double aDouble -> {
-                            yield 1 + aDouble;
-                        }
-                        case null, default -> throw new RuntimeException("Invalid unary operator: " + res);
-                    }
-                }
-                case "--" -> {
-                    Object res = executeBlock(expression.getValue(), env);
-                    switch (res) {
-                        case Integer integer -> {
-                            yield integer - 1;
-                        }
-                        case Double aDouble -> {
-                            yield BigDecimal.valueOf(aDouble).subtract(BigDecimal.ONE).doubleValue();
-                        }
-                        case null, default -> throw new RuntimeException("Invalid unary operator: " + res);
-                    }
-                }
-                case "-" -> {
-                    Object res = executeBlock(expression.getValue(), env);
-                    switch (res) {
-                        case Integer r -> {
-                            yield -r;
-                        }
-                        case Double r -> {
-                            yield BigDecimal.valueOf(r).negate().doubleValue();
-                        }
-                        case null, default -> throw new RuntimeException("Invalid unary operator: " + res);
-                    }
-                }
-                case "!" -> {
-                    Object res = executeBlock(expression.getValue(), env);
-                    if (res instanceof Boolean aBoolean) {
-                        yield !aBoolean;
-                    }
-                    throw new RuntimeException("Invalid not operator: " + res);
-                }
-                default -> throw new RuntimeException("Operator could not be evaluated: " + expression.getOperator());
-            };
+        if (!(expression.getOperator() instanceof String op)) {
+            throw new RuntimeException("Operator could not be evaluated");
         }
-        throw new RuntimeException("Operator could not be evaluated");
+
+        return switch (op) {
+            case "++" -> incrementValue(expression);
+            case "--" -> decrementValue(expression);
+            case "-" -> negateValue(expression);
+            case "!" -> notValue(expression);
+            default -> throw new RuntimeException("Operator could not be evaluated: " + op);
+        };
+    }
+
+    private Object incrementValue(UnaryExpression expression) {
+        Object value = executeBlock(expression.getValue(), env);
+        return switch (value) {
+            case Integer i -> i + 1;
+            case Double d -> d + 1;
+            case null, default -> throw new RuntimeException("Invalid unary operator: " + value);
+        };
+    }
+
+    private Object decrementValue(UnaryExpression expression) {
+        Object value = executeBlock(expression.getValue(), env);
+        return switch (value) {
+            case Integer i -> i - 1;
+            case Double d -> BigDecimal.valueOf(d).subtract(BigDecimal.ONE).doubleValue();
+            case null, default -> throw new RuntimeException("Invalid unary operator: " + value);
+        };
+    }
+
+    private Object negateValue(UnaryExpression expression) {
+        Object value = executeBlock(expression.getValue(), env);
+        return switch (value) {
+            case Integer i -> -i;
+            case Double d -> BigDecimal.valueOf(d).negate().doubleValue();
+            case null, default -> throw new RuntimeException("Invalid unary operator: " + value);
+        };
+    }
+
+    private Object notValue(UnaryExpression expression) {
+        Object value = executeBlock(expression.getValue(), env);
+        if (value instanceof Boolean b) {
+            return !b;
+        }
+        throw new RuntimeException("Invalid not operator: " + value);
     }
 
     @Override
@@ -896,18 +892,36 @@ public final class Interpreter extends StackVisitor<Object> {
         if (!expression.hasType()) {
             return;
         }
-        if (expression.getInit() instanceof ArrayExpression
-            && !(expression.getType() instanceof ArrayTypeIdentifier)) {
-            throw new IllegalArgumentException("Invalid type for array: %s".formatted(printer.visit(expression.getId())));
-        }
+
+        validateArrayType(expression);
+
         var type = visit(expression.getType());
         if (type instanceof Set<?> set) {
-            if (value instanceof Collection<?> collection) {
-                if (!set.containsAll(collection))
-                    throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
-            } else if (!set.contains(value)) {
-                throw new IllegalArgumentException(format("Invalid value `{0}` for type `{1}`. Valid values `{2}`", value, expression.getType().string(), type));
-            }
+            validateValueInSet(expression, value, set);
+        }
+    }
+
+    private void validateArrayType(DependencyHolder expression) {
+        if (expression.getInit() instanceof ArrayExpression
+            && !(expression.getType() instanceof ArrayTypeIdentifier)) {
+            throw new IllegalArgumentException(
+                    "Invalid type for array: %s".formatted(printer.visit(expression.getId()))
+            );
+        }
+    }
+
+    private void validateValueInSet(DependencyHolder expression, Object value, Set<?> validValues) {
+        boolean isValid = value instanceof Collection<?> collection
+                ? validValues.containsAll(collection)
+                : validValues.contains(value);
+
+        if (!isValid) {
+            throw new IllegalArgumentException(format(
+                    "Invalid value `{0}` for type `{1}`. Valid values `{2}`",
+                    value,
+                    expression.getType().string(),
+                    validValues
+            ));
         }
     }
 
