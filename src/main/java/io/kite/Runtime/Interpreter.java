@@ -400,50 +400,36 @@ public final class Interpreter extends StackVisitor<Object> {
         var left = visit(expression.getLeft());
         var right = visit(expression.getRight());
 
+        validateLogicalOperands(expression, left, right);
+
+        return switch (expression.getOperator()) {
+            case Logical_Or -> isTruthy(left) ? left : right;
+            case Logical_And -> isTruthy(left) ? right : left;
+            default -> throw new IllegalArgumentException(
+                    "Unknown logical operator in expression: " + printer.visit(expression)
+            );
+        };
+    }
+
+    private void validateLogicalOperands(LogicalExpression expression, Object left, Object right) {
         if (left == null || right == null) {
-            throw new IllegalArgumentException("Left expression does not exist: " + printer.visit(expression));
+            throw new IllegalArgumentException("Null operand in logical expression: " + printer.visit(expression));
         }
+
         if (!(left instanceof Boolean) || !(right instanceof Boolean)) {
-            throw new IllegalArgumentException("Left expression does not exist: " + printer.visit(expression));
+            throw new IllegalArgumentException("Logical expression requires boolean operands: " + printer.visit(expression));
         }
-
-        if (expression.getOperator() == TokenType.Logical_Or) {
-            if (isTruthy(left)) {
-                return left;
-            }
-            if (isTruthy(right)) {
-                return right;
-            }
-            return right;
-        } else if (expression.getOperator() == TokenType.Logical_And) {
-            if (isTruthy(right)) {
-                return left;
-            }
-
-            if (isTruthy(left)) {
-                return right;
-            }
-
-            return right;
-        }
-
-        throw new IllegalArgumentException("Left expression does not exist: " + printer.visit(expression));
     }
 
     @Override
     public Object visit(AssignmentExpression expression) {
-        switch (expression.getLeft()) {
-            case MemberExpression memberExpression -> {
-                var instanceEnv = executeBlock(memberExpression.getObject(), env);
-                if (instanceEnv instanceof ResourceValue resourceValue) {
-                    throw new RuntimeError("Resources can only be updated inside their block: " + resourceValue.getName());
-                }
+        if (expression.getLeft() instanceof MemberExpression memberExpression) {
+            var instanceEnv = executeBlock(memberExpression.getObject(), env);
+            if (instanceEnv instanceof ResourceValue resourceValue) {
+                throw new RuntimeError("Resources can only be updated inside their block: " + resourceValue.getName());
             }
-            case SymbolIdentifier identifier -> {
-                return assignmentSymbol(expression, identifier);
-            }
-            case null, default -> {
-            }
+        } else if (expression.getLeft() instanceof SymbolIdentifier identifier) {
+            return assignmentSymbol(expression, identifier);
         }
         throw new RuntimeException("Invalid assignment");
     }
