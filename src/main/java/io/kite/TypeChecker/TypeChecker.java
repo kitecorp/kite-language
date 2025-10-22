@@ -315,27 +315,34 @@ public final class TypeChecker extends StackVisitor<Type> {
         if (Objects.equals(actualType, declaredType)) {
             return declaredType;
         }
+
         if (!declaredType.getTypes().contains(actualType)) {
-            String string = format("Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
+            throw new TypeError(format(
+                    "Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                     printer.visit(declaredType),
                     printer.visit(declaredType),
                     actualType.getValue(),
-                    printer.visit(expectedVal));
-            throw new TypeError(string);
+                    printer.visit(expectedVal)
+            ));
         }
-        if (!(actualType instanceof ObjectType properties)) {
-            return declaredType;
+
+        if (actualType instanceof ObjectType objectType) {
+            validateObjectProperties(objectType, declaredType);
         }
-        // iterate over init object properties to make sure all declarations match the allowed properties in the union type type
-        for (var entry : properties.getEnvironment().getVariables().entrySet()) {
+
+        return declaredType;
+    }
+
+    private void validateObjectProperties(ObjectType actualObject, UnionType declaredType) {
+        // Iterate over init object properties to ensure all match the allowed properties in the union type
+        for (var entry : actualObject.getEnvironment().getVariables().entrySet()) {
             for (Expression type : declaredType.getTypes()) {
-                if (type instanceof ObjectType objectType) {
-                    var declared = objectType.lookup(entry.getKey()); // make sure the property exists in the declared type
-                    expect(entry.getValue(), declared, declared);
+                if (type instanceof ObjectType declaredObject) {
+                    var declaredProperty = declaredObject.lookup(entry.getKey());
+                    expect(entry.getValue(), declaredProperty, declaredProperty);
                 }
             }
         }
-        return declaredType;
     }
 
     private Type expect(Type actualType, Type expectedType, Statement actualVal, Statement expectedVal) {
