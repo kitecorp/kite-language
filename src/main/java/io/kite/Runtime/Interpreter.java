@@ -554,26 +554,23 @@ public final class Interpreter extends StackVisitor<Object> {
         if (resource.isCounted()) {
             return resource;
         }
-        validate(resource);
-//        if (callstack.peekLast() instanceof ForStatement) {
-//            resource = ResourceExpression.resource(resource);
-//        }
-        push(ContextStack.Resource);
-        // SchemaValue already installed globally when evaluating a SchemaDeclaration. This means the schema must be declared before the resource
-        var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
 
-        var typeEnvironment = installedSchema.getEnvironment();
-        setResourceName(resource);
+        validate(resource);
+        push(ContextStack.Resource);
+
         try {
-            ResourceValue value;
-            if (resource.isEvaluating()) {
-                // notifying an existing resource that it's dependencies were satisfied else create a new resource
-                value = resource.getValue();
-            } else {
-                value = initResource(resource, installedSchema, typeEnvironment);
-            }
+            // SchemaValue already installed globally when evaluating a SchemaDeclaration
+            // This means the schema must be declared before the resource
+            var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
+            setResourceName(resource);
+
+            var value = resource.isEvaluating()
+                    ? resource.getValue() // Notifying existing resource that its dependencies were satisfied
+                    : initResource(resource, installedSchema, installedSchema.getEnvironment());
+
             value.setProviders(resource.getProviders());
             value.setTag(resource.getTags());
+
             return detectCycle(resource, value);
         } finally {
             pop(ContextStack.Resource);
@@ -703,34 +700,55 @@ public final class Interpreter extends StackVisitor<Object> {
      * they need an implicit variable to be declared (each). We think this is confusing for the user and adds extra complexity and
      * things to be remembered
      */
-    @Override
     public Object visit(ForStatement statement) {
+        push(statement);
+
         try {
-            push(statement);
             if (statement.hasRange()) {
                 return ForWithRange(statement);
-            } else if (statement.hasArray()) {
-                var array = visit(statement.getArray());// get array items
-                if (array instanceof List<?> list) {
-                    var forEnv = new Environment<>(env);
-                    Object result = null;
-                    for (int i = 0; i < list.size(); i++) {
-                        Object item = list.get(i);
-
-                        forInit(forEnv, statement.getIndex(), i);
-                        forInit(forEnv, statement.getItem(), item);
-                        if (item instanceof Map<?, ?> map) {
-                            map.forEach((key, value) -> forInit(forEnv, Identifier.symbol(statement.getItem().string() + "." + key), value));
-                        }
-                        result = executeBlock(statement.getBody(), forEnv);
-                    }
-                    return result;
-                }
             }
+
+            if (statement.hasArray()) {
+                return executeForArray(statement);
+            }
+
+            throw new OperationNotImplementedException("For statement not implemented");
         } finally {
             pop(statement);
         }
-        throw new OperationNotImplementedException("For statement not implemented");
+    }
+
+    private Object executeForArray(ForStatement statement) {
+        var array = visit(statement.getArray());
+
+        if (!(array instanceof List<?> list)) {
+            throw new OperationNotImplementedException("For statement requires an array");
+        }
+
+        var forEnv = new Environment<>(env);
+        Object result = null;
+
+        for (int i = 0; i < list.size(); i++) {
+            Object item = list.get(i);
+
+            forInit(forEnv, statement.getIndex(), i);
+            forInit(forEnv, statement.getItem(), item);
+
+            // Flatten map properties into the loop environment
+            if (item instanceof Map<?, ?> map) {
+                flattenMapProperties(forEnv, statement.getItem(), map);
+            }
+
+            result = executeBlock(statement.getBody(), forEnv);
+        }
+
+        return result;
+    }
+
+    private void flattenMapProperties(Environment<Object> forEnv, Identifier itemIdentifier, Map<?, ?> map) {
+        map.forEach((key, value) ->
+                forInit(forEnv, Identifier.symbol(itemIdentifier.string() + "." + key), value)
+        );
     }
 
     private Object ForWithRange(ForStatement statement) {
