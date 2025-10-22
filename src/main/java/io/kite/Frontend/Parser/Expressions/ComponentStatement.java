@@ -7,8 +7,8 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.Decorators.ProviderSupport;
+import io.kite.TypeChecker.Types.ComponentType;
 import io.kite.TypeChecker.Types.DecoratorType;
-import io.kite.TypeChecker.Types.ResourceType;
 import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -105,7 +105,7 @@ public final class ComponentStatement extends Statement implements Annotatable, 
 
     public Type targetType() {
         // todo change to component type
-        return ResourceType.INSTANCE;
+        return ComponentType.INSTANCE;
     }
 
     @Override

@@ -176,8 +176,7 @@ public final class Interpreter extends StackVisitor<Object> {
         }
         try {
             return env.lookup(expression.string(), expression.getHops());
-        } catch (
-                NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
+        } catch (NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
             return env.lookup(expression.string(), 0);
         }
     }
