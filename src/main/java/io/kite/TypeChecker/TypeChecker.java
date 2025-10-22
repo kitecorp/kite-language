@@ -669,16 +669,22 @@ public final class TypeChecker extends StackVisitor<Type> {
     @Override
     public Type visit(ForStatement statement) {
         var typeEnv = new TypeEnvironment(env);
+
         if (statement.hasRange()) {
             typeEnv.init(statement.getItem(), ValueType.Number);
         } else if (statement.getArray() != null) {
-            Type visit = visit(statement.getArray());
-            // make sure it's an iterable array (for item in vars); vars must be array of any kind
-            expect(visit, ArrayType.ARRAY_TYPE, statement.getArray());
-            var arrayType = (ArrayType) visit; // the kind of the item we set 'item' to the type of the array elements type
+            var arrayType = validateAndGetArrayType(statement);
             typeEnv.init(statement.getItem(), arrayType.getType());
         }
+
         return executeBlock(statement.getBody(), typeEnv);
+    }
+
+    private ArrayType validateAndGetArrayType(ForStatement statement) {
+        Type iterableType = visit(statement.getArray());
+        // Ensure it's an iterable array (for item in vars); vars must be an array of any kind
+        expect(iterableType, ArrayType.ARRAY_TYPE, statement.getArray());
+        return (ArrayType) iterableType;
     }
 
     @Override
