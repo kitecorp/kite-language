@@ -985,26 +985,31 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     private void assign(Expression expression, String identifier, Expression right, Type expected) {
         /**
-         * check if right hand side type is cloud. For example a val object once it's assigned we can't change it's properties
+         * Check if right hand side type is immutable. For example a val object once it's assigned we can't change its properties
          * val x = { env: "test" }; x.env -> error
          */
         Type lookup = env.lookup(identifier);
         boolean isImmutable = lookup instanceof ObjectType objectType && objectType.isImmutable();
-        if (isImmutable || vals.contains(identifier)) {
-            Type visit = visit(right);
-            if (Objects.equals(ObjectType.INSTANCE.getValue(), visit.getValue())) {
-                if (visit == lookup) {
-                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
-                } else if (vals.contains(identifier)) {
-                    throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
-                } else {
-                    env.assign(identifier, expected);
-                    return;
-                }
-            }
-            throw new TypeError("Cannot assign `" + printer.visit(right) + "` to val `" + identifier + "` in expression: " + printer.visit(expression));
+
+        if (!isImmutable && !vals.contains(identifier)) {
+            env.assign(identifier, expected);
+            return;
         }
-        env.assign(identifier, expected);
+
+        Type rightType = visit(right);
+
+        // Allow reassigning object types if they're different instances (not the same reference)
+        if (Objects.equals(ObjectType.INSTANCE.getValue(), rightType.getValue())
+            && rightType != lookup
+            && !vals.contains(identifier)) {
+            env.assign(identifier, expected);
+            return;
+        }
+
+        throw new TypeError(
+                "Cannot assign `" + printer.visit(right) + "` to val `" + identifier
+                + "` in expression: " + printer.visit(expression)
+        );
     }
 
     @Override
