@@ -709,8 +709,8 @@ public final class TypeChecker extends StackVisitor<Type> {
             throw new InvalidInitException("Schema not found during " + resourceName(resource) + " initialization");
         }
         if (resource.targetType() instanceof CountAnnotatable annotatable) {
-            if (annotatable.counted()) {
-                annotatable.counted(null);
+            if (annotatable.isCounted()) {
+                annotatable.setCounted(false);
                 return installedSchema.getInstance(resourceName(resource));
             }
         }

@@ -35,7 +35,7 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     private BlockExpression block;
     private Set<AnnotationDeclaration> annotations;
     private Set<String> providers;
-    private Boolean counted;
+    private boolean counted;
 
     private ComponentStatement() {
         this.annotations = Set.of();
@@ -106,16 +106,6 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     public Type targetType() {
         // todo change to component type
         return ResourceType.INSTANCE;
-    }
-
-    @Override
-    public Boolean counted() {
-        return counted;
-    }
-
-    @Override
-    public void counted(Boolean counted) {
-        this.counted = counted;
     }
 
     @Override

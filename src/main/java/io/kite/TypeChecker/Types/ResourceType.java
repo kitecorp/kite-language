@@ -4,6 +4,7 @@ import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.TypeChecker.TypeEnvironment;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +17,9 @@ public final class ResourceType extends ReferenceType implements CountAnnotatabl
     @Getter
     private final SchemaType schema;
     private final String name;
-    private Boolean counted = null;
+    @Getter
+    @Setter
+    private boolean counted;
 
     public ResourceType(String name, SchemaType schema, @Nullable TypeEnvironment env) {
         super(SystemType.RESOURCE);
@@ -33,16 +36,4 @@ public final class ResourceType extends ReferenceType implements CountAnnotatabl
         return this.name;
     }
 
-    @Override
-    public Boolean counted() {
-        if (counted == null) {
-            this.counted = Boolean.FALSE;
-        }
-        return counted;
-    }
-
-    @Override
-    public void counted(Boolean counted) {
-        this.counted = counted;
-    }
 }

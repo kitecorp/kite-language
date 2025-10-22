@@ -40,7 +40,7 @@ public final class ResourceStatement
     private ResourceValue value;
     private Object index;
     private Set<AnnotationDeclaration> annotations;
-    private Boolean counted;
+    private boolean counted;
     @Singular
     private Set<Expression> dependencies;
     private Set<String> providers;
@@ -132,16 +132,6 @@ public final class ResourceStatement
     @Override
     public Type targetType() {
         return ResourceType.INSTANCE;
-    }
-
-    @Override
-    public Boolean counted() {
-        return counted != null && counted;
-    }
-
-    @Override
-    public void counted(Boolean evaluatedCount) {
-        this.counted = evaluatedCount;
     }
 
     public boolean hasIndex() {

@@ -5,7 +5,7 @@ package io.kite.Frontend.annotations;
  * For now just resource and component are supported
  */
 public interface CountAnnotatable {
-    Boolean counted();
+    boolean isCounted();
 
-    void counted(Boolean evaluatedCount);
+    void setCounted(boolean evaluatedCount);
 }
