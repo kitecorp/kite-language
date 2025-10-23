@@ -20,10 +20,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(staticName = "resource")
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -34,12 +34,14 @@ public final class ResourceStatement
     @Nullable
     private Expression name;
     private BlockExpression block;
+
     private boolean isEvaluated;
     private boolean isEvaluating;
     private String existing;
     private ResourceValue value;
     private Object index;
-    private Set<AnnotationDeclaration> annotations;
+    @Singular
+    private Set<AnnotationDeclaration> annotations = new HashSet<>();
     private boolean counted;
     @Singular
     private Set<Expression> dependencies;
@@ -47,17 +49,7 @@ public final class ResourceStatement
     private Tags tags;
 
     public static ResourceStatement resource(ResourceStatement expression) {
-        var copy = new ResourceStatement();
-        copy.type = expression.getType();
-        copy.name = expression.getName();
-        copy.block = expression.getBlock();
-        copy.existing = expression.existing;
-        copy.index = expression.index;
-        copy.value = expression.value;
-        copy.isEvaluated = expression.isEvaluated;
-        copy.isEvaluating = expression.isEvaluating;
-        copy.dependencies = expression.dependencies;
-        return copy;
+        return expression.toBuilder().build();
     }
 
     public static ResourceStatement resource(String existing, Identifier type, Expression name, BlockExpression block) {
@@ -108,11 +100,6 @@ public final class ResourceStatement
 
     public static ResourceStatement resource(Set<AnnotationDeclaration> annotations, Identifier type, Expression name, BlockExpression body) {
         return ResourceStatement.builder().type(type).name(name).annotations(annotations).block(body).build();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getType(), getName(), getBlock());
     }
 
     public List<Statement> getArguments() {
