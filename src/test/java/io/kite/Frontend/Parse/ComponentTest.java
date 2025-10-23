@@ -13,6 +13,7 @@ import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
 import static io.kite.Frontend.Parser.Expressions.ComponentStatement.component;
 import static io.kite.Frontend.Parser.Expressions.InputDeclaration.input;
+import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Factory.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -111,6 +112,36 @@ public class ComponentTest extends ParserTest {
                 block(
                         input("name", type("string")),
                         input("size", type("string"))
+                )));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void componentInputsSimple() {
+        var res = parse("""
+                component Bucket {
+                    input string name
+                    input string size
+                }
+                """);
+        var expected = program(component("Bucket",
+                block(
+                        input("name", type("string")),
+                        input("size", type("string"))
+                )));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void componentOutputSimple() {
+        var res = parse("""
+                component Bucket {
+                    output string name = "bucket-prod"
+                }
+                """);
+        var expected = program(component("Bucket",
+                block(
+                        output("name", type("string"), string("bucket-prod"))
                 )));
         assertEquals(expected, res);
     }
