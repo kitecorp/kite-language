@@ -154,7 +154,4 @@ public final class InputDeclaration extends Statement implements Annotatable {
         return type.getType();
     }
 
-    public void setSensitive(boolean sensitive) {
-        this.sensitive = sensitive;
-    }
 }

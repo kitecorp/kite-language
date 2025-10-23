@@ -1387,26 +1387,21 @@ public class Parser {
     }
 
     private void validateInputsOutputs(Identifier componentName, BlockExpression body) {
-        var set = new HashSet<String>();
+        var set = new HashSet<String>(body.getExpression().size());
         for (var statement : body.getExpression()) {
-            switch (statement) {
-                case InputDeclaration inputDeclaration -> {
-                    if (componentName != null) {
-                        throw ParserErrors.error("Component type should not have inputs");
-                    }
-                    if (!set.add(inputDeclaration.name())) {
-                        throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
-                    }
+            if (statement instanceof InputDeclaration inputDeclaration) {
+                if (componentName != null) {
+                    throw ParserErrors.error("Component type should not have inputs");
                 }
-                case OutputDeclaration outputDeclaration -> {
-                    if (componentName != null) {
-                        throw ParserErrors.error("Component type should not have outputs");
-                    }
-                    if (!set.add(outputDeclaration.name())) {
-                        throw ParserErrors.error(format("Duplicate outputs names in component `{0}` : {1}", printer.visit(componentName), printer.visit(outputDeclaration)));
-                    }
+                if (!set.add(inputDeclaration.name())) {
+                    throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
                 }
-                case null, default -> {
+            } else if (statement instanceof OutputDeclaration outputDeclaration) {
+                if (componentName != null) {
+                    throw ParserErrors.error("Component type should not have outputs");
+                }
+                if (!set.add(outputDeclaration.name())) {
+                    throw ParserErrors.error(format("Duplicate outputs names in component `{0}` : {1}", printer.visit(componentName), printer.visit(outputDeclaration)));
                 }
             }
         }
