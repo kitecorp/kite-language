@@ -1367,8 +1367,9 @@ public class Parser {
 
     /**
      * ComponentDeclaration
-     * : component TypeIdentifier name '{'
+     * : component TypeIdentifier name? '{'
      * :    Inputs
+     * :    Output
      * : '}'
      * ;
      */
@@ -1378,27 +1379,36 @@ public class Parser {
         Identifier name = null;
         if (IsLookAhead(Identifier)) { // present when component is initialised. Absent when component is declared
             name = Identifier();
+            contextStack.push(ContextStack.Component);
+        } else{
+            contextStack.push(ContextStack.ComponentDeclaration);
         }
         var body = (BlockExpression) BlockExpression("Expect '{' after component name.", "Expect '}' after component body.");
 
-        validateInputsOutputs(name, body);
 
-        return ComponentStatement.component(componentType, name, body, annotations);
+        var component = ComponentStatement.component(componentType, name, body, annotations);
+        validateInputsOutputs(component, body);
+
+        contextStack.pop();
+        return component;
     }
 
-    private void validateInputsOutputs(Identifier componentName, BlockExpression body) {
+    /**
+     * Check input/output names are unique in the body of the component
+     */
+    private void validateInputsOutputs(ComponentStatement componentName, BlockExpression body) {
         var set = new HashSet<String>(body.getExpression().size());
         for (var statement : body.getExpression()) {
             if (statement instanceof InputDeclaration inputDeclaration) {
-                if (componentName != null) {
-                    throw ParserErrors.error("Component type should not have inputs");
+                if (componentName.getName() != null) {
+                    throw ParserErrors.error("Component initialisation should not have inputs %s has input: %s".formatted(printer.visit(componentName), printer.visit(inputDeclaration)));
                 }
                 if (!set.add(inputDeclaration.name())) {
-                    throw ParserErrors.error(format("Duplicate input names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
+                    throw ParserErrors.error(format("Duplicate names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
                 }
             } else if (statement instanceof OutputDeclaration outputDeclaration) {
-                if (componentName != null) {
-                    throw ParserErrors.error("Component type should not have outputs");
+                if (componentName.getName() != null) {
+                    throw ParserErrors.error("Component initialisation should not have outputs %s has input: %s".formatted(printer.visit(componentName), printer.visit(outputDeclaration)));
                 }
                 if (!set.add(outputDeclaration.name())) {
                     throw ParserErrors.error(format("Duplicate outputs names in component `{0}` : {1}", printer.visit(componentName), printer.visit(outputDeclaration)));
