@@ -125,4 +125,8 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     public void addProvider(String provider) {
         getProviders().add(provider);
     }
+
+    public boolean hasName() {
+        return getName() != null;
+    }
 }

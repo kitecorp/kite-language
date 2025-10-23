@@ -83,8 +83,22 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
-    public String visit(ComponentStatement expression) {
-        throw new UnsupportedOperationException("ComponentStatement is not supported in SyntaxPrinter");
+    public String visit(ComponentStatement component) {
+        if (component.hasName()) {
+            return theme.kw("component ")
+                   + visit(component.getType())
+                   + " "
+                   + visit(component.getName())
+                   + theme.punctuation(" {\n")
+                   + visit(component.getBlock())
+                   + theme.punctuation("}\n");
+        } else {
+            return theme.kw("component ")
+                   + visit(component.getType())
+                   + theme.punctuation(" {\n")
+                   + visit(component.getBlock())
+                   + theme.punctuation("}\n");
+        }
     }
 
     @Override
@@ -429,6 +443,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             case ParameterIdentifier p -> theme.type(formatParameter(p));
             case ArrayTypeIdentifier a -> theme.type(visit(a.getType()));
             case TypeIdentifier t -> theme.type(t.string());
+            case PluginIdentifier p -> theme.type(p.string());
             case null -> null;
             default -> theme.identifier(expression.string());
         };

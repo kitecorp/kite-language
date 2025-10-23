@@ -33,6 +33,9 @@ public final class PluginIdentifier extends Identifier {
 
     @Override
     public String string() {
+        if (path == null) {
+            return type.string();
+        }
         return path.string() + "/" + type.string() + "@" + date.toString();
     }
 
