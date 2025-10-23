@@ -186,7 +186,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputStringVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = "hello"
                 output string something=x
                 """);
@@ -199,7 +199,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputNumberVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = 10
                 output number something=x
                 """);
@@ -212,7 +212,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputDecimalVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = 10.2
                 output number something=x
                 """);
@@ -225,7 +225,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputDecimalZeroVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = 0.1
                 output number something=x
                 """);
@@ -238,7 +238,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputTrueVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = true
                 output boolean something=x
                 """);
@@ -251,7 +251,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputFalseVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = false
                 output boolean something=x
                 """);
@@ -264,7 +264,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputObjectEmptyVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = {}
                 output object something=x
                 """);
@@ -277,7 +277,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputObjectVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = { env: 'dev'}
                 output object something=x
                 """);
@@ -290,7 +290,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayStringVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = "hello"
                 output string[] something=[x]
                 """);
@@ -303,7 +303,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayNumberVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = 10
                 output number[] something=[x]
                 """);
@@ -316,7 +316,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayDecimalVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = 10.2
                 output number[] something=[x]
                 """);
@@ -329,7 +329,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayDecimalZeroVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = 0.1
                 output number[] something=[x]
                 """);
@@ -342,7 +342,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayTrueVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = true
                 output boolean[] something=[x]
                 """);
@@ -355,7 +355,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayFalseVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = false
                 output boolean[] something=[x]
                 """);
@@ -368,7 +368,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayObjectEmptyVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = {}
                 output object[] something=[x]
                 """);
@@ -381,7 +381,7 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputArrayObjectVar() {
-        var res = (Program) parse("""
+        var res = parse("""
                 var x = { env: 'dev'}
                 output object[] something=[x]
                 """);
