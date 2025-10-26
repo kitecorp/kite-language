@@ -29,6 +29,28 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
+    void componentInitialization() {
+        assertThrows(NotFoundException.class, () -> eval("""
+                component app name {
+                
+                }
+                """));
+    }
+
+    @Test
+    void componentDeclarationAndInitialization() {
+        var x = eval("""
+                component app {
+                
+                }
+                component app first {
+                
+                }
+                """);
+        assertEquals(new ComponentType("app", "first", null), x);
+    }
+
+    @Test
     void newResourceThrowsIfNoNameIsSpecified() {
         eval("""
                 schema Server { }
