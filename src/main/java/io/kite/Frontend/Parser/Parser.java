@@ -1518,16 +1518,13 @@ public class Parser {
         return Identifier();
     }
 
-    private PluginIdentifier ComponentType() {
+    private Identifier ComponentType() {
         switch (lookAhead().type()) {
             case String -> {
                 throw ParserErrors.error("Component type can't be a string ", lookAhead(), lookAhead().type());
-//                var token = eat(String);
-//                return PluginIdentifier.fromString(token.value().toString());
             }
             case Identifier -> {
-                TypeIdentifier type = typeParser.TypeIdentifier();
-                return PluginIdentifier.from(type);
+                return typeParser.TypeIdentifier();
             }
             case null, default -> throw new RuntimeException("Unexpected token type: " + lookAhead().type());
         }
