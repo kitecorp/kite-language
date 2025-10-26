@@ -3,7 +3,9 @@ package io.kite.TypeChecker;
 import io.kite.Base.CheckerTest;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.TypeChecker.Types.ComponentType;
+import io.kite.Visitors.PlainTheme;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +22,23 @@ public class ComponentTest extends CheckerTest {
                 }
                 """);
         assertEquals(new ComponentType("app"), x);
+    }
+
+    @Test
+    void componentDeclarationDuplication() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var x = Assertions.assertThrows(TypeError.class, () -> eval("""
+                component app {
+                
+                }
+                component app {
+                
+                }
+                """));
+        Assertions.assertEquals("""
+                Component type already exists: component app {
+                }
+                """, x.getMessage());
     }
 
     @Test
