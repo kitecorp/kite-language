@@ -1,7 +1,6 @@
 package io.kite.Frontend.Parser.Expressions;
 
 import io.kite.Frontend.Parse.Literals.Identifier;
-import io.kite.Frontend.Parse.Literals.PluginIdentifier;
 import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
@@ -18,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.kite.Frontend.Parse.Literals.Identifier.id;
+
 /**
  * A component is a collection of resources, inputs and outputs.
  * A component can be just a type or a initialization (like a class/object). If the component doesn't have a name
@@ -26,7 +27,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public final class ComponentStatement extends Statement implements Annotatable, CountAnnotatable, ProviderSupport {
-    private PluginIdentifier type;
+    private Identifier type;
     /**
      * When missing it will be a component type. When present it will be an initialization
      */
@@ -41,14 +42,14 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         this.annotations = Set.of();
     }
 
-    private ComponentStatement(PluginIdentifier type, @Nullable Identifier name, BlockExpression block) {
+    private ComponentStatement(Identifier type, @Nullable Identifier name, BlockExpression block) {
         this();
         this.type = type;
         this.name = name;
         this.block = block;
     }
 
-    private ComponentStatement(PluginIdentifier type, @Nullable Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
+    private ComponentStatement(Identifier type, @Nullable Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
         this();
         this.type = type;
         this.name = name;
@@ -56,11 +57,11 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         this.annotations = annotations;
     }
 
-    public static Statement component(PluginIdentifier type, Identifier name, BlockExpression block, AnnotationDeclaration... annotations) {
+    public static Statement component(Identifier type, Identifier name, BlockExpression block, AnnotationDeclaration... annotations) {
         return new ComponentStatement(type, name, block, Set.of(annotations));
     }
 
-    public static ComponentStatement component(PluginIdentifier type, Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
+    public static ComponentStatement component(Identifier type, Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
         return new ComponentStatement(type, name, block, annotations);
     }
 
@@ -69,18 +70,15 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     }
 
     public static Statement component(String type, String name, BlockExpression operator) {
-        var build = PluginIdentifier.fromString(type);
-        return component(build, Identifier.id(name), operator);
+        return component(id(type), id(name), operator);
     }
 
     public static Statement component(String type, String name, BlockExpression operator, AnnotationDeclaration... annotations) {
-        var build = PluginIdentifier.fromString(type);
-        return component(build, Identifier.id(name), operator, annotations);
+        return component(id(type), id(name), operator, annotations);
     }
 
     public static Statement component(String type, BlockExpression operator) {
-        var build = PluginIdentifier.fromString(type);
-        return new ComponentStatement(build, null, operator);
+        return new ComponentStatement(id(type), null, operator);
     }
 
     public List<Statement> getArguments() {
@@ -104,8 +102,7 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     }
 
     public Type targetType() {
-        // todo change to component type
-        return ComponentType.INSTANCE;
+        return ComponentType.getInstance();
     }
 
     @Override
@@ -128,5 +125,9 @@ public final class ComponentStatement extends Statement implements Annotatable, 
 
     public boolean hasName() {
         return getName() != null;
+    }
+
+    public boolean hasType() {
+        return getType() != null;
     }
 }
