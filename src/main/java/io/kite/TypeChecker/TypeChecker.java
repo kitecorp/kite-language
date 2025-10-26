@@ -381,33 +381,6 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     @Override
-    public Type visit(ComponentStatement expression) {
-        if (!expression.hasType()) {
-            throw new TypeError("Invalid component declaration: " + printer.visit(expression));
-        }
-        // define
-        return componentDefinition(expression);
-    }
-
-    private Type componentDefinition(ComponentStatement expression) {
-        String typeName = expression.getType().string();
-        if (env.lookupKey(typeName)) { // if component type is already registered in current env, throw an error
-            if (expression.hasName()) {
-                return componentInitialization(expression);
-            }
-            throw new TypeError("Component type already exists: " + printer.visit(expression));
-        } else { // register the component type
-            return env.init(typeName, new ComponentType(typeName, env));
-        }
-    }
-
-    private Type componentInitialization(ComponentStatement expression) {
-        var string = expression.getName().string();
-        var name = env.init(string, new ComponentType(expression.getType().string(), string, env));
-        return name;
-    }
-
-    @Override
     public Type visit(InputDeclaration expression) {
         var declaredType = visit(expression.getType());
 
@@ -785,7 +758,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         var installedSchema = lookupSchema(resource);
 
-        if (isCountedResource(resource)) {
+        if (isCounted(resource.targetType())) {
             return installedSchema.getInstance(resourceName(resource));
         }
 
@@ -815,11 +788,11 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     /**
-     * Method used for the @counted decorator. Once we evaluate the resource using the @counted we don't need
-     * to initialise again when the ast reaches the resource declaration.
+     * Method used for the @counted decorator. Once we evaluate the type using the @counted we don't need
+     * to initialise again when the ast reaches the type declaration.
      */
-    private boolean isCountedResource(ResourceStatement resource) {
-        if (resource.targetType() instanceof CountAnnotatable annotatable && annotatable.isCounted()) {
+    private boolean isCounted(Type type) {
+        if (type instanceof CountAnnotatable annotatable && annotatable.isCounted()) {
             annotatable.setCounted(false);
             return true;
         }
@@ -844,6 +817,36 @@ public final class TypeChecker extends StackVisitor<Type> {
                 );
             }
         }
+    }
+
+    @Override
+    public Type visit(ComponentStatement expression) {
+        if (!expression.hasType()) {
+            throw new TypeError("Invalid component declaration: " + printer.visit(expression));
+        }
+        if (isCounted(expression.targetType())) {
+            return visit(expression.getType());
+        }
+        // define
+        return componentDefinition(expression);
+    }
+
+    private Type componentDefinition(ComponentStatement expression) {
+        String typeName = expression.getType().string();
+        if (env.lookupKey(typeName)) { // if component type is already registered in current env, throw an error
+            if (expression.hasName()) {
+                return componentInitialization(expression);
+            }
+            throw new TypeError("Component type already exists: " + printer.visit(expression));
+        } else { // register the component type
+            return env.init(typeName, new ComponentType(typeName, env));
+        }
+    }
+
+    private Type componentInitialization(ComponentStatement expression) {
+        var string = expression.getName().string();
+        var name = env.init(string, new ComponentType(expression.getType().string(), string, env));
+        return name;
     }
 
     @Override
