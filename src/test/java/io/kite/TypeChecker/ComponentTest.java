@@ -25,7 +25,7 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
-    void componentDeclarationDuplication() {
+    void componentDeclarationDuplicate() {
         checker.getPrinter().setTheme(new PlainTheme());
         var x = Assertions.assertThrows(TypeError.class, () -> eval("""
                 component app {
@@ -37,6 +37,25 @@ public class ComponentTest extends CheckerTest {
                 """));
         Assertions.assertEquals("""
                 Component type already exists: component app {
+                }
+                """, x.getMessage());
+    }
+    @Test
+    void componentDeclarationDuplicateInit() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var x = Assertions.assertThrows(InvalidInitException.class, () -> eval("""
+                component app {
+                
+                }
+                component app name {
+                
+                }
+                component app name {
+                
+                }
+                """));
+        Assertions.assertEquals("""
+                Component instance already exists: component app name {
                 }
                 """, x.getMessage());
     }

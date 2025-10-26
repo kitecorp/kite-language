@@ -7,6 +7,7 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.CycleDetectionSupport;
 import io.kite.Runtime.Values.Deferred;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
@@ -856,9 +857,13 @@ public final class TypeChecker extends StackVisitor<Type> {
         var componentType = expression.getType().string();
 
         var value = new ComponentType(componentType, name, env);
-        var res = env.init(name, value);
-        executeBlock(expression.getArguments(), value.getEnvironment());
-        return res;
+        try {
+            var res = env.init(name, value);
+            executeBlock(expression.getArguments(), value.getEnvironment());
+            return res;
+        } catch (DeclarationExistsException e) {
+            throw new InvalidInitException(format("Component instance already exists: {0}", printer.visit(expression)));
+        }
     }
 
     @Override
