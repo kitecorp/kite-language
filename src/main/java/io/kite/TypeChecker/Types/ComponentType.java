@@ -15,29 +15,36 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
     private static ComponentType instance;
 
     @Getter
+    private final String type;
+    @Getter
     private final String name;
+
     @Getter
     @Setter
     private boolean counted;
 
-    public ComponentType(String name, @Nullable TypeEnvironment parent) {
+    public ComponentType(String type, String name, @Nullable TypeEnvironment parent) {
         super(SystemType.COMPONENT);
+        this.type = type;
         this.name = name;
         this.environment = new TypeEnvironment(parent);
     }
 
-    public ComponentType(String name) {
-        super(SystemType.COMPONENT, null);
-        this.name = name;
+    public ComponentType(String type, @Nullable TypeEnvironment parent) {
+        this(type, null, new TypeEnvironment(parent));
+    }
+
+    public ComponentType(String type) {
+        this(type, null);
     }
 
     public ComponentType() {
-        this("component", null);
+        this(null);
     }
 
     public static synchronized ComponentType getInstance() {
         if (instance == null) {
-            instance = new ComponentType();
+            instance = new ComponentType("component");
         }
         return instance;
     }

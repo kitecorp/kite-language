@@ -382,29 +382,29 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ComponentStatement expression) {
-        if (expression.hasType()) { // define
-            return componentDefinition(expression);
+        if (!expression.hasType()) {
+            throw new TypeError("Invalid component declaration: " + printer.visit(expression));
         }
-        if (expression.hasName()) { // initialization
-            return componentInitialization(expression);
-        }
-
-        throw new TypeError("Invalid component declaration: " + printer.visit(expression));
-    }
-
-    private Type componentInitialization(ComponentStatement expression) {
-        var nameType = visit(expression.getName());
-        // only identifiers are allowed as component names
-        return expect(nameType, ValueType.String, expression.getName());
+        // define
+        return componentDefinition(expression);
     }
 
     private Type componentDefinition(ComponentStatement expression) {
         String typeName = expression.getType().string();
         if (env.lookupKey(typeName)) { // if component type is already registered in current env, throw an error
+            if (expression.hasName()) {
+                return componentInitialization(expression);
+            }
             throw new TypeError("Component type already exists: " + printer.visit(expression));
         } else { // register the component type
             return env.init(typeName, new ComponentType(typeName, env));
         }
+    }
+
+    private Type componentInitialization(ComponentStatement expression) {
+        var string = expression.getName().string();
+        var name = env.init(string, new ComponentType(expression.getType().string(), string, env));
+        return name;
     }
 
     @Override
