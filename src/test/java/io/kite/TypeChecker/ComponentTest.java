@@ -40,6 +40,7 @@ public class ComponentTest extends CheckerTest {
                 }
                 """, x.getMessage());
     }
+
     @Test
     void componentDeclarationDuplicateInit() {
         checker.getPrinter().setTheme(new PlainTheme());
@@ -80,6 +81,26 @@ public class ComponentTest extends CheckerTest {
                 }
                 """);
         assertEquals(new ComponentType("app", "first", null), x);
+    }
+
+    @Test
+    void componentCreationWithResource() {
+        var x = eval("""
+                schema vm {
+                    string name
+                }
+                
+                component app {
+                    resource vm main {
+                        name     = "first"
+                    }
+                }
+                component app first {
+                
+                }
+                """);
+        assertEquals(new ComponentType("app", "first", null), x);
+//        assertEquals();
     }
 
 //    @Test
