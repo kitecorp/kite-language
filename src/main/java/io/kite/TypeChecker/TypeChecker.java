@@ -824,29 +824,41 @@ public final class TypeChecker extends StackVisitor<Type> {
         if (!expression.hasType()) {
             throw new TypeError("Invalid component declaration: " + printer.visit(expression));
         }
+
         if (isCounted(expression.targetType())) {
             return visit(expression.getType());
         }
-        // define
-        return componentDefinition(expression);
+
+        return createComponent(expression);
     }
 
-    private Type componentDefinition(ComponentStatement expression) {
+    /**
+     * Creates either:
+     * a component declaration: component typeName {...}
+     * a component instance:    component typeName name {...}
+     */
+    private Type createComponent(ComponentStatement expression) {
         String typeName = expression.getType().string();
-        if (env.lookupKey(typeName)) { // if component type is already registered in current env, throw an error
-            if (expression.hasName()) {
-                return componentInitialization(expression);
+        if (env.lookupKey(typeName)) { // if component type is already registered, it must be an initialization
+            if (!expression.hasName()) { // throw if it's not a component initialization
+                throw new TypeError("Component type already exists: " + printer.visit(expression));
             }
-            throw new TypeError("Component type already exists: " + printer.visit(expression));
-        } else { // register the component type
+            return newComponent(expression);
+        } else if (expression.hasName()) { // register the component type
+            throw new InvalidInitException(format("Component type {0} not declared: {1}", printer.visit(expression.getType()), printer.visit(expression)));
+        } else {
             return env.init(typeName, new ComponentType(typeName, env));
         }
     }
 
-    private Type componentInitialization(ComponentStatement expression) {
-        var string = expression.getName().string();
-        var name = env.init(string, new ComponentType(expression.getType().string(), string, env));
-        return name;
+    private Type newComponent(ComponentStatement expression) {
+        var name = expression.name();
+        var componentType = expression.getType().string();
+
+        var value = new ComponentType(componentType, name, env);
+        var res = env.init(name, value);
+        executeBlock(expression.getArguments(), value.getEnvironment());
+        return res;
     }
 
     @Override
