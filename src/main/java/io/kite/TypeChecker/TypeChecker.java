@@ -36,6 +36,8 @@ public final class TypeChecker extends StackVisitor<Type> {
     private final SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
     private final Map<String, DecoratorChecker> decoratorInfoMap;
+    private final ComponentRegistry componentRegistry;
+
     @Getter
     private TypeEnvironment env;
 
@@ -55,6 +57,8 @@ public final class TypeChecker extends StackVisitor<Type> {
         env.init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
         env.init("print", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
         env.init("println", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
+
+        this.componentRegistry = new ComponentRegistry();
 
         this.decoratorInfoMap = new HashMap<>();
         this.decoratorInfoMap.put(SensitiveDecorator.NAME, new SensitiveDecorator());
@@ -848,6 +852,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         } else if (expression.hasName()) { // register the component type
             throw new InvalidInitException(format("Component type {0} not declared: {1}", printer.visit(expression.getType()), printer.visit(expression)));
         } else {
+            componentRegistry.registerDeclaration(typeName, expression);
             return env.init(typeName, new ComponentType(typeName, env));
         }
     }
@@ -859,7 +864,17 @@ public final class TypeChecker extends StackVisitor<Type> {
         var value = new ComponentType(componentType, name, env);
         try {
             var res = env.init(name, value);
-            executeBlock(expression.getArguments(), value.getEnvironment());
+            // Get the declaration from registry
+            var declaration = componentRegistry.getDeclaration(componentType);
+            if (declaration == null) {
+                throw new TypeError("Component declaration not found: " + componentType);
+            } else {
+                // Execute declaration block in new environment
+                executeBlock(declaration.getArguments(), value.getEnvironment());
+
+                // Initialization block can ONLY set inputs (validated during execution)
+                executeBlock(expression.getArguments(), value.getEnvironment());
+            }
             return res;
         } catch (DeclarationExistsException e) {
             throw new InvalidInitException(format("Component instance already exists: {0}", printer.visit(expression)));
