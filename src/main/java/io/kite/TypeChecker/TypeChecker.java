@@ -532,7 +532,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         // If accessing a component INSTANCE, only allow outputs (not resources or inputs)
-        if (componentType.getName() != null && member instanceof ResourceType) {
+        if (member instanceof ResourceType) {
             throw new TypeError(
                     format("Cannot access resource `{0}` from component instance `{1}`. Only outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
         }

@@ -445,23 +445,22 @@ public class ComponentTest extends CheckerTest {
     @Test
     void crossComponentResourceReference() {
         var res = (Type) eval("""
-                schema network {
-                    string id
-                }
-                
                 schema vm {
-                    string network_id
+                    string id
+                    string networkId
                 }
                 
                 component networking {
-                    resource network vpc {
+                    resource vm vpc {
                         id = "vpc-123"
                     }
+                
+                    output string vpcId = vpc.id
                 }
                 
                 component app {
-                    resource vm web_server {
-                        network_id = networking.vpc.id
+                    resource vm webServer {
+                        networkId = networking.vpcId
                     }
                 }
                 """);
@@ -469,16 +468,42 @@ public class ComponentTest extends CheckerTest {
         // Verify both components exist
         var appComponent = assertIsComponentType(res, "app");
 
-        // You might need to look up networking component from the environment
+        // Look up networking component from the environment
         var networkingComponent = (ComponentType) checker.getEnv().lookup("networking");
         assertNotNull(networkingComponent, "Networking component should exist");
 
         // Verify resources
-        var vpcResource = assertComponentHasResource(networkingComponent, "vpc", "network");
+        var vpcResource = assertComponentHasResource(networkingComponent, "vpc", "vm");
         assertResourceProperty(vpcResource, "id", ValueType.String);
 
-        var webServerResource = assertComponentHasResource(appComponent, "web_server", "vm");
-        assertResourceProperty(webServerResource, "network_id", ValueType.String);
+        // Verify output
+        var vpcOutput = networkingComponent.lookup("vpcId");
+        assertEquals(ValueType.String, vpcOutput);
+
+        var webServerResource = assertComponentHasResource(appComponent, "webServer", "vm");
+        assertResourceProperty(webServerResource, "networkId", ValueType.String);
+    }
+
+    @Test
+    void componentDefinitionCannotAccessAnotherDefinitionResource() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    string id
+                    string networkId
+                }
+                
+                component networking {
+                    resource vm vpc {
+                        id = "vpc-123"
+                    }
+                }
+                
+                component app {
+                    resource vm webServer {
+                        networkId = networking.vpc.id
+                    }
+                }
+                """));
     }
 
     @Test
