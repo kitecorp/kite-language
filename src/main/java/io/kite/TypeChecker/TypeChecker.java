@@ -513,6 +513,15 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     private Type lookupComponentMember(ComponentType componentType, SymbolIdentifier memberName) {
         String name = memberName.string();
+
+        // Check if this is a component definition (no instance name)
+        if (componentType.getName() == null) {
+            throw new TypeError(
+                    "Cannot access component definition '%s.%s'. Only component instances can be referenced."
+                            .formatted(printer.visit(componentType.getType()), memberName.string())
+            );
+        }
+
         Type member = componentType.lookup(name);
 
         if (member == null) {

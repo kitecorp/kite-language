@@ -529,6 +529,40 @@ public class ComponentTest extends CheckerTest {
         assertResourceProperty(webServerResource, "networkId", ValueType.String);
     }
 
+    @Test
+    void componentInstanceCannotAccessComponentDefinition() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var exception = assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    string id
+                    string networkId
+                }
+                
+                component networking {
+                    input string vpcId
+                
+                    resource vm vpc {
+                        id = vpcId
+                    }
+                }
+                
+                component app {
+                    input string netRef
+                
+                    resource vm webServer {
+                        networkId = netRef
+                    }
+                }
+                
+                component app prodApp {
+                    netRef = networking.vpc.id
+                }
+                """));
+
+        assertEquals("Cannot access component definition 'networking.vpc'. Only component instances can be referenced.", exception.getMessage(),
+                "Error should indicate cannot access component definition from instance");
+    }
+
 //
 //    @Test
 //    void propertyAccessThroughOtherResource() {
