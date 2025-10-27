@@ -344,59 +344,42 @@ public class ComponentTest extends CheckerTest {
         assertEquals("Variable not found: dbNameee", exception.getMessage());
     }
 
-//
-//    /**
-//     * This checks for the following syntax
-//     * vm.main
-//     * All resources are defined in the schema
-//     * global env{
-//     * vm   SchemaValue -> variables{ main -> resource vm}
-//     * }
-//     */
-//    @Test
-//    void resourceIsDefinedInSchemaEnv() {
-//        ResourceType res = (ResourceType) eval("""
-//                schema Server { }
-//                resource Server main  {
-//
-//                }
-//                """);
-//        var schema = (SchemaType) checker.getEnv().get("Server");
-//
-//        assertNotNull(schema);
-//        assertEquals(SchemaType.class, schema.getClass());
-//        assertEquals("Server", schema.getValue());
-//
-//        assertNotNull(res);
-//        assertEquals("main", res.getName());
-//    }
-//
-//    @Test
-//    void resourceIsDefinedInSchema() {
-//        eval("""
-//                schema vm {
-//                    string name
-//                    number maxCount = 0
-//                    boolean enabled  = true
-//                }
-//                resource vm main {
-//                    name     = "first"
-//                    maxCount = 1
-//                    enabled  = false
-//                }
-//                """);
-//        var schema = (SchemaType) checker.getEnv().get("vm");
-//
-//        assertNotNull(schema);
-//        assertEquals("vm", schema.getValue());
-//
-//        var resource = (ResourceType) schema.getInstances().lookup("main");
-//        assertNotNull(resource);
-//        assertEquals("main", resource.getName());
-//        assertEquals(ValueType.String, resource.getProperty("name"));
-//        assertEquals(ValueType.Number, resource.getProperty("maxCount"));
-//        assertEquals(ValueType.Boolean, resource.getProperty("enabled"));
-//    }
+    @Test
+    void componentWithResourceReferencingAnotherResource() {
+        var res = (Type) eval("""
+                schema vm {
+                    string name
+                }
+                
+                schema network {
+                    string cidr
+                }
+                
+                component app {
+                    resource network vpc {
+                        cidr = "10.0.0.0/16"
+                    }
+                
+                    resource vm web_server {
+                        name = vpc.cidr
+                    }
+                }
+                """);
+
+        // Verify component type
+        var appComponent = assertIsComponentType(res, "app");
+
+        // Verify both resources exist
+        var vpcResource = assertComponentHasResource(appComponent, "vpc", "network");
+        var webServerResource = assertComponentHasResource(appComponent, "web_server", "vm");
+
+        // Verify vpc resource has cidr property
+        assertResourceProperty(vpcResource, "cidr", ValueType.String);
+
+        // Verify web_server references vpc's property (type should be string)
+        assertResourceProperty(webServerResource, "name", ValueType.String);
+    }
+
 //
 //    @Test
 //    void propertyAccessThroughOtherResource() {
