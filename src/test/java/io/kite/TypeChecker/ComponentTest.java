@@ -127,35 +127,38 @@ public class ComponentTest extends CheckerTest {
             }
             """);
 
-        // Build expected nested database component
-        var dbVmResource = new ResourceType("db_server", new SchemaType("vm"), new TypeEnvironment(checker.getEnv()));
-        dbVmResource.getEnvironment().init("name", ValueType.String);
-        var databaseComponentType = new ComponentType("database", new TypeEnvironment(checker.getEnv(), Map.of("db_server", dbVmResource)));
+        // Verify res is a ComponentType
+        assertInstanceOf(ComponentType.class, res);
+        var appComponentType = (ComponentType) res;
+        assertEquals("app", appComponentType.getType());
 
-        // Build expected app component with nested component definition
-        var webVmResource = new ResourceType("web_server", new SchemaType("vm"), new TypeEnvironment(checker.getEnv()));
-        webVmResource.getEnvironment().init("name", ValueType.String);
+        // Verify the nested component definition exists in app's environment
+        var nestedDatabase = appComponentType.getEnvironment().lookup("database");
+        assertNotNull(nestedDatabase, "Nested database component should exist");
+        assertInstanceOf(ComponentType.class, nestedDatabase);
 
-        var appComponentType = new ComponentType("app", new TypeEnvironment(checker.getEnv(), Map.of(
-                "database", databaseComponentType,  // nested component definition
-                "web_server", webVmResource
-        )));
+        var databaseComponent = (ComponentType) nestedDatabase;
+        assertEquals("database", databaseComponent.getType());
 
-        assertEquals(appComponentType, res);
+        // Verify nested component has its resource
+        var dbServer = databaseComponent.getEnvironment().lookup("db_server");
+        assertNotNull(dbServer, "db_server resource should exist in database component");
+        assertInstanceOf(ResourceType.class, dbServer);
 
-        // Verify the nested component definition exists
-        var nestedDatabase = (ComponentType) appComponentType.getEnvironment().lookup("database");
-        assertNotNull(nestedDatabase);
-        assertEquals("database", nestedDatabase.getType());
+        var dbServerResource = (ResourceType) dbServer;
+        assertEquals("db_server", dbServerResource.getName());
+        assertEquals("vm", dbServerResource.getSchema().name());
+        assertEquals(ValueType.String, dbServerResource.getProperty("name"));
 
-        // Verify nested component has its resources
-        var dbServer = (ResourceType) nestedDatabase.getEnvironment().lookup("db_server");
-        assertNotNull(dbServer);
-        assertEquals(ValueType.String, dbServer.getProperty("name"));
+        // Verify outer component has its resource
+        var webServer = appComponentType.getEnvironment().lookup("web_server");
+        assertNotNull(webServer, "web_server resource should exist in app component");
+        assertInstanceOf(ResourceType.class, webServer);
 
-        // Verify outer component has its resources
-        var webServer = (ResourceType) appComponentType.getEnvironment().lookup("web_server");
-        assertEquals(ValueType.String, webServer.getProperty("name"));
+        var webServerResource = (ResourceType) webServer;
+        assertEquals("web_server", webServerResource.getName());
+        assertEquals("vm", webServerResource.getSchema().name());
+        assertEquals(ValueType.String, webServerResource.getProperty("name"));
     }
 
     @Test
