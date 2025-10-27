@@ -917,7 +917,136 @@ public class ComponentTest extends CheckerTest {
         var appComponent = assertIsComponentType(res, "app");
         assertEquals(ObjectType.INSTANCE, appComponent.lookup("serverInfo"));
     }
-//
+
+    @Test
+    void multipleOutputsInComponent() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                    string name
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                        name = "prod-server"
+                    }
+                
+                    output string serverId = server.id
+                    output string serverName = server.name
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.String, appComponent.lookup("serverId"));
+        assertEquals(ValueType.String, appComponent.lookup("serverName"));
+    }
+
+    @Test
+    void outputReferencingMultipleResources() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server1 {
+                        id = "s1"
+                    }
+                    resource vm server2 {
+                        id = "s2"
+                    }
+                
+                    output string combinedId = server1.id + server2.id
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.String, appComponent.lookup("combinedId"));
+    }
+
+    @Test
+    void outputWithComputedExpression() {
+        var res = (Type) eval("""
+                component app {
+                    input number count = 5
+                    output number doubled = count * 2
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.Number, appComponent.lookup("doubled"));
+    }
+
+
+    @Test
+    void crossComponentChainedOutputs() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                    string refId
+                }
+                
+                component base {
+                    resource vm vpc {
+                        id = "vpc-1"
+                    }
+                    output string vpcId = vpc.id
+                }
+                
+                component middle {
+                    input string baseRef
+                    resource vm subnet {
+                        id = "subnet-1"
+                        refId = baseRef
+                    }
+                    output string subnetId = subnet.id
+                }
+                
+                component app {
+                    input string middleRef
+                    resource vm instance {
+                        id = "instance-1"
+                        refId = middleRef
+                    }
+                }
+                
+                component base baseInst {
+                }
+                
+                component middle middleInst {
+                    baseRef = baseInst.vpcId
+                }
+                
+                component app appInst {
+                    middleRef = middleInst.subnetId
+                }
+                """);
+
+        // Verify the chain of outputs works
+        var appInstance = assertIsComponentType(res, "app");
+        assertEquals("appInst", appInstance.getName());
+    }
+
+    @Test
+    void outputBeforeResourceDeclaration() {
+        // Output cannot reference a resource declared later
+        assertThrows(NotFoundException.class, () -> eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    output string serverId = server.id
+                
+                    resource vm server {
+                        id = "server-123"
+                    }
+                }
+                """));
+    }
+
+    //
 //    @Test
 //    void propertyAccessThroughOtherResource() {
 //        eval("""
