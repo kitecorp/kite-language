@@ -782,15 +782,16 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         var installedSchema = lookupSchema(resource);
 
+        String resourceName = resourceName(resource);
         if (isCounted(resource.targetType())) {
-            return installedSchema.getInstance(resourceName(resource));
+            return installedSchema.getInstance(resourceName);
         }
 
-        var resourceEnv = createResourceEnvironment(installedSchema, resource);
+        var resourceEnv = createResourceEnvironment(installedSchema, resource, resourceName);
         validateResourceProperties(resourceEnv, installedSchema, resource);
 
-        var resourceType = new ResourceType(resourceName(resource), installedSchema, resourceEnv);
-        installedSchema.addInstance(resourceName(resource), resourceType);
+        var resourceType = new ResourceType(resourceName, installedSchema, resourceEnv);
+        installedSchema.addInstance(resourceName, resourceType);
 
         return resourceType;
     }
@@ -823,10 +824,10 @@ public final class TypeChecker extends StackVisitor<Type> {
         return false;
     }
 
-    private TypeEnvironment createResourceEnvironment(SchemaType installedSchema, ResourceStatement resource) {
+    private TypeEnvironment createResourceEnvironment(SchemaType installedSchema, ResourceStatement resource, String resourceName) {
         var schemaEnv = installedSchema.getEnvironment();
         // Clone/inherit all default properties from schema properties to the new resource
-        var resourceEnv = new TypeEnvironment(schemaEnv, schemaEnv.getVariables());
+        var resourceEnv = new TypeEnvironment(resourceName, schemaEnv, schemaEnv.getVariables());
         // Init resource environment with values defined by the user
         executeBlock(resource.getArguments(), resourceEnv);
         return resourceEnv;
@@ -872,7 +873,14 @@ public final class TypeChecker extends StackVisitor<Type> {
             throw new InvalidInitException(format("Component type {0} not declared: {1}", printer.visit(expression.getType()), printer.visit(expression)));
         } else {
             componentRegistry.registerDeclaration(typeName, expression);
-            return env.init(typeName, new ComponentType(typeName, env));
+
+            var componentType = new ComponentType(typeName, env);
+
+            // Execute declaration block in new environment. Will check inputs, outputs and resources
+            // if everything is ok, save the component definition in the environment
+            executeBlock(expression.getArguments(), componentType.getEnvironment());
+
+            return env.init(typeName, componentType);
         }
     }
 
@@ -888,10 +896,6 @@ public final class TypeChecker extends StackVisitor<Type> {
             if (declaration == null) {
                 throw new TypeError("Component declaration not found: " + componentType);
             } else {
-                // Execute declaration block in new environment
-                List<Statement> arguments = declaration.getArguments();
-                executeBlock(arguments, value.getEnvironment());
-
                 // Initialization block can ONLY set inputs (validated during execution)
                 executeBlock(expression.getArguments(), value.getEnvironment());
             }
