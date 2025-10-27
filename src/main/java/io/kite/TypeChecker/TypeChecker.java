@@ -936,10 +936,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
             return result;
         } catch (DeclarationExistsException e) {
-            throw new InvalidInitException(format(
-                    "Component instance already exists: {0}",
-                    printer.visit(expression)
-            ));
+            throw new InvalidInitException(format("Component instance already exists: {0}", printer.visit(expression)));
         }
     }
 
@@ -952,12 +949,13 @@ public final class TypeChecker extends StackVisitor<Type> {
         if (parentContext instanceof ComponentStatement parentStatement) {
             if (parentStatement.isDefinition()) {
                 throw new InvalidInitException(
-                        "Component initialization not allowed inside component definition: " +
-                        printer.visit(expression)
+                        "Component initialization not allowed inside component definition: %s"
+                                .formatted(printer.visit(expression))
                 );
             }
         }
     }
+
     @Override
     public Type visit(VarDeclaration expression) {
         String var = expression.getId().string();
