@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static io.kite.TypeChecker.Types.ArrayType.arrayType;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
@@ -727,6 +728,195 @@ public class ComponentTest extends CheckerTest {
         assertEquals(ValueType.String, outputType);
     }
 
+    @Test
+    void outputReferencingNonExistentResource() {
+        assertThrows(NotFoundException.class, () -> eval("""
+                component app {
+                    output string serverId = server.id
+                }
+                """));
+    }
+
+    @Test
+    void outputReferencingNonExistentProperty() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                    }
+                
+                    output string serverId = server.nonExistent
+                }
+                """));
+    }
+
+    @Test
+    void outputReferencingAnotherOutput() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                    }
+                
+                    output string serverId = server.id
+                    output string serverIdCopy = serverId
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.String, appComponent.lookup("serverId"));
+        assertEquals(ValueType.String, appComponent.lookup("serverIdCopy"));
+    }
+
+    @Test
+    void outputReferencingInput() {
+        var res = (Type) eval("""
+                component app {
+                    input string name = "test"
+                    output string outputName = name
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.String, appComponent.lookup("outputName"));
+    }
+
+    @Test
+    void outputInNestedComponent() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    component database {
+                        resource vm db {
+                            id = "db-123"
+                        }
+                
+                        output string dbId = db.id
+                    }
+                
+                    resource vm web {
+                        id = "web-123"
+                    }
+                
+                    output string webId = web.id
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        var databaseComponent = (ComponentType) appComponent.lookup("database");
+
+        // Both components should have their outputs
+        assertEquals(ValueType.String, databaseComponent.lookup("dbId"));
+        assertEquals(ValueType.String, appComponent.lookup("webId"));
+    }
+
+    @Test
+    void outputAccessingNestedComponentOutput() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    component database {
+                        resource vm db {
+                            id = "db-123"
+                        }
+                
+                        output string dbId = db.id
+                    }
+                
+                    resource vm web {
+                        id = database.dbId
+                    }
+                
+                    output string webId = web.id
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.String, appComponent.lookup("webId"));
+    }
+
+    @Test
+    void outputInComponentInstanceCannotAddNewOutputs() {
+        // Component instances should not be able to declare new outputs
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    input string inputId
+                    resource vm server {
+                        id = inputId
+                    }
+                }
+                
+                component app prodApp {
+                    inputId = "prod-123"
+                    output string newOutput = "test"
+                }
+                """));
+    }
+
+
+    @Test
+    void outputArrayType() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server1 {
+                        id = "s1"
+                    }
+                    resource vm server2 {
+                        id = "s2"
+                    }
+                
+                    output string[] serverIds = [server1.id, server2.id]
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(arrayType(ValueType.String), appComponent.lookup("serverIds"));
+    }
+
+    @Test
+    void outputObjectType() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                    }
+                
+                    output object serverInfo = {
+                        id: server.id,
+                        name: "prod"
+                    }
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ObjectType.INSTANCE, appComponent.lookup("serverInfo"));
+    }
 //
 //    @Test
 //    void propertyAccessThroughOtherResource() {

@@ -1386,27 +1386,9 @@ public class Parser {
 
 
         var component = ComponentStatement.component(componentType, name, body, annotations);
-        validateInputsOutputs(component, body);
 
         contextStack.pop();
         return component;
-    }
-
-    /**
-     * Check input/output names are unique in the body of the component
-     */
-    private void validateInputsOutputs(ComponentStatement componentName, BlockExpression body) {
-        for (var statement : body.getExpression()) {
-            if (statement instanceof InputDeclaration inputDeclaration) {
-                if (componentName.getName() != null) {
-                    throw ParserErrors.error("Component initialisation should not have inputs %s has input: %s".formatted(printer.visit(componentName), printer.visit(inputDeclaration)));
-                }
-            } else if (statement instanceof OutputDeclaration outputDeclaration) {
-                if (componentName.getName() != null) {
-                    throw ParserErrors.error("Component initialisation should not have outputs %s has input: %s".formatted(printer.visit(componentName), printer.visit(outputDeclaration)));
-                }
-            }
-        }
     }
 
     private InputDeclaration InputDeclaration(Set<AnnotationDeclaration> annotations) {
