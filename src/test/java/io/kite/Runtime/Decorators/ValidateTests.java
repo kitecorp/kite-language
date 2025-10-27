@@ -155,11 +155,15 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void presetDnsLabelEdges() {
+    void presetDnsLabelEdgesLeadingDash() {
         assertThrows(IllegalArgumentException.class, () -> eval("""
                     @validate(preset="dns_label")
                     input string name = "-api"   // leading dash
                 """));
+    }
+
+    @Test
+    void presetDnsLabelEdgesTrailingDash() {
         assertThrows(IllegalArgumentException.class, () -> eval("""
                     @validate(preset="dns_label")
                     input string name = "api-"   // trailing dash
@@ -184,11 +188,15 @@ public class ValidateTests extends DecoratorTests {
     }
 
     @Test
-    void presetKebabOkAndNoDoubleDash() {
+    void presetKebabOk() {
         eval("""
                     @validate(preset="kebab")
                     input string svc = "api-v2"
                 """);
+    }
+
+    @Test
+    void presetKebabNotOkDoubleDash() {
         assertThrows(IllegalArgumentException.class, () -> eval("""
                     @validate(preset="kebab")
                     input string svc = "api--v2"
