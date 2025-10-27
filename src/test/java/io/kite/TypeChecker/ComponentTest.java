@@ -143,7 +143,7 @@ public class ComponentTest extends CheckerTest {
                 """);
         var resourceType = new ResourceType("main", new SchemaType("vm"), new TypeEnvironment(checker.getEnv()));
         resourceType.getEnvironment().init("name", ValueType.String);
-        var componentType = new ComponentType("app", new TypeEnvironment(checker.getEnv(), Map.of("main", resourceType)));
+        var componentType = new ComponentType("app", new TypeEnvironment("app", checker.getEnv(), Map.of("main", resourceType)));
         assertEquals(componentType, res);
 
         assertEquals(componentType.getEnvironment(), ((ComponentType) res).getEnvironment());
