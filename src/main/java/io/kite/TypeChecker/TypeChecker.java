@@ -515,17 +515,26 @@ public final class TypeChecker extends StackVisitor<Type> {
         String name = memberName.string();
 
         // Check if this is a component definition (no instance name)
-        if (componentType.getName() == null && ExecutionContext(ComponentStatement.class) instanceof ComponentStatement statement && statement.hasName()) {
-            throw new TypeError(
-                    "Cannot access component definition '%s.%s'. Only component instances can be referenced."
-                            .formatted(printer.visit(componentType.getType()), memberName.string())
-            );
+        if (componentType.getName() == null) {
+            var context = ExecutionContext(ComponentStatement.class);
+            if (context instanceof ComponentStatement statement && statement.hasName()) {
+                throw new TypeError(
+                        "Cannot access component definition '%s.%s'. Only component instances can be referenced."
+                                .formatted(componentType.getType(), memberName.string())
+                );
+            }
         }
 
         Type member = componentType.lookup(name);
 
         if (member == null) {
             throw new TypeError(format("Component '{0}' does not have member '{1}'", componentType.getType(), name));
+        }
+
+        // If accessing a component INSTANCE, only allow outputs (not resources or inputs)
+        if (componentType.getName() != null && member instanceof ResourceType) {
+            throw new TypeError(
+                    format("Cannot access resource `{0}` from component instance `{1}`. Only outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
         }
 
         return member;

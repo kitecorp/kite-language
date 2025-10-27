@@ -1046,6 +1046,42 @@ public class ComponentTest extends CheckerTest {
                 """));
     }
 
+    @Test
+    void componentInstanceCannotAccessAnotherInstanceResource() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    string id
+                    string networkId
+                }
+                
+                component networking {
+                    input string vpcId
+                
+                    resource vm vpc {
+                        id = vpcId
+                    }
+                
+                    output string vpcOutputId = vpc.id
+                }
+                
+                component app {
+                    input string netRef
+                
+                    resource vm webServer {
+                        networkId = netRef
+                    }
+                }
+                
+                component networking prodNet {
+                    vpcId = "vpc-production"
+                }
+                
+                component app prodApp {
+                    netRef = prodNet.vpc.id
+                }
+                """));
+    }
+
     //
 //    @Test
 //    void propertyAccessThroughOtherResource() {
