@@ -155,6 +155,25 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
     }
 
+    @NotNull
+    private Type executeBlock(List<Statement> statements, TypeEnvironment environment, Class<?>... filterBy) {
+        TypeEnvironment previous = this.env;
+        try {
+            this.env = environment;
+            Type res = ValueType.Null;
+            for (Statement statement : statements) {
+                for (Class<?> aClass : filterBy) {
+                    if (statement.getClass().equals(aClass)) {
+                        res = visit(statement);
+                    }
+                }
+            }
+            return res;
+        } finally {
+            this.env = previous;
+        }
+    }
+
     private Type executeBlock(Expression statement, TypeEnvironment environment) {
         TypeEnvironment previous = this.env;
         try {
@@ -870,7 +889,8 @@ public final class TypeChecker extends StackVisitor<Type> {
                 throw new TypeError("Component declaration not found: " + componentType);
             } else {
                 // Execute declaration block in new environment
-                executeBlock(declaration.getArguments(), value.getEnvironment());
+                List<Statement> arguments = declaration.getArguments();
+                executeBlock(arguments, value.getEnvironment());
 
                 // Initialization block can ONLY set inputs (validated during execution)
                 executeBlock(expression.getArguments(), value.getEnvironment());
