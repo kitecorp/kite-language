@@ -154,41 +154,38 @@ public class ComponentTest extends CheckerTest {
     @Test
     void componentDeclarationWithNestedComponentDefinition() {
         var res = (Type) eval("""
-                schema vm {
-                    string name
-                }
-                
-                component app {
-                    component database {
-                        resource vm db_server {
-                            name = "database"
-                        }
-                    }
-                
-                    resource vm web_server {
-                        name = "webserver"
+            schema vm {
+                string name
+            }
+            
+            component app {
+                component database {
+                    resource vm db_server {
+                        name = "database"
                     }
                 }
-                """);
+            
+                resource vm web_server {
+                    name = "webserver"
+                }
+            }
+            """);
 
-        // Verify app component
+        // Verify app component structure
         var appComponent = assertIsComponentType(res, "app");
+        assertComponentHasNestedComponent(appComponent, "database");
+        assertComponentHasResource(appComponent, "web_server", "vm");
 
-        // Verify nested database component
-        var databaseType = assertHasInEnvironment(appComponent, "database",
-                "Nested database component should exist in app");
-        var databaseComponent = assertIsComponentType(databaseType, "database");
+        // Verify nested database component structure
+        var databaseComponent = (ComponentType) appComponent.getEnvironment().lookup("database");
+        assertComponentHasResource(databaseComponent, "db_server", "vm");
 
-        // Verify database component's resource
-        var dbServerType = assertHasInEnvironment(databaseComponent, "db_server", "db_server resource should exist in database component");
-        var dbServerResource = assertIsResourceType(dbServerType, "db_server", "vm");
-        assertResourceProperty(dbServerResource, "name", ValueType.String);
+        // Verify properties are set correctly
+        var dbServer = (ResourceType) databaseComponent.getEnvironment().lookup("db_server");
+        assertResourceProperty(dbServer, "name", ValueType.String);
 
-        // Verify app component's resource
-        var webServerType = assertHasInEnvironment(appComponent, "web_server",
-                "web_server resource should exist in app component");
-        var webServerResource = assertIsResourceType(webServerType, "web_server", "vm");
-        assertResourceProperty(webServerResource, "name", ValueType.String);
+        var webServer = (ResourceType) appComponent.getEnvironment().lookup("web_server");
+        assertResourceProperty(webServer, "name", ValueType.String);
     }
 
     @Test
