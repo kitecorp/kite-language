@@ -97,7 +97,21 @@ public class ComponentTest extends CheckerTest {
                 }
                 """);
         assertEquals(new ComponentType("app"), x);
+    }
 
+    @Test
+    void componentDeclarationWithResourceThrows() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    number name
+                }
+                
+                component app {
+                    resource vm main {
+                        name     = "first"
+                    }
+                }
+                """));
     }
 
 //    @Test

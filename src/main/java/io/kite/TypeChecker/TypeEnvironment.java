@@ -30,6 +30,10 @@ public class TypeEnvironment extends Environment<Type> {
     public TypeEnvironment(@Nullable Environment<Type> parent, Map<String, Type> variables) {
         super(parent, variables);
     }
+    public TypeEnvironment(String name,@Nullable Environment<Type> parent, Map<String, Type> variables) {
+        super(parent, variables);
+        setName(name);
+    }
 
     public TypeEnvironment(@Nullable Environment<Type> parent, ResourceValue variables) {
         super(parent, variables);
