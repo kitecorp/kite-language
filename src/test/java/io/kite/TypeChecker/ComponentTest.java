@@ -230,18 +230,18 @@ public class ComponentTest extends CheckerTest {
     @Test
     void componentDeclarationWithInputAndDefaultValue() {
         var res = (Type) eval("""
-            schema vm {
-                string name
-            }
-            
-            component database {
-                input string dbName = "default"
-                
-                resource vm db_server {
-                    name = dbName
+                schema vm {
+                    string name
                 }
-            }
-            """);
+                
+                component database {
+                    input string dbName = "default"
+                
+                    resource vm db_server {
+                        name = dbName
+                    }
+                }
+                """);
 
         // Verify component type
         var databaseComponent = assertIsComponentType(res, "database");
@@ -253,6 +253,42 @@ public class ComponentTest extends CheckerTest {
 
         // Verify resource exists
         var dbServer = assertComponentHasResource(databaseComponent, "db_server", "vm");
+
+        // Verify resource property 'name' is of type string
+        assertResourceProperty(dbServer, "name", ValueType.String);
+    }
+
+    @Test
+    void componentInitializationWithInputValue() {
+        var res = (Type) eval("""
+                schema vm {
+                    string name
+                }
+                
+                component database {
+                    input string dbName
+                
+                    resource vm db_server {
+                        name = dbName
+                    }
+                }
+                
+                component database prod_db {
+                    dbName = "production"
+                }
+                """);
+
+        // Verify instance was created
+        var prodDbInstance = assertIsComponentType(res, "database");
+        assertEquals("prod_db", prodDbInstance.getName());
+
+        // Verify input has the provided value
+        var dbName = prodDbInstance.lookup("dbName");
+        assertNotNull(dbName, "Input 'dbName' should exist");
+        assertEquals(ValueType.String, dbName, "Input should be of type string");
+
+        // Verify resource exists
+        var dbServer = assertComponentHasResource(prodDbInstance, "db_server", "vm");
 
         // Verify resource property 'name' is of type string
         assertResourceProperty(dbServer, "name", ValueType.String);
