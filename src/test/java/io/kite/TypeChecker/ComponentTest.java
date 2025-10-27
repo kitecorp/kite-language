@@ -495,6 +495,8 @@ public class ComponentTest extends CheckerTest {
                     resource vm vpc {
                         id = vpcId
                     }
+                
+                    output string vpcOutputId = vpc.id
                 }
                 
                 component app {
@@ -510,7 +512,7 @@ public class ComponentTest extends CheckerTest {
                 }
                 
                 component app prodApp {
-                    netRef = prodNet.vpc.id
+                    netRef = prodNet.vpcOutputId
                 }
                 """);
 
@@ -526,6 +528,10 @@ public class ComponentTest extends CheckerTest {
         // Verify resources exist and types are correct
         var vpcResource = assertComponentHasResource(prodNetInstance, "vpc", "vm");
         assertResourceProperty(vpcResource, "id", ValueType.String);
+
+        // Verify output exists
+        var vpcOutput = prodNetInstance.lookup("vpcOutputId");
+        assertEquals(ValueType.String, vpcOutput);
 
         var webServerResource = assertComponentHasResource(prodAppInstance, "webServer", "vm");
         assertResourceProperty(webServerResource, "networkId", ValueType.String);
