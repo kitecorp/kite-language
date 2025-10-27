@@ -515,7 +515,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         String name = memberName.string();
 
         // Check if this is a component definition (no instance name)
-        if (componentType.getName() == null) {
+        if (componentType.getName() == null && ExecutionContext(ComponentStatement.class) instanceof ComponentStatement statement && statement.hasName()) {
             throw new TypeError(
                     "Cannot access component definition '%s.%s'. Only component instances can be referenced."
                             .formatted(printer.visit(componentType.getType()), memberName.string())
