@@ -537,6 +537,17 @@ public final class TypeChecker extends StackVisitor<Type> {
                     format("Cannot access resource `{0}` from component instance `{1}`. Only outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
         }
 
+//        // Block direct input access - inputs are private
+//        if (member instanceof Input || isInputType(member)) {  // Check however you identify inputs
+//            String componentRef = componentType.getName() != null ?
+//                    "instance `" + componentType.getName() + "`" :
+//                    "definition `" + componentType.getType() + "`";
+//            throw new TypeError(format(
+//                    "Cannot access input `{0}` from component {1}. Inputs are private to the component.",
+//                    name, componentRef
+//            ));
+//        }
+
         return member;
     }
 

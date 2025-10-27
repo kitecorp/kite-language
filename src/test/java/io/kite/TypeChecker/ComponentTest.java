@@ -8,6 +8,7 @@ import io.kite.TypeChecker.Types.*;
 import io.kite.Visitors.PlainTheme;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -1113,6 +1114,85 @@ public class ComponentTest extends CheckerTest {
                 """));
     }
 
+    @Test
+    @Disabled
+    void componentInputsNotAccessibleFromOutside() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {
+                    input string name = "test"
+                }
+                
+                component other {
+                    input string ref = app.name
+                }
+                """));
+    }
+
+    @Test
+    void componentWithOnlyOutputs() {
+        var res = (Type) eval("""
+                component config {
+                    input string env = "prod"
+                    output string environment = env
+                    output string region = "us-east-1"
+                }
+                """);
+
+        var configComponent = assertIsComponentType(res, "config");
+        assertEquals(ValueType.String, configComponent.lookup("environment"));
+        assertEquals(ValueType.String, configComponent.lookup("region"));
+    }
+
+    @Test
+    void nestedComponentsCanAccessSiblingOutputs() {
+        var res = eval("""
+                schema vm {
+                    string id
+                    string dbRef
+                }
+                
+                component app {
+                    component database {
+                        resource vm db {
+                            id = "db-123"
+                        }
+                        output string dbId = db.id
+                    }
+                
+                    component api {
+                        resource vm server {
+                            id = "api-123"
+                            dbRef = database.dbId
+                        }
+                    }
+                }
+                """);
+
+        // Should work - sibling components can reference each other's outputs
+    }
+
+    @Test
+    void parentCanAccessNestedComponentOutput() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    component database {
+                        resource vm db {
+                            id = "db-123"
+                        }
+                        output string dbId = db.id
+                    }
+                
+                    output string exposedDbId = database.dbId
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        assertEquals(ValueType.String, appComponent.lookup("exposedDbId"));
+    }
     //
 //    @Test
 //    void propertyAccessThroughOtherResource() {
