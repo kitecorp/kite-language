@@ -23,23 +23,26 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
     @Setter
     private boolean counted;
 
-    public ComponentType(String type, String name, @Nullable TypeEnvironment parent) {
+    public ComponentType(String type, String name, @Nullable TypeEnvironment environment) {
         super(SystemType.COMPONENT);
         this.type = type;
         this.name = name;
-        this.environment = new TypeEnvironment(name, parent);
+        this.environment = environment;
+        if (environment!=null && !environment.hasName()) {
+            environment.setName(name);
+        }
     }
 
     public ComponentType(String type, String name) {
-        this(type, name, new TypeEnvironment(name));
+        this(type, name, null);
     }
 
     public ComponentType(String type, @Nullable TypeEnvironment parent) {
-        this(type, null, new TypeEnvironment(parent));
+        this(type, null, parent);
     }
 
     public ComponentType(String type) {
-        this(type, null, new TypeEnvironment());
+        this(type, null, null);
     }
 
     public ComponentType() {

@@ -4,6 +4,7 @@ import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.Type;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -45,5 +46,9 @@ public class TypeEnvironment extends Environment<Type> {
 
     public TypeEnvironment() {
         super();
+    }
+
+    public boolean hasName() {
+        return StringUtils.isNotBlank(getName());
     }
 }

@@ -792,6 +792,9 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         var resourceType = new ResourceType(resourceName, installedSchema, resourceEnv);
         installedSchema.addInstance(resourceName, resourceType);
+        if (ExecutionContextIn(ComponentStatement.class)) {
+            env.init(resourceName, resourceType);
+        }
 
         return resourceType;
     }
@@ -874,7 +877,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         } else {
             componentRegistry.registerDeclaration(typeName, expression);
 
-            var componentType = new ComponentType(typeName, env);
+            var componentType = new ComponentType(typeName, new TypeEnvironment(env));
 
             // Execute declaration block in new environment. Will check inputs, outputs and resources
             // if everything is ok, save the component definition in the environment
@@ -888,7 +891,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var name = expression.name();
         var componentType = expression.getType().string();
 
-        var value = new ComponentType(componentType, name, env);
+        var value = new ComponentType(componentType, name, new TypeEnvironment(env));
         try {
             var res = env.init(name, value);
             // Get the declaration from registry
