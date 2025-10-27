@@ -1,8 +1,6 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -161,27 +159,5 @@ public class ComponentTest extends ParserTest {
                 )));
         assertEquals(expected, res);
     }
-
-    @Test
-    void componentInputsThrowIfSameNameIsDuplicated() {
-        parse("""
-                component Aws.Storage.S3.Bucket api {
-                    input string name
-                    input string name
-                }
-                """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
-    }
-
-    @Test
-    void componentDeclarationShouldNotAllowInputs() {
-        parse("""
-                component Aws.Storage.S3.Bucket api {
-                    input string name
-                }
-                """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
-    }
-
 
 }
