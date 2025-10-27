@@ -868,7 +868,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private Type createComponent(ComponentStatement expression) {
         String typeName = expression.getType().string();
         if (env.lookupKey(typeName)) { // if component type is already registered, it must be an initialization
-            if (!expression.hasName()) { // throw if it's not a component initialization
+            if (expression.isDefinition()) { // throw if it's not a component initialization
                 throw new TypeError("Component type already exists: " + printer.visit(expression));
             }
             return newComponent(expression);
