@@ -888,6 +888,11 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     private Type newComponent(ComponentStatement expression) {
+        if(ExecutionContext(ComponentStatement.class) instanceof ComponentStatement parentStatement) {
+            if (parentStatement.isDefinition()) {
+                throw new InvalidInitException("Component initialization not allowed inside component definition: " + printer.visit(expression));
+            }
+        }
         var name = expression.name();
         var componentType = expression.getType().string();
 

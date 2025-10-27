@@ -19,9 +19,9 @@ public abstract non-sealed class StackVisitor<R> implements Visitor<R> {
         this.contextStacks = new ArrayDeque<>();
     }
 
-    protected boolean ExecutionContextIn(Class<?> forStatementClass) {
+    protected boolean ExecutionContextIn(Class<?> aClass) {
         for (Callstack next : callstack) {
-            if (next.getClass().equals(forStatementClass)) {
+            if (next.getClass().equals(aClass)) {
                 return true;
             }
         }
@@ -29,9 +29,9 @@ public abstract non-sealed class StackVisitor<R> implements Visitor<R> {
     }
 
     @Nullable
-    protected Callstack ExecutionContext(Class<?> forStatementClass) {
+    protected Callstack ExecutionContext(Class<?> aClass) {
         for (Callstack next : callstack) {
-            if (next.getClass().equals(forStatementClass)) {
+            if (next.getClass().equals(aClass)) {
                 return next;
             }
         }

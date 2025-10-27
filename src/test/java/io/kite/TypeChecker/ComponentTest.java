@@ -152,6 +152,21 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
+    void componentDeclarationWithResourceThrows() {
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    number name
+                }
+                
+                component app {
+                    resource vm main {
+                        name     = "first" 
+                    }
+                }
+                """), "throws because name is a number (in schema) and we assign a string");
+    }
+
+    @Test
     void componentDeclarationWithNestedComponentDefinition() {
         var res = (Type) eval("""
                 schema vm {
@@ -187,20 +202,30 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
-    void componentDeclarationWithResourceThrows() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+    void componentInitializationInsideComponentShouldFail() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var exception = assertThrows(InvalidInitException.class, () -> eval("""
                 schema vm {
-                    number name
+                    string name
+                }
+                
+                component database {
+                    resource vm db_server {
+                        name = "database"
+                    }
                 }
                 
                 component app {
-                    resource vm main {
-                        name     = "first"
+                    // This should fail - initialization inside a component
+                    component database prod_db {
+                
                     }
                 }
                 """));
-    }
 
+        assertEquals("Component initialization not allowed inside component definition: component database prod_db {\n}\n",
+                exception.getMessage());
+    }
 //    @Test
 //    void newResourceThrowsIfNoNameIsSpecified() {
 //        eval("""

@@ -105,6 +105,10 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         return ComponentType.getInstance();
     }
 
+    public boolean isDefinition() {
+        return getType() != null && name == null;
+    }
+
     @Override
     public Set<String> getProviders() {
         if (providers == null) {
