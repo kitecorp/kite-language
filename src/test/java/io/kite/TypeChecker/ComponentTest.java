@@ -37,20 +37,20 @@ public class ComponentTest extends CheckerTest {
         return resource;
     }
 
-    private static void assertComponentHasResource(ComponentType component, String resourceName, String schemaType) {
-        var resourceType = assertHasInEnvironment(component, resourceName, null);
-        assertIsResourceType(resourceType, resourceName, schemaType);
-    }
-
-    private static void assertComponentHasNestedComponent(ComponentType parent, String nestedName) {
-        var nestedType = assertHasInEnvironment(parent, nestedName, null);
-        assertIsComponentType(nestedType, nestedName);
-    }
-
     private static Type assertHasInEnvironment(ComponentType component, String key, String errorMessage) {
-        var value = component.getEnvironment().lookup(key);
+        var value = component.lookup(key); // Use helper instead of getEnvironment().lookup()
         assertNotNull(value, errorMessage != null ? errorMessage : key + " should exist in environment");
         return value;
+    }
+
+    private static ResourceType assertComponentHasResource(ComponentType component, String resourceName, String schemaType) {
+        var resourceType = assertHasInEnvironment(component, resourceName, null);
+        return assertIsResourceType(resourceType, resourceName, schemaType); // Return the ResourceType
+    }
+
+    private static ComponentType assertComponentHasNestedComponent(ComponentType parent, String nestedName) {
+        var nestedType = assertHasInEnvironment(parent, nestedName, null);
+        return assertIsComponentType(nestedType, nestedName); // Return the ComponentType
     }
 
     private static void assertResourceProperty(ResourceType resource, String propertyName, Type expectedType) {
@@ -154,37 +154,35 @@ public class ComponentTest extends CheckerTest {
     @Test
     void componentDeclarationWithNestedComponentDefinition() {
         var res = (Type) eval("""
-            schema vm {
-                string name
-            }
-            
-            component app {
-                component database {
-                    resource vm db_server {
-                        name = "database"
+                schema vm {
+                    string name
+                }
+                
+                component app {
+                    component database {
+                        resource vm db_server {
+                            name = "database"
+                        }
+                    }
+                
+                    resource vm web_server {
+                        name = "webserver"
                     }
                 }
-            
-                resource vm web_server {
-                    name = "webserver"
-                }
-            }
-            """);
+                """);
 
         // Verify app component structure
         var appComponent = assertIsComponentType(res, "app");
-        assertComponentHasNestedComponent(appComponent, "database");
-        assertComponentHasResource(appComponent, "web_server", "vm");
+
+        // Get nested components and resources without casting
+        var databaseComponent = assertComponentHasNestedComponent(appComponent, "database");
+        var webServer = assertComponentHasResource(appComponent, "web_server", "vm");
 
         // Verify nested database component structure
-        var databaseComponent = (ComponentType) appComponent.getEnvironment().lookup("database");
-        assertComponentHasResource(databaseComponent, "db_server", "vm");
+        var dbServer = assertComponentHasResource(databaseComponent, "db_server", "vm");
 
-        // Verify properties are set correctly
-        var dbServer = (ResourceType) databaseComponent.getEnvironment().lookup("db_server");
+        // Verify properties
         assertResourceProperty(dbServer, "name", ValueType.String);
-
-        var webServer = (ResourceType) appComponent.getEnvironment().lookup("web_server");
         assertResourceProperty(webServer, "name", ValueType.String);
     }
 
