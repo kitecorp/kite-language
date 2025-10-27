@@ -953,12 +953,25 @@ public final class TypeChecker extends StackVisitor<Type> {
 
             // Then execute initialization block (typically sets input values)
             if (!expression.getArguments().isEmpty()) {
+                validateInitializationBlock(expression.getArguments()); // ADD THIS
                 executeBlock(expression.getArguments(), instance.getEnvironment());
             }
 
             return result;
         } catch (DeclarationExistsException e) {
             throw new InvalidInitException(format("Component instance already exists: {0}", printer.visit(expression)));
+        }
+    }
+
+    private void validateInitializationBlock(List<Statement> statements) {
+        for (Statement stmt : statements) {
+            if (stmt instanceof ExpressionStatement statement) {
+                if (!(statement.getStatement() instanceof AssignmentExpression)) {
+                    throw new TypeError("Cannot declare resources in component initialization");
+                }
+            } else {
+                throw new TypeError("Cannot declare resources in component initialization");
+            }
         }
     }
 
