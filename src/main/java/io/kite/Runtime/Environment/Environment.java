@@ -63,8 +63,9 @@ public class Environment<T> implements IEnvironment<T> {
     public Environment() {
         this(new HashMap<>());
     }
+
     public Environment(String name) {
-        this(new HashMap<>());
+        this(new HashMap<>(1));
         this.name = name;
     }
 

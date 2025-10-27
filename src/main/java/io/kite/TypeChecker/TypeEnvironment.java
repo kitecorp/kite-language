@@ -2,21 +2,29 @@ package io.kite.TypeChecker;
 
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
-import io.kite.TypeChecker.Types.*;
+import io.kite.TypeChecker.Types.Type;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 /*
-* Mapping from names to types
-* In type theory is called Gamma
-*
-* */
+ * Mapping from names to types
+ * In type theory is called Gamma
+ *
+ * */
 @Log4j2
 public class TypeEnvironment extends Environment<Type> {
     public TypeEnvironment(@Nullable Environment<Type> parent) {
         super(parent);
+    }
+
+    public TypeEnvironment(String name, @Nullable Environment<Type> parent) {
+        super(name, parent);
+    }
+
+    public TypeEnvironment(String name) {
+        super(name);
     }
 
     public TypeEnvironment(@Nullable Environment<Type> parent, Map<String, Type> variables) {

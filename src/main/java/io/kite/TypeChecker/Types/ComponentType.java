@@ -15,9 +15,9 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
     private static ComponentType instance;
 
     @Getter
-    private final String type;
+    private String type;
     @Getter
-    private final String name;
+    private String name;
 
     @Getter
     @Setter
@@ -27,7 +27,11 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
         super(SystemType.COMPONENT);
         this.type = type;
         this.name = name;
-        this.environment = new TypeEnvironment(parent);
+        this.environment = new TypeEnvironment(name, parent);
+    }
+
+    public ComponentType(String type, String name) {
+        this(type, name, new TypeEnvironment(name));
     }
 
     public ComponentType(String type, @Nullable TypeEnvironment parent) {
@@ -35,7 +39,7 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
     }
 
     public ComponentType(String type) {
-        this(type, null);
+        this(type, null, new TypeEnvironment());
     }
 
     public ComponentType() {

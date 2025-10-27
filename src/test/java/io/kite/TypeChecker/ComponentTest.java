@@ -84,7 +84,7 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
-    void componentCreationWithResource() {
+    void componentDeclarationWithResource() {
         var x = eval("""
                 schema vm {
                     string name
@@ -95,12 +95,9 @@ public class ComponentTest extends CheckerTest {
                         name     = "first"
                     }
                 }
-                component app first {
-                
-                }
                 """);
-        assertEquals(new ComponentType("app", "first", null), x);
-//        assertEquals();
+        assertEquals(new ComponentType("app"), x);
+
     }
 
 //    @Test
