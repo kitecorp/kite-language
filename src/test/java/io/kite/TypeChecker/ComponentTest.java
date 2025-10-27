@@ -226,16 +226,38 @@ public class ComponentTest extends CheckerTest {
         assertEquals("Component initialization not allowed inside component definition: component database prod_db {\n}\n",
                 exception.getMessage());
     }
-//    @Test
-//    void newResourceThrowsIfNoNameIsSpecified() {
-//        eval("""
-//                schema Server { }
-//                resource Server {
-//
-//                }
-//                """);
-//        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
-//    }
+
+    @Test
+    void componentDeclarationWithInputAndDefaultValue() {
+        var res = (Type) eval("""
+            schema vm {
+                string name
+            }
+            
+            component database {
+                input string dbName = "default"
+                
+                resource vm db_server {
+                    name = dbName
+                }
+            }
+            """);
+
+        // Verify component type
+        var databaseComponent = assertIsComponentType(res, "database");
+
+        // Verify input exists
+        var dbName = databaseComponent.lookup("dbName");
+        assertNotNull(dbName, "Input 'dbName' should exist");
+        assertEquals(ValueType.String, dbName, "Input should be of type string");
+
+        // Verify resource exists
+        var dbServer = assertComponentHasResource(databaseComponent, "db_server", "vm");
+
+        // Verify resource property 'name' is of type string
+        assertResourceProperty(dbServer, "name", ValueType.String);
+    }
+
 //
 //    /**
 //     * This checks for the following syntax

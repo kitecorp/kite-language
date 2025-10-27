@@ -42,7 +42,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private TypeEnvironment env;
 
     public TypeChecker() {
-        this(new TypeEnvironment());
+        this(new TypeEnvironment("global"));
     }
 
     public TypeChecker(TypeEnvironment environment) {
@@ -418,7 +418,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         onFinalAnnotations(expression.getAnnotations());
-        return declaredType;
+        return env.init(expression.getId(), declaredType);
     }
 
     private void validateInitializer(InputDeclaration expression, Type declaredType) {
@@ -766,7 +766,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var name = schema.getName();
         var body = schema.getProperties();
 
-        var schemaType = new SchemaType(name.string(), env);
+        var schemaType = new SchemaType(name.string(), new TypeEnvironment(name.string(), env));
         env.init(name, schemaType);
         for (SchemaProperty property : body) {
             var vardeclaration = VarDeclaration.var(property.name(), property.type(), property.init());
@@ -830,7 +830,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private TypeEnvironment createResourceEnvironment(SchemaType installedSchema, ResourceStatement resource, String resourceName) {
         var schemaEnv = installedSchema.getEnvironment();
         // Clone/inherit all default properties from schema properties to the new resource
-        var resourceEnv = new TypeEnvironment(resourceName, schemaEnv, schemaEnv.getVariables());
+        var resourceEnv = new TypeEnvironment(resourceName, env, schemaEnv.getVariables());
         // Init resource environment with values defined by the user
         executeBlock(resource.getArguments(), resourceEnv);
         return resourceEnv;
@@ -896,7 +896,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         componentRegistry.registerDeclaration(typeName, expression);
 
         // Create component type with its own environment
-        var componentType = new ComponentType(typeName, new TypeEnvironment(env));
+        var componentType = new ComponentType(typeName, new TypeEnvironment(typeName, env));
 
         // Execute declaration block to validate and initialize inputs, outputs, and resources
         executeBlock(expression.getArguments(), componentType.getEnvironment());
