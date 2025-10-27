@@ -849,9 +849,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ComponentStatement expression) {
-        if (!expression.hasType()) {
-            throw new TypeError("Invalid component declaration: " + printer.visit(expression));
-        }
+        validateComponentStatement(expression);
 
         if (isCounted(expression.targetType())) {
             return visit(expression.getType());
@@ -860,59 +858,106 @@ public final class TypeChecker extends StackVisitor<Type> {
         return createComponent(expression);
     }
 
+    private void validateComponentStatement(ComponentStatement expression) {
+        if (!expression.hasType()) {
+            throw new TypeError("Invalid component declaration: " + printer.visit(expression));
+        }
+    }
+
     /**
      * Creates either:
-     * a component declaration: component typeName {...}
-     * a component instance:    component typeName name {...}
+     * - Component declaration: component typeName {...}
+     * - Component instance: component typeName name {...}
      */
     private Type createComponent(ComponentStatement expression) {
         String typeName = expression.getType().string();
-        if (env.lookupKey(typeName)) { // if component type is already registered, it must be an initialization
-            if (expression.isDefinition()) { // throw if it's not a component initialization
-                throw new TypeError("Component type already exists: " + printer.visit(expression));
-            }
-            return newComponent(expression);
-        } else if (expression.hasName()) { // register the component type
-            throw new InvalidInitException(format("Component type {0} not declared: {1}", printer.visit(expression.getType()), printer.visit(expression)));
-        } else {
-            componentRegistry.registerDeclaration(typeName, expression);
+        boolean typeExists = env.lookupKey(typeName);
 
-            var componentType = new ComponentType(typeName, new TypeEnvironment(env));
-
-            // Execute declaration block in new environment. Will check inputs, outputs and resources
-            // if everything is ok, save the component definition in the environment
-            executeBlock(expression.getArguments(), componentType.getEnvironment());
-
-            return env.init(typeName, componentType);
+        if (typeExists && expression.isDefinition()) {
+            throw new TypeError("Component type already exists: " + printer.visit(expression));
         }
+
+        if (!typeExists && expression.hasName()) {
+            throw new InvalidInitException(format(
+                    "Component type {0} not declared: {1}", printer.visit(expression.getType()), printer.visit(expression)
+            ));
+        }
+
+        return typeExists ? initializeComponent(expression) : declareComponent(expression);
     }
 
-    private Type newComponent(ComponentStatement expression) {
-        if(ExecutionContext(ComponentStatement.class) instanceof ComponentStatement parentStatement) {
-            if (parentStatement.isDefinition()) {
-                throw new InvalidInitException("Component initialization not allowed inside component definition: " + printer.visit(expression));
-            }
-        }
-        var name = expression.name();
-        var componentType = expression.getType().string();
+    /**
+     * Declares a new component type and registers it in both the registry and environment
+     */
+    private Type declareComponent(ComponentStatement expression) {
+        String typeName = expression.getType().string();
 
-        var value = new ComponentType(componentType, name, new TypeEnvironment(env));
+        // Register in component registry for later instantiation
+        componentRegistry.registerDeclaration(typeName, expression);
+
+        // Create component type with its own environment
+        var componentType = new ComponentType(typeName, new TypeEnvironment(env));
+
+        // Execute declaration block to validate and initialize inputs, outputs, and resources
+        executeBlock(expression.getArguments(), componentType.getEnvironment());
+
+        // Register in type environment
+        return env.init(typeName, componentType);
+    }
+
+    /**
+     * Creates a new instance of a declared component type
+     */
+    private Type initializeComponent(ComponentStatement expression) {
+        validateNotNestedInitialization(expression);
+
+        String instanceName = expression.name();
+        String componentType = expression.getType().string();
+
+        // Get the declaration from registry
+        ComponentStatement declaration = componentRegistry.getDeclaration(componentType);
+        if (declaration == null) {
+            throw new TypeError("Component declaration not found: " + componentType);
+        }
+
+        // Create instance with its own environment
+        var instance = new ComponentType(componentType, instanceName, new TypeEnvironment(env));
+
         try {
-            var res = env.init(name, value);
-            // Get the declaration from registry
-            var declaration = componentRegistry.getDeclaration(componentType);
-            if (declaration == null) {
-                throw new TypeError("Component declaration not found: " + componentType);
-            } else {
-                // Initialization block can ONLY set inputs (validated during execution)
-                executeBlock(expression.getArguments(), value.getEnvironment());
+            var result = env.init(instanceName, instance);
+
+            // First execute declaration block to set up base structure (resources, etc.)
+            executeBlock(declaration.getArguments(), instance.getEnvironment());
+
+            // Then execute initialization block (typically sets input values)
+            if (!expression.getArguments().isEmpty()) {
+                executeBlock(expression.getArguments(), instance.getEnvironment());
             }
-            return res;
+
+            return result;
         } catch (DeclarationExistsException e) {
-            throw new InvalidInitException(format("Component instance already exists: {0}", printer.visit(expression)));
+            throw new InvalidInitException(format(
+                    "Component instance already exists: {0}",
+                    printer.visit(expression)
+            ));
         }
     }
 
+    /**
+     * Validates that component initialization is not happening inside a component definition
+     */
+    private void validateNotNestedInitialization(ComponentStatement expression) {
+        var parentContext = ExecutionContext(ComponentStatement.class);
+
+        if (parentContext instanceof ComponentStatement parentStatement) {
+            if (parentStatement.isDefinition()) {
+                throw new InvalidInitException(
+                        "Component initialization not allowed inside component definition: " +
+                        printer.visit(expression)
+                );
+            }
+        }
+    }
     @Override
     public Type visit(VarDeclaration expression) {
         String var = expression.getId().string();
