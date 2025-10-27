@@ -380,6 +380,105 @@ public class ComponentTest extends CheckerTest {
         assertResourceProperty(webServerResource, "name", ValueType.String);
     }
 
+    @Test
+    void resourceReferenceToNonExistentProperty() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var exception = assertThrows(TypeError.class, () -> eval("""
+        schema network {
+            string id
+            string cidr
+        }
+        
+        schema vm {
+            string name
+        }
+        
+        component app {
+            resource network vpc {
+                id = "vpc-123"
+                cidr = "10.0.0.0/16"
+            }
+            
+            resource vm web_server {
+                name = vpc.nonexistent
+            }
+        }
+        """));
+
+        assertTrue(exception.getMessage().contains("nonexistent")
+                   || exception.getMessage().contains("vpc"),
+                "Error should indicate the property doesn't exist");
+    }
+
+    @Test
+    void resourceReferenceWithTypeMismatch() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var exception = assertThrows(TypeError.class, () -> eval("""
+        schema network {
+            string cidr
+        }
+        
+        schema vm {
+            string name
+            number cpu_count
+        }
+        
+        component app {
+            resource network vpc {
+                cidr = "10.0.0.0/16"
+            }
+            
+            resource vm web_server {
+                name = "web"
+                cpu_count = vpc.cidr
+            }
+        }
+        """));
+
+        assertTrue(exception.getMessage().contains("number")
+                   && exception.getMessage().contains("string"),
+                "Error should indicate type mismatch between number and string");
+    }
+
+    @Test
+    void crossComponentResourceReference() {
+        var res = (Type) eval("""
+        schema network {
+            string id
+        }
+        
+        schema vm {
+            string network_id
+        }
+        
+        component networking {
+            resource network vpc {
+                id = "vpc-123"
+            }
+        }
+        
+        component app {
+            resource vm web_server {
+                network_id = networking.vpc.id
+            }
+        }
+        """);
+
+        // Verify both components exist
+        var appComponent = assertIsComponentType(res, "app");
+
+        // You might need to look up networking component from the environment
+        var networkingComponent = (ComponentType) checker.getEnv().lookup("networking");
+        assertNotNull(networkingComponent, "Networking component should exist");
+
+        // Verify resources
+        var vpcResource = assertComponentHasResource(networkingComponent, "vpc", "network");
+        assertResourceProperty(vpcResource, "id", ValueType.String);
+
+        var webServerResource = assertComponentHasResource(appComponent, "web_server", "vm");
+        assertResourceProperty(webServerResource, "network_id", ValueType.String);
+    }
+
 //
 //    @Test
 //    void propertyAccessThroughOtherResource() {

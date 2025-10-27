@@ -505,9 +505,21 @@ public final class TypeChecker extends StackVisitor<Type> {
         return switch (objectType) {
             case SchemaType schemaType -> lookupSchemaInstance(schemaType, resourceName);
             case ResourceType resourceType -> lookupResourceProperty(expression, resourceType, resourceName);
+            case ComponentType componentType -> lookupComponentMember(componentType, resourceName);
             case ObjectType obj -> accessMemberType(expression, resourceName.string(), obj);
             case null, default -> objectType;
         };
+    }
+
+    private Type lookupComponentMember(ComponentType componentType, SymbolIdentifier memberName) {
+        String name = memberName.string();
+        Type member = componentType.lookup(name);
+
+        if (member == null) {
+            throw new TypeError(format("Component '{0}' does not have member '{1}'", componentType.getType(), name));
+        }
+
+        return member;
     }
 
     private Type lookupSchemaInstance(SchemaType schemaType, SymbolIdentifier resourceName) {
