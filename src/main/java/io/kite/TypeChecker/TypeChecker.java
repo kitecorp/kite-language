@@ -791,9 +791,10 @@ public final class TypeChecker extends StackVisitor<Type> {
         validateResourceProperties(resourceEnv, installedSchema, resource);
 
         var resourceType = new ResourceType(resourceName, installedSchema, resourceEnv);
-        installedSchema.addInstance(resourceName, resourceType);
         if (ExecutionContextIn(ComponentStatement.class)) {
             env.init(resourceName, resourceType);
+        } else {
+            installedSchema.addInstance(resourceName, resourceType);
         }
 
         return resourceType;
