@@ -294,6 +294,31 @@ public class ComponentTest extends CheckerTest {
         assertResourceProperty(dbServer, "name", ValueType.String);
     }
 
+    @Test
+    void componentInitializationWithWrongInputType() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var exception = assertThrows(TypeError.class, () -> eval("""
+        schema vm {
+            string name
+        }
+        
+        component database {
+            input string dbName
+            
+            resource vm db_server {
+                name = dbName
+            }
+        }
+        
+        component database prod_db {
+            dbName = 123
+        }
+        """));
+
+        assertEquals("Expected type `string` but got `number` in expression: dbName = 123",
+                exception.getMessage());
+    }
+
 //
 //    /**
 //     * This checks for the following syntax
