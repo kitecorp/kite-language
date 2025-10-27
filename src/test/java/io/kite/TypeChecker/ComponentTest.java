@@ -15,6 +15,50 @@ import static org.junit.jupiter.api.Assertions.*;
 @Log4j2
 public class ComponentTest extends CheckerTest {
 
+    // Helper methods for component testing
+    private static ComponentType assertIsComponentType(Type type, String expectedTypeName) {
+        assertInstanceOf(ComponentType.class, type, "Expected a ComponentType");
+        var component = (ComponentType) type;
+        assertEquals(expectedTypeName, component.getType(), "Component type name mismatch");
+        return component;
+    }
+
+    private static ResourceType assertIsResourceType(Type type, String expectedName, String expectedSchemaType) {
+        assertInstanceOf(ResourceType.class, type, "Expected a ResourceType");
+        var resource = (ResourceType) type;
+        assertEquals(expectedName, resource.getName(), "Resource name mismatch");
+
+        if (expectedSchemaType != null) {
+            assertInstanceOf(SchemaType.class, resource.getSchema(), "Expected SchemaType for resource");
+            var schema = resource.getSchema();
+            assertEquals(expectedSchemaType, schema.name(), "Schema type mismatch");
+        }
+
+        return resource;
+    }
+
+    private static void assertComponentHasResource(ComponentType component, String resourceName, String schemaType) {
+        var resourceType = assertHasInEnvironment(component, resourceName, null);
+        assertIsResourceType(resourceType, resourceName, schemaType);
+    }
+
+    private static void assertComponentHasNestedComponent(ComponentType parent, String nestedName) {
+        var nestedType = assertHasInEnvironment(parent, nestedName, null);
+        assertIsComponentType(nestedType, nestedName);
+    }
+
+    private static Type assertHasInEnvironment(ComponentType component, String key, String errorMessage) {
+        var value = component.getEnvironment().lookup(key);
+        assertNotNull(value, errorMessage != null ? errorMessage : key + " should exist in environment");
+        return value;
+    }
+
+    private static void assertResourceProperty(ResourceType resource, String propertyName, Type expectedType) {
+        var propertyValue = resource.getProperty(propertyName);
+        assertEquals(expectedType, propertyValue,
+                "Property " + propertyName + " should be " + expectedType);
+    }
+
     @Test
     void componentDeclaration() {
         var x = eval("""
@@ -109,56 +153,42 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentDeclarationWithNestedComponentDefinition() {
-        var res = eval("""
-            schema vm {
-                string name
-            }
-            
-            component app {
-                component database {
-                    resource vm db_server {
-                        name = "database"
-                    }
+        var res = (Type) eval("""
+                schema vm {
+                    string name
                 }
                 
-                resource vm web_server {
-                    name = "webserver"
+                component app {
+                    component database {
+                        resource vm db_server {
+                            name = "database"
+                        }
+                    }
+                
+                    resource vm web_server {
+                        name = "webserver"
+                    }
                 }
-            }
-            """);
+                """);
 
-        // Verify res is a ComponentType
-        assertInstanceOf(ComponentType.class, res);
-        var appComponentType = (ComponentType) res;
-        assertEquals("app", appComponentType.getType());
+        // Verify app component
+        var appComponent = assertIsComponentType(res, "app");
 
-        // Verify the nested component definition exists in app's environment
-        var nestedDatabase = appComponentType.getEnvironment().lookup("database");
-        assertNotNull(nestedDatabase, "Nested database component should exist");
-        assertInstanceOf(ComponentType.class, nestedDatabase);
+        // Verify nested database component
+        var databaseType = assertHasInEnvironment(appComponent, "database",
+                "Nested database component should exist in app");
+        var databaseComponent = assertIsComponentType(databaseType, "database");
 
-        var databaseComponent = (ComponentType) nestedDatabase;
-        assertEquals("database", databaseComponent.getType());
+        // Verify database component's resource
+        var dbServerType = assertHasInEnvironment(databaseComponent, "db_server", "db_server resource should exist in database component");
+        var dbServerResource = assertIsResourceType(dbServerType, "db_server", "vm");
+        assertResourceProperty(dbServerResource, "name", ValueType.String);
 
-        // Verify nested component has its resource
-        var dbServer = databaseComponent.getEnvironment().lookup("db_server");
-        assertNotNull(dbServer, "db_server resource should exist in database component");
-        assertInstanceOf(ResourceType.class, dbServer);
-
-        var dbServerResource = (ResourceType) dbServer;
-        assertEquals("db_server", dbServerResource.getName());
-        assertEquals("vm", dbServerResource.getSchema().name());
-        assertEquals(ValueType.String, dbServerResource.getProperty("name"));
-
-        // Verify outer component has its resource
-        var webServer = appComponentType.getEnvironment().lookup("web_server");
-        assertNotNull(webServer, "web_server resource should exist in app component");
-        assertInstanceOf(ResourceType.class, webServer);
-
-        var webServerResource = (ResourceType) webServer;
-        assertEquals("web_server", webServerResource.getName());
-        assertEquals("vm", webServerResource.getSchema().name());
-        assertEquals(ValueType.String, webServerResource.getProperty("name"));
+        // Verify app component's resource
+        var webServerType = assertHasInEnvironment(appComponent, "web_server",
+                "web_server resource should exist in app component");
+        var webServerResource = assertIsResourceType(webServerType, "web_server", "vm");
+        assertResourceProperty(webServerResource, "name", ValueType.String);
     }
 
     @Test
