@@ -384,26 +384,26 @@ public class ComponentTest extends CheckerTest {
     void resourceReferenceToNonExistentProperty() {
         checker.getPrinter().setTheme(new PlainTheme());
         var exception = assertThrows(TypeError.class, () -> eval("""
-        schema network {
-            string id
-            string cidr
-        }
-        
-        schema vm {
-            string name
-        }
-        
-        component app {
-            resource network vpc {
-                id = "vpc-123"
-                cidr = "10.0.0.0/16"
-            }
-            
-            resource vm web_server {
-                name = vpc.nonexistent
-            }
-        }
-        """));
+                schema network {
+                    string id
+                    string cidr
+                }
+                
+                schema vm {
+                    string name
+                }
+                
+                component app {
+                    resource network vpc {
+                        id = "vpc-123"
+                        cidr = "10.0.0.0/16"
+                    }
+                
+                    resource vm web_server {
+                        name = vpc.nonexistent
+                    }
+                }
+                """));
 
         assertTrue(exception.getMessage().contains("nonexistent")
                    || exception.getMessage().contains("vpc"),
@@ -414,26 +414,26 @@ public class ComponentTest extends CheckerTest {
     void resourceReferenceWithTypeMismatch() {
         checker.getPrinter().setTheme(new PlainTheme());
         var exception = assertThrows(TypeError.class, () -> eval("""
-        schema network {
-            string cidr
-        }
-        
-        schema vm {
-            string name
-            number cpu_count
-        }
-        
-        component app {
-            resource network vpc {
-                cidr = "10.0.0.0/16"
-            }
-            
-            resource vm web_server {
-                name = "web"
-                cpu_count = vpc.cidr
-            }
-        }
-        """));
+                schema network {
+                    string cidr
+                }
+                
+                schema vm {
+                    string name
+                    number cpu_count
+                }
+                
+                component app {
+                    resource network vpc {
+                        cidr = "10.0.0.0/16"
+                    }
+                
+                    resource vm web_server {
+                        name = "web"
+                        cpu_count = vpc.cidr
+                    }
+                }
+                """));
 
         assertTrue(exception.getMessage().contains("number")
                    && exception.getMessage().contains("string"),
@@ -443,26 +443,26 @@ public class ComponentTest extends CheckerTest {
     @Test
     void crossComponentResourceReference() {
         var res = (Type) eval("""
-        schema network {
-            string id
-        }
-        
-        schema vm {
-            string network_id
-        }
-        
-        component networking {
-            resource network vpc {
-                id = "vpc-123"
-            }
-        }
-        
-        component app {
-            resource vm web_server {
-                network_id = networking.vpc.id
-            }
-        }
-        """);
+                schema network {
+                    string id
+                }
+                
+                schema vm {
+                    string network_id
+                }
+                
+                component networking {
+                    resource network vpc {
+                        id = "vpc-123"
+                    }
+                }
+                
+                component app {
+                    resource vm web_server {
+                        network_id = networking.vpc.id
+                    }
+                }
+                """);
 
         // Verify both components exist
         var appComponent = assertIsComponentType(res, "app");
@@ -477,6 +477,56 @@ public class ComponentTest extends CheckerTest {
 
         var webServerResource = assertComponentHasResource(appComponent, "web_server", "vm");
         assertResourceProperty(webServerResource, "network_id", ValueType.String);
+    }
+
+    @Test
+    void crossComponentInstanceResourceReference() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                    string networkId
+                }
+                
+                component networking {
+                    input string vpcId
+                
+                    resource vm vpc {
+                        id = vpcId
+                    }
+                }
+                
+                component app {
+                    input string netRef
+                
+                    resource vm webServer {
+                        networkId = netRef
+                    }
+                }
+                
+                component networking prodNet {
+                    vpcId = "vpc-production"
+                }
+                
+                component app prodApp {
+                    netRef = prodNet.vpc.id
+                }
+                """);
+
+        // Verify the prodApp instance was created
+        var prodAppInstance = assertIsComponentType(res, "app");
+        assertEquals("prodApp", prodAppInstance.getName());
+
+        // Verify prodNet instance exists
+        var prodNetInstance = (ComponentType) checker.getEnv().lookup("prodNet");
+        assertNotNull(prodNetInstance, "prodNet instance should exist");
+        assertEquals("prodNet", prodNetInstance.getName());
+
+        // Verify resources exist and types are correct
+        var vpcResource = assertComponentHasResource(prodNetInstance, "vpc", "vm");
+        assertResourceProperty(vpcResource, "id", ValueType.String);
+
+        var webServerResource = assertComponentHasResource(prodAppInstance, "webServer", "vm");
+        assertResourceProperty(webServerResource, "networkId", ValueType.String);
     }
 
 //
