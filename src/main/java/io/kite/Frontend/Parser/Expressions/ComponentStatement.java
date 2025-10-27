@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.kite.Frontend.Parse.Literals.Identifier.id;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 
 /**
  * A component is a collection of resources, inputs and outputs.
@@ -42,13 +43,6 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         this.annotations = Set.of();
     }
 
-    private ComponentStatement(Identifier type, @Nullable Identifier name, BlockExpression block) {
-        this();
-        this.type = type;
-        this.name = name;
-        this.block = block;
-    }
-
     private ComponentStatement(Identifier type, @Nullable Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
         this();
         this.type = type;
@@ -57,28 +51,38 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         this.annotations = annotations;
     }
 
-    public static Statement component(Identifier type, Identifier name, BlockExpression block, AnnotationDeclaration... annotations) {
+    // Single private constructor - all others delegate to this
+    private ComponentStatement(Identifier type, @Nullable Identifier name, BlockExpression block) {
+        this(type, name, block, Set.of());
+    }
+
+    // Factory methods
+    public static Statement component() {
+        return new ComponentStatement();
+    }
+
+    public static Statement component(String type, BlockExpression block) {
+        return new ComponentStatement(type(type), null, block);
+    }
+
+    public static Statement component(String type, String name, BlockExpression block) {
+        return component(type(type), id(name), block);
+    }
+
+    public static Statement component(Identifier type, Identifier name, BlockExpression block) {
+        return new ComponentStatement(type, name, block);
+    }
+
+    public static Statement component(String type, String name, BlockExpression block, AnnotationDeclaration... annotations) {
+        return component(type(type), id(name), block, annotations);
+    }
+
+    public static ComponentStatement component(Identifier type, Identifier name, BlockExpression block, AnnotationDeclaration... annotations) {
         return new ComponentStatement(type, name, block, Set.of(annotations));
     }
 
     public static ComponentStatement component(Identifier type, Identifier name, BlockExpression block, Set<AnnotationDeclaration> annotations) {
         return new ComponentStatement(type, name, block, annotations);
-    }
-
-    public static Statement component() {
-        return new ComponentStatement();
-    }
-
-    public static Statement component(String type, String name, BlockExpression operator) {
-        return component(id(type), id(name), operator);
-    }
-
-    public static Statement component(String type, String name, BlockExpression operator, AnnotationDeclaration... annotations) {
-        return component(id(type), id(name), operator, annotations);
-    }
-
-    public static Statement component(String type, BlockExpression operator) {
-        return new ComponentStatement(id(type), null, operator);
     }
 
     public List<Statement> getArguments() {
