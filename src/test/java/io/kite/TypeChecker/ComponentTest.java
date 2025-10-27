@@ -2,6 +2,7 @@ package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
 import io.kite.Runtime.exceptions.InvalidInitException;
+import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.TypeChecker.Types.*;
 import io.kite.Visitors.PlainTheme;
 import lombok.extern.log4j.Log4j2;
@@ -298,25 +299,49 @@ public class ComponentTest extends CheckerTest {
     void componentInitializationWithWrongInputType() {
         checker.getPrinter().setTheme(new PlainTheme());
         var exception = assertThrows(TypeError.class, () -> eval("""
-        schema vm {
-            string name
-        }
-        
-        component database {
-            input string dbName
-            
-            resource vm db_server {
-                name = dbName
-            }
-        }
-        
-        component database prod_db {
-            dbName = 123
-        }
-        """));
+                schema vm {
+                    string name
+                }
+                
+                component database {
+                    input string dbName
+                
+                    resource vm db_server {
+                        name = dbName
+                    }
+                }
+                
+                component database prod_db {
+                    dbName = 123
+                }
+                """));
 
         assertEquals("Expected type `string` but got `number` in expression: dbName = 123",
                 exception.getMessage());
+    }
+
+    @Test
+    void componentInitializationWithMissingInputType() {
+        checker.getPrinter().setTheme(new PlainTheme());
+        var exception = assertThrows(NotFoundException.class, () -> eval("""
+                schema vm {
+                    string name
+                }
+                
+                component database {
+                    input string dbName
+                
+                    resource vm db_server {
+                        name = dbName
+                    }
+                }
+                
+                component database prod_db {
+                    dbNameee = 123 
+                }
+                """));
+
+        assertEquals("Variable not found: dbNameee", exception.getMessage());
     }
 
 //
