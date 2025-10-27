@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
 public class ComponentTest extends CheckerTest {
@@ -106,6 +105,57 @@ public class ComponentTest extends CheckerTest {
         assertEquals(componentType.getEnvironment(), ((ComponentType) res).getEnvironment());
         var main = (ResourceType) componentType.getEnvironment().lookup("main");
         assertEquals(ValueType.String, main.getProperty("name"));
+    }
+
+    @Test
+    void componentDeclarationWithNestedComponentDefinition() {
+        var res = eval("""
+            schema vm {
+                string name
+            }
+            
+            component app {
+                component database {
+                    resource vm db_server {
+                        name = "database"
+                    }
+                }
+                
+                resource vm web_server {
+                    name = "webserver"
+                }
+            }
+            """);
+
+        // Build expected nested database component
+        var dbVmResource = new ResourceType("db_server", new SchemaType("vm"), new TypeEnvironment(checker.getEnv()));
+        dbVmResource.getEnvironment().init("name", ValueType.String);
+        var databaseComponentType = new ComponentType("database", new TypeEnvironment(checker.getEnv(), Map.of("db_server", dbVmResource)));
+
+        // Build expected app component with nested component definition
+        var webVmResource = new ResourceType("web_server", new SchemaType("vm"), new TypeEnvironment(checker.getEnv()));
+        webVmResource.getEnvironment().init("name", ValueType.String);
+
+        var appComponentType = new ComponentType("app", new TypeEnvironment(checker.getEnv(), Map.of(
+                "database", databaseComponentType,  // nested component definition
+                "web_server", webVmResource
+        )));
+
+        assertEquals(appComponentType, res);
+
+        // Verify the nested component definition exists
+        var nestedDatabase = (ComponentType) appComponentType.getEnvironment().lookup("database");
+        assertNotNull(nestedDatabase);
+        assertEquals("database", nestedDatabase.getType());
+
+        // Verify nested component has its resources
+        var dbServer = (ResourceType) nestedDatabase.getEnvironment().lookup("db_server");
+        assertNotNull(dbServer);
+        assertEquals(ValueType.String, dbServer.getProperty("name"));
+
+        // Verify outer component has its resources
+        var webServer = (ResourceType) appComponentType.getEnvironment().lookup("web_server");
+        assertEquals(ValueType.String, webServer.getProperty("name"));
     }
 
     @Test
