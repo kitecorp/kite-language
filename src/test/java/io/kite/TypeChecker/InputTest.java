@@ -1,6 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import io.kite.TypeChecker.Types.AnyType;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.ValueType;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.TypeChecker.Types.ArrayType.arrayType;
 import static io.kite.TypeChecker.Types.UnionType.unionType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker Input")
 public class InputTest extends CheckerTest {
@@ -252,5 +254,37 @@ public class InputTest extends CheckerTest {
         assertEquals(arrayType(unionType("custom", ValueType.String, ValueType.Number)), res);
     }
 
+    @Test
+    void inputTypeMismatch() {
+        assertThrows(TypeError.class, () -> eval("input string something = 123"));
+    }
+
+    @Test
+    void inputArrayTypeMismatch() {
+        assertThrows(TypeError.class, () -> eval("input string[] something = [1, 2, 3]"));
+    }
+
+    @Test
+    void inputAccessibleInSameScope() {
+        var res = eval("""
+                input string name = "test"
+                var result = name
+                """);
+        // Verify inputs can be referenced
+    }
+
+    @Test
+    void inputDuplicateDeclaration() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
+                input string something
+                input string something
+                """));
+    }
+
+    @Test
+    void inputStringWithNullDefault() {
+        // Should this be allowed or throw an error?
+        assertThrows(TypeError.class, () -> eval("input string something = null"));
+    }
 
 }
