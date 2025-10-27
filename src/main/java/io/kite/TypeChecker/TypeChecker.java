@@ -459,7 +459,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         onFinalAnnotations(expression.getAnnotations());
-        return declaredType;
+        return env.init(expression.getId(), declaredType);
     }
 
     private void validateInitializer(OutputDeclaration expression, Type declaredType) {

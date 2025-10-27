@@ -1,6 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
+import io.kite.Runtime.exceptions.DeclarationExistsException;
 import io.kite.Runtime.exceptions.InvalidInitException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.TypeChecker.Types.*;
@@ -561,6 +562,169 @@ public class ComponentTest extends CheckerTest {
 
         assertEquals("Cannot access component definition 'networking.vpc'. Only component instances can be referenced.", exception.getMessage(),
                 "Error should indicate cannot access component definition from instance");
+    }
+
+    @Test
+    void outputInComponent() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                    }
+                
+                    output string serverId = server.id
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        var outputType = appComponent.lookup("serverId");
+        assertNotNull(outputType, "Output should exist in component");
+        assertEquals(ValueType.String, outputType);
+    }
+
+    @Test
+    void outputInComponentFromInput() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    input string inputId
+                
+                    resource vm server {
+                        id = inputId
+                    }
+                
+                    output string serverId = server.id
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+
+        // Verify input exists
+        var inputType = appComponent.lookup("inputId");
+        assertEquals(ValueType.String, inputType);
+
+        // Verify output exists
+        var outputType = appComponent.lookup("serverId");
+        assertEquals(ValueType.String, outputType);
+    }
+
+    @Test
+    void outputInComponentInstance() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    input string inputId
+                
+                    resource vm server {
+                        id = inputId
+                    }
+                
+                    output string serverId = server.id
+                }
+                
+                component app prodApp {
+                    inputId = "prod-123"
+                }
+                """);
+
+        var prodAppInstance = assertIsComponentType(res, "app");
+        assertEquals("prodApp", prodAppInstance.getName());
+
+        // Verify output exists in instance
+        var outputType = prodAppInstance.lookup("serverId");
+        assertNotNull(outputType, "Output should exist in component instance");
+        assertEquals(ValueType.String, outputType);
+    }
+
+    @Test
+    void outputTypeMismatchInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                    }
+                
+                    output number serverId = server.id
+                }
+                """));
+    }
+
+    @Test
+    void outputDuplicateInComponent() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
+                schema vm {
+                    string id
+                }
+                
+                component app {
+                    resource vm server {
+                        id = "server-123"
+                    }
+                
+                    output string serverId = server.id
+                    output string serverId = server.id
+                }
+                """));
+    }
+
+    @Test
+    void outputAccessFromAnotherComponentInstance() {
+        var res = (Type) eval("""
+                schema vm {
+                    string id
+                    string networkId
+                }
+                
+                component networking {
+                    input string vpcId
+                
+                    resource vm vpc {
+                        id = vpcId
+                    }
+                
+                    output string vpcOutputId = vpc.id
+                }
+                
+                component app {
+                    input string netRef
+                
+                    resource vm webServer {
+                        networkId = netRef
+                    }
+                }
+                
+                component networking prodNet {
+                    vpcId = "vpc-production"
+                }
+                
+                component app prodApp {
+                    netRef = prodNet.vpcOutputId
+                }
+                """);
+
+        // Verify prodApp instance was created
+        var prodAppInstance = assertIsComponentType(res, "app");
+        assertEquals("prodApp", prodAppInstance.getName());
+
+        // Verify prodNet instance exists with output
+        var prodNetInstance = (ComponentType) checker.getEnv().lookup("prodNet");
+        assertNotNull(prodNetInstance);
+        var outputType = prodNetInstance.lookup("vpcOutputId");
+        assertEquals(ValueType.String, outputType);
     }
 
 //

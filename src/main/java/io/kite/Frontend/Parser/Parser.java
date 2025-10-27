@@ -40,7 +40,6 @@ import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionS
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
-import static java.text.MessageFormat.format;
 
 
 /**
@@ -1397,21 +1396,14 @@ public class Parser {
      * Check input/output names are unique in the body of the component
      */
     private void validateInputsOutputs(ComponentStatement componentName, BlockExpression body) {
-        var set = new HashSet<String>(body.getExpression().size());
         for (var statement : body.getExpression()) {
             if (statement instanceof InputDeclaration inputDeclaration) {
                 if (componentName.getName() != null) {
                     throw ParserErrors.error("Component initialisation should not have inputs %s has input: %s".formatted(printer.visit(componentName), printer.visit(inputDeclaration)));
                 }
-                if (!set.add(inputDeclaration.name())) {
-                    throw ParserErrors.error(format("Duplicate names in component `{0}` : {1}", printer.visit(componentName), printer.visit(inputDeclaration)));
-                }
             } else if (statement instanceof OutputDeclaration outputDeclaration) {
                 if (componentName.getName() != null) {
                     throw ParserErrors.error("Component initialisation should not have outputs %s has input: %s".formatted(printer.visit(componentName), printer.visit(outputDeclaration)));
-                }
-                if (!set.add(outputDeclaration.name())) {
-                    throw ParserErrors.error(format("Duplicate outputs names in component `{0}` : {1}", printer.visit(componentName), printer.visit(outputDeclaration)));
                 }
             }
         }
