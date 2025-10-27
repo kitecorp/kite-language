@@ -2,6 +2,7 @@ package io.kite.TypeChecker.Types;
 
 import io.kite.TypeChecker.TypeEnvironment;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,6 +11,7 @@ public sealed class ReferenceType
         permits AnyType, ArrayType, ComponentType, ObjectType, ResourceType, SchemaType, UnionType {
 
     @Getter
+    @Setter
     protected TypeEnvironment environment;
 
     public ReferenceType(String typeName) {

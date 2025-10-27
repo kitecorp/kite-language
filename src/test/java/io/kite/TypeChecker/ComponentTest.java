@@ -2,11 +2,13 @@ package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
 import io.kite.Runtime.exceptions.InvalidInitException;
-import io.kite.TypeChecker.Types.ComponentType;
+import io.kite.TypeChecker.Types.*;
 import io.kite.Visitors.PlainTheme;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -85,7 +87,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentDeclarationWithResource() {
-        var x = eval("""
+        var res = eval("""
                 schema vm {
                     string name
                 }
@@ -96,7 +98,14 @@ public class ComponentTest extends CheckerTest {
                     }
                 }
                 """);
-        assertEquals(new ComponentType("app"), x);
+        var resourceType = new ResourceType("main", new SchemaType("vm"), new TypeEnvironment(checker.getEnv()));
+        resourceType.getEnvironment().init("name", ValueType.String);
+        var componentType = new ComponentType("app", new TypeEnvironment(checker.getEnv(), Map.of("main", resourceType)));
+        assertEquals(componentType, res);
+
+        assertEquals(componentType.getEnvironment(), ((ComponentType) res).getEnvironment());
+        var main = (ResourceType) componentType.getEnvironment().lookup("main");
+        assertEquals(ValueType.String, main.getProperty("name"));
     }
 
     @Test
