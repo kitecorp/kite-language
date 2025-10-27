@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -28,7 +30,7 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
         this.type = type;
         this.name = name;
         this.environment = environment;
-        if (environment!=null && !environment.hasName()) {
+        if (environment != null && !environment.hasName()) {
             environment.setName(name);
         }
     }
@@ -56,5 +58,28 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
         return instance;
     }
 
+    public Type lookup(String key) {
+        return environment.lookup(key);
+    }
+
+    public boolean has(String key) {
+        return environment.lookupKey(key);
+    }
+
+    public Optional<ComponentType> getNestedComponent(String name) {
+        Type type = lookup(name);
+        return type instanceof ComponentType ? Optional.of((ComponentType) type) : Optional.empty();
+    }
+
+    public Optional<ResourceType> getResource(String name) {
+        Type type = lookup(name);
+        return type instanceof ResourceType ? Optional.of((ResourceType) type) : Optional.empty();
+    }
+
+    // Or more general
+    public <T extends Type> Optional<T> get(String name, Class<T> expectedType) {
+        Type type = lookup(name);
+        return expectedType.isInstance(type) ? Optional.of(expectedType.cast(type)) : Optional.empty();
+    }
 
 }
