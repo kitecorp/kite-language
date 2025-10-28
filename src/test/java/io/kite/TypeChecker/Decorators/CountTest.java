@@ -69,8 +69,10 @@ public class CountTest extends CheckerTest {
     @Test
     void decoratorCountZero() {
         eval("""
+                component vm {}
+                
                 @count(0)
-                component vm {}""");
+                component vm server {}""");
     }
 
     @Test
@@ -126,8 +128,9 @@ public class CountTest extends CheckerTest {
     void decoratorCountMax() {
         // valid because we just check if the argument is a number
         eval("""
+                component vm {}
                 @count(1000)
-                component vm {}"""
+                component vm server {}"""
         );
     }
 
@@ -135,9 +138,10 @@ public class CountTest extends CheckerTest {
     void decoratorCountMaxVar() {
         // valid because we just check if the argument is a number
         eval("""
+                component vm {}
                 var max = 1000
                 @count(max)
-                component vm {}"""
+                component vm server {}"""
         );
     }
 
@@ -164,16 +168,18 @@ public class CountTest extends CheckerTest {
     void decoratorCountMin() {
         // valid because we just check if the argument is a number
         eval("""
+                component vm {}
                 @count(-10)
-                component vm {}""");
+                component vm server {}""");
     }
 
     @Test
     @DisplayName("decorator @count with decimal value rounds it to the floor")
     void decoratorCountZeroDecimal() {
         eval("""
+                component vm {}
                 @count(0.7)
-                component vm {}""");
+                component vm server {}""");
     }
 
     @Test
@@ -334,7 +340,6 @@ public class CountTest extends CheckerTest {
                     string name
                 }
                 
-                @count(2)
                 component app {
                     @count(3)
                     resource vm server {
@@ -366,29 +371,6 @@ public class CountTest extends CheckerTest {
                 """);
     }
 
-    @Test
-    void decoratorCountOnComponentDefinitionAndInstance() {
-        var res = eval("""
-                schema vm {
-                    string name
-                }
-                
-                @count(2)
-                component app {
-                    input string appName
-                
-                    @count(3)
-                    resource vm server {
-                        name = appName + "-server-$count"
-                    }
-                }
-                
-                @count(2)
-                component app prodApp {
-                    appName = "prod-$count"
-                }
-                """);
-    }
 
     @Test
     void decoratorCountOnComponentDefinitionShouldFail() {
