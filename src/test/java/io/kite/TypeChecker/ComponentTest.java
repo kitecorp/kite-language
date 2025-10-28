@@ -172,7 +172,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentDeclarationWithNestedComponentDefinition() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string name
                 }
@@ -233,7 +233,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentDeclarationWithInputAndDefaultValue() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string name
                 }
@@ -264,7 +264,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentInitializationWithInputValue() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string name
                 }
@@ -349,7 +349,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentWithResourceReferencingAnotherResource() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string name
                 }
@@ -445,7 +445,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void crossComponentResourceReference() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                     string networkId
@@ -509,7 +509,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void crossComponentInstanceResourceReference() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                     string networkId
@@ -599,7 +599,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputInComponent() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -621,7 +621,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputInComponentFromInput() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -650,7 +650,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputInComponentInstance() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -716,7 +716,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputAccessFromAnotherComponentInstance() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                     string networkId
@@ -788,7 +788,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputReferencingAnotherOutput() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -810,7 +810,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputReferencingInput() {
-        var res = (Type) eval("""
+        var res = eval("""
                 component app {
                     input string name = "test"
                     output string outputName = name
@@ -823,7 +823,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputInNestedComponent() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -855,7 +855,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputAccessingNestedComponentOutput() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -906,7 +906,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputArrayType() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -929,7 +929,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputObjectType() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -952,7 +952,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void multipleOutputsInComponent() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                     string name
@@ -976,7 +976,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputReferencingMultipleResources() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -999,7 +999,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputWithComputedExpression() {
-        var res = (Type) eval("""
+        var res = eval("""
                 component app {
                     input number count = 5
                     output number doubled = count * 2
@@ -1013,7 +1013,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void crossComponentChainedOutputs() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                     string refId
@@ -1130,7 +1130,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void componentWithOnlyOutputs() {
-        var res = (Type) eval("""
+        var res = eval("""
                 component config {
                     input string env = "prod"
                     output string environment = env
@@ -1173,7 +1173,7 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void parentCanAccessNestedComponentOutput() {
-        var res = (Type) eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
@@ -1192,6 +1192,77 @@ public class ComponentTest extends CheckerTest {
 
         var appComponent = assertIsComponentType(res, "app");
         assertEquals(ValueType.String, appComponent.lookup("exposedDbId"));
+    }
+
+
+    @Test
+    void componentInputWithAllowedDecorator() {
+        var res = eval("""
+                component app {
+                    @allowed(["hello", "world"])
+                    input string something
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        var inputType = appComponent.lookup("something");
+        assertNotNull(inputType);
+        assertEquals(ValueType.String, inputType);
+    }
+
+    @Test
+    void componentInputWithAllowedDecoratorValidValue() {
+        var res = eval("""
+                component app {
+                    @allowed(["hello", "world"])
+                    input string something = "hello"
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        var inputType = appComponent.lookup("something");
+        assertEquals(ValueType.String, inputType);
+    }
+
+    @Test
+    void componentInstanceInputWithAllowedDecoratorValidValue() {
+        var res = eval("""
+                component app {
+                    @allowed(["hello", "world"])
+                    input string something
+                }
+                
+                component app prodApp {
+                    something = "hello"
+                }
+                """);
+
+        var prodAppInstance = assertIsComponentType(res, "app");
+        assertEquals("prodApp", prodAppInstance.getName());
+    }
+
+    @Test
+    void componentInputWithAllowedDecoratorWrongType() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {
+                    @allowed(["hello", "world"])
+                    input string something = 123
+                }
+                """));
+    }
+
+    @Test
+    void componentInstanceInputWithAllowedDecoratorInvalidValue() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {
+                    @allowed(["hello", "world"])
+                    input string something
+                }
+                
+                component app prodApp {
+                    something = 123
+                }
+                """));
     }
 
 }
