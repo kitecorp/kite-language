@@ -69,7 +69,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         this.decoratorInfoMap.put(MinValueDecorator.NAME, new MinValueDecorator());
         this.decoratorInfoMap.put(MaxValueDecorator.NAME, new MaxValueDecorator());
         this.decoratorInfoMap.put(AllowedDecorator.NAME, new AllowedDecorator());
-        this.decoratorInfoMap.put(DependsOnDecorator.NAME, new DependsOnDecorator());
+        this.decoratorInfoMap.put(DependsOnDecorator.NAME, new DependsOnDecorator(this));
         this.decoratorInfoMap.put(NonEmptyDecorator.NAME, new NonEmptyDecorator());
         this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
         this.decoratorInfoMap.put(ValidateDecorator.NAME, new ValidateDecorator());
