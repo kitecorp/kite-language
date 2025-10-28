@@ -213,6 +213,14 @@ public class ValidateTests extends DecoratorTests {
         assertTrue(ex.getMessage().contains("index 1"));
     }
 
+    @Test
+    void validateWithEmptyRegex() {
+        var error = assertThrows(IllegalArgumentException.class, () -> eval("""
+                @validate(regex="")
+                input string something
+                """));
+        // Should empty regex be allowed?
+    }
 //    @Test
 //    void validate_runs_on_override() {
 //        // default passes, CLI/env override fails: your harness should simulate override
