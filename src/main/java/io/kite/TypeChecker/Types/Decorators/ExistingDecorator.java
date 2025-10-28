@@ -2,10 +2,10 @@ package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
-import io.kite.Visitors.SyntaxPrinter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -16,15 +16,13 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class ExistingDecorator extends DecoratorChecker {
     public static final String NAME = "existing";
-    private final SyntaxPrinter printer;
 
-    public ExistingDecorator(SyntaxPrinter syntaxPrinter) {
-        super(NAME, decorator(
+    public ExistingDecorator(TypeChecker checker) {
+        super(checker,NAME, decorator(
                         List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE)
                 ), Set.of()
         );
-        this.printer = syntaxPrinter;
     }
 
     @Override

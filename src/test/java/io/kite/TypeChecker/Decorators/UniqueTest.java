@@ -17,7 +17,7 @@ public class UniqueTest extends CheckerTest {
         var error = assertThrows(TypeError.class, () -> eval("""
                 @unique(10)
                 input string something"""));
-        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@unique(10) must not have any arguments", error.getMessage());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class UniqueTest extends CheckerTest {
                 @unique()
                 input string[] something
                 """));
-        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@unique() must not have any arguments", error.getMessage());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class UniqueTest extends CheckerTest {
                 @unique("test")
                 input string[] something
                 """));
-        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@unique(\"test\") must not have any arguments", error.getMessage());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class UniqueTest extends CheckerTest {
                 @unique(true)
                 input string[] something
                 """));
-        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@unique(true) must not have any arguments", error.getMessage());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class UniqueTest extends CheckerTest {
                 @unique([1, 2])
                 input string[] something
                 """));
-        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@unique([1, 2]) must not have any arguments", error.getMessage());
     }
 
     @Test
@@ -154,7 +154,9 @@ public class UniqueTest extends CheckerTest {
                 @unique({key: "value"})
                 input string[] something
                 """));
-        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@unique({\n" +
+                     " \"key\": \"value\" \n" +
+                     "}) must not have any arguments", error.getMessage());
     }
 
     @Test

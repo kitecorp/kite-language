@@ -61,21 +61,21 @@ public final class TypeChecker extends StackVisitor<Type> {
         this.componentRegistry = new ComponentRegistry();
 
         this.decoratorInfoMap = new HashMap<>();
-        this.decoratorInfoMap.put(SensitiveDecorator.NAME, new SensitiveDecorator());
+        this.decoratorInfoMap.put(SensitiveDecorator.NAME, new SensitiveDecorator(this));
         this.decoratorInfoMap.put(CountDecorator.NAME, new CountDecorator(this));
-        this.decoratorInfoMap.put(DescriptionDecorator.NAME, new DescriptionDecorator());
-        this.decoratorInfoMap.put(MaxLengthDecorator.NAME, new MaxLengthDecorator());
-        this.decoratorInfoMap.put(MinLengthDecorator.NAME, new MinLengthDecorator());
-        this.decoratorInfoMap.put(MinValueDecorator.NAME, new MinValueDecorator());
-        this.decoratorInfoMap.put(MaxValueDecorator.NAME, new MaxValueDecorator());
-        this.decoratorInfoMap.put(AllowedDecorator.NAME, new AllowedDecorator());
+        this.decoratorInfoMap.put(DescriptionDecorator.NAME, new DescriptionDecorator(this));
+        this.decoratorInfoMap.put(MaxLengthDecorator.NAME, new MaxLengthDecorator(this));
+        this.decoratorInfoMap.put(MinLengthDecorator.NAME, new MinLengthDecorator(this));
+        this.decoratorInfoMap.put(MinValueDecorator.NAME, new MinValueDecorator(this));
+        this.decoratorInfoMap.put(MaxValueDecorator.NAME, new MaxValueDecorator(this));
+        this.decoratorInfoMap.put(AllowedDecorator.NAME, new AllowedDecorator(this));
         this.decoratorInfoMap.put(DependsOnDecorator.NAME, new DependsOnDecorator(this));
-        this.decoratorInfoMap.put(NonEmptyDecorator.NAME, new NonEmptyDecorator());
-        this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator());
-        this.decoratorInfoMap.put(ValidateDecorator.NAME, new ValidateDecorator());
+        this.decoratorInfoMap.put(NonEmptyDecorator.NAME, new NonEmptyDecorator(this));
+        this.decoratorInfoMap.put(UniqueDecorator.NAME, new UniqueDecorator(this));
+        this.decoratorInfoMap.put(ValidateDecorator.NAME, new ValidateDecorator(this));
         this.decoratorInfoMap.put(ProviderDecorator.NAME, new ProviderDecorator(this));
         this.decoratorInfoMap.put(TagsDecorator.NAME, new TagsDecorator(this));
-        this.decoratorInfoMap.put(ExistingDecorator.NAME, new ExistingDecorator(printer));
+        this.decoratorInfoMap.put(ExistingDecorator.NAME, new ExistingDecorator(this));
     }
 
     @Override

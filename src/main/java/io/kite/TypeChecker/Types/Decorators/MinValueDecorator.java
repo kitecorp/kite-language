@@ -3,6 +3,7 @@ package io.kite.TypeChecker.Types.Decorators;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -18,8 +19,8 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 public class MinValueDecorator extends DecoratorChecker {
     public static final String NAME = "minValue";
 
-    public MinValueDecorator() {
-        super(NAME, decorator(List.of(ValueType.Number),
+    public MinValueDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(List.of(ValueType.Number),
                 Set.of(
                         DecoratorType.Target.INPUT,
                         DecoratorType.Target.OUTPUT

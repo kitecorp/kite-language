@@ -2,6 +2,7 @@ package io.kite.TypeChecker.Types.Decorators;
 
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.ValueType;
 import org.fusesource.jansi.Ansi;
@@ -16,18 +17,18 @@ public class DescriptionDecorator extends DecoratorChecker {
 
     public static final String NAME = "description";
 
-    public DescriptionDecorator() {
-        super(NAME, decorator(List.of(ValueType.String),
-                Set.of(
-                        Target.RESOURCE,
-                        Target.COMPONENT,
-                        Target.INPUT,
-                        Target.OUTPUT,
-                        Target.VAR,
-                        Target.SCHEMA,
-                        Target.SCHEMA_PROPERTY,
-                        Target.FUN
-                )),
+    public DescriptionDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(List.of(ValueType.String),
+                        Set.of(
+                                Target.RESOURCE,
+                                Target.COMPONENT,
+                                Target.INPUT,
+                                Target.OUTPUT,
+                                Target.VAR,
+                                Target.SCHEMA,
+                                Target.SCHEMA_PROPERTY,
+                                Target.FUN
+                        )),
                 Set.of()
         );
     }

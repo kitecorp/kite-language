@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.ParserTest;
 import io.kite.Frontend.Parser.Program;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.Types.Type;
+import io.kite.Visitors.PlainTheme;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -14,6 +15,7 @@ public class CheckerTest extends ParserTest {
     @BeforeEach
     void setUp() {
         checker = new TypeChecker();
+        checker.getPrinter().setTheme(new PlainTheme());
     }
 
     @AfterEach

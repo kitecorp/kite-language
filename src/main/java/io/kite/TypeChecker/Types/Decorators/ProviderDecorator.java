@@ -25,7 +25,7 @@ public class ProviderDecorator extends DecoratorChecker {
     private final SyntaxPrinter printer;
 
     public ProviderDecorator(TypeChecker checker) {
-        super(NAME, decorator(List.of(ValueType.String),
+        super(checker, NAME, decorator(List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
                 ), Set.of()
         );
@@ -35,6 +35,14 @@ public class ProviderDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
+        if (doesNotHaveArguments(declaration)) {
+            var message = Ansi.ansi()
+                    .a(printer.visit(declaration))
+                    .a(" is missing arguments")
+                    .toString();
+            throw new TypeError(message);
+        }
+
         var value = declaration.getValue();
         if (value != null) {
             validateValue(declaration, value);
@@ -81,7 +89,7 @@ public class ProviderDecorator extends DecoratorChecker {
 
 
     @Override
-    public boolean hasArguments(AnnotationDeclaration declaration) {
+    public boolean doesNotHaveArguments(AnnotationDeclaration declaration) {
         return declaration.getValue() == null
                && (declaration.getArgs() == null || declaration.getArgs().isEmpty());
     }

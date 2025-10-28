@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -18,8 +19,8 @@ public class UniqueDecorator extends DecoratorChecker {
 
     public static final String NAME = "unique";
 
-    public UniqueDecorator() {
-        super(NAME, decorator(List.of(),
+    public UniqueDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(List.of(),
                         Set.of(DecoratorType.Target.INPUT)
                 ),
                 Set.of(SystemType.ARRAY)
@@ -28,6 +29,13 @@ public class UniqueDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
+        if (doesNotHaveArguments(declaration)) {
+            var message = Ansi.ansi()
+                    .a(printer.visit(declaration))
+                    .a(" must not have any arguments")
+                    .toString();
+            throw new TypeError(message);
+        }
         switch (declaration.getTarget()) {
             case InputDeclaration input -> isAllowedOnType(input.getType());
             case OutputDeclaration input -> isAllowedOnType(input.getType());

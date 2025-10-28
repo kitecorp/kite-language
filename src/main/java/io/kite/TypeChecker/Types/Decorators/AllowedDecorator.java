@@ -6,6 +6,7 @@ import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.*;
 import io.kite.Visitors.SyntaxPrinter;
@@ -22,8 +23,8 @@ public class AllowedDecorator extends DecoratorChecker {
     public static final String NAME = "allowed";
     private SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
 
-    public AllowedDecorator() {
-        super(NAME, decorator(
+    public AllowedDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(
                         List.of(ArrayType.ARRAY_TYPE,
                                 ObjectType.INSTANCE,
                                 ValueType.Number,
@@ -46,8 +47,7 @@ public class AllowedDecorator extends DecoratorChecker {
                     case StringLiteral literal -> expectTargetType(declaration, ValueType.String);
                     case NumberLiteral literal -> expectTargetType(declaration, ValueType.Number);
                     case BooleanLiteral literal -> expectTargetType(declaration, ValueType.Boolean);
-                    case ObjectExpression literal ->
-                            expectTargetType(declaration, ObjectType.INSTANCE);
+                    case ObjectExpression literal -> expectTargetType(declaration, ObjectType.INSTANCE);
                     default -> throw new IllegalStateException("Unexpected value: " + item);
                 }
             }
