@@ -153,4 +153,262 @@ public class TagsTest extends CheckerTest {
         assertEquals("Invalid key format: `env stage`. Keys must be alphanumeric.", error.getMessage());
     }
 
+    @Test
+    void tagsOnComponent() {
+        eval("""
+                component app {}
+                
+                @tags("production")
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void tagsOnComponentStringArray() {
+        eval("""
+                component app {}
+                
+                @tags(["production", "critical"])
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void tagsOnComponentObject() {
+        eval("""
+                component app {}
+                
+                @tags({env: "prod", team: "backend"})
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void tagsOnResourceInComponent() {
+        eval("""
+                schema vm {}
+                
+                component app {
+                    @tags("database")
+                    resource vm db {}
+                }
+                """);
+    }
+
+    @Test
+    void tagsOnResourceInComponentStringArray() {
+        eval("""
+                schema vm {}
+                
+                component app {
+                    @tags(["database", "critical"])
+                    resource vm db {}
+                }
+                """);
+    }
+
+    @Test
+    void tagsOnResourceInComponentObject() {
+        eval("""
+                schema vm {}
+                
+                component app {
+                    @tags({
+                        env: "prod",
+                        component: "database"
+                    })
+                    resource vm db {}
+                }
+                """);
+    }
+
+    @Test
+    void tagsOnMultipleResourcesInComponent() {
+        eval("""
+                schema vm {}
+                
+                component app {
+                    @tags({env: "prod"})
+                    resource vm web {}
+                
+                    @tags({env: "prod", type: "database"})
+                    resource vm db {}
+                }
+                """);
+    }
+
+    @Test
+    void tagsOnComponentDefinitionShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                @tags("production")
+                component app {}
+                """));
+    }
+
+    @Test
+    void tagsEmptyOnComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {}
+                
+                @tags()
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsEmptyListOnComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {}
+                
+                @tags([])
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsEmptyStringOnComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {}
+                
+                @tags("")
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsNumberOnComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                component app {}
+                
+                @tags(10)
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsInvalidObjectOnComponent() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                component app {}
+                
+                @tags({env: 10})
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsInvalidObjectBoolOnComponent() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                component app {}
+                
+                @tags({env: true})
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsInvalidObjectEmptyKeyOnComponent() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                component app {}
+                
+                @tags({"": "prod"})
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsInvalidObjectEmptyValueOnComponent() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                component app {}
+                
+                @tags({env: ""})
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsInvalidObjectNestedValueOnComponent() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                component app {}
+                
+                @tags({env: {season: "prod"}})
+                component app prodApp {}
+                """));
+    }
+
+    @Test
+    void tagsInvalidKeyFormatOnComponent() {
+        var error = assertThrows(ParseError.class, () -> eval("""
+                component app {}
+                
+                @tags({"env stage": "prod"})
+                component app prodApp {}
+                """));
+        assertEquals("Invalid key format: `env stage`. Keys must be alphanumeric.", error.getMessage());
+    }
+
+    @Test
+    void tagsEmptyOnResourceInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    @tags()
+                    resource vm server {}
+                }
+                """));
+    }
+
+    @Test
+    void tagsNumberOnResourceInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    @tags(10)
+                    resource vm server {}
+                }
+                """));
+    }
+
+    @Test
+    void tagsInvalidObjectOnResourceInComponent() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    @tags({env: 10})
+                    resource vm server {}
+                }
+                """));
+    }
+
+    @Test
+    void tagsWithVariableInComponent() {
+        eval("""
+                schema vm {}
+                
+                component app {
+                    input string environment = "prod"
+                
+                    @tags(environment)
+                    resource vm server {}
+                }
+                """);
+    }
+
+    @Test
+    void tagsOnComponentAndResource() {
+        eval("""
+                schema vm {}
+                
+                component app {
+                    @tags({component: "app"})
+                    resource vm server {}
+                }
+                
+                @tags({environment: "production"})
+                component app prodApp {}
+                """);
+    }
+
 }
