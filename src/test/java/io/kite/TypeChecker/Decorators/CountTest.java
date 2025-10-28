@@ -326,4 +326,77 @@ public class CountTest extends CheckerTest {
                 }
                 """);
     }
+
+    @Test
+    void decoratorCountOnComponentAndResource() {
+        var res = eval("""
+                schema vm {
+                    string name
+                }
+                
+                @count(2)
+                component app {
+                    @count(3)
+                    resource vm server {
+                        name = "app-$count-server-$count"
+                    }
+                }
+                """);
+    }
+
+    @Test
+    void decoratorCountOnComponentInstance() {
+        var res = eval("""
+                schema vm {
+                    string name
+                }
+                
+                component app {
+                    input string appName
+                
+                    resource vm server {
+                        name = appName
+                    }
+                }
+                
+                @count(3)
+                component app prodApp {
+                    appName = "prod-$count"
+                }
+                """);
+    }
+
+    @Test
+    void decoratorCountOnComponentDefinitionAndInstance() {
+        var res = eval("""
+                schema vm {
+                    string name
+                }
+                
+                @count(2)
+                component app {
+                    input string appName
+                
+                    @count(3)
+                    resource vm server {
+                        name = appName + "-server-$count"
+                    }
+                }
+                
+                @count(2)
+                component app prodApp {
+                    appName = "prod-$count"
+                }
+                """);
+    }
+
+    @Test
+    void decoratorCountOnComponentDefinitionShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                @count(2)
+                component app {
+                    input string name
+                }
+                """));
+    }
 }

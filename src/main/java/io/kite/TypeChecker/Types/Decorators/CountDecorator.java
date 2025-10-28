@@ -60,7 +60,7 @@ public class CountDecorator extends DecoratorChecker {
                         .a("@").a(getName())
                         .reset()
                         .a(" only accepts numbers as arguments but it got: ")
-                        .a(declaration.getValue())
+                        .a(typeChecker.getPrinter().visit(declaration.getValue()))
                         .toString();
                 throw new TypeError(message);
             }
@@ -70,7 +70,7 @@ public class CountDecorator extends DecoratorChecker {
                         .a("@").a(getName())
                         .reset()
                         .a(" only accepts numbers as arguments but it got: ")
-                        .a(declaration.getValue())
+                        .a(typeChecker.getPrinter().visit(declaration.getValue()))
                         .toString();
                 throw new TypeError(message);
             }
@@ -79,7 +79,18 @@ public class CountDecorator extends DecoratorChecker {
         }
         var body = switch (declaration.getTarget()) {
             case ResourceStatement expression -> expression;
-            case ComponentStatement statement -> statement;
+            case ComponentStatement statement -> {
+                if (statement.isDefinition()) {
+                    String message = Ansi.ansi()
+                            .fgYellow()
+                            .a("@").a(getName())
+                            .reset()
+                            .a(" cannnot be applied to a component definition")
+                            .toString();
+                    throw new TypeError(message);
+                }
+                yield statement;
+            }
             default -> throw new TypeError("Unexpected value: " + declaration.getTarget());
         };
 
