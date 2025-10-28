@@ -3,6 +3,7 @@ package io.kite.TypeChecker.Types.Decorators;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.Expression;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -16,8 +17,8 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 public class ValidateDecorator extends DecoratorChecker {
     public static final String NAME = "validate";
 
-    public ValidateDecorator() {
-        super(NAME, decorator(List.of(),
+    public ValidateDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(List.of(),
                         Set.of(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT)
                 ),
                 Set.of(SystemType.ARRAY, SystemType.STRING)
@@ -26,6 +27,20 @@ public class ValidateDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
+        if (declaration.getValue() != null) {
+            var message = Ansi.ansi()
+                    .a(printer.visit(declaration))
+                    .a(" can only have named arguments")
+                    .toString();
+            throw new TypeError(message);
+        } else if (doesNotHaveArguments(declaration)) {
+            var message = Ansi.ansi()
+                    .a(printer.visit(declaration))
+                    .a(" is missing arguments")
+                    .toString();
+            throw new TypeError(message);
+        }
+
         var namedArgs = declaration.getNamedArgs();
 
         if (namedArgs == null || namedArgs.isEmpty()) {
@@ -46,7 +61,7 @@ public class ValidateDecorator extends DecoratorChecker {
 
 
     @Override
-    public boolean hasArguments(AnnotationDeclaration declaration) {
+    public boolean doesNotHaveArguments(AnnotationDeclaration declaration) {
         return declaration.getValue() != null
                || declaration.getObject() != null
                || declaration.getArgs() != null && !declaration.getArgs().isEmpty()

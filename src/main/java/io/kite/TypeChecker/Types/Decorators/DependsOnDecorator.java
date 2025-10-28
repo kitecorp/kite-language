@@ -20,7 +20,7 @@ public class DependsOnDecorator extends DecoratorChecker {
     private SyntaxPrinter printer;
 
     public DependsOnDecorator(TypeChecker checker) {
-        super(NAME, decorator(
+        super(checker, NAME, decorator(
                 List.of(ArrayType.ARRAY_TYPE, ResourceType.INSTANCE),
                 Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
         ), Set.of());

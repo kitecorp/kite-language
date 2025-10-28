@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.InputDeclaration;
 import io.kite.Frontend.Parser.Expressions.OutputDeclaration;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -18,8 +19,8 @@ public class NonEmptyDecorator extends DecoratorChecker {
 
     public static final String NAME = "nonEmpty";
 
-    public NonEmptyDecorator() {
-        super(NAME, decorator(List.of(),
+    public NonEmptyDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(List.of(),
                         Set.of(DecoratorType.Target.INPUT)
                 ),
                 Set.of(SystemType.STRING, SystemType.ARRAY)
@@ -28,6 +29,13 @@ public class NonEmptyDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
+        if (declaration.getValue() != null) {
+            var message = Ansi.ansi()
+                    .a(printer.visit(declaration))
+                    .a(" can only have named arguments")
+                    .toString();
+            throw new TypeError(message);
+        }
         switch (declaration.getTarget()) {
             case InputDeclaration input -> {
                 isAllowedOnType(input.getType());

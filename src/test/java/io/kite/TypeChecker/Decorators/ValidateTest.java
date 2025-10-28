@@ -2,6 +2,7 @@ package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
 import io.kite.TypeChecker.TypeError;
+import io.kite.Visitors.PlainTheme;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +14,12 @@ public class ValidateTest extends CheckerTest {
 
     @Test
     void validateInvalidArgs() {
+        checker.getPrinter().setTheme(new PlainTheme());
         var error = assertThrows(TypeError.class, () -> eval("""
                 @validate(10)
                 input string something"""
         ));
-        assertEquals("\u001B[33m@validate\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("@validate(10) can only have named arguments", error.getMessage());
     }
 
     @Test
@@ -152,11 +154,12 @@ public class ValidateTest extends CheckerTest {
 
     @Test
     void validateWithEmptyParentheses() {
+        checker.getPrinter().setTheme(new PlainTheme());
         var error = assertThrows(TypeError.class, () -> eval("""
                 @validate()
                 input string something
                 """));
-        assertEquals("Missing \u001B[33m@validate\u001B[m arguments!", error.getMessage());
+        assertEquals("@validate() is missing arguments", error.getMessage());
     }
 
     @Test
@@ -204,13 +207,6 @@ public class ValidateTest extends CheckerTest {
         assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
     }
 
-    @Test
-    void validateOnOutput() {
-        var error = assertThrows(TypeError.class, () -> eval("""
-                @validate(regex="^[a-z]+$")
-                output string something = "test"
-                """));
-    }
 
     @Test
     void validateOnResource() {

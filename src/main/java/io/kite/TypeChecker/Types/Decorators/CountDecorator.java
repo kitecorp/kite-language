@@ -20,18 +20,16 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 public class CountDecorator extends DecoratorChecker {
 
     public static final String NAME = "count";
-    private final TypeChecker typeChecker;
 
-    public CountDecorator(TypeChecker typeChecker) {
-        super(NAME, decorator(List.of(ValueType.Number), Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)), Set.of());
-        this.typeChecker = typeChecker;
+    public CountDecorator(TypeChecker checker) {
+        super(checker, NAME, decorator(List.of(ValueType.Number), Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)), Set.of());
     }
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         switch (declaration.getValue()) {
             case Identifier identifier -> {
-                var type = typeChecker.visit(identifier);
+                var type = checker.visit(identifier);
                 if (type != ValueType.Number) {
                     String message = Ansi.ansi()
                             .fgYellow()
@@ -43,14 +41,15 @@ public class CountDecorator extends DecoratorChecker {
                     throw new TypeError(message);
                 }
             }
-            case NumberLiteral literal -> {}
+            case NumberLiteral literal -> {
+            }
             case StringLiteral literal -> {
                 String message = Ansi.ansi()
                         .fgYellow()
                         .a("@").a(getName())
                         .reset()
                         .a(" only accepts numbers as arguments but it got: ")
-                        .a(typeChecker.getPrinter().visit(literal))
+                        .a(checker.getPrinter().visit(literal))
                         .toString();
                 throw new TypeError(message);
             }
@@ -60,7 +59,7 @@ public class CountDecorator extends DecoratorChecker {
                         .a("@").a(getName())
                         .reset()
                         .a(" only accepts numbers as arguments but it got: ")
-                        .a(typeChecker.getPrinter().visit(declaration.getValue()))
+                        .a(checker.getPrinter().visit(declaration.getValue()))
                         .toString();
                 throw new TypeError(message);
             }
@@ -70,7 +69,7 @@ public class CountDecorator extends DecoratorChecker {
                         .a("@").a(getName())
                         .reset()
                         .a(" only accepts numbers as arguments but it got: ")
-                        .a(typeChecker.getPrinter().visit(declaration.getValue()))
+                        .a(checker.getPrinter().visit(declaration.getValue()))
                         .toString();
                 throw new TypeError(message);
             }

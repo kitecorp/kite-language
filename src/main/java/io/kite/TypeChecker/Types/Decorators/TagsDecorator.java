@@ -11,7 +11,6 @@ import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
 import io.kite.TypeChecker.Types.ValueType;
-import io.kite.Visitors.SyntaxPrinter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -21,17 +20,13 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class TagsDecorator extends DecoratorChecker {
     public static final String NAME = "tags";
-    private final SyntaxPrinter printer;
-    private final TypeChecker checker;
 
     public TagsDecorator(TypeChecker checker) {
-        super(NAME, decorator(
+        super(checker, NAME, decorator(
                         List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
                 ), Set.of()
         );
-        this.printer = checker.getPrinter();
-        this.checker = checker;
     }
 
     @Override

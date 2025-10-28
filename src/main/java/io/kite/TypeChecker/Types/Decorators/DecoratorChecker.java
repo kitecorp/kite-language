@@ -3,6 +3,7 @@ package io.kite.TypeChecker.Types.Decorators;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.SystemType;
@@ -16,7 +17,8 @@ import java.util.Set;
 
 @Data
 public abstract class DecoratorChecker {
-    protected final SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
+    protected final SyntaxPrinter printer;
+    protected final TypeChecker checker;
     private final String name;
     private final DecoratorType type;
     /**
@@ -24,7 +26,9 @@ public abstract class DecoratorChecker {
      */
     private final Set<SystemType> allowedOn;
 
-    public DecoratorChecker(String name, DecoratorType type, Set<SystemType> allowedOn) {
+    public DecoratorChecker(TypeChecker checker, String name, DecoratorType type, Set<SystemType> allowedOn) {
+        this.printer = checker.getPrinter();
+        this.checker = checker;
         this.name = name;
         this.type = type;
         this.allowedOn = allowedOn;
@@ -33,10 +37,13 @@ public abstract class DecoratorChecker {
     protected abstract Object validate(AnnotationDeclaration declaration, List<Object> args);
 
     public Object validate(AnnotationDeclaration declaration, Object... args) {
-        if (hasArguments(declaration)) {
-            var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" must not have any arguments").toString();
-            throw new TypeError(message);
-        }
+//        if (doesNotHaveArguments(declaration)) {
+//            var message = Ansi.ansi()
+//                    .a(printer.visit(declaration))
+//                    .a(" is missing arguments")
+//                    .toString();
+//            throw new TypeError(message);
+//        }
 
 //        throwIfNotAllowedOnType(declaration.getTarget().targetType());
 
@@ -52,20 +59,6 @@ public abstract class DecoratorChecker {
         }
 
         return res;
-    }
-
-    private void throwIfNotAllowedOnType(Type type) {
-        if (!isAllowedOn(type)) {
-            String message = Ansi.ansi()
-                    .fgYellow()
-                    .a("@").a(getName())
-                    .reset()
-                    .a(" is only valid for arrays. Applied to: ")
-                    .fgBlue()
-                    .a(type.getValue())
-                    .toString();
-            throw new TypeError(message);
-        }
     }
 
     public boolean onTargetEvaluated(AnnotationDeclaration declaration) {
@@ -160,7 +153,7 @@ public abstract class DecoratorChecker {
         return targets().contains(target.getTarget());
     }
 
-    protected boolean hasArguments(AnnotationDeclaration declaration) {
+    protected boolean doesNotHaveArguments(AnnotationDeclaration declaration) {
         return type.getParams().isEmpty() &&
                (declaration.getValue() != null
                 || declaration.getObject() != null
