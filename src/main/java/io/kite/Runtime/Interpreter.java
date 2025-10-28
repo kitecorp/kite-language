@@ -464,19 +464,51 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(MemberExpression expression) {
-        var value = executeBlock(expression.getObject(), env);
+        var object = executeBlock(expression.getObject(), env);
 
-        return switch (value) {
-            case SchemaValue schemaValue -> visitSchemaMember(expression, schemaValue);
-            case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
-            case Map<?, ?> map -> visitMapMember(expression, map);
-            case Deferred deferred -> visitDeferredMember(expression, deferred);
-            case null, default -> value;
-        };
+        if (expression.isComputed()) {
+            // Array/object indexing: obj[index] or obj["key"]
+            var index = visit(expression.getProperty());
+            return switch (object) {
+                case List<?> list -> visitListMember(index, list);
+                case Map<?, ?> map -> visitMapMember(expression, map);
+//                case ObjectValue objVal -> objVal.getProperties().get(index.toString());
+                case ResourceValue resourceVal -> visitResourceMember(expression, resourceVal);
+                case Dependency dependency -> {
+                    if (dependency.value() instanceof List<?> list) {
+                        yield visitListMember(index, list);
+                    } else {
+                        yield dependency.value();
+                    }
+                }
+                case null, default ->
+                        throw new RuntimeError("Cannot index into type: " + (object != null ? object.getClass().getSimpleName() : "null"));
+            };
+        } else {
+            // Dot notation: obj.property
+            return switch (object) {
+                case SchemaValue schemaValue -> visitSchemaMember(expression, schemaValue);
+                case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
+                case Map<?, ?> map -> visitMapMember(expression, map);
+                case Deferred deferred -> visitDeferredMember(expression, deferred);
+                case null, default -> object;
+            };
+        }
+    }
+
+    private Object visitListMember(Object index, List<?> list) {
+        if (!(index instanceof Number)) {
+            throw new RuntimeError("Array index must be a number, got: " + index);
+        }
+        int i = ((Number) index).intValue();
+        if (i < 0 || i >= list.size()) {
+            throw new RuntimeError("Array index out of bounds: " + i + " (size: " + list.size() + ")");
+        }
+        return list.get(i);
     }
 
     private Object visitSchemaMember(MemberExpression expression, SchemaValue schemaValue) {
-        var propertyName = getSymbolIdentifier(expression);
+        var propertyName = getPropertyName(expression);
 
         if (!ExecutionContextIn(ForStatement.class)) {
             return propertyOrDeferred(schemaValue.getInstances(), propertyName);
@@ -507,7 +539,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private Object visitResourceMember(MemberExpression expression, ResourceValue resourceValue) {
-        var propertyName = getSymbolIdentifier(expression);
+        var propertyName = getPropertyName(expression);
 
         // If doing complex string interpolation and trying to access resource property
         // See: ResourceStringInterpolation#stringInterpolationMemberAccess()
@@ -526,7 +558,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
-        var propertyName = getSymbolIdentifier(expression);
+        var propertyName = getPropertyName(expression);
         return map.get(propertyName);
     }
 
@@ -540,7 +572,7 @@ public final class Interpreter extends StackVisitor<Object> {
         return deferred;
     }
 
-    private @NotNull String getSymbolIdentifier(MemberExpression expression) {
+    private @NotNull String getPropertyName(MemberExpression expression) {
         return switch (expression.getProperty()) {
             case SymbolIdentifier identifier -> identifier.string();
             case StringLiteral literal -> literal.getValue();
@@ -955,7 +987,7 @@ public final class Interpreter extends StackVisitor<Object> {
         if (output.getInit() instanceof MemberExpression memberExpression) {
             if (visit(output.getInit()) instanceof Dependency dependency) {
                 var resource = dependency.resource();
-                var propertyName = getSymbolIdentifier(memberExpression);
+                var propertyName = getPropertyName(memberExpression);
                 return resources.get(resource.getName()).get(propertyName);
             }
         }
