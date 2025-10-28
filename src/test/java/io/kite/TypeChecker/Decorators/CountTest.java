@@ -381,4 +381,31 @@ public class CountTest extends CheckerTest {
                 }
                 """));
     }
+
+
+    @Test
+    void decoratorCountOnComponentInstanceWithCountedResources() {
+        var res = eval("""
+                schema vm {
+                    string name
+                }
+                
+                component app {
+                    input string appName
+                
+                    @count(2)
+                    resource vm server {
+                        name = appName + "-server-$count"
+                    }
+                }
+                
+                @count(3)
+                component app prodApp {
+                    appName = "prod-$count"
+                }
+                """);
+        // Creates 3 app instances, each with 2 servers
+    }
+
 }
+
