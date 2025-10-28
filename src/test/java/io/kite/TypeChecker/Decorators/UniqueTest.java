@@ -1,68 +1,71 @@
 package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
+import io.kite.Frontend.Parser.errors.ErrorList;
 import io.kite.TypeChecker.TypeError;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("@unique")
 public class UniqueTest extends CheckerTest {
 
     @Test
     void uniqueInvalidArgs() {
-        var error = Assertions.assertThrows(TypeError.class, () -> eval("""
+        var error = assertThrows(TypeError.class, () -> eval("""
                 @unique(10)
                 input string something"""));
-        Assertions.assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
     }
 
     @Test
     void uniqueString() {
-        var error = Assertions.assertThrows(TypeError.class, () -> eval("""
+        var error = assertThrows(TypeError.class, () -> eval("""
                 @unique
                 input string something"""));
-        Assertions.assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mstring", error.getMessage());
+        assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mstring", error.getMessage());
     }
 
     @Test
     void uniqueNumber() {
-        var error = Assertions.assertThrows(TypeError.class, () ->
+        var error = assertThrows(TypeError.class, () ->
                 eval("""
                         @unique
                         input number something""")
         );
-        Assertions.assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mnumber", error.getMessage());
+        assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mnumber", error.getMessage());
     }
 
     @Test
     void uniqueBoolean() {
-        var error = Assertions.assertThrows(TypeError.class, () ->
+        var error = assertThrows(TypeError.class, () ->
                 eval("""
                         @unique
                         input boolean something""")
         );
-        Assertions.assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mboolean", error.getMessage());
+        assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mboolean", error.getMessage());
     }
 
     @Test
     void uniqueAny() {
-        var error = Assertions.assertThrows(TypeError.class, () ->
+        var error = assertThrows(TypeError.class, () ->
                 eval("""
                         @unique
                         input any something""")
         );
-        Assertions.assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34many", error.getMessage());
+        assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34many", error.getMessage());
     }
 
     @Test
     void uniqueObject() {
-        var error = Assertions.assertThrows(TypeError.class, () ->
+        var error = assertThrows(TypeError.class, () ->
                 eval("""
                         @unique
                         input object something""")
         );
-        Assertions.assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mobject", error.getMessage());
+        assertEquals("\u001B[33m@unique\u001B[m is only valid for arrays. Applied to: \u001B[34mobject", error.getMessage());
     }
 
     @Test
@@ -99,6 +102,147 @@ public class UniqueTest extends CheckerTest {
         eval("""
                 @unique
                 input object[] something""");
+    }
+
+    @Test
+    void uniqueWithEmptyParentheses() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique()
+                input string[] something
+                """));
+        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+    }
+
+    @Test
+    void uniqueWithMultipleArgs() {
+        var error = assertThrows(ErrorList.class, () -> eval("""
+                @unique(1, 2)
+                input string[] something
+                """));
+    }
+
+    @Test
+    void uniqueWithStringArg() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique("test")
+                input string[] something
+                """));
+        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+    }
+
+    @Test
+    void uniqueWithBooleanArg() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique(true)
+                input string[] something
+                """));
+        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+    }
+
+    @Test
+    void uniqueWithArrayArg() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique([1, 2])
+                input string[] something
+                """));
+        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+    }
+
+    @Test
+    void uniqueWithObjectArg() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique({key: "value"})
+                input string[] something
+                """));
+        assertEquals("\u001B[33m@unique\u001B[m must not have any arguments", error.getMessage());
+    }
+
+    @Test
+    void uniqueOnOutput() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique
+                output string[] something = ["a", "b"]
+                """));
+        // Assuming @unique is only for inputs - check your implementation
+    }
+
+    @Test
+    void uniqueOnResource() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @unique
+                resource vm something {}
+                """));
+    }
+
+    @Test
+    void uniqueOnComponent() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique
+                component app {}
+                """));
+    }
+
+    @Test
+    void uniqueOnSchema() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique
+                schema vm {}
+                """));
+    }
+
+    @Test
+    void uniqueInComponent() {
+        eval("""
+                component app {
+                    @unique
+                    input string[] items
+                }
+                """);
+    }
+
+    @Test
+    void uniqueOnInputInComponent() {
+        eval("""
+                component app {
+                    @unique
+                    input number[] values = [1, 2, 3]
+                }
+                """);
+    }
+
+    @Test
+    void uniqueWithDefaultValue() {
+        eval("""
+                @unique
+                input string[] items = ["a", "b", "c"]
+                """);
+    }
+
+    @Test
+    void uniqueWithEmptyArrayDefault() {
+        eval("""
+                @unique
+                input string[] items = []
+                """);
+    }
+
+    @Test
+    void uniqueOnUnionArray() {
+        eval("""
+                type custom = string | number
+                @unique
+                input custom[] items
+                """);
+    }
+
+    @Test
+    void uniqueWithTypeMismatchDefault() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @unique
+                input string[] items = [1, 2, 3]
+                """));
+        // Should fail on type mismatch, not @unique
     }
 
 }
