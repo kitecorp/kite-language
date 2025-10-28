@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComponentTest extends CheckerTest {
 
     // Helper methods for component testing
-    private static ComponentType assertIsComponentType(Type type, String expectedTypeName) {
+    public static ComponentType assertIsComponentType(Type type, String expectedTypeName) {
         assertInstanceOf(ComponentType.class, type, "Expected a ComponentType");
         var component = (ComponentType) type;
         assertEquals(expectedTypeName, component.getType(), "Component type name mismatch");
         return component;
     }
 
-    private static ResourceType assertIsResourceType(Type type, String expectedName, String expectedSchemaType) {
+    public static ResourceType assertIsResourceType(Type type, String expectedName, String expectedSchemaType) {
         assertInstanceOf(ResourceType.class, type, "Expected a ResourceType");
         var resource = (ResourceType) type;
         assertEquals(expectedName, resource.getName(), "Resource name mismatch");
@@ -41,23 +41,23 @@ public class ComponentTest extends CheckerTest {
         return resource;
     }
 
-    private static Type assertHasInEnvironment(ComponentType component, String key, String errorMessage) {
+    public static Type assertHasInEnvironment(ComponentType component, String key, String errorMessage) {
         var value = component.lookup(key); // Use helper instead of getEnvironment().lookup()
         assertNotNull(value, errorMessage != null ? errorMessage : key + " should exist in environment");
         return value;
     }
 
-    private static ResourceType assertComponentHasResource(ComponentType component, String resourceName, String schemaType) {
+    public static ResourceType assertComponentHasResource(ComponentType component, String resourceName, String schemaType) {
         var resourceType = assertHasInEnvironment(component, resourceName, null);
         return assertIsResourceType(resourceType, resourceName, schemaType); // Return the ResourceType
     }
 
-    private static ComponentType assertComponentHasNestedComponent(ComponentType parent, String nestedName) {
+    public static ComponentType assertComponentHasNestedComponent(ComponentType parent, String nestedName) {
         var nestedType = assertHasInEnvironment(parent, nestedName, null);
         return assertIsComponentType(nestedType, nestedName); // Return the ComponentType
     }
 
-    private static void assertResourceProperty(ResourceType resource, String propertyName, Type expectedType) {
+    public static void assertResourceProperty(ResourceType resource, String propertyName, Type expectedType) {
         var propertyValue = resource.getProperty(propertyName);
         assertEquals(expectedType, propertyValue,
                 "Property " + propertyName + " should be " + expectedType);
@@ -1192,77 +1192,6 @@ public class ComponentTest extends CheckerTest {
 
         var appComponent = assertIsComponentType(res, "app");
         assertEquals(ValueType.String, appComponent.lookup("exposedDbId"));
-    }
-
-
-    @Test
-    void componentInputWithAllowedDecorator() {
-        var res = eval("""
-                component app {
-                    @allowed(["hello", "world"])
-                    input string something
-                }
-                """);
-
-        var appComponent = assertIsComponentType(res, "app");
-        var inputType = appComponent.lookup("something");
-        assertNotNull(inputType);
-        assertEquals(ValueType.String, inputType);
-    }
-
-    @Test
-    void componentInputWithAllowedDecoratorValidValue() {
-        var res = eval("""
-                component app {
-                    @allowed(["hello", "world"])
-                    input string something = "hello"
-                }
-                """);
-
-        var appComponent = assertIsComponentType(res, "app");
-        var inputType = appComponent.lookup("something");
-        assertEquals(ValueType.String, inputType);
-    }
-
-    @Test
-    void componentInstanceInputWithAllowedDecoratorValidValue() {
-        var res = eval("""
-                component app {
-                    @allowed(["hello", "world"])
-                    input string something
-                }
-                
-                component app prodApp {
-                    something = "hello"
-                }
-                """);
-
-        var prodAppInstance = assertIsComponentType(res, "app");
-        assertEquals("prodApp", prodAppInstance.getName());
-    }
-
-    @Test
-    void componentInputWithAllowedDecoratorWrongType() {
-        assertThrows(TypeError.class, () -> eval("""
-                component app {
-                    @allowed(["hello", "world"])
-                    input string something = 123
-                }
-                """));
-    }
-
-    @Test
-    void componentInstanceInputWithAllowedDecoratorInvalidValue() {
-        assertThrows(TypeError.class, () -> eval("""
-                component app {
-                    @allowed(["hello", "world"])
-                    input string something
-                }
-                
-                component app prodApp {
-                    something = 123
-                }
-                """));
     }
 
 }
