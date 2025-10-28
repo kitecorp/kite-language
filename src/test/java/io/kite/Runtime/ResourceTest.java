@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
@@ -324,6 +326,263 @@ public class ResourceTest extends RuntimeTest {
                 """);
 
         assertEquals("prod", res);
+    }
+
+    @Test
+    void multipleResourcesSameSchema() {
+        var res = eval("""
+                schema vm {
+                    string name
+                }
+                
+                resource vm web {
+                    name = "web-server"
+                }
+                
+                resource vm db {
+                    name = "database"
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("web-server", schema.findInstance("web").argVal("name"));
+        assertEquals("database", schema.findInstance("db").argVal("name"));
+    }
+
+    @Test
+    void resourceWithArrayProperty() {
+        var res = eval("""
+                schema vm {
+                    string[] tags
+                }
+                
+                resource vm main {
+                    tags = ["production", "critical"]
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        var tags = (List<?>) resource.argVal("tags");
+        assertEquals(2, tags.size());
+        assertEquals("production", tags.get(0));
+    }
+
+    @Test
+    void resourceWithObjectProperty() {
+        var res = eval("""
+                schema vm {
+                    object config
+                }
+                
+                resource vm main {
+                    config = {
+                        env: "prod",
+                        region: "us-east"
+                    }
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertNotNull(resource.argVal("config"));
+    }
+
+    @Test
+    void resourceWithComputedValue() {
+        var res = eval("""
+                schema vm {
+                    number count
+                }
+                
+                var baseCount = 5
+                
+                resource vm main {
+                    count = baseCount * 2
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertEquals(10, resource.argVal("count"));
+    }
+
+    @Test
+    void resourceReferencingArray() {
+        var res = eval("""
+                schema vm {
+                    string[] names
+                    string selectedName
+                }
+                
+                resource vm source {
+                    names = ["first", "second", "third"]
+                }
+                
+                resource vm target {
+                    selectedName = vm.source.names[0]
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var target = schema.findInstance("target");
+        assertEquals("first", target.argVal("selectedName"));
+    }
+
+    @Test
+    void resourceWithNullValue() {
+        var res = eval("""
+                schema vm {
+                    any value
+                }
+                
+                resource vm main {
+                    value = null
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertNull(resource.argVal("value"));
+    }
+
+    @Test
+    void resourceChainedReferences() {
+        var res = eval("""
+                schema vm {
+                    string id
+                    string refId
+                }
+                
+                resource vm first {
+                    id = "first-id"
+                }
+                
+                resource vm second {
+                    id = "second-id"
+                    refId = vm.first.id
+                }
+                
+                resource vm third {
+                    id = "third-id"
+                    refId = vm.second.id
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        assertEquals("first-id", schema.findInstance("second").argVal("refId"));
+        assertEquals("second-id", schema.findInstance("third").argVal("refId"));
+    }
+
+    @Test
+    void resourceWithStringConcatenation() {
+        var res = eval("""
+                schema vm {
+                    string name
+                    string fullName
+                }
+                
+                resource vm main {
+                    name = "server"
+                    fullName = name + "-production"
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertEquals("server-production", resource.argVal("fullName"));
+    }
+
+    @Test
+    void resourceAccessingGlobalVariable() {
+        var res = eval("""
+                schema vm {
+                    string region
+                }
+                
+                var defaultRegion = "us-east-1"
+                
+                resource vm main {
+                    region = defaultRegion
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertEquals("us-east-1", resource.argVal("region"));
+    }
+
+    @Test
+    void resourceWithNestedPropertyAccess() {
+        var res = eval("""
+                schema vm {
+                    object config
+                    string value
+                }
+                
+                resource vm source {
+                    config = { nested: { key: "value" } }
+                }
+                
+                resource vm target {
+                    value = vm.source.config.nested.key
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var target = schema.findInstance("target");
+        assertEquals("value", target.argVal("value"));
+    }
+
+    @Test
+    void resourcePropertyUsedInExpression() {
+        var res = eval("""
+                schema vm {
+                    number count
+                    number doubled
+                }
+                
+                resource vm main {
+                    count = 5
+                    doubled = count * 2
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertEquals(10, resource.argVal("doubled"));
+    }
+
+    @Test
+    void resourceWithAllPropertyTypes() {
+        var res = eval("""
+                schema vm {
+                    string str
+                    number num
+                    boolean bool
+                    any anyVal
+                    object obj
+                    string[] arr
+                }
+                
+                resource vm main {
+                    str = "test"
+                    num = 42
+                    bool = true
+                    anyVal = null
+                    obj = {key: "value"}
+                    arr = ["a", "b"]
+                }
+                """);
+
+        var schema = (SchemaValue) global.get("vm");
+        var resource = schema.findInstance("main");
+        assertEquals("test", resource.argVal("str"));
+        assertEquals(42, resource.argVal("num"));
+        assertEquals(true, resource.argVal("bool"));
+        assertNull(resource.argVal("anyVal"));
+        assertNotNull(resource.argVal("obj"));
+        assertEquals(2, ((List<?>) resource.argVal("arr")).size());
     }
 
 }
