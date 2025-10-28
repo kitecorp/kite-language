@@ -120,15 +120,7 @@ public abstract class DecoratorChecker {
         }
 
         var value = declaration.getValue();
-        var number = switch (value) {
-            case NumberLiteral literal -> literal.getValue();
-            case StringLiteral literal ->
-                    throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(\"").a(literal.getValue()).a("\")").reset().a(" is invalid. Only numbers are valid arguments").toString());
-            case BooleanLiteral literal ->
-                    throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(").a(literal.isValue()).a(")").reset().a(" is invalid. Only numbers are valid arguments").toString());
-            default ->
-                    throw new TypeError(Ansi.ansi().fgYellow().a(name).a("(").a(value).a(")").reset().a(" is invalid").toString());
-        };
+        var number = getValue(value);
         var longValue = number.longValue();
         if (longValue < min) {
             String decorator = Ansi.ansi()
@@ -150,6 +142,18 @@ public abstract class DecoratorChecker {
             throw new TypeError(decorator);
         }
         return longValue;
+    }
+
+    private Number getValue(Object value) {
+        return switch (value) {
+            case NumberLiteral literal -> literal.getValue();
+            case StringLiteral literal ->
+                    throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(\"").a(literal.getValue()).a("\")").reset().a(" is invalid. Only numbers are valid arguments").toString());
+            case BooleanLiteral literal ->
+                    throw new TypeError(Ansi.ansi().fgYellow().a("@").a(name).a("(").a(literal.isValue()).a(")").reset().a(" is invalid. Only numbers are valid arguments").toString());
+            default ->
+                    throw new TypeError(Ansi.ansi().fgYellow().a(name).a("(").a(value).a(")").reset().a(" is invalid").toString());
+        };
     }
 
     public boolean isOnValidTarget(Annotatable target) {
