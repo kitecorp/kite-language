@@ -124,6 +124,7 @@ public class AllowedTest extends CheckerTest {
                 input any something"""));
         // throws because explicit type is any and implicit type is missing
     }
+
     @Test
     void decoratorAllowObjectAny() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
@@ -131,6 +132,7 @@ public class AllowedTest extends CheckerTest {
                 input any something"""));
         // throws because explicit type is any and implicit type is missing
     }
+
 
 
 }
