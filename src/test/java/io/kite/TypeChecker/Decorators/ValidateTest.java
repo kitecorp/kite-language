@@ -150,4 +150,126 @@ public class ValidateTest extends CheckerTest {
         );
     }
 
+    @Test
+    void validateWithEmptyParentheses() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate()
+                input string something
+                """));
+        assertEquals("Missing \u001B[33m@validate\u001B[m arguments!", error.getMessage());
+    }
+
+    @Test
+    void validateWithOnlyFlags() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(flags="i")
+                input string something
+                """));
+        // Should fail - regex is required
+    }
+
+    @Test
+    void validateWithOnlyMessage() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(message="Invalid format")
+                input string something
+                """));
+        // Should fail - regex is required
+    }
+
+    @Test
+    void validateWithBooleanRegex() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(regex=true)
+                input string something
+                """));
+        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+    }
+
+    @Test
+    void validateWithArrayRegex() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(regex=["test"])
+                input string something
+                """));
+        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+    }
+
+    @Test
+    void validateWithObjectRegex() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(regex={key: "value"})
+                input string something
+                """));
+        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+    }
+
+    @Test
+    void validateOnOutput() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(regex="^[a-z]+$")
+                output string something = "test"
+                """));
+    }
+
+    @Test
+    void validateOnResource() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @validate(regex="^[a-z]+$")
+                resource vm something {}
+                """));
+    }
+
+    @Test
+    void validateOnComponent() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(regex="^[a-z]+$")
+                component app {}
+                """));
+    }
+
+    @Test
+    void validateOnSchema() {
+        var error = assertThrows(TypeError.class, () -> eval("""
+                @validate(regex="^[a-z]+$")
+                schema vm {}
+                """));
+    }
+
+    @Test
+    void validateInComponent() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$", flags="i")
+                    input string name
+                }
+                """);
+    }
+
+    @Test
+    void validateWithDefaultValue() {
+        eval("""
+                @validate(regex="^[a-z0-9-]+$")
+                input string name = "test-123"
+                """);
+    }
+
+    @Test
+    void validateOnStringArrayWithAllArgs() {
+        eval("""
+                @validate(regex="^[a-z0-9-]+$", flags="gi", message="Invalid format")
+                input string[] items
+                """);
+    }
+
+    @Test
+    void validateWithUnknownNamedArgument() {
+        var error = eval("""
+                @validate(regex="^[a-z]+$", unknown="value")
+                input string something
+                """);
+        // unknown args are just ignored
+    }
+
 }
