@@ -315,4 +315,102 @@ public class DependsOnTest extends CheckerTest {
                 """));
     }
 
+    @Test
+    void componentInstanceDependsOnResource() {
+        var res = eval("""
+                schema vm {}
+                
+                resource vm database {}
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                @dependsOn(vm.database)
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void componentInstanceDependsOnMultipleResources() {
+        var res = eval("""
+                schema vm {}
+                
+                resource vm database {}
+                resource vm cache {}
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                @dependsOn([vm.database, vm.cache])
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void componentDefinitionDependsOnResourceShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                resource vm database {}
+                
+                @dependsOn(vm.database)
+                component app {
+                    resource vm server {}
+                }
+                """));
+    }
+
+    @Test
+    void resourceDependsOnComponentInstance() {
+        var res = eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                component app prodApp {}
+                
+                @dependsOn(prodApp)
+                resource vm monitoring {}
+                """);
+    }
+
+    @Test
+    void resourceDependsOnMultipleComponentInstances() {
+        var res = eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                component database {
+                    resource vm db {}
+                }
+                
+                component app prodApp {}
+                component database prodDb {}
+                
+                @dependsOn([prodApp, prodDb])
+                resource vm monitoring {}
+                """);
+    }
+
+    @Test
+    void resourceDependsOnComponentDefinitionShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                @dependsOn(app)
+                resource vm monitoring {}
+                """));
+    }
+
 }
