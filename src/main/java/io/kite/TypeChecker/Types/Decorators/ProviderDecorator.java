@@ -1,12 +1,18 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.Frontend.Parser.Expressions.ComponentStatement;
 import io.kite.Frontend.Parser.Expressions.Expression;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
+import io.kite.TypeChecker.Types.SystemType;
 import io.kite.TypeChecker.Types.ValueType;
 import io.kite.Visitors.SyntaxPrinter;
+import org.apache.commons.lang3.StringUtils;
+import org.fusesource.jansi.Ansi;
 
 import java.util.List;
 import java.util.Set;
@@ -15,37 +21,62 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class ProviderDecorator extends DecoratorChecker {
     public static final String NAME = "provider";
+    private final TypeChecker checker;
     private final SyntaxPrinter printer;
 
-    public ProviderDecorator(SyntaxPrinter printer) {
+    public ProviderDecorator(TypeChecker checker) {
         super(NAME, decorator(List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
                 ), Set.of()
         );
-        this.printer = printer;
+        this.checker = checker;
+        this.printer = checker.getPrinter();
     }
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         var value = declaration.getValue();
         if (value != null) {
-            if (value instanceof StringLiteral literal) {
-                if (literal.getValue().isEmpty()) {
-                    throw new TypeError("@provider must have a non-empty string as argument or an array of strings");
-                }
-            } else {
-                throw new TypeError("%s has invalid argument `%s`".formatted(printer.visit(declaration), printer.visit(value)));
-            }
-        } else if (declaration.getArgs() != null && !declaration.getArgs().isEmpty()) {
+            validateValue(declaration, value);
+        } else if (declaration.hasArgs()) {
             for (Expression item : declaration.getArgs().getItems()) {
-                if (!(item instanceof StringLiteral literal)) {
+                if (item instanceof StringLiteral literal) {
+                    validateValue(declaration, literal);
+                } else {
                     throw new TypeError("%s has invalid argument `%s`".formatted(printer.visit(declaration), printer.visit(item)));
                 }
             }
         }
 
+        if (declaration.getTarget() instanceof ComponentStatement statement) {
+            if (statement.isDefinition()) {
+                String message = Ansi.ansi()
+                        .fgYellow()
+                        .a("@").a(getName())
+                        .reset()
+                        .a(" cannnot be applied to a component definition")
+                        .toString();
+                throw new TypeError(message);
+            }
+        }
+
 
         return null;
+    }
+
+    private void validateValue(AnnotationDeclaration declaration, Object value) {
+        if (value instanceof StringLiteral literal) {
+            if (StringUtils.isBlank(literal.getValue())) {
+                throw new TypeError("@provider must have a non-empty string as argument or an array of strings");
+            }
+        } else if (value instanceof Identifier identifier) {
+            var res = checker.visit(identifier);
+            if (res.getKind() != SystemType.STRING) {
+                throw new TypeError("@provider must have a string as argument or an array of strings");
+            }
+        } else {
+            throw new TypeError("%s has invalid argument `%s`".formatted(printer.visit(declaration), printer.visit(value)));
+        }
     }
 
 

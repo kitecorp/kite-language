@@ -138,6 +138,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
             case Boolean z -> theme.bool(String.valueOf(z));
             case String s -> theme.string("\"" + s + "\"");
             case ArrayExpression a -> visit(a);
+            case SymbolIdentifier symbolIdentifier -> visit(symbolIdentifier.getSymbol());
             case List list -> list.stream().map(this::visit)
                     .collect(Collectors.joining(", ", "[", "]"));
             case Map<?, ?> map -> map.entrySet().stream()
