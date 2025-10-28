@@ -152,4 +152,8 @@ public final class AnnotationDeclaration extends Expression {
             case null, default -> null;
         };
     }
+
+    public boolean hasArgs() {
+        return getArgs() != null && !getArgs().isEmpty();
+    }
 }

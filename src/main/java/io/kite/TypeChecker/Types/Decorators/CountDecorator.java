@@ -1,5 +1,8 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parse.Literals.NumberLiteral;
+import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.ComponentStatement;
 import io.kite.Frontend.Parser.Expressions.ResourceStatement;
@@ -7,6 +10,7 @@ import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.ValueType;
+import org.fusesource.jansi.Ansi;
 
 import java.util.List;
 import java.util.Set;
@@ -25,7 +29,54 @@ public class CountDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        var count = validateNumber(declaration, 0, 1000);
+        switch (declaration.getValue()) {
+            case Identifier identifier -> {
+                var type = typeChecker.visit(identifier);
+                if (type != ValueType.Number) {
+                    String message = Ansi.ansi()
+                            .fgYellow()
+                            .a("@").a(getName())
+                            .reset()
+                            .a(" only accepts numbers as arguments but it got: ")
+                            .a(type.getValue())
+                            .toString();
+                    throw new TypeError(message);
+                }
+            }
+            case NumberLiteral literal -> {}
+            case StringLiteral literal -> {
+                String message = Ansi.ansi()
+                        .fgYellow()
+                        .a("@").a(getName())
+                        .reset()
+                        .a(" only accepts numbers as arguments but it got: ")
+                        .a(typeChecker.getPrinter().visit(literal))
+                        .toString();
+                throw new TypeError(message);
+            }
+            case String expression -> {
+                String message = Ansi.ansi()
+                        .fgYellow()
+                        .a("@").a(getName())
+                        .reset()
+                        .a(" only accepts numbers as arguments but it got: ")
+                        .a(declaration.getValue())
+                        .toString();
+                throw new TypeError(message);
+            }
+            case null -> {
+                String message = Ansi.ansi()
+                        .fgYellow()
+                        .a("@").a(getName())
+                        .reset()
+                        .a(" only accepts numbers as arguments but it got: ")
+                        .a(declaration.getValue())
+                        .toString();
+                throw new TypeError(message);
+            }
+            default -> {
+            }
+        }
         var body = switch (declaration.getTarget()) {
             case ResourceStatement expression -> expression;
             case ComponentStatement statement -> statement;
