@@ -20,7 +20,7 @@ public class UniqueDecorator extends DecoratorChecker {
 
     public UniqueDecorator() {
         super(NAME, decorator(List.of(),
-                        Set.of(DecoratorType.Target.INPUT, DecoratorType.Target.OUTPUT)
+                        Set.of(DecoratorType.Target.INPUT)
                 ),
                 Set.of(SystemType.ARRAY)
         );
