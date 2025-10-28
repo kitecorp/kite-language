@@ -2,9 +2,10 @@ package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
 import io.kite.TypeChecker.TypeError;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("TypeChecker @dependsOn")
 public class DependsOnTest extends CheckerTest {
@@ -68,7 +69,7 @@ public class DependsOnTest extends CheckerTest {
 
     @Test
     void dependsOnResourceInvalidArray() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
                 
                 resource vm first { }
@@ -82,7 +83,7 @@ public class DependsOnTest extends CheckerTest {
 
     @Test
     void dependsOnString() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
                 
                 resource vm first { }
@@ -96,7 +97,7 @@ public class DependsOnTest extends CheckerTest {
 
     @Test
     void dependsOnNumber() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
                 
                 resource vm first { }
@@ -110,7 +111,7 @@ public class DependsOnTest extends CheckerTest {
 
     @Test
     void dependsOnObject() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
                 
                 resource vm first { }
@@ -121,5 +122,197 @@ public class DependsOnTest extends CheckerTest {
         );
     }
 
+    @Test
+    void dependsOnResourceInComponent() {
+        var res = eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm first { }
+                
+                    @dependsOn(vm.first)
+                    resource vm something {}
+                }
+                """);
+    }
+
+    @Test
+    void dependsOnResourceReverseInComponent() {
+        var res = eval("""
+                schema vm {}
+                
+                component app {
+                    @dependsOn(vm.something)
+                    resource vm first { }
+                
+                    resource vm something {}
+                }
+                """);
+    }
+
+    @Test
+    void dependsOnResourceArrayInComponent() {
+        var res = eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm first { }
+                    resource vm second { }
+                
+                    @dependsOn([vm.first, vm.second])
+                    resource vm something {}
+                }
+                """);
+    }
+
+    @Test
+    void dependsOnResourceArrayReverseInComponent() {
+        var res = eval("""
+                schema vm {}
+                
+                component app {
+                    @dependsOn([vm.second, vm.third])
+                    resource vm first { }
+                
+                    resource vm second { }
+                    resource vm third {}
+                }
+                """);
+    }
+
+    @Test
+    void dependsOnResourceInvalidArrayInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm first { }
+                    resource vm second { }
+                
+                    @dependsOn([vm.first, "vm.second"])
+                    resource vm something {}
+                }
+                """));
+    }
+
+    @Test
+    void dependsOnStringInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm first { }
+                
+                    @dependsOn("vm.first")
+                    resource vm something {}
+                }
+                """));
+    }
+
+    @Test
+    void dependsOnNumberInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm first { }
+                
+                    @dependsOn(10)
+                    resource vm something {}
+                }
+                """));
+    }
+
+    @Test
+    void dependsOnObjectInComponent() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component app {
+                    resource vm first { }
+                
+                    @dependsOn(true)
+                    resource vm something {}
+                }
+                """));
+    }
+
+    @Test
+    void dependsOnComponentInstance() {
+        var res = eval("""
+                schema vm {}
+                
+                component networking {
+                    resource vm vpc {}
+                }
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                component networking prodNet {}
+                
+                @dependsOn(prodNet)
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void dependsOnComponentInstanceArray() {
+        var res = eval("""
+                schema vm {}
+                
+                component networking {
+                    resource vm vpc {}
+                }
+                
+                component database {
+                    resource vm db {}
+                }
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                component networking prodNet {}
+                component database prodDb {}
+                
+                @dependsOn([prodNet, prodDb])
+                component app prodApp {}
+                """);
+    }
+
+    @Test
+    void dependsOnComponentDefinitionShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                component networking {
+                    resource vm vpc {}
+                }
+                
+                @dependsOn(networking)
+                component app {
+                    resource vm server {}
+                }
+                """));
+    }
+
+    @Test
+    void dependsOnComponentDefinitionFromInstanceShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                
+                component networking {
+                    resource vm vpc {}
+                }
+                
+                component app {
+                    resource vm server {}
+                }
+                
+                @dependsOn(networking)
+                component app prodApp {}
+                """));
+    }
 
 }

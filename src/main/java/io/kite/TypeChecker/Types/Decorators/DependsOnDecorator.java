@@ -1,13 +1,11 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.Frontend.Parser.Expressions.ArrayExpression;
-import io.kite.Frontend.Parser.Expressions.Expression;
-import io.kite.Frontend.Parser.Expressions.MemberExpression;
+import io.kite.Frontend.Parse.Literals.Identifier;
+import io.kite.Frontend.Parser.Expressions.*;
+import io.kite.Runtime.Values.Deferred;
+import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.TypeError;
-import io.kite.TypeChecker.Types.ArrayType;
-import io.kite.TypeChecker.Types.DecoratorType;
-import io.kite.TypeChecker.Types.ResourceType;
+import io.kite.TypeChecker.Types.*;
 import io.kite.Visitors.SyntaxPrinter;
 import org.fusesource.jansi.Ansi;
 
@@ -18,13 +16,16 @@ import static io.kite.TypeChecker.Types.DecoratorType.decorator;
 
 public class DependsOnDecorator extends DecoratorChecker {
     public static final String NAME = "dependsOn";
-    private SyntaxPrinter syntaxPrinter = new SyntaxPrinter();
+    private final TypeChecker checker;
+    private SyntaxPrinter printer;
 
-    public DependsOnDecorator() {
+    public DependsOnDecorator(TypeChecker checker) {
         super(NAME, decorator(
                 List.of(ArrayType.ARRAY_TYPE, ResourceType.INSTANCE),
                 Set.of(DecoratorType.Target.RESOURCE, DecoratorType.Target.COMPONENT)
         ), Set.of());
+        this.checker = checker;
+        this.printer = checker.getPrinter();
     }
 
     @Override
@@ -37,15 +38,56 @@ public class DependsOnDecorator extends DecoratorChecker {
     }
 
     private void validateArgsType(AnnotationDeclaration declaration) {
+        if (declaration.getTarget() instanceof ComponentStatement statement) {
+            if (statement.isDefinition()) {
+                String visit = printer.visit(statement);
+                String message = Ansi.ansi()
+                        .fgYellow()
+                        .a("@").a(getName())
+                        .reset()
+                        .a(" cannot be applied on a component definition: ")
+                        .fgBlue()
+                        .a(visit)
+                        .toString();
+                throw new TypeError(message);
+            }
+        }
         if (declaration.getArgs() instanceof ArrayExpression arrayExpression) {
             for (Expression item : arrayExpression.getItems()) {
-                if (item instanceof MemberExpression memberExpression) {
-                } else {
-                    throwErrorForInvalidArgument(item);
+                switch (item) {
+                    case MemberExpression _, Identifier _ -> validateIdentity(item);
+                    case null, default -> throwErrorForInvalidArgument(item);
                 }
             }
+        } else if (declaration.getValue() instanceof Identifier identifier) {
+            validateIdentity(identifier);
         } else if (!(declaration.getValue() instanceof MemberExpression memberExpression)) {
             throwErrorForInvalidArgument(declaration);
+        }
+    }
+
+    private void validateIdentity(Expression item) {
+        var res = checker.visit(item);
+        switch (res) {
+            case ResourceType _ -> {
+            }
+            case ComponentType component -> {
+                if (component.isDefinition()) {
+                    String visit = printer.visit(component);
+                    String message = Ansi.ansi()
+                            .fgYellow()
+                            .a("@").a(getName())
+                            .reset()
+                            .a(" cannot depend on a component definition: ")
+                            .fgBlue()
+                            .a(visit)
+                            .toString();
+                    throw new TypeError(message);
+                }
+            }
+            case AnyType anyType when anyType.getAny() instanceof Deferred -> {
+            }
+            default -> throwErrorForInvalidArgument(item);
         }
     }
 
@@ -70,7 +112,7 @@ public class DependsOnDecorator extends DecoratorChecker {
     }
 
     private void throwErrorForInvalidArgument(Expression typeIdentifier) {
-        String visit = syntaxPrinter.visit(typeIdentifier);
+        String visit = printer.visit(typeIdentifier);
         String message = Ansi.ansi()
                 .fgYellow()
                 .a("@").a(getName())

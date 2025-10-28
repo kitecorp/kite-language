@@ -82,4 +82,8 @@ public final class ComponentType extends ReferenceType implements CountAnnotatab
         return expectedType.isInstance(type) ? Optional.of(expectedType.cast(type)) : Optional.empty();
     }
 
+    public boolean isDefinition() {
+        return getType() != null && name == null;
+    }
+
 }
