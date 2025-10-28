@@ -3,10 +3,11 @@ package io.kite.TypeChecker.Decorators;
 import io.kite.Base.CheckerTest;
 import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.AnyType;
-import org.junit.jupiter.api.Assertions;
+import io.kite.TypeChecker.Types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.kite.TypeChecker.ComponentTest.assertIsComponentType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -24,7 +25,7 @@ public class SensitiveTest extends CheckerTest {
 
     @Test
     void decoratorSensitiveInvalidArgs() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 @sensitive(2)
                 output any something = null
                 """));
@@ -32,7 +33,7 @@ public class SensitiveTest extends CheckerTest {
 
     @Test
     void decoratorSensitiveInvalidElement() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 @sensitive
                 var x = 2"""));
     }
@@ -43,6 +44,69 @@ public class SensitiveTest extends CheckerTest {
                 @sensitiveUnknown
                 output any something = null"""));
 
+    }
+
+    @Test
+    void decoratorSensitiveInComponent() {
+        var res = eval("""
+                component app {
+                    @sensitive
+                    output string apiKey = "secret"
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        var outputType = appComponent.lookup("apiKey");
+        assertEquals(ValueType.String, outputType);
+    }
+
+    @Test
+    void decoratorSensitiveOnInput() {
+        var res = eval("""
+                @sensitive
+                input string password = "secret"
+                """);
+
+        assertEquals(ValueType.String, res);
+    }
+
+    @Test
+    void decoratorSensitiveOnInputInComponent() {
+        var res = eval("""
+                component app {
+                    @sensitive
+                    input string password
+                }
+                """);
+
+        var appComponent = assertIsComponentType(res, "app");
+        var inputType = appComponent.lookup("password");
+        assertEquals(ValueType.String, inputType);
+    }
+
+    @Test
+    void decoratorSensitiveOnResourceShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema vm {}
+                @sensitive
+                resource vm server {}
+                """));
+    }
+
+    @Test
+    void decoratorSensitiveOnSchemaShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                @sensitive
+                schema vm {}
+                """));
+    }
+
+    @Test
+    void decoratorSensitiveOnComponentShouldFail() {
+        assertThrows(TypeError.class, () -> eval("""
+                @sensitive
+                component app {}
+                """));
     }
 
 }
