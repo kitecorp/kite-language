@@ -323,14 +323,23 @@ public final class TypeChecker extends StackVisitor<Type> {
                     printer.visit(expectedVal)
             ));
         }
+//
 
         return expectedType;
     }
 
     private Type handleNonArrayActual(Type actualType, Type expectedType, Expression expectedVal) {
         if (expectedType instanceof ArrayType expectedArrayType) {
+            if (actualType.getKind() != SystemType.ARRAY && !(expectedVal instanceof AssignmentExpression)) {
+                throw new TypeError(format(
+                        "Expected array type `{0}` but got `{1}` in expression: {2}",
+                        expectedType, actualType, printer.visit(expectedVal)
+                ));
+            }
             expect(actualType, expectedArrayType.getType(), expectedVal);
             return expectedArrayType;
+        } else if (Objects.equals(actualType, expectedType)) {
+            return expectedType;
         }
         return expectedType;
     }
