@@ -185,9 +185,9 @@ public class UnionTypeTest extends CheckerTest {
         var res = eval("""
                 type alias = number | string | null
                 var alias[] x = []
-                x+=10
-                x+=null
-                x+="hello"
+                x += 10
+                x += null
+                x += "hello"
                 """);
         assertEquals(arrayType(unionType("alias", ValueType.Number, ValueType.String, ValueType.Null)), res);
     }
