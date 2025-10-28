@@ -161,12 +161,281 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 """));
     }
 
-//    @Test
-//    void validate_runs_on_override() {
-//        // default passes, CLI/env override fails: your harness should simulate override
-//        withCliArg("name", "BAD!", () -> assertThrows(IllegalArgumentException.class, () -> eval("""
-//                    @validate(regex="^[A-Z]+$")
-//                    input string name = "OK"
-//                """)));
-//    }
+    @Test
+    void validateInComponentHappyFlow() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$", flags="i", message="Use letters, numbers, dashes")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "bucket"
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentWithSymbol() {
+        var err = assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "bucket."
+                }
+                """));
+        assertTrue(err.getMessage().contains("Use letters, numbers, dashes"));
+        assertTrue(err.getMessage().contains("bucket."));
+    }
+
+    @Test
+    void validateInComponentUpperCase() {
+        var err = assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "Bucket"
+                }
+                """));
+        assertTrue(err.getMessage().contains("Use letters, numbers, dashes"));
+        assertTrue(err.getMessage().contains("Bucket"));
+    }
+
+    @Test
+    void validateInComponentUpperCaseIgnored() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$", flags="i", message="Use letters, numbers, dashes")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "Bucket"
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentStringArray() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string[] regions
+                }
+                
+                component app prod {
+                    regions = ["api-01", "db-01"]
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentStringArraySingle() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string[] regions
+                }
+                
+                component app prod {
+                    regions = ["hello"]
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentStringArrayMultiple() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string[] regions
+                }
+                
+                component app prod {
+                    regions = ["hello", "world"]
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentSimpleOk() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "api-01"
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentSimpleFail() {
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "Api_01"
+                }
+                """));
+    }
+
+    @Test
+    void validateInComponentFlagsCaseInsensitiveOk() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$", flags="i")
+                    input string region
+                }
+                
+                component app prod {
+                    region = "Api-01"
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentArrayAllOk() {
+        eval("""
+                component app {
+                    @validate(regex="^env-[a-z]+$")
+                    input string[] regions
+                }
+                
+                component app prod {
+                    regions = ["env-dev", "env-prod"]
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentArrayPointsToOffender() {
+        var ex = assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^env-[a-z]+$")
+                    input string[] regions
+                }
+                
+                component app prod {
+                    regions = ["env-dev", "prod"]
+                }
+                """));
+        assertTrue(ex.getMessage().contains("index 1"));
+        assertTrue(ex.getMessage().contains("prod"));
+    }
+
+    @Test
+    void validateInComponentWithDefaultValue() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region = "default-region"
+                }
+                
+                component app prod {
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentWithInvalidDefaultValue() {
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region = "Invalid_Region"
+                }
+                
+                component app prod {
+                }
+                """));
+    }
+
+    @Test
+    void validateInComponentOverrideValidDefault() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region = "default-region"
+                }
+                
+                component app prod {
+                    region = "prod-region"
+                }
+                """);
+    }
+
+    @Test
+    void validateInComponentOverrideWithInvalidValue() {
+        assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region = "default-region"
+                }
+                
+                component app prod {
+                    region = "Invalid_Region"
+                }
+                """));
+    }
+
+    @Test
+    void validateInNestedComponent() {
+        eval("""
+                component outer {
+                    component inner {
+                        @validate(regex="^[a-z0-9-]+$")
+                        input string name
+                    }
+                }
+                """);
+    }
+
+    @Test
+    void validateMultipleInputsInComponent() {
+        eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region
+                
+                    @validate(regex="^env-[a-z]+$")
+                    input string environment
+                }
+                
+                component app prod {
+                    region = "us-east-1"
+                    environment = "env-prod"
+                }
+                """);
+    }
+
+    @Test
+    void validateMultipleInputsOneInvalid() {
+        var ex = assertThrows(IllegalArgumentException.class, () -> eval("""
+                component app {
+                    @validate(regex="^[a-z0-9-]+$")
+                    input string region
+                
+                    @validate(regex="^env-[a-z]+$")
+                    input string environment
+                }
+                
+                component app prod {
+                    region = "us-east-1"
+                    environment = "prod"
+                }
+                """));
+        assertTrue(ex.getMessage().contains("environment") || ex.getMessage().contains("prod"));
+    }
+
 }
