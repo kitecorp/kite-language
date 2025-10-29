@@ -89,6 +89,13 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         return block.getExpression();
     }
 
+    public String name() {
+        if (name instanceof Identifier identifier) {
+            return identifier.string();
+        }
+        return null;
+    }
+
     /**
      * If the name is missing then the component is a type. Else it's an initialization and should be initialized in interpreter
      */

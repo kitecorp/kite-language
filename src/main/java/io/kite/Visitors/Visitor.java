@@ -171,8 +171,8 @@ public sealed interface Visitor<R>
      */
     R visit(ResourceStatement expression);
 
-    default String resourceName(Expression resource) {
-        var resourceName = switch (resource) {
+    default String resourceName(ResourceStatement resource) {
+        var resourceName = switch (resource.getName()) {
             case SymbolIdentifier identifier -> identifier.string();
             case StringLiteral literal -> literal.getValue();
             case Identifier identifier -> identifier.string();
