@@ -33,7 +33,7 @@ public final class ComponentStatement extends Statement implements Annotatable, 
      * When missing it will be a component type. When present it will be an initialization
      */
     @Nullable
-    private Identifier name;
+    private Expression name;
     private BlockExpression block;
     private Set<AnnotationDeclaration> annotations;
     private Set<String> providers;
@@ -87,10 +87,6 @@ public final class ComponentStatement extends Statement implements Annotatable, 
 
     public List<Statement> getArguments() {
         return block.getExpression();
-    }
-
-    public String name() {
-        return name.string();
     }
 
     /**

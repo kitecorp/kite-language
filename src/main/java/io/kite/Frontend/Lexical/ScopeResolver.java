@@ -151,11 +151,6 @@ public final class ScopeResolver implements Visitor<Void> {
     }
 
     @Override
-    public Void visit(ComponentStatement expression) {
-        throw new RuntimeException("oops: ComponentStatement is not an expression statement: " + expression.toString());
-    }
-
-    @Override
     public Void visit(InputDeclaration expression) {
         visit(expression.getId());
         if (expression.hasType()) {
@@ -320,6 +315,40 @@ public final class ScopeResolver implements Visitor<Void> {
     public Void visit(WhileStatement statement) {
         resolve(statement.getTest());
         resolve(statement.getBody());
+        return null;
+    }
+
+    @Override
+    public Void visit(ComponentStatement expression) {
+        beginScope();
+        if (expression.getName() != null) {
+            switch (expression.getName()) {
+                case SymbolIdentifier identifier -> {
+                    declare(identifier);
+                    define(identifier);
+                }
+                case Identifier id -> {
+                    declare(id);
+                    define(id);
+                }
+                case MemberExpression memberExpression -> {
+                    if (memberExpression.getObject() instanceof SymbolIdentifier identifier) {
+                        declare(identifier);
+                        define(identifier);
+                    }
+//                    visit(memberExpression.getObject());
+//                    visit(memberExpression.getProperty());
+                }
+                default -> {
+                }
+            }
+            resolve(expression.getName());
+        }
+        for (Statement argument : expression.getArguments()) {
+            visit(argument);
+        }
+        resolve(expression.getArguments());
+        endScope();
         return null;
     }
 
