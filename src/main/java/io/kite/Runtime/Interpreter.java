@@ -492,8 +492,8 @@ public final class Interpreter extends StackVisitor<Object> {
                 case Map<?, ?> map -> visitMapMember(expression, map);
                 case Deferred deferred -> visitDeferredMember(expression, deferred);
                 case Dependency dependency -> {
-                    if (dependency.value() instanceof Map<?, ?> map) {
-                        yield visitMapMember(expression, map);
+                    if (dependency.value() instanceof Map<?, ?> list) {
+                        yield visitMapMember(expression, list);
                     } else {
                         yield dependency.value();
                     }
