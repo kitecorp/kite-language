@@ -172,7 +172,7 @@ public class ForResourceTest extends RuntimeTest {
         eval("""
                   schema vm { string name }
                   for i in 0..2 {
-                    resource vm cidr { name = vm.vpc.name }
+                    resource vm cidr { name = vpc.name }
                     resource vm vpc  { name = 'vpc-$i' }
                   }
                 """);
@@ -186,9 +186,9 @@ public class ForResourceTest extends RuntimeTest {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                   schema vm { string name }
                   for i in 0..1 {
-                    resource vm a {  name = vm.b.name }  // a -> b
+                    resource vm a {  name = b.name }  // a -> b
                 
-                    resource vm b { name = vm.a.name }  // b -> a
+                    resource vm b { name = a.name }  // b -> a
                   }
                 """));
     }
@@ -200,7 +200,7 @@ public class ForResourceTest extends RuntimeTest {
                   var vm[] col = []
                   for i in ["prod","test"] {
                     resource vm main { name = i }
-                    col += vm.main
+                    col += main
                   }
                 """);
         var schema = interpreter.getSchema("vm");
@@ -222,7 +222,7 @@ public class ForResourceTest extends RuntimeTest {
         Assertions.assertThrows(RuntimeException.class, () -> eval("""
                   schema vm { string name }
                   for i in 0..2 { resource vm a { name = '$i' } }
-                  for j in 0..2 { resource vm b { name = vm.a[j].name } } // if bracket-indexing unsupported
+                  for j in 0..2 { resource vm b { name = a[j].name } } // if bracket-indexing unsupported
                 """));
     }
 
@@ -335,7 +335,7 @@ public class ForResourceTest extends RuntimeTest {
                 for i in 0..2 {
                     var name = 'prod'
                     resource vm cidr {
-                      name     = vm.vpc.name
+                      name     = vpc.name
                     }
                     resource vm vpc {
                       name     = '$name-$i'
@@ -373,7 +373,7 @@ public class ForResourceTest extends RuntimeTest {
                       name     = '$name-$i'
                     }
                     resource vm cidr {
-                      name     = vm.vpc.name
+                      name     = vpc.name
                     }
                 }
                 """);
@@ -405,11 +405,11 @@ public class ForResourceTest extends RuntimeTest {
                 
                     resource vm vpc {
                       name     = '$name-$i'
-                      color    = vm.cidr.color 
+                      color    = cidr.color 
                     }
                     resource vm cidr {
-                      name     = vm.vpc.name
-                      color    = vm.vpc.color
+                      name     = vpc.name
+                      color    = vpc.color
                     }
                 
                 }
@@ -429,7 +429,7 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm main {
                       name     = name
                     }
-                    vms += vm.main
+                    vms += main
                 }
                 """);
 
@@ -453,7 +453,7 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm main {
                       name     = name
                     }
-                    vms += vm.main
+                    vms += main
                 }
                 """);
 
@@ -477,7 +477,7 @@ public class ForResourceTest extends RuntimeTest {
                       name     = "second"
                 }
                 
-                for it in [vm.main, vm.second] {
+                for it in [main, second] {
                     println(it)
                 }
                 """);
@@ -496,7 +496,7 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm main {
                       name     = name
                     }
-                    vms += vm.main
+                    vms += main
                 }
                 """);
 
@@ -520,7 +520,7 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm main {
                       name     = i
                     }
-                    vms += vm.main
+                    vms += main
                 }
                 """);
 
