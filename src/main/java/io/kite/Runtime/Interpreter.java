@@ -627,7 +627,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
             var value = resource.isEvaluating()
                     ? resource.getValue() // Notifying existing resource that its dependencies were satisfied
-                    : initResource(resource, installedSchema, installedSchema.environment());
+                    : initResource(resource, installedSchema, installedSchema.getEnvironment());
 
             value.setProviders(resource.getProviders());
             value.setTag(resource.getTags());

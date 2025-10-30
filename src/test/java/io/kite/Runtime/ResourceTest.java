@@ -200,7 +200,7 @@ public class ResourceTest extends RuntimeTest {
         var resource = interpreter.getInstance("main");
 
         // default x in schema remains the same
-        assertEquals(2, schema.environment().get("x"));
+        assertEquals(2, schema.getEnvironment().get("x"));
 
         // x of main resource was updated with a new value
         var x = resource.get("x");

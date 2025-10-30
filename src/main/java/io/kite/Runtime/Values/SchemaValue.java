@@ -3,12 +3,19 @@ package io.kite.Runtime.Values;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Environment.IEnvironment;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record SchemaValue(String type, @ToString.Exclude @EqualsAndHashCode.Exclude Environment environment) {
+@Data
+public class SchemaValue {
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private final Environment environment;
+    private final String type;
+
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
         this.type = type.string();
         this.environment = environment;
