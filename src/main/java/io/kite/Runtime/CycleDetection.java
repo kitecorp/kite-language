@@ -3,7 +3,10 @@ package io.kite.Runtime;
 import io.kite.Runtime.Values.ResourceValue;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Log4j2
 public class CycleDetection {
@@ -21,14 +24,14 @@ public class CycleDetection {
      * 1. direct cycles: a -> b and b -> a
      * 2. indirect cycles: a->b->c->a
      */
-    public static void detect(ResourceValue resource) {
+    public static void detect(ResourceValue resource, Interpreter interpreter) {
         Set<String> visited = new HashSet<>();
         Set<String> activePath = new HashSet<>();
 
-        detectCycles(resource, visited, activePath);
+        detectCycles(resource, visited, activePath, interpreter);
     }
 
-    private static void detectCycles(ResourceValue resource, Set<String> visited, Set<String> activePath) {
+    private static void detectCycles(ResourceValue resource, Set<String> visited, Set<String> activePath, Interpreter interpreter) {
         // If the resource is already in the active path, a cycle exists
         if (activePath.contains(resource.name())) {
             String message = "Cycle detected at resource: " + resource.name();
@@ -47,9 +50,9 @@ public class CycleDetection {
 
         // Recurse into all dependencies
         for (String dependencyName : resource.getDependencies()) {
-            var dependency = resource.getSchema().getInstance(dependencyName); // Implement this lookup
+            var dependency = interpreter.getInstance(dependencyName); // Implement this lookup
             if (dependency != null) {
-                detectCycles(dependency, visited, activePath);
+                detectCycles(dependency, visited, activePath, interpreter);
             }
         }
 

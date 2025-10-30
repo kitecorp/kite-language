@@ -3,7 +3,6 @@ package io.kite.Runtime;
 import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.Values.ResourceValue;
-import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.RuntimeError;
 import lombok.SneakyThrows;
@@ -31,10 +30,10 @@ public class ResourceTest extends RuntimeTest {
 
     /**
      * This checks for the following syntax
-     * vm.main
-     * All resources are defined in the schema
+     * main (direct access)
+     * All resources are defined in the environment where they're created
      * global env{
-     * vm   SchemaValue -> variables{ main -> resource vm}
+     * main -> resource vm
      * }
      */
     @Test
@@ -42,17 +41,11 @@ public class ResourceTest extends RuntimeTest {
         var res = eval("""
                 schema vm { }
                 resource vm main {
-                
+
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        assertNotNull(schema);
-        assertEquals("vm", schema.getType());
-
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertNotNull(resource);
         assertEquals("main", resource.getName());
@@ -61,7 +54,7 @@ public class ResourceTest extends RuntimeTest {
     @Test
     void resourceIsDefinedInSchema() {
         var res = eval("""
-                schema vm { 
+                schema vm {
                     string name
                     number maxCount=0
                 }
@@ -71,24 +64,18 @@ public class ResourceTest extends RuntimeTest {
                 }
                 resource vm second {
                     name = "second"
-                    maxCount = vm.main.maxCount
+                    maxCount = main.maxCount
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        assertNotNull(schema);
-        assertEquals("vm", schema.getType());
-
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals("first", resource.argVal("name"));
         assertEquals(1, resource.argVal("maxCount"));
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
 
         assertNotNull(second);
         assertEquals("second", second.getName());
@@ -117,15 +104,13 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-                
+
                 resource vm main {
-                
+
                 }
                 """);
         log.warn(res);
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertEquals(2, resource.getProperties().lookup("x"));
     }
@@ -143,9 +128,9 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
+        var schema = interpreter.getSchema("vm");
 
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertEquals(2, resource.getProperties().lookup("x"));
     }
@@ -156,28 +141,26 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-                
+
                 resource vm main  {
-                
+
                 }
-                var y = vm.main
-                var z = vm.main.x
+                var y = main
+                var z = main.x
                 z
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertSame(2, resource.getProperties().get("x"));
         // make sure main's x has been changed
         assertEquals(2, resource.getProperties().get("x"));
 
-        // assert y holds reference to vm.main
-        var y = global.lookup("y");
+        // assert y holds reference to main
+        var y = interpreter.getVar("y");
         assertSame(y, resource);
-        // assert y holds reference to vm.main
-        var z = global.lookup("z");
-        assertSame(z, schema.getEnvironment().get("x"));
+        // assert z holds reference to main.x
+        var z = interpreter.getVar("z");
+        assertEquals(2, z);
 
         assertEquals(2, res);
     }
@@ -193,11 +176,11 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-                
+
                 resource vm  main {
-                
+
                 }
-                vm.main.x = 3
+                main.x = 3
                 """));
     }
 
@@ -207,18 +190,17 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-                
+
                 resource vm main {
                     x = 3
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var schema = interpreter.getSchema("vm");
+        var resource = interpreter.getInstance("main");
 
         // default x in schema remains the same
-        assertEquals(2, schema.getEnvironment().get("x"));
+        assertEquals(2, schema.environment().get("x"));
 
         // x of main resource was updated with a new value
         var x = resource.get("x");
@@ -232,15 +214,13 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-                
+
                 resource vm main  {
                     x = 3
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
     }
@@ -258,9 +238,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -280,9 +258,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -302,9 +278,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -317,12 +291,12 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    string name
                 }
-                
+
                 resource vm main {
                   name     = 'prod'
                 }
                 
-                var name = vm.main.name
+                var name = main.name
                 """);
 
         assertEquals("prod", res);
@@ -334,19 +308,20 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                     string name
                 }
-                
+
                 resource vm web {
                     name = "web-server"
                 }
-                
+
                 resource vm db {
                     name = "database"
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        assertEquals("web-server", schema.findInstance("web").argVal("name"));
-        assertEquals("database", schema.findInstance("db").argVal("name"));
+        var web = interpreter.getInstance("web");
+        var db = interpreter.getInstance("db");
+        assertEquals("web-server", web.argVal("name"));
+        assertEquals("database", db.argVal("name"));
     }
 
     @Test
@@ -355,14 +330,13 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                     string[] tags
                 }
-                
+
                 resource vm main {
                     tags = ["production", "critical"]
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         var tags = (List<?>) resource.argVal("tags");
         assertEquals(2, tags.size());
         assertEquals("production", tags.get(0));
@@ -374,7 +348,7 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                     object config
                 }
-                
+
                 resource vm main {
                     config = {
                         env: "prod",
@@ -383,8 +357,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNotNull(resource.argVal("config"));
     }
 
@@ -402,8 +375,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertEquals(10, resource.argVal("count"));
     }
 
@@ -420,12 +392,11 @@ public class ResourceTest extends RuntimeTest {
                 }
                 
                 resource vm target {
-                    selectedName = vm.source.names[0]
+                    selectedName = source.names[0]
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var target = schema.findInstance("target");
+        var target = interpreter.getInstance("target");
         assertEquals("first", target.argVal("selectedName"));
     }
 
@@ -441,8 +412,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNull(resource.argVal("value"));
     }
 
@@ -460,18 +430,19 @@ public class ResourceTest extends RuntimeTest {
                 
                 resource vm second {
                     id = "second-id"
-                    refId = vm.first.id
+                    refId = first.id
                 }
                 
                 resource vm third {
                     id = "third-id"
-                    refId = vm.second.id
+                    refId = second.id
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        assertEquals("first-id", schema.findInstance("second").argVal("refId"));
-        assertEquals("second-id", schema.findInstance("third").argVal("refId"));
+        var second = interpreter.getInstance("second");
+        var third = interpreter.getInstance("third");
+        assertEquals("first-id", second.argVal("refId"));
+        assertEquals("second-id", third.argVal("refId"));
     }
 
     @Test
@@ -488,8 +459,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertEquals("server-production", resource.argVal("fullName"));
     }
 
@@ -507,8 +477,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertEquals("us-east-1", resource.argVal("region"));
     }
 
@@ -525,12 +494,11 @@ public class ResourceTest extends RuntimeTest {
                 }
                 
                 resource vm target {
-                    value = vm.source.config.nested.key
+                    value = source.config.nested.key
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var target = schema.findInstance("target");
+        var target = interpreter.getInstance("target");
         assertEquals("value", target.argVal("value"));
     }
 
@@ -548,8 +516,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertEquals(10, resource.argVal("doubled"));
     }
 
@@ -575,8 +542,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertEquals("test", resource.argVal("str"));
         assertEquals(42, resource.argVal("num"));
         assertEquals(true, resource.argVal("bool"));

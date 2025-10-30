@@ -15,8 +15,8 @@ public class VarDeclarationTest extends RuntimeTest {
     void varNull() {
         var res = eval("var x");
         assertNull(res);
-        Assertions.assertTrue(global.hasVar("x"));
-        assertNull(global.get("x"));
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        assertNull(interpreter.getVar("x"));
         log.info(res);
     }
 
@@ -94,7 +94,7 @@ public class VarDeclarationTest extends RuntimeTest {
                 var y = "hello $x"
                 """);
         assertEquals("hello world", res);
-        assertEquals("hello world", global.get("y"));
+        assertEquals("hello world", interpreter.getVar("y"));
         log.info(res);
     }
 
@@ -108,7 +108,7 @@ public class VarDeclarationTest extends RuntimeTest {
                 }
                 """);
         assertEquals("hello world", res);
-        assertEquals("hello world", global.get("y"));
+        assertEquals("hello world", interpreter.getVar("y"));
         log.info(res);
     }
 

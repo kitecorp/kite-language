@@ -3,34 +3,15 @@ package io.kite.Runtime.Values;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Environment.IEnvironment;
-import io.kite.Runtime.exceptions.DeclarationExistsException;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-@Data
-public class SchemaValue {
-    public static final String INSTANCES = "instances";
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private final Environment environment;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Setter
-    private Map<String, ResourceValue> instances;
-    private final String type;
-
+public record SchemaValue(String type, @ToString.Exclude @EqualsAndHashCode.Exclude Environment environment) {
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
         this.type = type.string();
-        this.instances = new LinkedHashMap<>();
         this.environment = environment;
-        this.environment.init(INSTANCES, instances);
     }
 
     public static SchemaValue of(Identifier name, Environment environment) {
@@ -79,21 +60,4 @@ public class SchemaValue {
         return environment.init(name, value);
     }
 
-    public ResourceValue initInstance(ResourceValue instance) {
-        var contains = this.instances.containsKey(instance.name()); // todo performance tip: replace contains with put only
-        if (contains) {
-            throw new DeclarationExistsException(">" + instance.name() + "< already exists in schema");
-        }
-        return this.instances.put(instance.name(), instance);
-    }
-
-    @Nullable
-    public ResourceValue getInstance(String name) {
-        return instances.get(name);
-    }
-
-    @Nullable
-    public ResourceValue findInstance(String instanceName) {
-        return getInstance(instanceName);
-    }
 }

@@ -20,28 +20,28 @@ public class UnionTypeTest extends RuntimeTest {
     @Test
     void typeNum() {
         var res = eval("type num = 1");
-        Assertions.assertTrue(global.hasVar("num"));
+        Assertions.assertTrue(interpreter.hasVar("num"));
         assertEquals(Set.of(1), res);
     }
 
     @Test
     void typeBoolTrue() {
         var res = eval("type bool = true");
-        Assertions.assertTrue(global.hasVar("bool"));
+        Assertions.assertTrue(interpreter.hasVar("bool"));
         assertEquals(Set.of(true), res);
     }
 
     @Test
     void typeBoolFalse() {
         var res = eval("type bool = false");
-        Assertions.assertTrue(global.hasVar("bool"));
+        Assertions.assertTrue(interpreter.hasVar("bool"));
         assertEquals(Set.of(false), res);
     }
 
     @Test
     void typeString() {
         var res = eval("type x = \"hello\"");
-        Assertions.assertTrue(global.hasVar("x"));
+        Assertions.assertTrue(interpreter.hasVar("x"));
         assertEquals(Set.of("hello"), res);
     }
 
@@ -50,9 +50,9 @@ public class UnionTypeTest extends RuntimeTest {
         var res = eval("""
                 type x = "hello" | "world"
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
+        Assertions.assertTrue(interpreter.hasVar("x"));
         assertEquals(Set.of("hello", "world"), res);
-        assertEquals(Set.of("hello", "world"), global.get("x"));
+        assertEquals(Set.of("hello", "world"), interpreter.getVar("x"));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class UnionTypeTest extends RuntimeTest {
         var res = eval("""
                 type x = { name: "hello" } | { name: "world" }
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
+        Assertions.assertTrue(interpreter.hasVar("x"));
         assertEquals(Set.of(Map.of("name", "hello"), Map.of("name", "world")), res);
     }
 
@@ -71,7 +71,7 @@ public class UnionTypeTest extends RuntimeTest {
                 type two = 2
                 type INT = one | two
                 """);
-        Assertions.assertTrue(global.hasVar("INT"));
+        Assertions.assertTrue(interpreter.hasVar("INT"));
         assertEquals(Set.of(1, 2), res);
     }
 
@@ -82,7 +82,7 @@ public class UnionTypeTest extends RuntimeTest {
                 type two = 2
                 type INT = one | two
                 """);
-        Assertions.assertTrue(global.hasVar("INT"));
+        Assertions.assertTrue(interpreter.hasVar("INT"));
         assertEquals(Set.of(1, 2), res);
     }
 
@@ -92,15 +92,15 @@ public class UnionTypeTest extends RuntimeTest {
                 type zero = 0
                 type INT = 1 | 'hello' | true | { env: 'dev' } | zero 
                 """);
-        Assertions.assertTrue(global.hasVar("INT"));
+        Assertions.assertTrue(interpreter.hasVar("INT"));
         assertEquals(Set.of(Map.of("env", "dev"), 0, 1, "hello", true), res);
     }
 
     @Test
     void typeUnionNum() {
         var res = eval("type num = 1 | 2 | 5");
-        Assertions.assertTrue(global.hasVar("num"));
-        assertNull(global.get("x"));
+        Assertions.assertTrue(interpreter.hasVar("num"));
+        assertNull(interpreter.getVar("x"));
         assertEquals(Set.of(1, 2, 5), res);
     }
 
@@ -110,16 +110,16 @@ public class UnionTypeTest extends RuntimeTest {
                 type customNumbers = 1 | 2 | 5
                 var customNumbers[] numbers = [1, 2, 5]
                 """);
-        Assertions.assertTrue(global.hasVar("customNumbers"));
-        assertNull(global.get("x"));
+        Assertions.assertTrue(interpreter.hasVar("customNumbers"));
+        assertNull(interpreter.getVar("x"));
         assertEquals(List.of(1, 2, 5), res);
     }
 
     @Test
     void typeUnionBool() {
         var res = eval("type num = true | false");
-        Assertions.assertTrue(global.hasVar("num"));
-        assertNull(global.get("x"));
+        Assertions.assertTrue(interpreter.hasVar("num"));
+        assertNull(interpreter.getVar("x"));
         assertEquals(Set.of(true, false), res);
     }
 
@@ -133,8 +133,8 @@ public class UnionTypeTest extends RuntimeTest {
                 x+=null
                 x+="hello"
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
-        assertNotNull(global.get("x"));
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        assertNotNull(interpreter.getVar("x"));
         var objects = new ArrayList<>();
         objects.add(10);
         objects.add(null);

@@ -54,7 +54,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertNotNull(instance);
         assertEquals("main", instance.getName());
@@ -78,14 +78,14 @@ public class ComponentTest extends RuntimeTest {
                 """);
         log.warn((res));
 
-        var main = (ComponentValue) global.lookup("server.main");
+        var main = interpreter.getComponent("server.main");
 
         assertNotNull(main);
         assertEquals("main", main.getName());
         assertEquals("localhost", main.argVal("hostname"));
         assertEquals(3000, main.argVal("port"));
 
-        var api = (ComponentValue) global.lookup("server.api");
+        var api = interpreter.getComponent("server.api");
 
         assertNotNull(api);
         assertEquals("api", api.getName());
@@ -120,7 +120,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
         log.warn(res);
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertEquals(2, instance.getProperties().lookup("x"));
     }
@@ -138,7 +138,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertEquals(2, instance.getProperties().lookup("x"));
     }
@@ -158,16 +158,16 @@ public class ComponentTest extends RuntimeTest {
                 z
                 """);
         log.warn((res));
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertSame(2, instance.getProperties().get("x"));
         // make sure main's x has been changed
         assertEquals(2, instance.getProperties().get("x"));
 
         // assert y holds reference to server.main
-        var y = global.lookup("y");
+        var y = interpreter.getVar("y");
         assertSame(y, instance);
         // assert z holds reference to the value of x (which is 2)
-        var z = global.lookup("z");
+        var z = interpreter.getVar("z");
         assertEquals(2, z);
 
         assertEquals(2, res);
@@ -204,7 +204,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         // x of main instance was updated with a new value
         var x = instance.get("x");
@@ -224,7 +224,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertInstanceOf(ComponentValue.class, instance);
     }
@@ -242,7 +242,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertInstanceOf(ComponentValue.class, instance);
         assertEquals(instance, res);
@@ -262,7 +262,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertInstanceOf(ComponentValue.class, instance);
         assertEquals(instance, res);
@@ -282,7 +282,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
 
         assertInstanceOf(ComponentValue.class, instance);
         assertEquals(instance, res);
@@ -322,8 +322,8 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var web = (ComponentValue) global.lookup("server.web");
-        var database = (ComponentValue) global.lookup("server.database");
+        var web = interpreter.getComponent("server.web");
+        var database = interpreter.getComponent("server.database");
 
         assertEquals("web-server", web.argVal("hostname"));
         assertEquals("db-server", database.argVal("hostname"));
@@ -341,7 +341,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         var services = (List<?>) instance.argVal("services");
         assertEquals(3, services.size());
         assertEquals("api", services.get(0));
@@ -362,7 +362,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertNotNull(instance.argVal("metadata"));
     }
 
@@ -380,7 +380,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertEquals(6, instance.argVal("replicas"));
     }
 
@@ -401,7 +401,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var target = (ComponentValue) global.lookup("server.target");
+        var target = interpreter.getComponent("server.target");
         assertEquals("/api", target.argVal("primaryEndpoint"));
     }
 
@@ -417,7 +417,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertNull(instance.argVal("config"));
     }
 
@@ -444,8 +444,8 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var secondary = (ComponentValue) global.lookup("server.secondary");
-        var tertiary = (ComponentValue) global.lookup("server.tertiary");
+        var secondary = interpreter.getComponent("server.secondary");
+        var tertiary = interpreter.getComponent("server.tertiary");
 
         assertEquals("primary-id", secondary.argVal("parentId"));
         assertEquals("secondary-id", tertiary.argVal("parentId"));
@@ -465,7 +465,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertEquals("api-service", instance.argVal("fullName"));
     }
 
@@ -483,7 +483,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertEquals("us-west-2", instance.argVal("region"));
     }
 
@@ -504,7 +504,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var target = (ComponentValue) global.lookup("server.target");
+        var target = interpreter.getComponent("server.target");
         assertEquals("localhost", target.argVal("value"));
     }
 
@@ -522,7 +522,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertEquals(8, instance.argVal("maxThreads"));
     }
 
@@ -548,7 +548,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = (ComponentValue) global.lookup("server.main");
+        var instance = interpreter.getComponent("server.main");
         assertEquals("test", instance.argVal("str"));
         assertEquals(42, instance.argVal("num"));
         assertEquals(true, instance.argVal("bool"));
