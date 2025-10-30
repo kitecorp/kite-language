@@ -52,7 +52,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                 }
                 
                 @sensitive
-                output string something = vm.main.arn
+                output string something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", "arn::"));
         var value = interpreter.printOutputs(main);
@@ -72,7 +72,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output number something = vm.main.arn
+                 output number something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 10));
         var value = interpreter.printOutputs(main);
@@ -92,7 +92,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output number something = vm.main.arn
+                 output number something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 0.2));
         var value = interpreter.printOutputs(main);
@@ -112,7 +112,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
 
                 @sensitive
-                 output boolean something = vm.main.arn
+                 output boolean something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", true));
         var value = interpreter.printOutputs(main);
@@ -132,7 +132,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output boolean something = vm.main.arn
+                 output boolean something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
@@ -152,7 +152,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any something = vm.main.arn
+                 output any something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
@@ -172,7 +172,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any something = vm.main.arn
+                 output any something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
@@ -192,7 +192,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any something = vm.main.arn
+                 output any something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", "arn::"));
         var value = interpreter.printOutputs(main);
@@ -212,7 +212,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any something = vm.main.arn
+                 output any something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 10));
         var value = interpreter.printOutputs(main);
@@ -233,7 +233,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any something = vm.main.arn
+                 output any something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 0.2));
         var value = interpreter.printOutputs(main);
@@ -253,7 +253,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any[] something = vm.main.arn
+                 output any[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(10)));
         var value = interpreter.printOutputs(main);
@@ -273,7 +273,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any[] something = vm.main.arn
+                 output any[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(0.2)));
         var value = interpreter.printOutputs(main);
@@ -293,7 +293,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any[] something = vm.main.arn
+                 output any[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of("hello")));
         var value = interpreter.printOutputs(main);
@@ -313,7 +313,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any[] something = vm.main.arn
+                 output any[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(true)));
         var value = interpreter.printOutputs(main);
@@ -333,7 +333,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output any[] something = vm.main.arn
+                 output any[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(false)));
         var value = interpreter.printOutputs(main);
@@ -353,7 +353,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output number[] something = vm.main.arn
+                 output number[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(10)));
         var value = interpreter.printOutputs(main);
@@ -373,7 +373,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output number[] something = vm.main.arn
+                 output number[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(0.2)));
         var value = interpreter.printOutputs(main);
@@ -393,7 +393,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output boolean[] something = vm.main.arn
+                 output boolean[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(true)));
         var value = interpreter.printOutputs(main);
@@ -413,7 +413,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output boolean[] something = vm.main.arn
+                 output boolean[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(false)));
         var value = interpreter.printOutputs(main);
@@ -433,7 +433,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output string[] something = vm.main.arn
+                 output string[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of("arn::")));
         var value = interpreter.printOutputs(main);
@@ -453,7 +453,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output object something = vm.main.arn
+                 output object something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", Map.of("env", "dev")));
         var value = interpreter.printOutputs(main);
@@ -471,7 +471,7 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
                  }
                 
                 @sensitive
-                 output object[] something = vm.main.arn
+                 output object[] something = main.arn
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(Map.of("env", "dev"))));
         var value = interpreter.printOutputs(main);
