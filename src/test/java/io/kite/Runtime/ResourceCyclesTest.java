@@ -151,7 +151,7 @@ public class ResourceCyclesTest extends RuntimeTest {
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.type());
+        assertEquals("vm", schema.getType());
 
         var resource = interpreter.getInstance("main");
         assertNotNull(resource);
@@ -191,7 +191,7 @@ public class ResourceCyclesTest extends RuntimeTest {
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.type());
+        assertEquals("vm", schema.getType());
 
         var resource = interpreter.getInstance("main");
         assertNotNull(resource);
@@ -235,7 +235,7 @@ public class ResourceCyclesTest extends RuntimeTest {
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.type());
+        assertEquals("vm", schema.getType());
 
         var resource = interpreter.getInstance("dep2");
         assertNotNull(resource);
@@ -287,7 +287,7 @@ public class ResourceCyclesTest extends RuntimeTest {
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.type());
+        assertEquals("vm", schema.getType());
 
         var resource = interpreter.getInstance("dep2");
         assertNotNull(resource);
@@ -338,7 +338,7 @@ public class ResourceCyclesTest extends RuntimeTest {
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.type());
+        assertEquals("vm", schema.getType());
 
         var resource = interpreter.getInstance("dep2");
         assertNotNull(resource);
