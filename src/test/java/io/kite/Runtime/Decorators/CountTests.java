@@ -81,7 +81,7 @@ public class CountTests extends DecoratorTests {
                 
                 @count(2)
                 resource vm second {
-                    name = vm.main.name
+                    name = main.name
                 }
                 """);
         var main0 = interpreter.getInstance("main[0]");
