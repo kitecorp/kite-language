@@ -24,13 +24,11 @@ public class OutputPrintSensitiveTests extends RuntimeTest {
 
     @Override
     protected void init() {
-        this.global = new Environment<>();
-        this.global.setName("global");
         this.parser = new Parser();
         this.tokenizer = new Tokenizer();
         this.typeChecker = new TypeChecker();
         this.scopeResolver = new ScopeResolver();
-        this.interpreter = new Interpreter(global);
+        this.interpreter = new Interpreter(new Environment<>("global"));
     }
 
 

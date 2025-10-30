@@ -19,8 +19,8 @@ public class VarArrayTest extends RuntimeTest {
         var res = eval("""
                 var x = []
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
-        var x = global.lookup("x");
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        var x = interpreter.getVar("x");
         Assertions.assertInstanceOf(List.class, x);
     }
 
@@ -29,7 +29,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var x = [1, 2]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(1, 2), varType);
     }
@@ -39,7 +39,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var x = [1.1, 2.2]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(1.1, 2.2), varType);
     }
@@ -49,7 +49,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var x = [true,false]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(true, false), varType);
     }
@@ -60,7 +60,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var x = [{env: "prod"}, {env: "dev"}]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev")), varType);
     }
@@ -70,8 +70,8 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var number[] x = []
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
-        var x = global.lookup("x");
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        var x = interpreter.getVar("x");
         Assertions.assertInstanceOf(List.class, x);
     }
 
@@ -80,8 +80,8 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var string[] x = []
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
-        var x = global.lookup("x");
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        var x = interpreter.getVar("x");
         Assertions.assertInstanceOf(List.class, x);
     }
 
@@ -90,8 +90,8 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var boolean[] x = []
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
-        var x = global.lookup("x");
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        var x = interpreter.getVar("x");
         Assertions.assertInstanceOf(List.class, x);
     }
 
@@ -100,8 +100,8 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = []
                 """);
-        Assertions.assertTrue(global.hasVar("x"));
-        var x = global.lookup("x");
+        Assertions.assertTrue(interpreter.hasVar("x"));
+        var x = interpreter.getVar("x");
         Assertions.assertInstanceOf(List.class, x);
     }
 
@@ -110,7 +110,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var number[] x = [1,2,3]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(1, 2, 3), varType);
     }
@@ -120,7 +120,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var string[] x = ["hi",'hello']
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of("hi", "hello"), varType);
     }
@@ -130,7 +130,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = ["hi",'hello']
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of("hi", "hello"), varType);
     }
@@ -140,7 +140,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = [1,2,3]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(1, 2, 3), varType);
     }
@@ -150,7 +150,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = [true]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(true), varType);
     }
@@ -160,7 +160,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = ['str', null]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         ArrayList<Object> expected = new ArrayList<>();
         expected.add("str");
@@ -173,7 +173,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = [{env: "prod"}, {env: "dev"}]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev")), varType);
     }
@@ -183,7 +183,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var any[] x = [{env: "prod"}, {env: "dev"}, 'hello', 123, true]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of(Map.of("env", "prod"), Map.of("env", "dev"), "hello", 123, true), varType);
     }
@@ -193,7 +193,7 @@ public class VarArrayTest extends RuntimeTest {
         eval("""
                 var x = ["hi", 1, true]
                 """);
-        var varType = (List) global.lookup("x");
+        var varType = (List) interpreter.getVar("x");
         Assertions.assertNotNull(varType);
         assertEquals(List.of("hi", 1, true), varType);
     }

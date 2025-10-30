@@ -2,7 +2,6 @@ package io.kite.Runtime.Decorators;
 
 import io.kite.Runtime.CycleException;
 import io.kite.Runtime.Values.ResourceValue;
-import io.kite.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,7 @@ public class DependsOnTests extends DecoratorTests {
                 
                 resource vm third { }
                 """);
-        var res = ((SchemaValue) interpreter.getEnv().get("vm")).findInstance("second");
+        var res = interpreter.getInstance("vm");
         Assertions.assertTrue(res.getDependencies().contains("first"));
         Assertions.assertTrue(res.getDependencies().contains("main"));
         Assertions.assertTrue(res.getDependencies().contains("third"));

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AssignmentTest extends RuntimeTest {
 
     private void setGlobalVar(Object of) {
-        global.init("VERSION", of);
+        interpreter.getEnv().init("VERSION", of);
     }
 
     @Test
@@ -153,7 +153,8 @@ public class AssignmentTest extends RuntimeTest {
     @Test
     void stringConcatNewLineFront() {
         var res = eval("""
-                "\n" + "hello " + "world"
+                "
+                " + "hello " + "world"
                 """);
         assertEquals("\nhello world", res);
     }

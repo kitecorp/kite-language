@@ -26,7 +26,10 @@ import io.kite.TypeChecker.TypeError;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.StackVisitor;
 import io.kite.Visitors.SyntaxPrinter;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
@@ -49,7 +52,6 @@ public final class Interpreter extends StackVisitor<Object> {
     @Getter
     private final SyntaxPrinter printer;
     private final DeferredObservable deferredObservable;
-
     @Getter
     private final List<OutputDeclaration> outputs;
     @Getter
@@ -57,6 +59,10 @@ public final class Interpreter extends StackVisitor<Object> {
     @Getter
     private final List<RuntimeException> errors;
     Parser parser = new Parser();
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Setter
+    private Map<String, ResourceValue> instances;
     @Getter
     private Environment<Object> env;
 
@@ -69,6 +75,8 @@ public final class Interpreter extends StackVisitor<Object> {
         this.outputs = new ArrayList<>();
         this.printer = new SyntaxPrinter();
         this.deferredObservable = new DeferredObservable();
+        this.instances = new LinkedHashMap<>();
+
         this.errors = new ArrayList<>();
         this.decorators = new HashMap<>();
 
@@ -118,6 +126,20 @@ public final class Interpreter extends StackVisitor<Object> {
         if (index != null) {
             forEnv.initOrAssign(index.string(), i);
         }
+    }
+
+    public ResourceValue initInstance(ResourceValue instance) {
+        var contains = this.instances.containsKey(instance.name()); // todo performance tip: replace contains with put only
+        if (contains) {
+            throw new DeclarationExistsException(">" + instance.name() + "< already exists in schema");
+        }
+        this.env.init(instance.name(), instance);
+        return this.instances.put(instance.name(), instance);
+    }
+
+    @Nullable
+    public ResourceValue getInstance(String name) {
+        return instances.get(name);
     }
 
     @Override
@@ -464,7 +486,12 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(MemberExpression expression) {
-        var object = executeBlock(expression.getObject(), env);
+        Object object;
+        try {
+            object = executeBlock(expression.getObject(), env);
+        } catch (NotFoundException e) {
+            object = visitSchemaMember(expression);
+        }
 
         if (expression.isComputed()) {
             // Array/object indexing: obj[index] or obj["key"]
@@ -487,7 +514,7 @@ public final class Interpreter extends StackVisitor<Object> {
         } else {
             // Dot notation: obj.property
             return switch (object) {
-                case SchemaValue schemaValue -> visitSchemaMember(expression, schemaValue);
+//                case SchemaValue schemaValue -> visitSchemaMember(expression);
                 case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
                 case Map<?, ?> map -> visitMapMember(expression, map);
                 case Deferred deferred -> visitDeferredMember(expression, deferred);
@@ -514,31 +541,30 @@ public final class Interpreter extends StackVisitor<Object> {
         return list.get(i);
     }
 
-    private Object visitSchemaMember(MemberExpression expression, SchemaValue schemaValue) {
-        var propertyName = getPropertyName(expression);
+    private Object visitSchemaMember(MemberExpression expression) {
+        var propertyName = getPropertyName(expression.getObject());
 
         if (!ExecutionContextIn(ForStatement.class)) {
-            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+            return propertyOrDeferred(instances, propertyName);
         }
 
         // Access computed property in for loop expression without the syntax
         // See: ForResourceTest#dependsOnEarlyResource()
         if (!(ExecutionContext(ResourceStatement.class) instanceof ResourceStatement resourceStatement)) {
-            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+            return propertyOrDeferred(instances, propertyName);
         }
 
         // In a loop (or @count) we try to access an equivalent resource without using the index
         // If nothing is found we might access the resource that is not an array
         // See: CountTests#countResourceDependencyIndex()
         var indexedProperty = "%s[%s]".formatted(propertyName, resourceStatement.getIndex());
-        var indexedResource = propertyOrDeferred(schemaValue.getInstances(), indexedProperty);
+        var indexedResource = propertyOrDeferred(instances, indexedProperty);
 
         if (indexedResource == null) {
-            return propertyOrDeferred(schemaValue.getInstances(), propertyName);
+            return propertyOrDeferred(instances, propertyName);
         }
 
-        if (indexedResource instanceof Deferred
-            && propertyOrDeferred(schemaValue.getInstances(), propertyName) instanceof ResourceValue resourceValue) {
+        if (indexedResource instanceof Deferred && propertyOrDeferred(instances, propertyName) instanceof ResourceValue resourceValue) {
             return resourceValue;
         }
 
@@ -546,7 +572,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private Object visitResourceMember(MemberExpression expression, ResourceValue resourceValue) {
-        var propertyName = getPropertyName(expression);
+        var propertyName = getPropertyName(expression.getProperty());
 
         // If doing complex string interpolation and trying to access resource property
         // See: ResourceStringInterpolation#stringInterpolationMemberAccess()
@@ -557,11 +583,7 @@ public final class Interpreter extends StackVisitor<Object> {
         var propertyValue = resourceValue.lookup(propertyName);
 
         // When retrieving the type of a resource through member expression, return a Dependency
-        if (expression.getObject() instanceof MemberExpression) {
-            return new Dependency(resourceValue, propertyValue);
-        }
-
-        return propertyValue;
+        return new Dependency(resourceValue, propertyValue);
     }
 
     private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
@@ -570,7 +592,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private Object visitDeferredMember(MemberExpression expression, Deferred deferred) {
-        if (expression.isComputed() && expression.getObject() instanceof MemberExpression memberExpression) {
+        if (expression.getObject() instanceof MemberExpression memberExpression) {
             var key = executeBlock(expression.getProperty(), env);
             var computedProperty = deferred.resource() + "[" + key + "]";
             memberExpression.setProperty(SymbolIdentifier.id(computedProperty));
@@ -579,8 +601,8 @@ public final class Interpreter extends StackVisitor<Object> {
         return deferred;
     }
 
-    private @NotNull String getPropertyName(MemberExpression expression) {
-        return switch (expression.getProperty()) {
+    private @NotNull String getPropertyName(Expression expression) {
+        return switch (expression) {
             case SymbolIdentifier identifier -> identifier.string();
             case StringLiteral literal -> literal.getValue();
             case null, default ->
@@ -605,7 +627,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
             var value = resource.isEvaluating()
                     ? resource.getValue() // Notifying existing resource that its dependencies were satisfied
-                    : initResource(resource, installedSchema, installedSchema.getEnvironment());
+                    : initResource(resource, installedSchema, installedSchema.environment());
 
             value.setProviders(resource.getProviders());
             value.setTag(resource.getTags());
@@ -646,11 +668,11 @@ public final class Interpreter extends StackVisitor<Object> {
     private ResourceValue initResource(ResourceStatement resource, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
-        resourceEnv.remove(SchemaValue.INSTANCES); // instances should not be available to a resource only to it's schema
-        var res = ResourceValue.resourceValue(resourceName(resource), resourceEnv, installedSchema, resource.getExisting());
+        String name = resourceName(resource);
+        var res = ResourceValue.resourceValue(name, resourceEnv, installedSchema, resource.getExisting());
         try {
             // init any kind of new resource
-            installedSchema.initInstance(res);
+            initInstance(res);
             resource.setValue(res);
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));
@@ -683,7 +705,7 @@ public final class Interpreter extends StackVisitor<Object> {
             case Deferred deferred -> {
                 instance.addDependency(deferred.resource());
 
-                CycleDetection.detect(instance);
+                CycleDetection.detect(instance, this);
 
                 resource.setEvaluated(false);
 
@@ -692,12 +714,12 @@ public final class Interpreter extends StackVisitor<Object> {
             case Dependency dependency -> {
                 instance.addDependency(dependency.resource().getName());
 
-                CycleDetection.detect(instance);
+                CycleDetection.detect(instance, this);
             }
             case ResourceValue resourceValue -> { // used by @dependsOn
                 instance.addDependency(resourceValue.getName());
 
-                CycleDetection.detect(instance);
+                CycleDetection.detect(instance, this);
             }
             case null, default -> {
             }
@@ -1084,12 +1106,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private void topologySortResources() {
-        for (Object value : env.getVariables().values()) {
-            if (value instanceof SchemaValue schemaValue) {
-                var res = topologySort(schemaValue.getInstances());
-                schemaValue.setInstances(res);
-            }
-        }
+        topologySort(instances);
     }
 
     @Override
@@ -1156,8 +1173,27 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
-    public ResourceValue getResource(String schema, String resource) {
-        var schemaValue = (SchemaValue) getEnv().lookup(schema);
-        return schemaValue.getInstances().get(resource);
+    public SchemaValue getSchema(String vm) {
+        return (SchemaValue) env.lookup(vm);
+    }
+
+    public Object getVar(String y) {
+        return env.lookup(y);
+    }
+
+    public boolean hasVar(String x) {
+        return env.hasVar(x);
+    }
+
+    public Object getFun(String myFun) {
+        return env.lookup(myFun);
+    }
+
+    public ComponentValue getComponent(String s) {
+        return (ComponentValue) env.lookup(s);
+    }
+
+    public Map<String, ResourceValue> getInstances() {
+        return instances;
     }
 }

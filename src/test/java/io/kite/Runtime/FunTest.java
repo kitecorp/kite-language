@@ -1,10 +1,9 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Parser.Expressions.VarDeclaration;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
-import io.kite.Frontend.Parser.Statements.BlockExpression;
+import io.kite.Frontend.Parser.Expressions.VarDeclaration;
 import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import io.kite.Frontend.Parser.Statements.VarStatement;
 import io.kite.Runtime.Values.FunValue;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -30,13 +30,13 @@ public class FunTest extends RuntimeTest {
         var expected = FunValue.of(
                 Identifier.id("myFun"),
                 List.of(),
-                ExpressionStatement.expressionStatement(BlockExpression.block(VarStatement.varStatement(
+                ExpressionStatement.expressionStatement(block(VarStatement.varStatement(
                         VarDeclaration.of(Identifier.id("x"), NumberLiteral.of(1))))),
-                global
+                interpreter.getEnv()
         );
         log.warn((res));
         assertEquals(expected, res);
-        Assertions.assertEquals(global.get("myFun"), res);
+        Assertions.assertEquals(interpreter.getFun("myFun"), res);
     }
 
     @Test
@@ -50,16 +50,16 @@ public class FunTest extends RuntimeTest {
         var expected = FunValue.of(
                 Identifier.id("myFun"),
                 List.of(),
-                ExpressionStatement.expressionStatement(BlockExpression.block(VarStatement.varStatement(
+                ExpressionStatement.expressionStatement(block(VarStatement.varStatement(
                                 VarDeclaration.of(Identifier.id("x"), NumberLiteral.of(1))
                         ),
                         ExpressionStatement.expressionStatement(Identifier.id("x")))),
-                global
+                interpreter.getEnv()
         );
 
         log.warn((res));
         assertEquals(expected, res);
-        Assertions.assertEquals(global.get("myFun"), res);
+        Assertions.assertEquals(interpreter.getFun("myFun"), res);
     }
 
     @Test

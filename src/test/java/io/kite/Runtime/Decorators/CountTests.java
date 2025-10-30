@@ -1,6 +1,5 @@
 package io.kite.Runtime.Decorators;
 
-import io.kite.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -44,9 +43,8 @@ public class CountTests extends DecoratorTests {
                     name = "main-$count"
                 }
                 """);
-        var vm = (SchemaValue) global.get("vm");
-        var main0 = vm.getInstance("main[0]");
-        var main1 = vm.getInstance("main[1]");
+        var main0 = interpreter.getInstance("main[0]");
+        var main1 = interpreter.getInstance("main[1]");
         Assertions.assertNotNull(main0);
         Assertions.assertNotNull(main1);
         Assertions.assertEquals("main-0", main0.get("name"));
@@ -63,9 +61,8 @@ public class CountTests extends DecoratorTests {
                     name = "main-${count}"
                 }
                 """);
-        var vm = (SchemaValue) global.get("vm");
-        var main0 = vm.getInstance("main[0]");
-        var main1 = vm.getInstance("main[1]");
+        var main0 = interpreter.getInstance("main[0]");
+        var main1 = interpreter.getInstance("main[1]");
         Assertions.assertNotNull(main0);
         Assertions.assertNotNull(main1);
         Assertions.assertEquals("main-0", main0.get("name"));
@@ -87,15 +84,14 @@ public class CountTests extends DecoratorTests {
                     name = vm.main.name
                 }
                 """);
-        var vm = (SchemaValue) global.get("vm");
-        var main0 = vm.getInstance("main[0]");
-        var main1 = vm.getInstance("main[1]");
+        var main0 = interpreter.getInstance("main[0]");
+        var main1 = interpreter.getInstance("main[1]");
         Assertions.assertNotNull(main0);
         Assertions.assertNotNull(main1);
         Assertions.assertEquals("main-0", main0.get("name"));
         Assertions.assertEquals("main-1", main1.get("name"));
-        var second0 = vm.getInstance("second[0]");
-        var second1 = vm.getInstance("second[1]");
+        var second0 = interpreter.getInstance("second[0]");
+        var second1 = interpreter.getInstance("second[1]");
         Assertions.assertNotNull(second0);
         Assertions.assertNotNull(second1);
         Assertions.assertEquals("main-0", second0.get("name"));
@@ -116,12 +112,11 @@ public class CountTests extends DecoratorTests {
                     name = vm.main.name
                 }
                 """);
-        var vm = (SchemaValue) global.get("vm");
-        var main0 = vm.getInstance("main");
+        var main0 = interpreter.getInstance("main");
         Assertions.assertNotNull(main0);
         Assertions.assertEquals("main-name", main0.get("name"));
-        var second0 = vm.getInstance("second[0]");
-        var second1 = vm.getInstance("second[1]");
+        var second0 = interpreter.getInstance("second[0]");
+        var second1 = interpreter.getInstance("second[1]");
         Assertions.assertNotNull(second0);
         Assertions.assertNotNull(second1);
         Assertions.assertEquals("main-name", second0.get("name"));

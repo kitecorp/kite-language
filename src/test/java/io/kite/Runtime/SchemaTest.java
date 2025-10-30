@@ -2,7 +2,6 @@ package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
 import io.kite.Runtime.Values.FunValue;
-import io.kite.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -24,9 +23,9 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn(res);
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
-        assertEquals("Vm", actual.getType());
+        assertEquals("Vm", actual.type());
     }
 
     @Test
@@ -40,9 +39,9 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
-        Assertions.assertEquals(FunValue.of("test", actual.getEnvironment()), actual.getEnvironment().lookup("test"));
+        Assertions.assertEquals(FunValue.of("test", actual.environment()), actual.environment().lookup("test"));
     }
 
     @Test
@@ -53,7 +52,7 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn(res);
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertTrue(actual.has("x"));
     }
@@ -67,7 +66,7 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn(res);
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertTrue(actual.has("x"));
         assertTrue(actual.has("y"));
@@ -83,7 +82,7 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         Assertions.assertEquals(20.2, actual.get("x"));
     }
@@ -96,7 +95,7 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         Assertions.assertEquals("hello", actual.get("x"));
     }
@@ -110,7 +109,7 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         Assertions.assertEquals(20.2, actual.get("x"));
         Assertions.assertEquals(20.2, actual.get("y"));
@@ -125,7 +124,7 @@ public class SchemaTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         Assertions.assertEquals("hello", actual.get("x"));
         Assertions.assertEquals("hello", actual.get("x"));
@@ -143,9 +142,9 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
-        Assertions.assertEquals(FunValue.of("init", actual.getEnvironment()), actual.getEnvironment().lookup("init"));
+        Assertions.assertEquals(FunValue.of("init", actual.environment()), actual.environment().lookup("init"));
     }
 
     @Test
@@ -160,9 +159,9 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
-        Assertions.assertEquals(FunValue.of("init", List.of(param("x", "object")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
+        Assertions.assertEquals(FunValue.of("init", List.of(param("x", "object")), actual.environment()), actual.environment().lookup("init"));
     }
 
     @Test
@@ -174,10 +173,10 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn(res);
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertEquals(res, actual);
-        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
+        Assertions.assertEquals(1, actual.environment().get("x"));
     }
 
     @Test
@@ -191,11 +190,11 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn(res);
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertEquals(res, actual);
-        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
-        Assertions.assertEquals(1, actual.getEnvironment().get("y"));
+        Assertions.assertEquals(1, actual.environment().get("x"));
+        Assertions.assertEquals(1, actual.environment().get("y"));
     }
 
     @Test
@@ -207,11 +206,11 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertNotNull(res);
         assertEquals(res, actual);
-        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
+        Assertions.assertEquals(1, actual.environment().get("x"));
     }
 
     @Test
@@ -224,7 +223,7 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertNotNull(res);
         assertEquals(res, actual);
@@ -241,7 +240,7 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertNotNull(res);
         assertEquals(res, actual);
@@ -256,7 +255,7 @@ public class SchemaTest extends RuntimeTest {
                 """);
 
         log.warn((res));
-        var actual = (SchemaValue) global.get("Vm");
+        var actual = interpreter.getSchema("Vm");
 
         assertNotNull(res);
         assertEquals(res, actual);

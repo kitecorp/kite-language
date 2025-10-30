@@ -1,7 +1,6 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Runtime.Values.SchemaValue;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,16 +24,14 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm second {
                     name = "second"
-                    maxCount = vm.main.maxCount
+                    maxCount = main.maxCount
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNotNull(resource);
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
         assertNotNull(second);
         assertEquals(1, second.getDependencies().size());
     }
@@ -47,8 +44,8 @@ public class ResourceCyclesTest extends RuntimeTest {
                     number maxCount=0
                 }
                 resource vm main {
-                    name = vm.third.name
-                    maxCount=vm.second.maxCount
+                    name = third.name
+                    maxCount=second.maxCount
                 }
                 resource vm second  {
                     name = "second"
@@ -60,12 +57,10 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNotNull(resource);
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
         assertNotNull(second);
         assertEquals(2, resource.getDependencies().size());
     }
@@ -77,14 +72,14 @@ public class ResourceCyclesTest extends RuntimeTest {
                     string name
                     number maxCount=0
                 }
-                
+
                 resource vm second  {
                     name = "second"
                     maxCount = 2
                 }
                 resource vm main {
-                    name = vm.third.name
-                    maxCount=vm.second.maxCount
+                    name = third.name
+                    maxCount=second.maxCount
                 }
                 resource vm third  {
                     name = "third"
@@ -92,12 +87,10 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNotNull(resource);
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
         assertNotNull(second);
         assertEquals(2, resource.getDependencies().size());
     }
@@ -118,20 +111,18 @@ public class ResourceCyclesTest extends RuntimeTest {
                     maxCount = 3
                 }
                 resource vm main {
-                    name = vm.third.name
-                    maxCount=vm.second.maxCount
+                    name = third.name
+                    maxCount=second.maxCount
                 }
-                
+
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
-
-        var main = schema.findInstance("main");
+        var main = interpreter.getInstance("main");
         assertNotNull(main);
         assertEquals(2, main.argVal("maxCount"));
         assertEquals("third", main.argVal("name"));
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
         assertNotNull(second);
         assertEquals(2, main.getDependencies().size());
     }
@@ -147,8 +138,8 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm second {
                     name = "second"
-                    maxCount = vm.main.maxCount
-                    minCount = vm.main.minCount
+                    maxCount = main.maxCount
+                    minCount = main.minCount
                 }
                 resource vm main {
                     name = "main"
@@ -157,20 +148,19 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
+        var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.getType());
+        assertEquals("vm", schema.type());
 
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals("main", resource.argVal("name"));
         assertEquals(2, resource.argVal("maxCount"));
         assertEquals(1, resource.argVal("minCount"));
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
         assertNotNull(second);
         assertEquals("second", second.getName());
         assertEquals("second", second.argVal("name"));
@@ -189,8 +179,8 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm second {
                     name = "second"
-                    maxCount = vm.main.maxCount
-                    minCount = vm.main.minCount
+                    maxCount = main.maxCount
+                    minCount = main.minCount
                 }
                 resource vm main {
                     name = "main"
@@ -198,20 +188,19 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
+        var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.getType());
+        assertEquals("vm", schema.type());
 
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals("main", resource.argVal("name"));
         assertEquals(2, resource.argVal("maxCount"));
         assertEquals(1, resource.argVal("minCount"));
 
-        var second = schema.findInstance("second");
+        var second = interpreter.getInstance("second");
         assertNotNull(second);
         assertEquals("second", second.getName());
         assertEquals("second", second.argVal("name"));
@@ -230,8 +219,8 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm main {
                     name = "main"
-                    maxCount = vm.dep1.maxCount
-                    minCount = vm.dep2.minCount
+                    maxCount = dep1.maxCount
+                    minCount = dep2.minCount
                 }
                 resource vm dep1 {
                     name = "dep1"
@@ -243,26 +232,26 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
+        var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.getType());
+        assertEquals("vm", schema.type());
 
-        var resource = schema.findInstance("dep2");
+        var resource = interpreter.getInstance("dep2");
         assertNotNull(resource);
         assertEquals("dep2", resource.getName());
         assertEquals("dep2", resource.argVal("name"));
         assertEquals(0, resource.argVal("maxCount"));
         assertEquals(3, resource.argVal("minCount"));
 
-        var dep1 = schema.findInstance("dep1");
+        var dep1 = interpreter.getInstance("dep1");
         assertNotNull(dep1);
         assertEquals("dep1", dep1.getName());
         assertEquals("dep1", dep1.argVal("name"));
         assertEquals(2, dep1.argVal("maxCount"));
         assertEquals(1, dep1.argVal("minCount"));
 
-        var main = schema.findInstance("main");
+        var main = interpreter.getInstance("main");
         assertNotNull(main);
         assertEquals("main", main.getName());
         assertEquals("main", main.argVal("name"));
@@ -281,12 +270,12 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm main {
                     name = "main"
-                    maxCount = vm.dep1.maxCount
-                    minCount = vm.dep2.minCount
+                    maxCount = dep1.maxCount
+                    minCount = dep2.minCount
                 }
                 resource vm dep1 {
                     name = "dep1"
-                    maxCount = vm.dep2.maxCount
+                    maxCount = dep2.maxCount
                 }
                 resource vm dep2 {
                     name = "dep2"
@@ -295,26 +284,26 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
+        var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.getType());
+        assertEquals("vm", schema.type());
 
-        var resource = schema.findInstance("dep2");
+        var resource = interpreter.getInstance("dep2");
         assertNotNull(resource);
         assertEquals("dep2", resource.getName());
         assertEquals("dep2", resource.argVal("name"));
         assertEquals(3, resource.argVal("maxCount"));
         assertEquals(2, resource.argVal("minCount"));
 
-        var dep1 = schema.findInstance("dep1");
+        var dep1 = interpreter.getInstance("dep1");
         assertNotNull(dep1);
         assertEquals("dep1", dep1.getName());
         assertEquals("dep1", dep1.argVal("name"));
         assertEquals(3, dep1.argVal("maxCount"));
         assertEquals(1, dep1.argVal("minCount"));
 
-        var main = schema.findInstance("main");
+        var main = interpreter.getInstance("main");
         assertNotNull(main);
         assertEquals("main", main.getName());
         assertEquals("main", main.argVal("name"));
@@ -333,12 +322,12 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm main {
                     name = "main"
-                    maxCount = vm.dep1.maxCount
-                    minCount = vm.dep2.minCount
+                    maxCount = dep1.maxCount
+                    minCount = dep2.minCount
                 }
                 resource vm dep1 {
                     name = "dep1"
-                    maxCount = vm.dep2.maxCount
+                    maxCount = dep2.maxCount
                 }
                 resource vm dep2 {
                     name = "dep2"
@@ -346,26 +335,26 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 """);
         log.warn((res));
-        var schema = (SchemaValue) global.get("vm");
+        var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
-        assertEquals("vm", schema.getType());
+        assertEquals("vm", schema.type());
 
-        var resource = schema.findInstance("dep2");
+        var resource = interpreter.getInstance("dep2");
         assertNotNull(resource);
         assertEquals("dep2", resource.getName());
         assertEquals("dep2", resource.argVal("name"));
         assertEquals(0, resource.argVal("maxCount"));
         assertEquals(2, resource.argVal("minCount"));
 
-        var dep1 = schema.findInstance("dep1");
+        var dep1 = interpreter.getInstance("dep1");
         assertNotNull(dep1);
         assertEquals("dep1", dep1.getName());
         assertEquals("dep1", dep1.argVal("name"));
         assertEquals(0, dep1.argVal("maxCount"));
         assertEquals(1, dep1.argVal("minCount"));
 
-        var main = schema.findInstance("main");
+        var main = interpreter.getInstance("main");
         assertNotNull(main);
         assertEquals("main", main.getName());
         assertEquals("main", main.argVal("name"));
@@ -382,14 +371,14 @@ public class ResourceCyclesTest extends RuntimeTest {
                     number maxCount=0
                     number minCount=1
                 }
-                
+
                 resource vm main  {
                     name = "main"
-                    maxCount = vm.dep1.maxCount
+                    maxCount = dep1.maxCount
                 }
                 resource vm dep1 {
                     name = "dep1"
-                    maxCount = vm.main.maxCount
+                    maxCount = main.maxCount
                 }
                 """));
 
@@ -406,7 +395,7 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm main {
                     name = "main"
-                    maxCount = vm.main.maxCount
+                    maxCount = main.maxCount
                 }
                 """));
 
@@ -423,15 +412,15 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
                 resource vm a {
                     name = "a"
-                    maxCount = vm.b.maxCount
+                    maxCount = b.maxCount
                 }
                 resource vm b {
                     name = "b"
-                    maxCount = vm.c.maxCount
+                    maxCount = c.maxCount
                 }
                 resource vm c {
                     name = "c"
-                    maxCount = vm.a.maxCount
+                    maxCount = a.maxCount
                 }
                 """));
 

@@ -58,6 +58,7 @@ public class Environment<T> implements IEnvironment<T> {
     public Environment(Map<String, T> variables) {
         this.parent = null;
         this.variables = variables;
+        this.name = "global";
     }
 
     public Environment() {

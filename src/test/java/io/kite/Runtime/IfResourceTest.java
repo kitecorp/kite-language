@@ -2,7 +2,6 @@ package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
 import io.kite.Runtime.Values.ResourceValue;
-import io.kite.Runtime.Values.SchemaValue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +24,7 @@ public class IfResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -49,9 +46,7 @@ public class IfResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -76,9 +71,7 @@ public class IfResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -99,9 +92,7 @@ public class IfResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);
@@ -120,9 +111,7 @@ public class IfResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = (SchemaValue) global.get("vm");
-
-        var resource = schema.findInstance("main");
+        var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
         assertEquals(resource, res);

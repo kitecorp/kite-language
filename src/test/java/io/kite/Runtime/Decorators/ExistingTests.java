@@ -13,7 +13,7 @@ public class ExistingTests extends DecoratorTests {
                 schema vm {}
                 @existing("arn:aws:lambda:eu-central-1:123456789012:function:processImage")
                 resource vm something {}""");
-        var resource = interpreter.getResource("vm", "something");
+        var resource = interpreter.getInstance("something");
         Assertions.assertNotNull(resource);
         Assertions.assertEquals("arn:aws:lambda:eu-central-1:123456789012:function:processImage", resource.getExisting());
     }
