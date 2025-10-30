@@ -1016,7 +1016,7 @@ public final class Interpreter extends StackVisitor<Object> {
         if (output.getInit() instanceof MemberExpression memberExpression) {
             if (visit(output.getInit()) instanceof Dependency dependency) {
                 var resource = dependency.resource();
-                var propertyName = getPropertyName(memberExpression);
+                var propertyName = getPropertyName(memberExpression.getProperty());
                 return resources.get(resource.getName()).get(propertyName);
             }
         }
