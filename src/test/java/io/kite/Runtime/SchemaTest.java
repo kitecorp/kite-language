@@ -25,7 +25,7 @@ public class SchemaTest extends RuntimeTest {
         log.warn(res);
         var actual = interpreter.getSchema("Vm");
 
-        assertEquals("Vm", actual.type());
+        assertEquals("Vm", actual.getType());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class SchemaTest extends RuntimeTest {
         log.warn((res));
         var actual = interpreter.getSchema("Vm");
 
-        Assertions.assertEquals(FunValue.of("test", actual.environment()), actual.environment().lookup("test"));
+        Assertions.assertEquals(FunValue.of("test", actual.getEnvironment()), actual.getEnvironment().lookup("test"));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class SchemaTest extends RuntimeTest {
         log.warn((res));
         var actual = interpreter.getSchema("Vm");
 
-        Assertions.assertEquals(FunValue.of("init", actual.environment()), actual.environment().lookup("init"));
+        Assertions.assertEquals(FunValue.of("init", actual.getEnvironment()), actual.getEnvironment().lookup("init"));
     }
 
     @Test
@@ -161,7 +161,7 @@ public class SchemaTest extends RuntimeTest {
         log.warn((res));
         var actual = interpreter.getSchema("Vm");
 
-        Assertions.assertEquals(FunValue.of("init", List.of(param("x", "object")), actual.environment()), actual.environment().lookup("init"));
+        Assertions.assertEquals(FunValue.of("init", List.of(param("x", "object")), actual.getEnvironment()), actual.getEnvironment().lookup("init"));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class SchemaTest extends RuntimeTest {
         var actual = interpreter.getSchema("Vm");
 
         assertEquals(res, actual);
-        Assertions.assertEquals(1, actual.environment().get("x"));
+        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
     }
 
     @Test
@@ -193,8 +193,8 @@ public class SchemaTest extends RuntimeTest {
         var actual = interpreter.getSchema("Vm");
 
         assertEquals(res, actual);
-        Assertions.assertEquals(1, actual.environment().get("x"));
-        Assertions.assertEquals(1, actual.environment().get("y"));
+        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
+        Assertions.assertEquals(1, actual.getEnvironment().get("y"));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class SchemaTest extends RuntimeTest {
 
         assertNotNull(res);
         assertEquals(res, actual);
-        Assertions.assertEquals(1, actual.environment().get("x"));
+        Assertions.assertEquals(1, actual.getEnvironment().get("x"));
     }
 
     @Test
