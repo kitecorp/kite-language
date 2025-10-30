@@ -4,6 +4,7 @@ import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.Runtime.Decorators.Tags;
 import io.kite.Runtime.Decorators.TagsSupport;
 import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.ResourcePath;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +36,7 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     @Getter
     private String existing;
     private Tags tags;
+    private ResourcePath path;
 
     public static ResourceValue resourceValue(String name, Environment<Object> resourceEnv, SchemaValue installedSchema, String existing) {
         return ResourceValue.builder()
@@ -51,6 +53,10 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
                 .schema(schemaValue)
                 .properties(properties)
                 .build();
+    }
+
+    public String getDatabaseKey() {
+        return path != null ? path.toDatabaseKey() : getName();
     }
 
     public boolean isExisting() {

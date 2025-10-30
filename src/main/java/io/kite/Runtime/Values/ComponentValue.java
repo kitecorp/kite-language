@@ -4,6 +4,7 @@ import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.Runtime.Decorators.Tags;
 import io.kite.Runtime.Decorators.TagsSupport;
 import io.kite.Runtime.Environment.Environment;
+import io.kite.Runtime.ResourcePath;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +26,7 @@ public class ComponentValue implements ProviderSupport, TagsSupport {
     private String name;
     private Set<String> dependencies;
     private Set<String> providers;
+    private ResourcePath path;
 
     /**
      * indicate if the cloud resource
