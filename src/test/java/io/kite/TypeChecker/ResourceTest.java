@@ -72,7 +72,7 @@ public class ResourceTest extends CheckerTest {
         assertNotNull(schema);
         assertEquals("vm", schema.getValue());
 
-        var resource = (ResourceType) schema.getInstances().lookup("main");
+        var resource = (ResourceType) checker.getEnv().get("main");
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals(ValueType.String, resource.getProperty("name"));
@@ -103,14 +103,14 @@ public class ResourceTest extends CheckerTest {
         assertNotNull(schema);
         assertEquals("vm", schema.getValue());
 
-        var resource = (ResourceType) schema.getInstances().lookup("main");
+        var resource = (ResourceType) checker.getEnv().get("main");
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals(ValueType.String, resource.getProperty("name"));
         assertEquals(ValueType.Number, resource.getProperty("maxCount"));
         assertEquals(ValueType.Boolean, resource.getProperty("enabled"));
 
-        var second = (ResourceType) schema.getInstances().lookup("second");
+        var second = (ResourceType) checker.getEnv().get("second");
 
         assertNotNull(second);
         assertEquals("second", second.getName());
@@ -141,14 +141,14 @@ public class ResourceTest extends CheckerTest {
         assertNotNull(schema);
         assertEquals("vm", schema.getValue());
 
-        var resource = (ResourceType) schema.getInstances().lookup("main");
+        var resource = (ResourceType) checker.getEnv().get("main");
         assertNotNull(resource);
         assertEquals("main", resource.getName());
         assertEquals(ValueType.String, resource.getProperty("name"));
         assertEquals(ValueType.Number, resource.getProperty("maxCount"));
         assertEquals(ValueType.Boolean, resource.getProperty("enabled"));
 
-        var second = (ResourceType) schema.getInstances().lookup("second");
+        var second = (ResourceType) checker.getEnv().get("second");
 
         assertNotNull(second);
         assertEquals("second", second.getName());
@@ -184,7 +184,7 @@ public class ResourceTest extends CheckerTest {
         log.warn(res);
         var schema = (SchemaType) checker.getEnv().get("vm");
 
-        var resource = (ResourceType) schema.getInstances().get("main");
+        var resource = (ResourceType) checker.getEnv().get("main");
 
         Assertions.assertEquals(ValueType.Number, resource.lookup("x"));
     }
@@ -205,7 +205,7 @@ public class ResourceTest extends CheckerTest {
                 """);
         var schema = (SchemaType) checker.getEnv().get("vm");
 
-        var main = (ResourceType) schema.getInstance("main");
+        var main = (ResourceType) checker.getEnv().get("main");
         assertSame(ValueType.Number, main.lookup("x"));
 
         // assert y holds reference to vm.main
@@ -261,7 +261,7 @@ public class ResourceTest extends CheckerTest {
         // default x in schema remains the same
         Assertions.assertEquals(ValueType.String, schema.getProperty("x"));
 
-        var resource = (ResourceType) schema.getInstance("main");
+        var resource = (ResourceType) checker.getEnv().get("main");
         // x of main resource was updated with a new value
         assertEquals(ValueType.String, resource.getProperty("x"));
     }
@@ -280,7 +280,7 @@ public class ResourceTest extends CheckerTest {
                 """);
         var schema = (SchemaType) checker.getEnv().get("vm");
 
-        var resource = schema.getInstance("main");
+        var resource = checker.getEnv().get("main");
 
         Assertions.assertInstanceOf(ResourceType.class, resource);
     }

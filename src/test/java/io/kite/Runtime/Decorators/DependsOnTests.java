@@ -19,7 +19,7 @@ public class DependsOnTests extends DecoratorTests {
                 
                 resource vm first { }
                 
-                @dependsOn(vm.first)
+                @dependsOn(first)
                 resource vm second {
                 
                 }
@@ -36,7 +36,7 @@ public class DependsOnTests extends DecoratorTests {
                 resource vm first { }
                 resource vm main { }
                 
-                @dependsOn([vm.first, vm.main])
+                @dependsOn([first, main])
                 resource vm second {
                 
                 }
@@ -55,7 +55,7 @@ public class DependsOnTests extends DecoratorTests {
                 resource vm first { }
                 resource vm main { }
                 
-                @dependsOn([vm.first, vm.main, vm.third])
+                @dependsOn([first, main, third])
                 resource vm second {
                 
                 }
@@ -74,12 +74,12 @@ public class DependsOnTests extends DecoratorTests {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
                 
-                @dependsOn(vm.third)
+                @dependsOn(third)
                 resource vm second {
                 
                 }
                 
-                @dependsOn(vm.second)
+                @dependsOn(second)
                 resource vm third { }
                 """));
     }
@@ -89,12 +89,12 @@ public class DependsOnTests extends DecoratorTests {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
                 
-                @dependsOn(vm.third)
+                @dependsOn(third)
                 resource vm second {
                 
                 }
                 
-                @dependsOn([vm.second])
+                @dependsOn([second])
                 resource vm third { }
                 """));
     }
@@ -104,12 +104,12 @@ public class DependsOnTests extends DecoratorTests {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
                 
-                @dependsOn([vm.third])
+                @dependsOn([third])
                 resource vm second {
                 
                 }
                 
-                @dependsOn([vm.second])
+                @dependsOn([second])
                 resource vm third { }
                 """));
     }
@@ -119,12 +119,12 @@ public class DependsOnTests extends DecoratorTests {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
                 
-                @dependsOn([vm.third])
+                @dependsOn([third])
                 resource vm second {
                 
                 }
                 
-                @dependsOn(vm.second)
+                @dependsOn(second)
                 resource vm third { }
                 """));
     }
@@ -137,12 +137,12 @@ public class DependsOnTests extends DecoratorTests {
                 resource vm first { }
                 resource vm main { }
                 
-                @dependsOn([vm.first, vm.main, vm.third])
+                @dependsOn([first, main, third])
                 resource vm second {
                 
                 }
                 
-                @dependsOn(vm.second)
+                @dependsOn(second)
                 resource vm third { }
                 """));
     }
@@ -155,12 +155,12 @@ public class DependsOnTests extends DecoratorTests {
                 resource vm first { }
                 resource vm main { }
                 
-                @dependsOn([vm.first, vm.main, vm.third])
+                @dependsOn([first, main, third])
                 resource vm second {
                 
                 }
                 
-                @dependsOn([vm.second, vm.main])
+                @dependsOn([second, main])
                 resource vm third { }
                 """));
     }
@@ -172,12 +172,12 @@ public class DependsOnTests extends DecoratorTests {
                 
                 
                 
-                @dependsOn([vm.first, vm.main, vm.third])
+                @dependsOn([first, main, third])
                 resource vm second {
                 
                 }
                 
-                @dependsOn([vm.second, vm.main])
+                @dependsOn([second, main])
                 resource vm third { }
                 
                 resource vm first { }
@@ -190,12 +190,12 @@ public class DependsOnTests extends DecoratorTests {
         Assertions.assertThrows(CycleException.class, () -> eval("""
                 schema vm { string name }
                 
-                @dependsOn([vm.third])
+                @dependsOn([third])
                 resource vm second {
                 
                 }
                 
-                @dependsOn([vm.second])
+                @dependsOn([second])
                 resource vm third { }
                 """));
     }

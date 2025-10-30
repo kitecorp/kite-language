@@ -564,11 +564,15 @@ public final class TypeChecker extends StackVisitor<Type> {
         // When retrieving the type of a resource, we first check the "instances" field for existing resources
         // Since that environment points to the parent (type env), it will also find the properties
         var result = CycleDetectionSupport.propertyOrDeferred(
-                schemaType.getInstances().getVariables(),
+                getInstances().getVariables(),
                 resourceName.string()
         );
 
         return result instanceof Deferred deferred ? new AnyType(deferred) : (Type) result;
+    }
+
+    private TypeEnvironment getInstances() {
+        return env;
     }
 
     private Type lookupResourceProperty(MemberExpression expression, ResourceType resourceType, SymbolIdentifier resourceName) {
@@ -834,7 +838,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         String resourceName = resourceName(resource);
         if (isCounted(resource.targetType())) {
-            return installedSchema.getInstance(resourceName);
+            return env.lookup(resourceName);
         }
 
         var resourceEnv = createResourceEnvironment(installedSchema, resource, resourceName);
@@ -844,7 +848,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         if (ExecutionContextIn(ComponentStatement.class)) {
             env.init(resourceName, resourceType);
         } else {
-            installedSchema.addInstance(resourceName, resourceType);
+            env.init(resourceName, resourceType);
         }
 
         return resourceType;

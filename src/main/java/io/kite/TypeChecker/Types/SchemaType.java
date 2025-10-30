@@ -2,9 +2,7 @@ package io.kite.TypeChecker.Types;
 
 import io.kite.TypeChecker.TypeEnvironment;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -13,27 +11,13 @@ import org.jetbrains.annotations.Nullable;
 public final class SchemaType extends ReferenceType {
     public static final SchemaType INSTANCE = new SchemaType("empty");
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Getter
-    private final TypeEnvironment instances;
 
     public SchemaType(String typeName, @Nullable TypeEnvironment env) {
         super(SystemType.SCHEMA, typeName, env);
-        this.instances = new TypeEnvironment();
     }
 
     public SchemaType(String typeName) {
         this(typeName, null);
     }
-
-    public Type addInstance(@NotNull String fieldName, ResourceType type) {
-        return instances.init(fieldName, type);
-    }
-
-    public Type getInstance(@NotNull String fieldName) {
-        return instances.lookup(fieldName);
-    }
-
 
 }
