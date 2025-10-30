@@ -203,7 +203,6 @@ public class ForResourceTest extends RuntimeTest {
                     col += main
                   }
                 """);
-        var schema = interpreter.getSchema("vm");
         assertEquals("prod", interpreter.getInstance("main[\"prod\"]").get("name"));
         // Optionally assert col’s contents if your runtime exposes it
     }
