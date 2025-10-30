@@ -514,7 +514,7 @@ public final class Interpreter extends StackVisitor<Object> {
         } else {
             // Dot notation: obj.property
             return switch (object) {
-//                case SchemaValue schemaValue -> visitSchemaMember(expression);
+                case SchemaValue schemaValue -> visitSchemaMember(expression);
                 case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
                 case Map<?, ?> map -> visitMapMember(expression, map);
                 case Deferred deferred -> visitDeferredMember(expression, deferred);

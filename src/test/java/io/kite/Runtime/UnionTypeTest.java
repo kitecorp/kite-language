@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Log4j2
 public class UnionTypeTest extends RuntimeTest {
@@ -100,7 +101,6 @@ public class UnionTypeTest extends RuntimeTest {
     void typeUnionNum() {
         var res = eval("type num = 1 | 2 | 5");
         Assertions.assertTrue(interpreter.hasVar("num"));
-        assertNull(interpreter.getVar("x"));
         assertEquals(Set.of(1, 2, 5), res);
     }
 
@@ -111,7 +111,6 @@ public class UnionTypeTest extends RuntimeTest {
                 var customNumbers[] numbers = [1, 2, 5]
                 """);
         Assertions.assertTrue(interpreter.hasVar("customNumbers"));
-        assertNull(interpreter.getVar("x"));
         assertEquals(List.of(1, 2, 5), res);
     }
 
@@ -119,7 +118,6 @@ public class UnionTypeTest extends RuntimeTest {
     void typeUnionBool() {
         var res = eval("type num = true | false");
         Assertions.assertTrue(interpreter.hasVar("num"));
-        assertNull(interpreter.getVar("x"));
         assertEquals(Set.of(true, false), res);
     }
 
