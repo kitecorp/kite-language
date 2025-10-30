@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.Decorators.ProviderSupport;
+import io.kite.Runtime.Values.ComponentValue;
 import io.kite.TypeChecker.Types.ComponentType;
 import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.Type;
@@ -34,6 +35,7 @@ public final class ComponentStatement extends Statement implements Annotatable, 
      */
     @Nullable
     private Expression name;
+    private ComponentValue value;
     private BlockExpression block;
     private Set<AnnotationDeclaration> annotations;
     private Set<String> providers;
