@@ -587,7 +587,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
-        var propertyName = getPropertyName(expression);
+        var propertyName = getPropertyName(expression.getProperty());
         return map.get(propertyName);
     }
 
