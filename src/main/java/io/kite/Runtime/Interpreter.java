@@ -112,7 +112,7 @@ public final class Interpreter extends StackVisitor<Object> {
         this.decorators.put("description", new DescriptionDecorator(printer));
         this.decorators.put("sensitive", new SensitiveDecorator());
         this.decorators.put("count", new CountDecorator(this));
-        this.decorators.put("dependsOn", new DependsOnDecorator());
+        this.decorators.put("dependsOn", new DependsOnDecorator(this));
         this.decorators.put("allowed", new AllowedDecorator(this));
         this.decorators.put("nonEmpty", new NonEmptyDecorator(this));
         this.decorators.put("unique", new UniqueDecorator(this));

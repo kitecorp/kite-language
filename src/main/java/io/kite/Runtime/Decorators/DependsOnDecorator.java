@@ -1,9 +1,12 @@
 package io.kite.Runtime.Decorators;
 
+import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
+import io.kite.Frontend.Parser.Expressions.ComponentStatement;
 import io.kite.Frontend.Parser.Expressions.Expression;
-import io.kite.Frontend.Parser.Expressions.MemberExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceStatement;
+import io.kite.Runtime.Interpreter;
+import io.kite.Runtime.Values.ResourceValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -14,14 +17,22 @@ import java.util.Set;
  */
 public class DependsOnDecorator extends DecoratorInterpreter {
 
-    public DependsOnDecorator() {
+    private final Interpreter interpreter;
+
+    public DependsOnDecorator(Interpreter interpreter) {
         super("dependsOn");
+        this.interpreter = interpreter;
     }
 
     @Override
     public Object execute(AnnotationDeclaration declaration) {
-        if (declaration.getValue() instanceof MemberExpression member) {
-            return registerDependency(declaration, Set.of(member));
+        if (declaration.getValue() instanceof Identifier identifier) {
+            var dependency = interpreter.visit(identifier);
+            return switch (dependency) {
+                case ResourceValue _, ComponentStatement _ -> registerDependency(declaration, Set.of(identifier));
+                case null, default ->
+                        throw new IllegalStateException("A `%s` can only depend on other resources or components ".formatted(interpreter.getPrinter().visit(declaration.getTarget().getTarget().name().toLowerCase())));
+            };
         } else if (declaration.getArgs() != null) {
             var set = new HashSet<>(declaration.getArgs().getItems());
             registerDependency(declaration, set);
