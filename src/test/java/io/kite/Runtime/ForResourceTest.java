@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.kite.Runtime.Values.ResourceValue.resourceValue;
@@ -464,6 +465,7 @@ public class ForResourceTest extends RuntimeTest {
         assertEquals("prod", interpreter.getInstance("""
                 main["test"]""").get("name"));
     }
+
     @Test
     @DisplayName("Print list of resources")
     void printListOfResources() {
@@ -530,6 +532,38 @@ public class ForResourceTest extends RuntimeTest {
                 main["prod"]""").get("name"));
         assertEquals("test", interpreter.getInstance("""
                 main["test"]""").get("name"));
+    }
+
+    @Test
+    @DisplayName("Create multiple resources in a loop by using index")
+    void testMultipleResourcesAreAccessedUsingIndexSyntaxStrings() {
+        var res = eval("""
+                schema vm {
+                   string name
+                }
+                var vm[] vms = []
+                var items = ['prod','test']
+                for i in items {
+                    resource vm main {
+                      name     = i
+                    }
+                    vms += main[i]
+                }
+                """);
+
+        assertEquals(2, interpreter.getInstances().size());
+
+        var prod = interpreter.getInstance("main[\"prod\"]");
+        var test = interpreter.getInstance("main[\"test\"]");
+
+        var schema = interpreter.getSchema("vm");
+        assertEquals(List.of(
+                resourceValue("main[\"prod\"]", new Environment<>(Map.of("name", "main[\"prod\"]")), schema),
+                resourceValue("main[\"test\"]", new Environment<>(Map.of("name", "main[\"test\"]")), schema)
+        ), List.of(prod, test));
+
+        assertEquals("prod", prod.get("name"));
+        assertEquals("test", test.get("name"));
     }
 
     @Test
@@ -674,9 +708,9 @@ public class ForResourceTest extends RuntimeTest {
                 """);
         var map = new LinkedHashMap<String, ResourceValue>();
         var schemaValue = this.interpreter.getSchema("Bucket");
-        map.put("photos[1]",  resourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
-        map.put("photos[2]",  resourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
-        map.put("photos[3]",  resourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));
+        map.put("photos[1]", resourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
+        map.put("photos[2]", resourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
+        map.put("photos[3]", resourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));
         assertEquals(map, interpreter.getInstances());
     }
 
@@ -695,9 +729,122 @@ public class ForResourceTest extends RuntimeTest {
 
         var map = new HashMap<String, ResourceValue>();
         var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("photos[\"hello\"]",  resourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue));
-        map.put("photos[\"world\"]",  resourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue));
+        map.put("photos[\"hello\"]", resourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue));
+        map.put("photos[\"world\"]", resourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue));
         assertEquals(map, interpreter.getInstances());
+    }
+
+    @Test
+    @DisplayName("Create multiple resources in a loop by using numeric index")
+    void testMultipleResourcesAreAccessedUsingIndexSyntaxNumbers() {
+        var res = eval("""
+                schema vm {
+                   string name
+                   int id
+                }
+                var vm[] vms = []
+                var items = [0, 1, 2]
+                for i in items {
+                    resource vm main {
+                      name = "server-${i}"
+                      id   = i
+                    }
+                    vms += main[i]
+                }
+                """);
+
+        assertEquals(3, interpreter.getInstances().size());
+
+        var main0 = interpreter.getInstance("main[0]");
+        assertEquals("server-0", main0.get("name"));
+        assertEquals(0, main0.get("id"));
+
+        var main1 = interpreter.getInstance("main[1]");
+        assertEquals("server-1", main1.get("name"));
+        assertEquals(1, main1.get("id"));
+
+        var main2 = interpreter.getInstance("main[2]");
+        assertEquals("server-2", main2.get("name"));
+        assertEquals(2, main2.get("id"));
+    }
+
+    @Test
+    @DisplayName("Create multiple resources in a loop using object properties as index")
+    void testMultipleResourcesAreAccessedUsingObjectIndex() {
+        var res = eval("""
+                schema vm {
+                   string name
+                   string environment
+                   string region
+                }
+                var vm[] vms = []
+                var configs = [
+                    {env: "prod", region: "us-east"},
+                    {env: "dev", region: "us-west"}
+                ]
+                for config in configs {
+                    resource vm main {
+                      name        = "server-${config.env}"
+                      environment = config.env
+                      region      = config.region
+                    }
+                    vms += main[config.env]
+                }
+                """);
+
+        assertEquals(2, interpreter.getInstances().size());
+
+        var prodInstance = interpreter.getInstance("""
+                main["prod"]""");
+        assertEquals("server-prod", prodInstance.get("name"));
+        assertEquals("prod", prodInstance.get("environment"));
+        assertEquals("us-east", prodInstance.get("region"));
+
+        var devInstance = interpreter.getInstance("""
+                main["dev"]""");
+        assertEquals("server-dev", devInstance.get("name"));
+        assertEquals("dev", devInstance.get("environment"));
+        assertEquals("us-west", devInstance.get("region"));
+    }
+
+    @Test
+    @DisplayName("Create multiple resources with mixed numeric and string indices")
+    void testMultipleResourcesWithMixedIndices() {
+        var res = eval("""
+                schema vm {
+                   string name
+                }
+                var vm[] vms = []
+                
+                // Create with string indices
+                for env in ["prod", "staging"] {
+                    resource vm web {
+                      name = "web-${env}"
+                    }
+                    vms += web[env]
+                }
+                
+                // Create with numeric indices
+                for i in [0, 1, 2] {
+                    resource vm db {
+                      name = "db-${i}"
+                    }
+                    vms += db[i]
+                }
+                """);
+
+        assertEquals(5, interpreter.getInstances().size());
+
+        // Verify string-indexed resources
+        assertEquals("web-prod", interpreter.getInstance("""
+                web["prod"]""").get("name"));
+        assertEquals("web-staging", interpreter.getInstance("""
+                web["staging"]""").get("name"));
+
+        // Verify numeric-indexed resources
+        assertEquals("db-0", interpreter.getInstance("db[0]").get("name"));
+        assertEquals("db-1", interpreter.getInstance("db[1]").get("name"));
+        assertEquals("db-2", interpreter.getInstance("db[2]").get("name"));
     }
 
 
