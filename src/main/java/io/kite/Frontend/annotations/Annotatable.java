@@ -13,6 +13,10 @@ public interface Annotatable {
 
     DecoratorType.Target getTarget();
 
+    default String getTargetName() {
+        return getTarget().name();
+    }
+
     Type targetType();
 
 }

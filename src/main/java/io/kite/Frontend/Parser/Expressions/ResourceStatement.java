@@ -44,7 +44,7 @@ public final class ResourceStatement
     private Set<AnnotationDeclaration> annotations = new HashSet<>();
     private boolean counted;
     @Singular
-    private Set<Expression> dependencies;
+    private Set<Expression> dependencies; // we use expression because we can have a deferred resource
     private Set<String> providers;
     private Tags tags;
 

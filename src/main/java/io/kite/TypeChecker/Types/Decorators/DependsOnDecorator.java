@@ -55,23 +55,27 @@ public class DependsOnDecorator extends DecoratorChecker {
         if (declaration.getArgs() instanceof ArrayExpression arrayExpression) {
             for (Expression item : arrayExpression.getItems()) {
                 switch (item) {
-                    case MemberExpression _, Identifier _ -> validateIdentity(item);
+                    case MemberExpression expression -> checkDependency((Identifier) expression.getProperty());
+                    case Identifier identifier -> checkDependency(identifier);
                     case null, default -> throwErrorForInvalidArgument(item);
                 }
             }
         } else if (declaration.getValue() instanceof Identifier identifier) {
-            validateIdentity(identifier);
+            checkDependency(identifier);
         } else if (!(declaration.getValue() instanceof MemberExpression memberExpression)) {
             throwErrorForInvalidArgument(declaration);
         }
     }
 
-    private void validateIdentity(Expression item) {
-        var res = checker.visit(item);
+    /**
+     * Checks if the dependency is a Resource or a Component. Can't be anything else
+     */
+    private void checkDependency(Identifier item) {
+        var res = checker.lookupInstance(item);
         switch (res) {
             case ResourceType _ -> {
             }
-            case ComponentType component -> {
+            case ComponentType component -> { // we got a component instance and definition. A dependency can't be a component definition
                 if (component.isDefinition()) {
                     String visit = printer.visit(component);
                     String message = Ansi.ansi()

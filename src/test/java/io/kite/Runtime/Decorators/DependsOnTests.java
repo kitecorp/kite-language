@@ -2,6 +2,7 @@ package io.kite.Runtime.Decorators;
 
 import io.kite.Runtime.CycleException;
 import io.kite.Runtime.Values.ResourceValue;
+import io.kite.Runtime.exceptions.NotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,18 @@ public class DependsOnTests extends DecoratorTests {
                 
                 }
                 """);
-        Assertions.assertTrue(res.getDependencies().contains("first"));
+        Assertions.assertTrue(res.hasDependency("first"));
         log.warn(res.getDependencies());
+    }
+
+    @Test
+    void dependsOnSingleResourceInexistantResource() {
+        Assertions.assertThrows(NotFoundException.class, () -> eval("""
+                schema vm { string name }
+                
+                @dependsOn(second)
+                resource vm first { }
+                """));
     }
 
     @Test
@@ -41,8 +52,8 @@ public class DependsOnTests extends DecoratorTests {
                 
                 }
                 """);
-        Assertions.assertTrue(res.getDependencies().contains("first"));
-        Assertions.assertTrue(res.getDependencies().contains("main"));
+        Assertions.assertTrue(res.hasDependency("first"));
+        Assertions.assertTrue(res.hasDependency("main"));
         log.warn(res.getDependencies());
     }
 
@@ -62,10 +73,10 @@ public class DependsOnTests extends DecoratorTests {
                 
                 resource vm third { }
                 """);
-        var res = interpreter.getInstance("vm");
-        Assertions.assertTrue(res.getDependencies().contains("first"));
-        Assertions.assertTrue(res.getDependencies().contains("main"));
-        Assertions.assertTrue(res.getDependencies().contains("third"));
+        var res = interpreter.getInstance("second");
+        Assertions.assertTrue(res.hasDependency("first"));
+        Assertions.assertTrue(res.hasDependency("main"));
+        Assertions.assertTrue(res.hasDependency("third"));
         log.warn(res.getDependencies());
     }
 
