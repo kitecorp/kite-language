@@ -133,6 +133,11 @@ public class Parser {
         return StatementList(EOF);
     }
 
+    /**
+     * Program
+     * ::= StatementList EOF
+     * ;
+     */
     private Program Program() {
         var statements = StatementList(EOF);
         program.setBody(statements);
@@ -181,6 +186,19 @@ public class Parser {
         return statementList;
     }
 
+    /**
+     * Declaration
+     * ::= FunctionDeclaration
+     * | TypeDeclaration
+     * | SchemaDeclaration
+     * | ResourceDeclaration
+     * | ComponentDeclaration
+     * | InputDeclaration
+     * | OutputDeclaration
+     * | VarDeclarations
+     * | Statement
+     * ;
+     */
     private Statement Declaration(Set<AnnotationDeclaration> annotations) {
         try {
             return switch (lookAhead().type()) {
@@ -258,6 +276,12 @@ public class Parser {
         };
     }
 
+    /**
+     * IterationStatement
+     *   ::= WhileStatement
+     *     | ForStatement
+     *   ;
+     */
     private Statement IterationStatement() {
         return switch (lookAhead().type()) {
             case While -> WhileStatement();
