@@ -10,19 +10,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The class registers observables interested in a resource evaluation.
- * It is needed in resource dependency resolution.
- * If a resource has dependencies it cannot access the dependency properties because those were not evaluated yet
- * so we subscribe to be notified when that resource gets evaluated
- * Let's say 2 instances need to have the same name:
+ * Observer registry for managing resource dependency notifications.
+ *
+ * <p>This class implements the Subject role in the Observer pattern for lazy resource dependency resolution.
+ * Resources with unresolved dependencies register as observers to be notified when those dependencies
+ * become available.
+ *
+ * <h2>Example:</h2>
+ * <pre>
  * resource Instance a {
- *    name = [b.name]
+ *    name = b.name  // b not yet evaluated → registers as observer
  * }
  * resource Instance b { }
- * --------- on b's evaluation -----------
- * "b" ---- notifies resources ----> [a]
- * ---------------------------------------
- * now A can be reevaluated
+ *
+ * // When b completes evaluation:
+ * "b" ──notifyObservers──> [a]
+ * // a is re-evaluated with b.name now available
+ * </pre>
+ *
+ * <p>See docs/DEPENDENCY_RESOLUTION.md for complete architecture documentation.
+ *
+ * @see DeferredObserverValue
+ * @see io.kite.Runtime.Interpreter#resolveDependencies
  */
 public class DeferredObservable {
     private final Map<String, Set<DeferredObserverValue>> deferredResources = new HashMap<>();

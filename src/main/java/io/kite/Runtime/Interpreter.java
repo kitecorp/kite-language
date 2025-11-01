@@ -686,6 +686,15 @@ public final class Interpreter extends StackVisitor<Object> {
      * 2. Validate no cyclic dependencies exist
      * 3. Register observers for unresolved (deferred) dependencies
      * 4. Notify dependent resources if this resource is fully evaluated
+     *
+     * <p>This implements an optimized observer pattern for lazy dependency resolution.
+     * See docs/DEPENDENCY_RESOLUTION.md for detailed architecture and sequence diagrams.
+     *
+     * @param resource The resource statement being evaluated
+     * @param instance The resource value instance
+     * @return The resource instance with dependencies resolved
+     * @see DeferredObservable
+     * @see ResourceStatement#notifyDependencyResolved
      */
     private ResourceValue resolveDependencies(ResourceStatement resource, ResourceValue instance) {
         resource.setEvaluated(true);

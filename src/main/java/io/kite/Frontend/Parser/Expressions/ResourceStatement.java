@@ -112,6 +112,20 @@ public final class ResourceStatement
         return interpreter.visit(this);
     }
 
+    /**
+     * Called when a dependency resource has been resolved.
+     * Uses a counter-based optimization to defer re-evaluation until ALL dependencies are satisfied.
+     *
+     * <p><strong>Optimization:</strong> Instead of re-evaluating on each dependency resolution,
+     * this method only triggers re-evaluation when the last dependency is satisfied.
+     * For a resource with N dependencies, this reduces evaluations from N+1 to 2 (initial + final).
+     *
+     * <p>See docs/DEPENDENCY_RESOLUTION.md for performance comparison and architecture details.
+     *
+     * @param interpreter          The interpreter instance
+     * @param resolvedResourceName The name of the dependency that was resolved
+     * @return The re-evaluated resource if all dependencies satisfied, null otherwise
+     */
     @Override
     public Object notifyDependencyResolved(Interpreter interpreter, String resolvedResourceName) {
         // Decrement the unresolved dependency counter
