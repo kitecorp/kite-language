@@ -42,16 +42,10 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     @Setter
     private ResourcePath path;
 
-    public static ResourceValue resourceValue(String name, Environment<Object> resourceEnv, SchemaValue installedSchema, String existing) {
-        return ResourceValue.builder()
-                .name(name)
-                .schema(installedSchema)
-                .existing(existing)
-                .properties(resourceEnv)
-                .build();
-    }
-
-    public static <T> ResourceValue resourceValue(String name, Environment<Object> properties, SchemaValue schemaValue) {
+    /**
+     * Most complete factory method - all other variants chain to this one.
+     */
+    public static ResourceValue resourceValue(String name, Environment<Object> properties, SchemaValue schemaValue, ResourcePath path, String existing) {
         properties.setName(name);
         return ResourceValue.builder()
                 .name(name)
@@ -59,7 +53,30 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
                 .properties(properties)
                 .dependencies(new HashSet<>())
                 .providers(new HashSet<>())
+                .path(path)
+                .existing(existing)
                 .build();
+    }
+
+    /**
+     * Factory method with ResourcePath but no existing resource.
+     */
+    public static ResourceValue resourceValue(String name, Environment<Object> properties, SchemaValue schemaValue, ResourcePath path) {
+        return resourceValue(name, properties, schemaValue, path, null);
+    }
+
+    /**
+     * Factory method with existing resource but no ResourcePath.
+     */
+    public static ResourceValue resourceValue(String name, Environment<Object> resourceEnv, SchemaValue installedSchema, String existing) {
+        return resourceValue(name, resourceEnv, installedSchema, null, existing);
+    }
+
+    /**
+     * Factory method without ResourcePath or existing resource (backwards compatibility).
+     */
+    public static <T> ResourceValue resourceValue(String name, Environment<Object> properties, SchemaValue schemaValue) {
+        return resourceValue(name, properties, schemaValue, null, null);
     }
 
     public String getDatabaseKey() {

@@ -28,6 +28,28 @@ Comprehensive guide to the resource dependency resolution mechanism:
     - `Deferred` - Unresolved dependency marker
     - `Dependency` - Resolved resource reference
 
+### [Loop Resource Dependencies](LOOP_RESOURCE_DEPENDENCIES.md)
+
+How resource dependencies work inside loops with context-aware name resolution:
+
+- **What it covers:**
+  - Translation from user code (`vpc.name`) to indexed names (`vpc[0]`)
+  - Loop context tracking and dependency resolution
+  - Complete flow from source code to engine execution
+  - Parallel execution opportunities
+
+- **When to read this:**
+  - Understanding loop-based resource creation
+  - Debugging "resource not found" errors in loops
+  - Understanding how dependencies are stored for looped resources
+  - Implementing features that work with resource loops
+
+- **Key concepts:**
+  - Context-aware resource resolution
+  - Fully qualified indexed names
+  - Dependency graph with loop iterations
+  - Engine execution order
+
 ## Quick Reference
 
 ### For Common Tasks
