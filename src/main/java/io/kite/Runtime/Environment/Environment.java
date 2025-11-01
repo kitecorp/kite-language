@@ -70,6 +70,11 @@ public class Environment<T> implements IEnvironment<T> {
         this.name = name;
     }
 
+    public Environment(String name, Environment<T> env, Map<String, T> variables) {
+        this(env, variables);
+        this.name = name;
+    }
+
     public static <T> Environment<T> copyOfVariables(Environment<T> environment) {
         return new Environment<>(environment, environment.variables);
     }
