@@ -183,6 +183,10 @@ public sealed interface Visitor<R>
         };
         var path = ResourcePath.parse(resource.getType().string() + "." + resourceName);
         if (resource.getName() instanceof MemberExpression) {
+            /*
+             * check the test
+             * {@link ForResourceTest#forResourceObjects()}
+             * */
             return path;
         }
         return switch (resource.getIndex()) {
