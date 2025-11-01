@@ -683,9 +683,13 @@ public final class Interpreter extends StackVisitor<Object> {
     private ResourceValue detectCycle(ResourceStatement resource, ResourceValue instance) {
         resource.setEvaluated(true);
         resource.setEvaluating(false);
+
+        // Phase 1: Collect all dependencies without cycle checking
+        var deferredList = new java.util.ArrayList<Deferred>();
+
         for (Statement it : resource.getArguments()) {
             var result = executeBlock(it, instance.getProperties());
-            detectCycle(resource, instance, result);
+            collectDependency(resource, instance, result, deferredList);
         }
 
         for (Expression it : resource.getDependencies()) { // dependencies set during decorator evaluation
@@ -695,7 +699,18 @@ public final class Interpreter extends StackVisitor<Object> {
             } else {
                 result = executeBlock(it, env);
             }
-            detectCycle(resource, instance, result);
+            collectDependency(resource, instance, result, deferredList);
+        }
+
+        // Phase 2: Perform cycle detection ONCE after all dependencies collected
+        if (instance.hasDependencies()) {
+            CycleDetection.detect(instance, this);
+        }
+
+        // Phase 3: Register observers for deferred dependencies
+        for (Deferred deferred : deferredList) {
+            deferredObservable.addObserver(resource, deferred);
+            resource.incrementUnresolvedDependencyCount();
         }
 
         if (resource.isEvaluated()) {
@@ -705,24 +720,18 @@ public final class Interpreter extends StackVisitor<Object> {
         return instance;
     }
 
-    private void detectCycle(ResourceStatement resource, ResourceValue instance, Object it) {
+    private void collectDependency(ResourceStatement resource, ResourceValue instance, Object it, java.util.List<Deferred> deferredList) {
         switch (it) {
             case Deferred deferred -> {
                 instance.addDependency(deferred.resource());
-
                 resource.setEvaluated(false);
-
-                deferredObservable.addObserver(resource, deferred);
+                deferredList.add(deferred);
             }
             case Dependency dependency -> {
                 instance.addDependency(dependency.resource().getName());
-
-                CycleDetection.detect(instance, this);
             }
             case ResourceValue resourceValue -> { // used by @dependsOn
                 instance.addDependency(resourceValue.getName());
-
-                CycleDetection.detect(instance, this);
             }
             case null, default -> {
             }
