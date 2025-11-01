@@ -803,7 +803,7 @@ public final class Interpreter extends StackVisitor<Object> {
                 resource.setEvaluated(false);
                 deferredList.add(deferred);
             }
-            case Dependency dependency -> instance.addDependency(dependency.resource().getName());
+            case Dependency dependency -> instance.addDependency(dependency.resource().getPath().toSegmentName());
             case ResourceValue resourceValue -> instance.addDependency(resourceValue.getName());
             case null, default -> {
             }
