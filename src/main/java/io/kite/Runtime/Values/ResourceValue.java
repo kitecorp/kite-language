@@ -50,10 +50,13 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     }
 
     public static <T> ResourceValue resourceValue(String name, Environment<Object> properties, SchemaValue schemaValue) {
+        properties.setName(name);
         return ResourceValue.builder()
                 .name(name)
                 .schema(schemaValue)
                 .properties(properties)
+                .dependencies(new HashSet<>())
+                .providers(new HashSet<>())
                 .build();
     }
 

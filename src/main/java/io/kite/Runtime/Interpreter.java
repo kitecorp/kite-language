@@ -667,8 +667,8 @@ public final class Interpreter extends StackVisitor<Object> {
 
     private ResourceValue initResource(ResourceStatement statement, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
-        var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
         String name = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
+        var resourceEnv = new Environment<>(name, env, typeEnvironment.getVariables());
         var res = ResourceValue.resourceValue(name, resourceEnv, installedSchema, statement.getExisting());
         try {
             // init any kind of new resource
