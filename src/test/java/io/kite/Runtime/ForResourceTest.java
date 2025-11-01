@@ -560,7 +560,7 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = interpreter.getSchema("vm");
         assertEquals(List.of(
-                resourceValue("main[\"prod\"]", new Environment<>(Map.of("name", "prod")), schema),
+                resourceValue("main[\"prod\"]", new Environment<>(Map.of("name", "prod")), schema, ResourcePath.),
                 resourceValue("main[\"test\"]", new Environment<>(Map.of("name", "test")), schema)
         ), List.of(prod, test));
 
