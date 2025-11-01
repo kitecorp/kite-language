@@ -3,11 +3,11 @@ package io.kite.Runtime.Decorators;
 public interface TagsSupport {
     Tags getTags();
 
-    void setTag(Tags tags);
+    void setTags(Tags tags);
 
     default void addTag(String provider) {
         if (getTags() == null) {
-            setTag(new Tags());
+            setTags(new Tags());
         }
         var tags = getTags();
         tags.addTag(provider);
@@ -15,7 +15,7 @@ public interface TagsSupport {
 
     default void addTag(String key, String value) {
         if (getTags() == null) {
-            setTag(new Tags());
+            setTags(new Tags());
         }
         var tags = getTags();
         tags.addTag(key, value);
