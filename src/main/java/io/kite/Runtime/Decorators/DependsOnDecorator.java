@@ -1,19 +1,18 @@
 package io.kite.Runtime.Decorators;
 
-import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.Frontend.Parser.Expressions.ComponentStatement;
 import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Runtime.Interpreter;
-import io.kite.Runtime.Values.ResourceValue;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Just sets the dependencies list and does nothing more. Actual evaluation and cycle detection will happen in the interpreter
+ * Just sets the dependencies list and does nothing more.
+ * Actual evaluation and cycle detection will happen in the interpreter.
+ * Resources that were not evaluated yet will be added to the dependency as deffered
  */
 public class DependsOnDecorator extends DecoratorInterpreter {
 
@@ -26,13 +25,10 @@ public class DependsOnDecorator extends DecoratorInterpreter {
 
     @Override
     public Object execute(AnnotationDeclaration declaration) {
-        if (declaration.getValue() instanceof Identifier identifier) {
-            var dependency = interpreter.visit(identifier);
-            return switch (dependency) {
-                case ResourceValue _, ComponentStatement _ -> registerDependency(declaration, Set.of(identifier));
-                case null, default ->
-                        throw new IllegalStateException("A `%s` can only depend on other resources or components ".formatted(interpreter.getPrinter().visit(declaration.getTarget().getTarget().name().toLowerCase())));
-            };
+        if (declaration.getValue() instanceof Expression identifier) {
+            var set = Set.of(identifier);
+            registerDependency(declaration, set);
+            return set;
         } else if (declaration.getArgs() != null) {
             var set = new HashSet<>(declaration.getArgs().getItems());
             registerDependency(declaration, set);
@@ -42,10 +38,13 @@ public class DependsOnDecorator extends DecoratorInterpreter {
         return null;
     }
 
-    private @NotNull Set<Expression> registerDependency(AnnotationDeclaration declaration, Set<Expression> visit) {
-        var resource = (ResourceStatement) declaration.getTarget();
-        resource.setDependencies(visit);
-        return resource.getDependencies();
+    private void registerDependency(AnnotationDeclaration declaration, Set<Expression> dependencies) {
+        switch (declaration.getTarget()) {
+            case ResourceStatement resource -> resource.setDependencies(dependencies);
+            case ComponentStatement component -> component.setDependencies(dependencies);
+            default ->
+                    throw new IllegalStateException("Hou cannot set dependencies on: " + declaration.getTarget().targetType().getKind().toString().toLowerCase());
+        }
     }
 
 

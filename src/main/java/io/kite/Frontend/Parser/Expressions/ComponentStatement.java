@@ -12,6 +12,7 @@ import io.kite.TypeChecker.Types.DecoratorType;
 import io.kite.TypeChecker.Types.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -38,6 +39,8 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     private ComponentValue value;
     private BlockExpression block;
     private Set<AnnotationDeclaration> annotations;
+    @Singular
+    private Set<Expression> dependencies;
     private Set<String> providers;
     private boolean counted;
 

@@ -107,6 +107,10 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
         return dependencies;
     }
 
+    public boolean hasDependency(String dependency) {
+        return getDependencies().contains(dependency);
+    }
+
     public Set<String> dependenciesOrNull() {
         if (dependencies != null && dependencies.isEmpty()) {
             return null;

@@ -1,6 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Runtime.Values.ResourceValue;
+import io.kite.Runtime.exceptions.NotFoundException;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.HashSet;
@@ -77,7 +78,9 @@ public class CycleDetection {
                                                       Set<String> seen, Map<String, R> out) {
         if (!seen.add(name)) return;
         R res = resources.get(name);
-        if (res == null) throw new IllegalStateException("Missing resource: " + name);
+        if (res == null) {
+            throw new NotFoundException("resource not defined: " + name);
+        }
         for (String dep : res.getDependencies()) {
             dfs(dep, resources, seen, out);
         }

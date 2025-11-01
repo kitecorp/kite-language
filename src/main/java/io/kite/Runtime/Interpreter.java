@@ -689,7 +689,12 @@ public final class Interpreter extends StackVisitor<Object> {
         }
 
         for (Expression it : resource.getDependencies()) { // dependencies set during decorator evaluation
-            var result = executeBlock(it, env);
+            Object result;
+            if (it instanceof Identifier identifier) {
+                result = env.containsKey(identifier.string()) ? executeBlock(it, env) : new Deferred(identifier.string());
+            } else {
+                result = executeBlock(it, env);
+            }
             detectCycle(resource, instance, result);
         }
 

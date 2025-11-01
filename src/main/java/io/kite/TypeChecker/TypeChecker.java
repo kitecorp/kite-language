@@ -512,7 +512,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var objectType = executeBlock(expression.getObject(), env);
 
         return switch (objectType) {
-            case SchemaType schemaType -> lookupSchemaInstance(schemaType, resourceName);
+            case SchemaType schemaType -> lookupInstance(resourceName);
             case ResourceType resourceType -> lookupResourceProperty(expression, resourceType, resourceName);
             case ComponentType componentType -> lookupComponentMember(componentType, resourceName);
             case ObjectType obj -> accessMemberType(expression, resourceName.string(), obj);
@@ -560,7 +560,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         return member;
     }
 
-    private Type lookupSchemaInstance(SchemaType schemaType, SymbolIdentifier resourceName) {
+    public Type lookupInstance(Identifier resourceName) {
         // When retrieving the type of a resource, we first check the "instances" field for existing resources
         // Since that environment points to the parent (type env), it will also find the properties
         var result = CycleDetectionSupport.propertyOrDeferred(
