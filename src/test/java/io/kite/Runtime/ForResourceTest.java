@@ -629,8 +629,6 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var schema = interpreter.getSchema("vm");
-
         var videos = interpreter.getInstance("videos");
         var photos = interpreter.getInstance("photos");
 
