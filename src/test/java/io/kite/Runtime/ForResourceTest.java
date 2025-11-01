@@ -198,7 +198,8 @@ public class ForResourceTest extends RuntimeTest {
         eval("""
                   schema vm { string name }
                   var vm[] col = []
-                  for i in ["prod","test"] {
+                
+                  for i in ["prod", "test"] {
                     resource vm main { name = i }
                     col += main
                   }

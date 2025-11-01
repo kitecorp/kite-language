@@ -710,8 +710,6 @@ public final class Interpreter extends StackVisitor<Object> {
             case Deferred deferred -> {
                 instance.addDependency(deferred.resource());
 
-                CycleDetection.detect(instance, this);
-
                 resource.setEvaluated(false);
 
                 deferredObservable.addObserver(resource, deferred);
