@@ -182,6 +182,9 @@ public sealed interface Visitor<R>
                     throw new OperationNotImplementedException("Resource name not implemented for: " + visit(resource));
         };
         var path = ResourcePath.parse(resource.getType().string() + "." + resourceName);
+        if (resource.getName() instanceof MemberExpression) {
+            return path;
+        }
         return switch (resource.getIndex()) {
             case SymbolIdentifier id -> path.appendKey(id.string());
             case StringLiteral literal -> path.appendKey(literal.getValue());
