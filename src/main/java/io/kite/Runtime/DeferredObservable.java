@@ -4,7 +4,10 @@ import io.kite.Runtime.Values.Deferred;
 import io.kite.Runtime.Values.DeferredObserverValue;
 import io.kite.Runtime.Values.ResourceValue;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The class registers observables interested in a resource evaluation.
@@ -13,7 +16,7 @@ import java.util.*;
  * so we subscribe to be notified when that resource gets evaluated
  * Let's say 2 instances need to have the same name:
  * resource Instance a {
- *    name = [Instance.b.name]
+ *    name = [b.name]
  * }
  * resource Instance b { }
  * --------- on b's evaluation -----------
