@@ -196,7 +196,6 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm vpc  { name = 'vpc-$i' }
                   }
                 """);
-        var schema = interpreter.getSchema("vm");
         assertEquals("vpc-0", interpreter.getInstance("cidr[0]").get("name"));
         assertEquals("vpc-1", interpreter.getInstance("cidr[1]").get("name"));
     }
@@ -594,7 +593,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("resource naming by string array ")
     void testResourceNamingByStringArray() {
-        var res = eval("""
+        eval("""
                 schema vm {
                    string name
                 }
@@ -606,15 +605,9 @@ public class ForResourceTest extends RuntimeTest {
                 """);
 
         assertEquals(2, interpreter.getInstances().size());
-        assertEquals("prod", interpreter.getInstance("""
-                main["prod"]
-                """.trim()).get("name"));
-        assertEquals("main[\"prod\"]", interpreter.getInstance("""
-                main["prod"]
-                """.trim()).getName());
-        assertEquals("test", interpreter.getInstance("""
-                main["test"]
-                """.trim()).get("name"));
+        assertEquals("prod", interpreter.getInstance("main[\"prod\"]").get("name"));
+        assertEquals("main", interpreter.getInstance("main[\"prod\"]").getName());
+        assertEquals("test", interpreter.getInstance("main[\"test\"]").get("name"));
     }
 
     @Test
