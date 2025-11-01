@@ -578,12 +578,11 @@ public final class Interpreter extends StackVisitor<Object> {
         // See: ResourceStringInterpolation#stringInterpolationMemberAccess()
         if (ExecutionContextIn(StringLiteral.class)) {
             return resourceValue.lookup(propertyName);
+        } else {
+            var propertyValue = resourceValue.lookup(propertyName);
+            // When retrieving the type of a resource through member expression, return a Dependency
+            return new Dependency(resourceValue, propertyValue);
         }
-
-        var propertyValue = resourceValue.lookup(propertyName);
-
-        // When retrieving the type of a resource through member expression, return a Dependency
-        return new Dependency(resourceValue, propertyValue);
     }
 
     private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
