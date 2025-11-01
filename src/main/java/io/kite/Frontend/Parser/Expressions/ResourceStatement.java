@@ -47,6 +47,7 @@ public final class ResourceStatement
     private Set<Expression> dependencies; // we use expression because we can have a deferred resource
     private Set<String> providers;
     private Tags tags;
+    private int unresolvedDependencyCount = 0;
 
     public static ResourceStatement resource(ResourceStatement expression) {
         return expression.toBuilder().build();
@@ -112,6 +113,22 @@ public final class ResourceStatement
     }
 
     @Override
+    public Object notifyDependencyResolved(Interpreter interpreter, String resolvedResourceName) {
+        // Decrement the unresolved dependency counter
+        decrementUnresolvedDependencyCount();
+
+        // Only perform full re-evaluation when ALL dependencies are resolved
+        // This avoids multiple expensive re-evaluations
+        if (hasUnresolvedDependencies()) {
+            // Still waiting for other dependencies - skip re-evaluation
+            return null;
+        }
+
+        // All dependencies now resolved - do full re-evaluation
+        return interpreter.visit(this);
+    }
+
+    @Override
     public DecoratorType.Target getTarget() {
         return DecoratorType.Target.RESOURCE;
     }
@@ -164,5 +181,19 @@ public final class ResourceStatement
     @Override
     public void setTag(Tags tags) {
         this.tags = tags;
+    }
+
+    public void incrementUnresolvedDependencyCount() {
+        unresolvedDependencyCount++;
+    }
+
+    public void decrementUnresolvedDependencyCount() {
+        if (unresolvedDependencyCount > 0) {
+            unresolvedDependencyCount--;
+        }
+    }
+
+    public boolean hasUnresolvedDependencies() {
+        return unresolvedDependencyCount > 0;
     }
 }

@@ -41,7 +41,7 @@ public class DeferredObservable {
 
         for (DeferredObserverValue it : observers) {
             it.setEvaluating(true);
-            it.notify(interpreter);
+            it.notifyDependencyResolved(interpreter, resourceName);
         }
 
         observers.removeIf(DeferredObserverValue::isEvaluated);
