@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static io.kite.Runtime.Values.ResourceValue.resourceValue;
@@ -671,8 +672,8 @@ public class ForResourceTest extends RuntimeTest {
                   name     = 'name-${index}'
                 }
                 """);
-        var map = new HashMap<String, ResourceValue>();
-        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
+        var map = new LinkedHashMap<String, ResourceValue>();
+        var schemaValue = this.interpreter.getSchema("Bucket");
         map.put("photos[1]",  resourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
         map.put("photos[2]",  resourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
         map.put("photos[3]",  resourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));

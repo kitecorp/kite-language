@@ -149,7 +149,7 @@ public class ComponentValue implements ProviderSupport, TagsSupport {
     }
 
     @Override
-    public void setTag(Tags tags) {
+    public void setTags(Tags tags) {
         this.tags = tags;
     }
 }

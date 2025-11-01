@@ -611,28 +611,28 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     @Override
-    public Object visit(ResourceStatement resource) {
-        if (resource.isCounted()) {
-            return resource;
+    public Object visit(ResourceStatement statement) {
+        if (statement.isCounted()) {
+            return statement;
         }
 
-        validate(resource);
+        validate(statement);
         push(ContextStack.Resource);
 
         try {
             // SchemaValue already installed globally when evaluating a SchemaDeclaration
             // This means the schema must be declared before the resource
-            var installedSchema = (SchemaValue) executeBlock(resource.getType(), env);
-            setResourceName(resource);
+            var installedSchema = (SchemaValue) executeBlock(statement.getType(), env);
+            setResourceName(statement);
 
-            var value = resource.isEvaluating()
-                    ? resource.getValue() // Notifying existing resource that its dependencies were satisfied
-                    : initResource(resource, installedSchema, installedSchema.getEnvironment());
+            var value = statement.isEvaluating()
+                    ? statement.getValue() // Notifying existing resource that its dependencies were satisfied
+                    : initResource(statement, installedSchema, installedSchema.getEnvironment());
 
-            value.setProviders(resource.getProviders());
-            value.setTag(resource.getTags());
+            value.setProviders(statement.getProviders());
+            value.setTags(statement.getTags());
 
-            return resolveDependencies(resource, value);
+            return resolveDependencies(statement, value);
         } finally {
             pop(ContextStack.Resource);
         }
@@ -665,17 +665,22 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
-    private ResourceValue initResource(ResourceStatement resource, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
+    private ResourceValue initResource(ResourceStatement statement, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
         var resourceEnv = new Environment<>(env, typeEnvironment.getVariables());
-        String name = resourceName(resource);
-        var res = ResourceValue.resourceValue(name, resourceEnv, installedSchema, resource.getExisting());
+        String name = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
+        var res = ResourceValue.resourceValue(name, resourceEnv, installedSchema, statement.getExisting());
         try {
             // init any kind of new resource
             initInstance(res);
-            resource.setValue(res);
+            statement.setValue(res);
+            if (ExecutionContextIn(ForStatement.class)) {
+                if (statement.getName() instanceof Identifier identifier) {
+                    env.initOrAssign(identifier.string(), res);
+                }
+            }
         } catch (DeclarationExistsException e) {
-            throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(resource)));
+            throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(statement)));
         }
         return res;
     }
@@ -845,7 +850,7 @@ public final class Interpreter extends StackVisitor<Object> {
             throw new OperationNotImplementedException("For statement requires an array");
         }
 
-        var forEnv = new Environment<>(env);
+        var forEnv = new Environment<>("for", env);
         Object result = null;
 
         for (int i = 0; i < list.size(); i++) {

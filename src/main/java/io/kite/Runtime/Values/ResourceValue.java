@@ -35,6 +35,8 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     @Setter
     @Getter
     private String existing;
+    @Getter
+    @Setter
     private Tags tags;
     private ResourcePath path;
 
@@ -152,16 +154,4 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
         this.properties = properties;
     }
 
-    @Override
-    public Tags getTags() {
-        if (tags == null) {
-            this.tags = new Tags();
-        }
-        return tags;
-    }
-
-    @Override
-    public void setTag(Tags tags) {
-        this.tags = tags;
-    }
 }

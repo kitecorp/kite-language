@@ -184,19 +184,6 @@ public final class ResourceStatement
         getProviders().add(provider);
     }
 
-    @Override
-    public Tags getTags() {
-        if (tags == null) {
-            this.tags = new Tags();
-        }
-        return tags;
-    }
-
-    @Override
-    public void setTag(Tags tags) {
-        this.tags = tags;
-    }
-
     public void incrementUnresolvedDependencyCount() {
         unresolvedDependencyCount++;
     }
