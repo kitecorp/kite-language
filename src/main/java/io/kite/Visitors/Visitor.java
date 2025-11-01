@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Inputs.InputChainResolver;
+import io.kite.Runtime.ResourcePath;
 import io.kite.Runtime.exceptions.OperationNotImplementedException;
 import io.kite.TypeChecker.Types.Type;
 import org.jetbrains.annotations.Nullable;
@@ -171,7 +172,7 @@ public sealed interface Visitor<R>
      */
     R visit(ResourceStatement expression);
 
-    default String resourceName(ResourceStatement resource) {
+    default ResourcePath resourceName(ResourceStatement resource) {
         var resourceName = switch (resource.getName()) {
             case SymbolIdentifier identifier -> identifier.string();
             case StringLiteral literal -> literal.getValue();
@@ -180,13 +181,14 @@ public sealed interface Visitor<R>
             case null, default ->
                     throw new OperationNotImplementedException("Resource name not implemented for: " + visit(resource));
         };
+        var path = ResourcePath.parse(resource.getType().string() + "." + resourceName);
         return switch (resource.getIndex()) {
-//            case SymbolIdentifier identifier -> resourceName += identifier.string();
-//            case StringLiteral literal -> resourceName += literal.getValue();
-//            case Identifier identifier -> resourceName += identifier.string();
-            case Map<?, ?> map -> "%s".formatted(resourceName);
-            case null -> resourceName;
-            default -> "%s[%s]".formatted(resourceName, resource.getIndex());
+            case SymbolIdentifier id -> path.appendKey(id.string());
+            case StringLiteral literal -> path.appendKey(literal.getValue());
+            case Identifier id -> path.appendKey(id.string());
+            case Map<?, ?> map -> path.appendKey(map.toString());
+            case null -> path;
+            default -> path.appendIndex(resource.getIndex());
         };
     }
 }

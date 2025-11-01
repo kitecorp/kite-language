@@ -38,6 +38,8 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     @Getter
     @Setter
     private Tags tags;
+    @Getter
+    @Setter
     private ResourcePath path;
 
     public static ResourceValue resourceValue(String name, Environment<Object> resourceEnv, SchemaValue installedSchema, String existing) {

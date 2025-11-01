@@ -5,7 +5,7 @@ import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
-import org.junit.jupiter.api.Assertions;
+import io.kite.Visitors.PlainTheme;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -132,7 +132,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     void duplicateStringKeys_conflict() {
         // Expect either last-write-wins OR a specific exception; assert accordingly.
-        Assertions.assertThrows(DeclarationExistsException.class, () -> eval("""
+        assertThrows(DeclarationExistsException.class, () -> eval("""
                   schema vm { string name }
                   var items = ["dup","dup"]
                   for i in items {
@@ -185,7 +185,7 @@ public class ForResourceTest extends RuntimeTest {
 
     @Test
     void indirectCycleDetection() {
-        Assertions.assertThrows(CycleException.class, () -> eval("""
+        assertThrows(CycleException.class, () -> eval("""
                   schema vm { string name }
                   for i in 0..1 {
                     resource vm a {  name = b.name }  // a -> b
@@ -206,13 +206,15 @@ public class ForResourceTest extends RuntimeTest {
                     col += main
                   }
                 """);
-        assertEquals("prod", interpreter.getInstance("main[\"prod\"]").get("name"));
+        var instance = interpreter.getInstance("main[\"prod\"]");
+        assertNotNull(instance);
+        assertEquals("prod", instance.get("name"));
         // Optionally assert col’s contents if your runtime exposes it
     }
 
     @Test
     void loopVarOutOfScope_error() {
-        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+        assertThrows(RuntimeException.class, () -> eval("""
                   schema vm { string name }
                   for i in 0..1 { resource vm main { name = 'ok' } }
                   resource vm late { name = i } // i not in scope
@@ -221,7 +223,7 @@ public class ForResourceTest extends RuntimeTest {
 
     @Test
     void crossLoopIndexSpace_error() {
-        Assertions.assertThrows(RuntimeException.class, () -> eval("""
+        assertThrows(RuntimeException.class, () -> eval("""
                   schema vm { string name }
                   for i in 0..2 { resource vm a { name = '$i' } }
                   for j in 0..2 { resource vm b { name = a[j].name } } // if bracket-indexing unsupported
@@ -397,7 +399,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Multiple resources with dependencies")
     void dependsOnEarlyResourceCycle() {
-        Assertions.assertThrows(CycleException.class, () -> eval("""
+        assertThrows(CycleException.class, () -> eval("""
                 schema vm {
                    string name
                    string color 
@@ -558,8 +560,8 @@ public class ForResourceTest extends RuntimeTest {
 
         var schema = interpreter.getSchema("vm");
         assertEquals(List.of(
-                resourceValue("main[\"prod\"]", new Environment<>(Map.of("name", "main[\"prod\"]")), schema),
-                resourceValue("main[\"test\"]", new Environment<>(Map.of("name", "main[\"test\"]")), schema)
+                resourceValue("main[\"prod\"]", new Environment<>(Map.of("name", "prod")), schema),
+                resourceValue("main[\"test\"]", new Environment<>(Map.of("name", "test")), schema)
         ), List.of(prod, test));
 
         assertEquals("prod", prod.get("name"));
@@ -616,8 +618,8 @@ public class ForResourceTest extends RuntimeTest {
         var videos = interpreter.getInstance("videos");
         var photos = interpreter.getInstance("photos");
 
-        Assertions.assertNotNull(videos);
-        Assertions.assertNotNull(photos);
+        assertNotNull(videos);
+        assertNotNull(photos);
         assertEquals(videos, res);
     }
 
@@ -646,8 +648,8 @@ public class ForResourceTest extends RuntimeTest {
         var videos = interpreter.getInstance("videos");
         var photos = interpreter.getInstance("photos");
 
-        Assertions.assertNotNull(videos);
-        Assertions.assertNotNull(photos);
+        assertNotNull(videos);
+        assertNotNull(photos);
         assertEquals(videos, res);
     }
 
@@ -771,6 +773,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Create multiple resources in a loop using object properties as index")
     void testMultipleResourcesAreAccessedUsingObjectIndex() {
+        interpreter.getPrinter().setTheme(new PlainTheme());
         var res = eval("""
                 schema vm {
                    string name
@@ -788,20 +791,20 @@ public class ForResourceTest extends RuntimeTest {
                       environment = config.env
                       region      = config.region
                     }
-                    vms += main[config.env]
+                    vms += main
                 }
                 """);
 
         assertEquals(2, interpreter.getInstances().size());
 
-        var prodInstance = interpreter.getInstance("""
-                main["prod"]""");
+        var prodInstance = interpreter.getInstance("main[\"{env=prod, region=us-east}\"]");
+        assertNotNull(prodInstance);
         assertEquals("server-prod", prodInstance.get("name"));
         assertEquals("prod", prodInstance.get("environment"));
         assertEquals("us-east", prodInstance.get("region"));
 
-        var devInstance = interpreter.getInstance("""
-                main["dev"]""");
+        var devInstance = interpreter.getInstance("main[\"{env=dev, region=us-west}\"]");
+        assertNotNull(devInstance);
         assertEquals("server-dev", devInstance.get("name"));
         assertEquals("dev", devInstance.get("environment"));
         assertEquals("us-west", devInstance.get("region"));
