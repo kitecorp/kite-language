@@ -836,7 +836,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         var installedSchema = lookupSchema(resource);
 
-        String resourceName = resourceName(resource);
+        var resourceName = resourceName(resource).getName();
         if (isCounted(resource.targetType())) {
             return env.lookup(resourceName);
         }
@@ -856,7 +856,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     private void validateResourceName(ResourceStatement resource) {
         if (resource.getName() == null) {
-            throw new InvalidInitException("Resource does not have a name: " + resourceName(resource));
+            throw new InvalidInitException("Resource does not have a name: " + printer.visit(resource));
         }
     }
 
@@ -865,7 +865,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         // This means the schema must be declared before the resource
         var installedSchema = (SchemaType) env.lookup(resource.getType().string());
         if (installedSchema == null) {
-            throw new InvalidInitException("Schema not found during " + resourceName(resource) + " initialization");
+            throw new InvalidInitException("Schema not found during when initializing: " + printer.visit(resource));
         }
         return installedSchema;
     }

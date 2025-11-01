@@ -129,12 +129,17 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     public ResourceValue initInstance(ResourceValue instance) {
-        var contains = this.instances.containsKey(instance.name()); // todo performance tip: replace contains with put only
+        String segmentName = instance.getPath().toSegmentName();
+        var contains = this.instances.containsKey(segmentName); // todo performance tip: replace contains with put only
         if (contains) {
-            throw new DeclarationExistsException(">" + instance.name() + "< already exists in schema");
+            throw new DeclarationExistsException(">" + segmentName + "< already exists in schema");
         }
-        this.env.init(instance.name(), instance);
-        return this.instances.put(instance.name(), instance);
+        this.env.init(segmentName, instance);
+        this.instances.put(segmentName, instance);
+        if (ExecutionContextIn(ForStatement.class)) {
+            env.initOrAssign(instance.getPath().getName(), instance);
+        }
+        return instance;
     }
 
     @Nullable
@@ -500,7 +505,7 @@ public final class Interpreter extends StackVisitor<Object> {
                 case List<?> list -> visitListMember(index, list);
                 case Map<?, ?> map -> visitMapMember(expression, map);
 //                case ObjectValue objVal -> objVal.getProperties().get(index.toString());
-                case ResourceValue resourceVal -> visitResourceMember(expression, resourceVal);
+                case ResourceValue resourceVal -> visitResourceArray(expression);
                 case Dependency dependency -> {
                     if (dependency.value() instanceof List<?> list) {
                         yield visitListMember(index, list);
@@ -528,6 +533,23 @@ public final class Interpreter extends StackVisitor<Object> {
                 case null, default -> object;
             };
         }
+    }
+
+    private Object visitResourceArray(MemberExpression expression) {
+        var identifier = switch (visit(expression.getObject())) {
+            case Identifier id -> id.string();
+            case ResourceValue resourceValue -> resourceValue.getName();
+            default ->
+                    throw new RuntimeException(format("Invalid resource array index: {0}", printer.visit(expression)));
+        };
+        var visit = switch (visit(expression.getProperty())) {
+            case String s -> "\"" + s + "\"";
+            case Number number -> number;
+            case null, default ->
+                    throw new TypeError("Invalid index type: %s".formatted(printer.visit(expression.getProperty())));
+        };
+        var format = format("{0}[{1}]", identifier, visit);
+        return env.lookup(format);
     }
 
     private Object visitListMember(Object index, List<?> list) {
@@ -571,6 +593,9 @@ public final class Interpreter extends StackVisitor<Object> {
         return indexedResource;
     }
 
+    /**
+     * Only valid for resource.property or component.property
+     */
     private Object visitResourceMember(MemberExpression expression, ResourceValue resourceValue) {
         var propertyName = getPropertyName(expression.getProperty());
 
@@ -666,22 +691,18 @@ public final class Interpreter extends StackVisitor<Object> {
 
     private ResourceValue initResource(ResourceStatement statement, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
-        String name = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
-        var resourceEnv = new Environment<>(name, env, typeEnvironment.getVariables());
-        var res = ResourceValue.resourceValue(name, resourceEnv, installedSchema, statement.getExisting());
+        var path = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
+        var resourceEnv = new Environment<>(path.getName(), env, typeEnvironment.getVariables());
+        var instance = ResourceValue.resourceValue(path.getName(), resourceEnv, installedSchema, statement.getExisting());
+        instance.setPath(path);
         try {
             // init any kind of new resource
-            initInstance(res);
-            statement.setValue(res);
-            if (ExecutionContextIn(ForStatement.class)) {
-                if (statement.getName() instanceof Identifier identifier) {
-                    env.initOrAssign(identifier.string(), res);
-                }
-            }
+            initInstance(instance);
+            statement.setValue(instance);
         } catch (DeclarationExistsException e) {
             throw new DeclarationExistsException("Resource already exists: \n%s".formatted(printer.visit(statement)));
         }
-        return res;
+        return instance;
     }
 
     /**
@@ -767,7 +788,7 @@ public final class Interpreter extends StackVisitor<Object> {
      */
     private void notifyDependentResources(ResourceStatement resource) {
         if (resource.isEvaluated()) {
-            deferredObservable.notifyObservers(this, resourceName(resource));
+            deferredObservable.notifyObservers(this, resource.getValue().name());
         }
     }
 

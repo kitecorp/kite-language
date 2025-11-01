@@ -193,6 +193,25 @@ public class ResourcePath {
     }
 
     /**
+     * Build a display-friendly name (without file path)
+     */
+    public String toSegmentName() {
+        StringBuilder sb = new StringBuilder();
+
+        if (parentPath != null && !parentPath.isEmpty()) {
+            sb.append(parentPath).append(".");
+        }
+
+        sb.append(name);
+
+        for (PathSegment segment : segments) {
+            sb.append(segment.toString());
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Create a child path by appending a segment
      */
     public ResourcePath append(PathSegment segment) {
@@ -212,6 +231,16 @@ public class ResourcePath {
      * Create a child path by appending an array index
      */
     public ResourcePath appendIndex(int index) {
+        return append(PathSegment.builder()
+                .type(PathSegment.SegmentType.ARRAY_INDEX)
+                .value(String.valueOf(index))
+                .build());
+    }
+
+    /**
+     * Create a child path by appending an array index
+     */
+    public ResourcePath appendIndex(Object index) {
         return append(PathSegment.builder()
                 .type(PathSegment.SegmentType.ARRAY_INDEX)
                 .value(String.valueOf(index))
