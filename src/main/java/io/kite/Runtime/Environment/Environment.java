@@ -14,6 +14,16 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a lexical scope for variable storage and lookup.
+ * <p>
+ * IMPORTANT: Environment equality is based on:
+ * - variables (Map content)
+ * - name (String)
+ * BUT NOT parent (excluded from equals/hashCode)
+ * <p>
+ * When comparing Environments in tests, ensure both 'variables' AND 'name' match!
+ */
 @Log4j2
 @Data
 public class Environment<T> implements IEnvironment<T> {
@@ -77,6 +87,42 @@ public class Environment<T> implements IEnvironment<T> {
 
     public static <T> Environment<T> copyOfVariables(Environment<T> environment) {
         return new Environment<>(environment, environment.variables);
+    }
+
+    /**
+     * Factory method to create an Environment with a name and variables (no parent).
+     * Useful for creating test fixtures.
+     *
+     * @param name      The environment name
+     * @param variables The variables map
+     * @return A new Environment instance
+     */
+    public static <T> Environment<T> of(String name, Map<String, T> variables) {
+        return new Environment<>(name, null, variables);
+    }
+
+    /**
+     * Factory method to create an Environment with only variables (name defaults to "global").
+     * Useful for simple test cases.
+     *
+     * @param variables The variables map
+     * @return A new Environment instance with name="global"
+     */
+    public static <T> Environment<T> of(Map<String, T> variables) {
+        return new Environment<>(variables);
+    }
+
+    /**
+     * Factory method to create an Environment with a name, parent, and variables.
+     * Useful for nested scopes in tests.
+     *
+     * @param name      The environment name
+     * @param parent    The parent environment
+     * @param variables The variables map
+     * @return A new Environment instance
+     */
+    public static <T> Environment<T> of(String name, Environment<T> parent, Map<String, T> variables) {
+        return new Environment<>(name, parent, variables);
     }
 
     /**

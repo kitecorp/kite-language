@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import static io.kite.Runtime.Values.ResourceValue.resourceValue;
@@ -20,6 +19,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("For loop resources")
 public class ForResourceTest extends RuntimeTest {
+
+    /**
+     * Helper method to create expected ResourceValue for test assertions.
+     * Simplifies verbose ResourceValue creation in tests.
+     *
+     * @param resourceName The resource name (e.g., "main")
+     * @param envName      The environment name (e.g., "main")
+     * @param properties   The properties map
+     * @param schemaType   The schema type (e.g., "vm", "Bucket")
+     * @param path         The resource path (e.g., "vm.main[\"prod\"]")
+     * @return A ResourceValue for comparison
+     */
+    private ResourceValue expected(String resourceName, String envName, Map<String, Object> properties, String schemaType, String path) {
+        return resourceValue(resourceName,
+                Environment.of(envName, properties),
+                interpreter.getSchema(schemaType),
+                ResourcePath.parse(path));
+    }
+
     @Test
     @DisplayName("Resolve var name using inside a loop")
     void testForReturnsResourceNestedVar() {
@@ -539,7 +557,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Create multiple resources in a loop by using index")
     void testMultipleResourcesAreAccessedUsingIndexSyntaxStrings() {
-        var res = eval("""
+        eval("""
                 schema vm {
                    string name
                 }
@@ -559,13 +577,18 @@ public class ForResourceTest extends RuntimeTest {
         var test = interpreter.getInstance("main[\"test\"]");
 
         var schema = interpreter.getSchema("vm");
-        assertEquals(List.of(
-                resourceValue("main[\"prod\"]", new Environment<>(Map.of("name", "prod")), schema),
-                resourceValue("main[\"test\"]", new Environment<>(Map.of("name", "test")), schema)
-        ), List.of(prod, test));
 
+        // Verify prod resource
+        assertEquals("main", prod.getName());
         assertEquals("prod", prod.get("name"));
+        assertEquals(schema, prod.getSchema());
+        assertEquals("vm.main[\"prod\"]", prod.getPath().toDatabaseKey());
+
+        // Verify test resource
+        assertEquals("main", test.getName());
         assertEquals("test", test.get("name"));
+        assertEquals(schema, test.getSchema());
+        assertEquals("vm.main[\"test\"]", test.getPath().toDatabaseKey());
     }
 
     @Test
