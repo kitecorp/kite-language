@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static io.kite.Runtime.Values.ResourceValue.resourceValue;
@@ -673,7 +672,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("for loop comprehension over objects with resource names as object properties")
     void arrayResourcesOverObjectsWithResourceNamesFromObjects() {
-        var array = eval("""
+        eval("""
                 schema Bucket {
                    string name
                 }
@@ -684,11 +683,9 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var map = new HashMap<String, ResourceValue>();
-        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("amazon", resourceValue("amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
-        map.put("bmw", resourceValue("bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
-        assertEquals(map, interpreter.getInstances());
+        var instances = interpreter.getInstances();
+        assertEquals("name-amazon", instances.get("amazon").get("name"));
+        assertEquals("name-bmw", instances.get("bmw").get("name"));
     }
 
     @Test
@@ -725,12 +722,10 @@ public class ForResourceTest extends RuntimeTest {
                   name     = 'name-${index}'
                 }
                 """);
-        var map = new LinkedHashMap<String, ResourceValue>();
-        var schemaValue = this.interpreter.getSchema("Bucket");
-        map.put("photos[1]", resourceValue("photos[1]", new Environment<>(Map.of("name", "name-1")), schemaValue));
-        map.put("photos[2]", resourceValue("photos[2]", new Environment<>(Map.of("name", "name-2")), schemaValue));
-        map.put("photos[3]", resourceValue("photos[3]", new Environment<>(Map.of("name", "name-3")), schemaValue));
-        assertEquals(map, interpreter.getInstances());
+        var instances = interpreter.getInstances();
+        assertEquals("name-1", instances.get("photos[1]").get("name"));
+        assertEquals("name-2", instances.get("photos[2]").get("name"));
+        assertEquals("name-3", instances.get("photos[3]").get("name"));
     }
 
     @Test
@@ -746,17 +741,15 @@ public class ForResourceTest extends RuntimeTest {
                 }
                 """);
 
-        var map = new HashMap<String, ResourceValue>();
-        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
-        map.put("photos[\"hello\"]", resourceValue("photos[\"hello\"]", new Environment<>(Map.of("name", "name-hello")), schemaValue));
-        map.put("photos[\"world\"]", resourceValue("photos[\"world\"]", new Environment<>(Map.of("name", "name-world")), schemaValue));
-        assertEquals(map, interpreter.getInstances());
+        var instances = interpreter.getInstances();
+        assertEquals("name-hello", instances.get("photos[\"hello\"]").get("name"));
+        assertEquals("name-world", instances.get("photos[\"world\"]").get("name"));
     }
 
     @Test
     @DisplayName("Create multiple resources in a loop by using numeric index")
     void testMultipleResourcesAreAccessedUsingIndexSyntaxNumbers() {
-        var res = eval("""
+        eval("""
                 schema vm {
                    string name
                    int id
