@@ -788,7 +788,7 @@ public final class Interpreter extends StackVisitor<Object> {
      */
     private void notifyDependentResources(ResourceStatement resource) {
         if (resource.isEvaluated()) {
-            deferredObservable.notifyObservers(this, resource.getValue().name());
+            deferredObservable.notifyObservers(this, resource.getValue().getPath().toSegmentName());
         }
     }
 

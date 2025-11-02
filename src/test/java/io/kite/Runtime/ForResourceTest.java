@@ -196,8 +196,11 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm vpc  { name = 'vpc-$i' }
                   }
                 """);
-        assertEquals("vpc-0", interpreter.getInstance("cidr[0]").get("name"));
-        assertEquals("vpc-1", interpreter.getInstance("cidr[1]").get("name"));
+        ResourceValue instance = interpreter.getInstance("cidr[0]");
+        assertEquals("vpc-0", instance.get("name"));
+
+        ResourceValue instance1 = interpreter.getInstance("cidr[1]");
+        assertEquals("vpc-1", instance1.get("name"));
     }
 
     @Test
