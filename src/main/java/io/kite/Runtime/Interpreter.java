@@ -513,6 +513,7 @@ public final class Interpreter extends StackVisitor<Object> {
                         yield dependency.value();
                     }
                 }
+                case Deferred deferred -> visitDeferredMember(expression, deferred);
                 case null, default ->
                         throw new RuntimeError("Cannot index into type: " + (object != null ? object.getClass().getSimpleName() : "null"));
             };

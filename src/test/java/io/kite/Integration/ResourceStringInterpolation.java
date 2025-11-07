@@ -15,7 +15,7 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
                         }
                 
                         fun main() {
-                            var x = "Hello ${vm.main.name}! Your number is ${vm.main.size}"
+                            var x = "Hello ${main.name}! Your number is ${main.size}"
                             println(x)
                         }
                         main()
@@ -33,8 +33,8 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
                         size = 1
                     }
                 
-                    var x = vm.main[0].name
-                    var y = vm.main[1].name
+                    var x = main[0].name
+                    var y = main[1].name
                 """);
         Assertions.assertEquals("main-property-0", interpreter.getEnv().get("x"));
         Assertions.assertEquals("main-property-1", interpreter.getEnv().get("y"));

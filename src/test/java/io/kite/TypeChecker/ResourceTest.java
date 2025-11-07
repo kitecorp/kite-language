@@ -29,7 +29,7 @@ public class ResourceTest extends CheckerTest {
 
     /**
      * This checks for the following syntax
-     * vm.main
+     * main
      * All resources are defined in the schema
      * global env{
      * vm   SchemaValue -> variables{ main -> resource vm}
@@ -95,7 +95,7 @@ public class ResourceTest extends CheckerTest {
                 }
                 resource vm second {
                     name     = "second"
-                    maxCount = vm.main.maxCount
+                    maxCount = main.maxCount
                 }
                 """);
         var schema = (SchemaType) checker.getEnv().get("vm");
@@ -127,7 +127,7 @@ public class ResourceTest extends CheckerTest {
                 }
                 resource vm second {
                     name     = "second"
-                    maxCount = vm.main.maxCount
+                    maxCount = main.maxCount
                 }
                 
                 resource vm main {
@@ -199,8 +199,8 @@ public class ResourceTest extends CheckerTest {
                 resource vm main {
                 
                 }
-                var y = vm.main
-                var z = vm.main.x
+                var y = main
+                var z = main.x
                 z
                 """);
         var schema = (SchemaType) checker.getEnv().get("vm");
@@ -208,10 +208,10 @@ public class ResourceTest extends CheckerTest {
         var main = (ResourceType) checker.getEnv().get("main");
         assertSame(ValueType.Number, main.lookup("x"));
 
-        // assert y holds reference to vm.main
+        // assert y holds reference to main
         var y = checker.getEnv().lookup("y");
         assertSame(main, y);
-        // assert y holds reference to vm.main
+        // assert y holds reference to main
         var z = checker.getEnv().lookup("z");
         assertSame(z, schema.getEnvironment().get("x"));
 
@@ -228,7 +228,7 @@ public class ResourceTest extends CheckerTest {
                 resource vm main {
                 
                 }
-                vm.main.y = 3
+                main.y = 3
                 """));
     }
 
@@ -242,7 +242,7 @@ public class ResourceTest extends CheckerTest {
                 resource Vm main {
                 
                 }
-                Vm.main.x = "test"
+                main.x = "test"
                 """)));
     }
 

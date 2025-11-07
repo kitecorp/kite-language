@@ -249,7 +249,7 @@ public class CountTest extends CheckerTest {
 
     @Test
     void decoratorCountReferenceFromAnotherCountedResource() {
-        var res = eval("""
+        eval("""
                 schema vm {
                     string id
                     string refId
@@ -263,7 +263,7 @@ public class CountTest extends CheckerTest {
                 @count(2)
                 resource vm second {
                     id = "second-$count"
-                    refId = vm.first.id
+                    refId = first.id
                 }
                 """);
     }
