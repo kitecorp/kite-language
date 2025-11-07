@@ -323,7 +323,7 @@ public class ProviderTest extends CheckerTest {
                 resource vm first {}
                 
                 @provider("aws")
-                @dependsOn(vm.first)
+                @dependsOn(first)
                 resource vm second {}
                 """);
     }

@@ -17,7 +17,7 @@ public class DependsOnTest extends CheckerTest {
                 
                 resource vm first { }
                 
-                @dependsOn(vm.first)
+                @dependsOn(first)
                 resource vm something {}
                 
                 """);
@@ -29,7 +29,7 @@ public class DependsOnTest extends CheckerTest {
         var res = eval("""
                 schema vm {}
                 
-                @dependsOn(vm.something)
+                @dependsOn(something)
                 resource vm first { }
                 
                 resource vm something {}
@@ -46,7 +46,7 @@ public class DependsOnTest extends CheckerTest {
                 resource vm first { }
                 resource vm second { }
                 
-                @dependsOn([vm.first, vm.second])
+                @dependsOn([first, second])
                 resource vm something {}
                 
                 """);
@@ -58,7 +58,7 @@ public class DependsOnTest extends CheckerTest {
         var res = eval("""
                 schema vm {}
                 
-                @dependsOn([vm.second, vm.third])
+                @dependsOn([second, third])
                 resource vm first { }
                 resource vm second { }
                 
@@ -75,7 +75,7 @@ public class DependsOnTest extends CheckerTest {
                 resource vm first { }
                 resource vm second { }
                 
-                @dependsOn([vm.first, "vm.second"])
+                @dependsOn([first, "second"])
                 resource vm something {}
                 
                 """));
@@ -88,7 +88,7 @@ public class DependsOnTest extends CheckerTest {
                 
                 resource vm first { }
                 
-                @dependsOn("vm.first")
+                @dependsOn("first")
                 resource vm something {}
                 
                 """)
@@ -130,7 +130,7 @@ public class DependsOnTest extends CheckerTest {
                 component app {
                     resource vm first { }
                 
-                    @dependsOn(vm.first)
+                    @dependsOn(first)
                     resource vm something {}
                 }
                 """);
@@ -142,7 +142,7 @@ public class DependsOnTest extends CheckerTest {
                 schema vm {}
                 
                 component app {
-                    @dependsOn(vm.something)
+                    @dependsOn(something)
                     resource vm first { }
                 
                     resource vm something {}
@@ -159,7 +159,7 @@ public class DependsOnTest extends CheckerTest {
                     resource vm first { }
                     resource vm second { }
                 
-                    @dependsOn([vm.first, vm.second])
+                    @dependsOn([first, second])
                     resource vm something {}
                 }
                 """);
@@ -171,7 +171,7 @@ public class DependsOnTest extends CheckerTest {
                 schema vm {}
                 
                 component app {
-                    @dependsOn([vm.second, vm.third])
+                    @dependsOn([second, third])
                     resource vm first { }
                 
                     resource vm second { }
@@ -189,7 +189,7 @@ public class DependsOnTest extends CheckerTest {
                     resource vm first { }
                     resource vm second { }
                 
-                    @dependsOn([vm.first, "vm.second"])
+                    @dependsOn([first, "second"])
                     resource vm something {}
                 }
                 """));
@@ -203,7 +203,7 @@ public class DependsOnTest extends CheckerTest {
                 component app {
                     resource vm first { }
                 
-                    @dependsOn("vm.first")
+                    @dependsOn("first")
                     resource vm something {}
                 }
                 """));
@@ -326,7 +326,7 @@ public class DependsOnTest extends CheckerTest {
                     resource vm server {}
                 }
                 
-                @dependsOn(vm.database)
+                @dependsOn(database)
                 component app prodApp {}
                 """);
     }
@@ -343,7 +343,7 @@ public class DependsOnTest extends CheckerTest {
                     resource vm server {}
                 }
                 
-                @dependsOn([vm.database, vm.cache])
+                @dependsOn([database, cache])
                 component app prodApp {}
                 """);
     }
@@ -355,7 +355,7 @@ public class DependsOnTest extends CheckerTest {
                 
                 resource vm database {}
                 
-                @dependsOn(vm.database)
+                @dependsOn(database)
                 component app {
                     resource vm server {}
                 }
