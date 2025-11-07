@@ -44,13 +44,13 @@ public class CountTest extends CheckerTest {
                 
                 @count(2)
                 resource vm main {
-                    name = vm.something.name
+                    name = something.name
                 }
                 """);
     }
 
     @Test
-    @Description("! we don't actually check vm.something[count]. We just say")
+    @Description("! we don't actually check something[count]. We just say")
     void decoratorMultipleResourcesNumber() {
         var res = eval("""
                 schema vm { number name; }
@@ -61,7 +61,7 @@ public class CountTest extends CheckerTest {
                 
                 @count(2)
                 resource vm main {
-                    name = vm.something.name
+                    name = something.name
                 }
                 """);
     }
