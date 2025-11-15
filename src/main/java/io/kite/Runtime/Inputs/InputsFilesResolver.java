@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 @Log4j2
 public class InputsFilesResolver extends InputResolver {
-    static final String INPUTS_DEFAULTS_KITE = "inputs.default.ki";
-    static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.ki";
+    static final String INPUTS_DEFAULTS_KITE = "inputs.default.kite";
+    static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.kite";
     private final Map<String, String> inputs;
     private boolean wasRead = false;
 
