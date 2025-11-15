@@ -9,18 +9,18 @@ to fully-qualified indexed names.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         USER CODE (Source .ki file)                      │
+│                         USER CODE (Source .kite file)                   │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
+│                                                                         │
 │  for i in 0..2 {                                                        │
-│      resource vm vpc {                                                   │
+│      resource vm vpc {                                                  │
 │          name = 'vpc-$i'                                                │
-│      }                                                                   │
-│      resource vm cidr {                                                  │
-│          name = vpc.name    ← User writes simple "vpc"                 │
-│      }                                                                   │
-│  }                                                                       │
-│                                                                          │
+│      }                                                                  │
+│      resource vm cidr {                                                 │
+│          name = vpc.name    ← User writes simple "vpc"                  │
+│      }                                                                  │
+│  }                                                                      │
+│                                                                         │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    │
                          Parse & Interpret

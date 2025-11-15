@@ -14,7 +14,7 @@ public class FileHelpers {
     public static final int LAST_MODIFIED_IN_MINUTES = 50000;
 
     public static File[] loadFiles() {
-        return loadFiles("glob:**.ki");
+        return loadFiles("glob:**.kite");
     }
 
     public static File[] loadFiles(String extensions)  {
