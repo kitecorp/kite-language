@@ -359,7 +359,7 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void schemaCloudStringsVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    @annotation(["test"]) Vm x =1
                 }
@@ -376,7 +376,7 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void schemaObjectVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    @annotation({env="test"}) Vm x =1
                 }
@@ -392,7 +392,7 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void schemaCloudNumbersVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    @annotation([1,2,3]) Vm x =1
                 }
@@ -409,7 +409,7 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void schemaCloudArrayVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    @annotation([importable]) Vm x =1
                 }
@@ -426,7 +426,7 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void schemaCloudVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    @annotation Vm x =1
                 }
@@ -441,7 +441,7 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void schemaCloudWithArgsVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    @annotation(importable) Vm x =1
                 }
