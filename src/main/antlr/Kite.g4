@@ -169,12 +169,12 @@ decoratorList
     ;
 
 decorator
-    : '@' identifier ('(' decoratorArgs ')')?
+    : '@' identifier ('(' NL* decoratorArgs NL* ')')?
     ;
 
 decoratorArgs
-    : decoratorArg (',' decoratorArg)*
-    | namedArg (',' namedArg)*
+    : decoratorArg (NL* ',' NL* decoratorArg)* (NL* ',')? NL*
+    | namedArg (NL* ',' NL* namedArg)* (NL* ',')? NL*
     ;
 
 namedArg

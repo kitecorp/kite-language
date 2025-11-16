@@ -89,7 +89,22 @@ public class KiteCompiler {
             originalMsg.contains("expecting ']'")) {
             return "missing ']' to close array";
         }
+// Missing ']' in decorator arguments
+        if (rules.contains("decoratorArgs") &&
+            (token.getType() == KiteLexer.IDENTIFIER ||
+             token.getType() == KiteLexer.LBRACE) &&
+            originalMsg.contains("expecting") &&
+            originalMsg.contains("']'")) {
+            return "missing ']' to close decorator array argument";
+        }
 
+        // Missing ')' in decorator arguments
+        if (rules.contains("decorator") &&
+            token.getType() == KiteLexer.IDENTIFIER &&
+            originalMsg.contains("expecting") &&
+            originalMsg.contains("')'")) {
+            return "missing ')' to close decorator arguments";
+        }
         // Default: use ANTLR's message (good enough for edge cases)
         return originalMsg;
     }
