@@ -1,8 +1,8 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,7 +37,7 @@ public final class WhileStatement extends Statement {
         return new WhileStatement(test, consequent);
     }
 
-    public static Statement of(Expression test, Statement consequent) {
+    public static WhileStatement of(Expression test, Statement consequent) {
         return new WhileStatement(test,consequent);
     }
 

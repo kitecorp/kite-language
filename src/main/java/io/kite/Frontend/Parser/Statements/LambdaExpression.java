@@ -1,10 +1,10 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.ParameterIdentifier;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -72,7 +72,7 @@ public non-sealed class LambdaExpression extends Expression {
         return new LambdaExpression(params, body);
     }
 
-    public static Expression lambda(List<ParameterIdentifier> params, Statement body, TypeIdentifier returnType) {
+    public static LambdaExpression lambda(List<ParameterIdentifier> params, Statement body, TypeIdentifier returnType) {
         return new LambdaExpression(params, body, returnType);
     }
 

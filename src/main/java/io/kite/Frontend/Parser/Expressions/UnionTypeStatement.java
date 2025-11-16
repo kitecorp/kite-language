@@ -51,7 +51,7 @@ public final class UnionTypeStatement extends Statement {
         return new UnionTypeStatement(name, block);
     }
 
-    public static Statement union(Identifier name, Set<Expression> block) {
+    public static UnionTypeStatement union(Identifier name, Set<Expression> block) {
         return new UnionTypeStatement(name, block);
     }
 

@@ -1,9 +1,9 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +26,7 @@ public final class ReturnStatement extends Statement {
     }
 
 
-    public static Statement funReturn(Expression body) {
+    public static ReturnStatement funReturn(Expression body) {
         return new ReturnStatement(body);
     }
 

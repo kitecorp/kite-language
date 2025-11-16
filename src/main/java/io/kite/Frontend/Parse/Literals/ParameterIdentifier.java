@@ -51,6 +51,10 @@ public final class ParameterIdentifier extends Identifier {
         return new ParameterIdentifier(SymbolIdentifier.id(name), type);
     }
 
+    public static ParameterIdentifier param(Identifier name, TypeIdentifier type) {
+        return new ParameterIdentifier(SymbolIdentifier.id(name.string()), type);
+    }
+
     @Override
     public String string() {
         if (type == null) {

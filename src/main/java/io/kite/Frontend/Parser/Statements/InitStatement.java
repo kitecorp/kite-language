@@ -1,8 +1,8 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.ParameterIdentifier;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +39,7 @@ public final class InitStatement extends Statement {
         return new InitStatement(params, body);
     }
 
-    public static Statement of(List<ParameterIdentifier> params, Statement body) {
+    public static InitStatement of(List<ParameterIdentifier> params, Statement body) {
         return new InitStatement(params, body);
     }
 

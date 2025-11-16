@@ -1,0 +1,478 @@
+grammar Kite;
+
+// ============================================================================
+// PARSER RULES (lowercase)
+// ============================================================================
+
+// Entry point
+program
+    : statementList EOF
+    ;
+
+statementList
+    : nonEmptyStatement (NL+ nonEmptyStatement)* NL*
+    ;
+
+nonEmptyStatement
+    : declaration
+    | ifStatement
+    | initStatement
+    | returnStatement
+    | iterationStatement
+    | expressionStatement
+    ;
+statement
+    : nonEmptyStatement
+    | emptyStatement
+    ;
+
+emptyStatement
+    : NL
+    ;
+
+// Declarations
+declaration
+    : decoratorList? functionDeclaration
+    | decoratorList? typeDeclaration
+    | decoratorList? schemaDeclaration
+    | decoratorList? resourceDeclaration
+    | decoratorList? componentDeclaration
+    | decoratorList? inputDeclaration
+    | decoratorList? outputDeclaration
+    | decoratorList? varDeclaration
+    ;
+
+functionDeclaration
+    : FUN identifier '(' parameterList? ')' typeIdentifier? blockExpression
+    ;
+
+typeDeclaration
+    : TYPE identifier '=' typeParams
+    ;
+
+typeParams
+    : unionTypeParam ('|' unionTypeParam)*
+    ;
+
+unionTypeParam
+    : literal
+    | objectExpression
+    | arrayExpression
+    | identifier
+    ;
+
+schemaDeclaration
+    : SCHEMA identifier '{' schemaProperty* '}'
+    ;
+
+schemaProperty
+    : decoratorList? typeIdentifier identifier propertyInitializer?
+    ;
+
+propertyInitializer
+    : '=' expression
+    ;
+
+resourceDeclaration
+    : RESOURCE typeIdentifier resourceName blockExpression
+    ;
+
+resourceName
+    : identifier
+    | callMemberExpression
+    | STRING
+    ;
+
+componentDeclaration
+    : COMPONENT componentType identifier? blockExpression
+    ;
+
+componentType
+    : typeIdentifier
+    ;
+
+inputDeclaration
+    : INPUT typeIdentifier identifier ('=' expression)?
+    ;
+
+outputDeclaration
+    : OUTPUT typeIdentifier identifier '=' expression
+    ;
+
+varDeclaration
+    : VAR varDeclarationList
+    ;
+
+varDeclarationList
+    : varDeclarator (',' varDeclarator)*
+    ;
+
+varDeclarator
+    : typeIdentifier? identifier varInitializer?
+    ;
+
+varInitializer
+    : ('=' | '+=') expression
+    ;
+
+// Statements
+ifStatement
+    : IF '('? expression ')'? statement elseStatement?
+    ;
+
+elseStatement
+    : ELSE statement
+    ;
+
+iterationStatement
+    : whileStatement
+    | forStatement
+    ;
+
+whileStatement
+    : WHILE '(' expression ')' NL? statement
+    ;
+
+forStatement
+    : FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) (':' | ']' | ')')? NL* forBody
+    ;
+
+forBody
+    : resourceDeclaration
+    | ifStatement
+    | expressionStatement
+    | emptyStatement
+    ;
+
+rangeExpression
+    : NUMBER '..' NUMBER
+    ;
+
+initStatement
+    : INIT '(' parameterList? ')' blockExpression
+    ;
+
+returnStatement
+    : RETURN expression?
+    ;
+
+expressionStatement
+    : expression
+    ;
+
+// Decorators/Annotations
+decoratorList
+    : decorator+
+    ;
+
+decorator
+    : '@' identifier ('(' decoratorArgs ')')?
+    ;
+
+decoratorArgs
+    : decoratorArg (',' decoratorArg)*
+    | namedArg (',' namedArg)*
+    ;
+
+namedArg
+    : identifier '=' expression
+    ;
+
+decoratorArg
+    : arrayExpression
+    | objectExpression
+    | callMemberExpression
+    | identifier
+    | literal
+    | '-' NUMBER
+    ;
+
+// Expressions (precedence from lowest to highest)
+expression
+    : objectExpression
+    | arrayExpression
+    | assignmentExpression
+    ;
+
+assignmentExpression
+    : orExpression (('=' | '+=') assignmentExpression)?
+    ;
+
+orExpression
+    : andExpression ('||' andExpression)*
+    ;
+
+andExpression
+    : equalityExpression ('&&' equalityExpression)*
+    ;
+
+equalityExpression
+    : relationalExpression (('==' | '!=') relationalExpression)*
+    ;
+
+relationalExpression
+    : additiveExpression (('<' | '>' | '<=' | '>=') additiveExpression)*
+    ;
+
+additiveExpression
+    : multiplicativeExpression (('+' | '-') multiplicativeExpression)*
+    ;
+
+multiplicativeExpression
+    : unaryExpression (('*' | '/' | '%') unaryExpression)*
+    ;
+
+unaryExpression
+    : ('-' | '++' | '--' | '!') unaryExpression
+    | leftHandSideExpression
+    ;
+
+leftHandSideExpression
+    : callMemberExpression
+    ;
+
+callMemberExpression
+    : primaryExpression (callOrMemberAccess)*
+    ;
+
+callOrMemberAccess
+    : '(' argumentList? ')'
+    | '.' identifier
+    | '[' expression ']'
+    ;
+
+primaryExpression
+    : '(' expression ')'
+    | lambdaExpression
+    | literal
+    | identifier
+    | thisExpression
+    ;
+
+thisExpression
+    : THIS
+    ;
+
+lambdaExpression
+    : '(' parameterList? ')' typeIdentifier? '->' lambdaBody
+    ;
+
+lambdaBody
+    : blockExpression
+    | expression
+    ;
+
+blockExpression
+    : '{' NL* statementList? NL* '}'
+    ;
+
+objectExpression
+    : objectDeclaration
+    | blockExpression
+    ;
+
+objectDeclaration
+    : OBJECT '(' objectPropertyList? ')'
+    | '{' objectPropertyList? '}'
+    ;
+
+objectPropertyList
+    : objectProperty (',' objectProperty)*
+    ;
+
+objectProperty
+    : objectKey objectInitializer?
+    ;
+
+objectKey
+    : STRING
+    | IDENTIFIER
+    ;
+
+objectInitializer
+    : ':' expression
+    ;
+
+arrayExpression
+    : '[' forStatement ']'
+    | '[' arrayItems? ']'
+    ;
+
+arrayItems
+    : arrayItem (',' arrayItem)*
+    ;
+
+arrayItem
+    : callMemberExpression
+    | identifier
+    | objectExpression
+    | literal
+    ;
+
+// Type System
+typeIdentifier
+    : (complexTypeIdentifier | OBJECT | ANY) ('[' NUMBER? ']')*
+    ;
+
+complexTypeIdentifier
+    : IDENTIFIER ('.' IDENTIFIER)*
+    ;
+
+// Parameters
+parameterList
+    : parameter (',' parameter)*
+    ;
+
+parameter
+    : typeIdentifier? identifier
+    ;
+
+// Arguments
+argumentList
+    : expression (',' expression)*
+    ;
+
+// Identifiers
+identifier
+    : STRING
+    | IDENTIFIER
+    ;
+
+// Literals
+literal
+    : NUMBER
+    | STRING
+    | TRUE
+    | FALSE
+    | NULL
+    ;
+
+// ============================================================================
+// LEXER RULES (uppercase)
+// ============================================================================
+
+// Keywords - IaC specific
+RESOURCE    : 'resource' ;
+COMPONENT   : 'component' ;
+SCHEMA      : 'schema' ;
+INPUT       : 'input' ;
+OUTPUT      : 'output' ;
+
+// Keywords - Control flow
+IF          : 'if' ;
+ELSE        : 'else' ;
+WHILE       : 'while' ;
+FOR         : 'for' ;
+IN          : 'in' ;
+RETURN      : 'return' ;
+
+// Keywords - Declarations
+FUN         : 'fun' ;
+VAR         : 'var' ;
+TYPE        : 'type' ;
+INIT        : 'init' ;
+THIS        : 'this' ;
+
+// Keywords - Types
+OBJECT      : 'object' ;
+ANY         : 'any' ;
+
+// Literals
+TRUE        : 'true' ;
+FALSE       : 'false' ;
+NULL        : 'null' ;
+
+// Operators - Arithmetic
+PLUS        : '+' ;
+MINUS       : '-' ;
+MULTIPLY    : '*' ;
+DIVIDE      : '/' ;
+MODULO      : '%' ;
+INCREMENT   : '++' ;
+DECREMENT   : '--' ;
+
+// Operators - Relational
+LT          : '<' ;
+GT          : '>' ;
+LE          : '<=' ;
+GE          : '>=' ;
+EQ          : '==' ;
+NE          : '!=' ;
+
+// Operators - Logical
+AND         : '&&' ;
+OR          : '||' ;
+NOT         : '!' ;
+
+// Operators - Assignment
+ASSIGN      : '=' ;
+PLUS_ASSIGN : '+=' ;
+MINUS_ASSIGN: '-=' ;
+MUL_ASSIGN  : '*=' ;
+DIV_ASSIGN  : '/=' ;
+
+// Other operators
+ARROW       : '->' ;
+RANGE       : '..' ;
+DOT         : '.' ;
+AT          : '@' ;
+UNION       : '|' ;
+
+// Delimiters
+LPAREN      : '(' ;
+RPAREN      : ')' ;
+LBRACE      : '{' ;
+RBRACE      : '}' ;
+LBRACK      : '[' ;
+RBRACK      : ']' ;
+COMMA       : ',' ;
+COLON       : ':' ;
+SEMICOLON   : ';' ;
+
+// Literals
+NUMBER
+    : [0-9]+ ('.' [0-9]+)?
+    ;
+
+STRING
+    : '"' DoubleStringCharacter* '"'
+    | '\'' SingleStringCharacter* '\''
+    ;
+
+fragment
+DoubleStringCharacter
+    : ~["\\\r\n]
+    | EscapeSequence
+    ;
+
+fragment
+SingleStringCharacter
+    : ~['\\\r\n]
+    | EscapeSequence
+    ;
+
+fragment
+EscapeSequence
+    : '\\' .
+    ;
+
+IDENTIFIER
+    : [a-zA-Z_][a-zA-Z0-9_]*
+    ;
+
+// Whitespace and Comments
+WS
+    : [ \t\r]+ -> skip
+    ;
+
+NL
+    : '\n'
+    ;
+
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip
+    ;
+
+BLOCK_COMMENT
+    : '/*' .*? '*/' -> skip
+    ;

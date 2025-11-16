@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id('org.gradlex.extra-java-module-info') version "1.12"
+    id 'antlr'
 }
 
 group 'io.kite'
@@ -14,6 +15,8 @@ def lombok = '1.18.42'
 
 dependencies {
     implementation project(':api')
+    antlr "org.antlr:antlr4:4.13.1"
+    implementation "org.antlr:antlr4-runtime:4.13.1"
 
     implementation 'org.apache.logging.log4j:log4j-api:2.24.2'
     implementation 'org.apache.logging.log4j:log4j-core:2.24.2'
@@ -48,7 +51,22 @@ java {
         languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-Xexact-output-dir", "-package", "io.kite.Frontend.Parser.generated"]
+    outputDirectory = file("${buildDir}/generated-src/antlr/main/io/kite/Frontend/Parser/generated")
 
+    doFirst {
+        outputDirectory.mkdirs()
+    }
+}
+sourceSets {
+    main {
+        java {
+            srcDirs += ["${buildDir}/generated-src/antlr/main"]
+        }
+    }
+}
 configurations {
     testClasses {
         canBeResolved = true  // ✅ this is key
