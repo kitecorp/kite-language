@@ -3,12 +3,10 @@ package io.kite.Runtime;
 import io.kite.ContextStack;
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
-import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parse.Literals.ObjectLiteral.ObjectLiteralPair;
 import io.kite.Frontend.Parser.Expressions.*;
-import io.kite.Frontend.Parser.Parser;
-import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Decorators.*;
@@ -58,7 +56,7 @@ public final class Interpreter extends StackVisitor<Object> {
     private final Map<String, DecoratorInterpreter> decorators;
     @Getter
     private final List<RuntimeException> errors;
-    Parser parser = new Parser();
+    private KiteCompiler parser = new KiteCompiler();
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Setter
@@ -237,7 +235,7 @@ public final class Interpreter extends StackVisitor<Object> {
             var values = new ArrayList<String>(expression.getInterpolationVars().size());
             for (String interpolationVar : expression.getInterpolationVars()) {
                 if (StringUtils.containsAny(".", "[")) { // complex interpolation ${vm.resourceName.property}
-                    var list = parser.produceStatements(new Tokenizer().tokenize(interpolationVar));
+                    var list = parser.parse(interpolationVar).getBody();
                     for (Statement statement : list) {
                         values.add(visit(statement).toString());
                     }
@@ -1175,9 +1173,6 @@ public final class Interpreter extends StackVisitor<Object> {
         try {
             Object lastEval = new NullValue();
 
-            if (ParserErrors.hadErrors()) {
-                return null;
-            }
             for (Statement i : program.getBody()) {
                 lastEval = executeBlock(i, env);
             }

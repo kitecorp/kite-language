@@ -1,7 +1,6 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Runtime.Values.ComponentValue;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.RuntimeError;
@@ -28,13 +27,13 @@ public class ComponentTest extends RuntimeTest {
 
     @Test
     void duplicateComponentDefinitionThrowsError() {
-        eval("""
+        var err = assertThrows(RuntimeException.class, () -> eval("""
                 component server { }
                 component server {
                 
                 }
-                """);
-        assertFalse(ParserErrors.getErrors().isEmpty());
+                """));
+        assertEquals("Duplicate component definition: server", err.getMessage());
     }
 
     /**

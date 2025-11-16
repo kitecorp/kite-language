@@ -1,15 +1,11 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Parser.ParserErrors;
-import io.kite.Frontend.Parser.Parser;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
 @Disabled
@@ -18,16 +14,14 @@ public class ValDeclarationTest extends RuntimeTest {
 
     @Test
     void valNull() {
-        var res = eval("val x");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
-        Assertions.assertEquals(Parser.VAL_NOT_INITIALISED.formatted("x"), ParserErrors.getErrors().getFirst().getMessage());
+        var err = assertThrows(RuntimeException.class, () -> eval("val x"));
+        assertEquals("val declaration must have an initial value", err.getMessage());
     }
 
     @Test
     void varInt() {
         var res = eval("val x = 2");
         assertEquals(2, res);
-        log.info(res);
     }
 
 
@@ -35,14 +29,12 @@ public class ValDeclarationTest extends RuntimeTest {
     void varDecimal() {
         var res = (Double) eval("val x = 2.1");
         assertEquals(2.1, res);
-        log.info(res);
     }
 
     @Test
     void varBool() {
         var res = (Boolean) eval("val x = true");
         assertTrue(res);
-        log.info(res);
     }
 
 
@@ -50,28 +42,24 @@ public class ValDeclarationTest extends RuntimeTest {
     void varExpressionPlus() {
         var res = eval("val x = 2+2");
         assertEquals(4, res);
-        log.info(res);
     }
 
     @Test
     void varExpressionMinus() {
         var res = eval("val x = 2-2");
         assertEquals(0, res);
-        log.info(res);
     }
 
     @Test
     void varExpressionMultiplication() {
         var res = eval("val x = 2*2");
         assertEquals(4, res);
-        log.info(res);
     }
 
     @Test
     void varExpressionDivision() {
         var res = eval("val x = 2/2");
         assertEquals(1, res);
-        log.info(res);
     }
 
     @Test
@@ -79,7 +67,6 @@ public class ValDeclarationTest extends RuntimeTest {
         var res = eval("val x = 2==2");
         var expected = true;
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -87,7 +74,6 @@ public class ValDeclarationTest extends RuntimeTest {
         var res = eval("val x = 2==1");
         var expected = false;
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -99,7 +85,6 @@ public class ValDeclarationTest extends RuntimeTest {
                 }
                 """);
 
-        log.info(res);
         assertEquals(1, res);
     }
 
