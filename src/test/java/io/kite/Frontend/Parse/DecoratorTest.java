@@ -4,7 +4,6 @@ import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parser.Expressions.ArrayExpression;
 import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Frontend.Parser.Factory;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
@@ -32,11 +31,11 @@ import static io.kite.Frontend.Parser.Expressions.OutputDeclaration.output;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
-import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Annotations can be attached to:
@@ -123,8 +122,6 @@ public class DecoratorTest extends ParserTest {
         var version = annotation("version");
         var annotation1 = annotation("annotation");
         var program = Factory.program(
-                expressionStatement(annotation1),
-                expressionStatement(version),
                 schema(
                         id("Backend"),
                         List.of(schemaProperty(type("string"), "name", 0)),
@@ -436,13 +433,12 @@ public class DecoratorTest extends ParserTest {
 
     @Test
     void decoratorMissingClosingParanthesis() {
-        parse("""
+        var err = assertThrows(ValidationException.class, () -> parse("""
                 schema square { 
                    @annotation(importable Vm x =1
                 }
-                """);
-        assertTrue(ParserErrors.hadErrors());
-        Assertions.assertEquals("Expected token ) but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
+                """));
+        Assertions.assertEquals("Parse error at line 2:26 - missing ')' to close decorator arguments", err.getMessage());
     }
 
     @Test
@@ -474,7 +470,7 @@ public class DecoratorTest extends ParserTest {
                    @annotation([importable] Vm x =1
                 }
                 """));
-        assertEquals("Parse error at line 2:28 - missing ')' at 'Vm'", err.getMessage());
+        assertEquals("Parse error at line 2:28 - missing ')' to close decorator arguments", err.getMessage());
     }
 
     @Test
@@ -484,7 +480,7 @@ public class DecoratorTest extends ParserTest {
                    @annotation(importable] Vm x =1
                 }
                 """));
-        assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {'.', '(', ')', '[', ','}", err.getMessage());
+        assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {')', '\\n'}", err.getMessage());
     }
 
 
