@@ -44,17 +44,17 @@ public class ValidateDecorator extends DecoratorChecker {
         var namedArgs = declaration.getNamedArgs();
 
         if (namedArgs == null || namedArgs.isEmpty()) {
-            throw new TypeError("Missing %s arguments!".formatted(validateFormatting()));
+            throw new TypeError("%s is missing arguments!".formatted(printer.visit(declaration)));
         }
         Expression regex = namedArgs.get("regex");
         Expression preset = namedArgs.get("preset");
         if (regex == null && preset == null) {
-            throw new TypeError("regex argument or preset argument is required for %s".formatted(validateFormatting()));
+            throw new TypeError("regex argument or preset argument is required for %s".formatted(printer.visit(declaration)));
         } else if (!(regex instanceof StringLiteral) && !(preset instanceof StringLiteral)) {
-            throw new TypeError("regex argument must be a string literal for %s".formatted(validateFormatting()));
+            throw new TypeError("regex argument must be a string literal for %s".formatted(printer.visit(declaration)));
         }
         if (!isAllowedOn(declaration.getTarget().targetType())) {
-            throw new TypeError("%s is not allowed on %s".formatted(validateFormatting(), declaration.getTarget().targetType().getValue()));
+            throw new TypeError("%s is not allowed on %s".formatted(printer.visit(declaration), declaration.getTarget().targetType().getValue()));
         }
         return null;
     }
@@ -67,12 +67,6 @@ public class ValidateDecorator extends DecoratorChecker {
                || declaration.getArgs() != null && !declaration.getArgs().isEmpty()
                || declaration.getNamedArgs() != null && declaration.getNamedArgs().isEmpty();
     }
-
-    private String validateFormatting() {
-        return Ansi.ansi().fgYellow().a("@").a(getName()).reset().toString();
-    }
-
-
 //    @Override
 //    public boolean validateAfterInit(AnnotationDeclaration declaration) {
 //        switch (declaration.getTarget()){
