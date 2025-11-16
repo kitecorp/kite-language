@@ -402,8 +402,23 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     }
 
     @Override
-    public Expression visitArrayItem(KiteParser.ArrayItemContext ctx) {
-        return (Expression) visit(ctx.getChild(0)); // Delegates to appropriate type
+    public Expression visitArrayItem(ArrayItemContext ctx) {
+        if (ctx.typeKeyword() != null) {
+            return (Expression) visit(ctx.typeKeyword());
+        } else {
+            return (Expression) visit(ctx.getChild(0));
+        }
+    }
+
+    // Add this new visitor if not already present
+    @Override
+    public Expression visitTypeKeyword(TypeKeywordContext ctx) {
+        if (ctx.OBJECT() != null) {
+            return TypeIdentifier.type("object");
+        } else if (ctx.ANY() != null) {
+            return TypeIdentifier.type("any");
+        }
+        return null;
     }
 
     @Override

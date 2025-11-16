@@ -1,12 +1,14 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
+import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TypeChecker Var")
 public class UnionTypeErrorsTest extends CheckerTest {
@@ -135,5 +137,119 @@ public class UnionTypeErrorsTest extends CheckerTest {
                 var alias x = []
                 """));
     }
+
+
+    @Test
+    void typeRepeatingIntError() {
+        var err = assertThrows(TypeError.class, () -> eval("type custom = 1 | 1"));
+        assertEquals("", err.getMessage());
+    }
+
+    @Test
+    void typeRepeatingDecimalError() {
+        parse("type custom = 1.2 | 1.2");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingStringError() {
+        parse("type custom = 'hi' | \"hi\" ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingBooleanError() {
+        parse("type custom = true | true ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingNullError() {
+        parse("type custom = null | null ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingNumberError() {
+        parse("type custom = number | number ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+
+    @Test
+    void typeRepeatingStringKeywordError() {
+        parse("type custom = string | string ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingBooleanKeywordError() {
+        parse("type custom = boolean | boolean ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingObjectKeywordError() {
+        parse("type custom = object | object ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingEmptyObjectError() {
+        parse("type custom = {} | {} ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingObjectError() {
+        parse("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' } ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayIntsError() {
+        parse("type custom = [1,2,3] | [1,2,3] ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayDecimalsError() {
+        parse("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3] ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+
+    @Test
+    void typeRepeatingArrayBooleanError() {
+        parse("type custom = [true] | [true] ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayStringsError() {
+        parse("type custom = ['hello'] | ['hello'] ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayObjectEmptyError() {
+        parse("type custom = [{}] | [{}] ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
+    @Test
+    void typeRepeatingArrayObjectEmptyKeywordError() {
+        var err = assertThrows(ValidationException.class, () ->
+                parse("type custom = [{}] | [object]")
+        );
+        assertEquals("Missing '=' after: type custom = [{}] | [object]", err.getMessage());
+    }
+
+    @Test
+    void typeRepeatingArrayObjectKeywordError() {
+        parse("type custom = [object] | [object] ");
+        assertFalse(ParserErrors.getErrors().isEmpty());
+    }
+
 
 }
