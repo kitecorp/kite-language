@@ -36,34 +36,35 @@ public final class IfStatement extends Statement {
         return alternate != null;
     }
 
-    public static Statement If(Expression test, Expression consequent, Expression alternate) {
+    public static Statement ifStatement(Expression test, Expression consequent, Expression alternate) {
         return new IfStatement(test, consequent, alternate);
     }
 
-    public static IfStatement If(Expression test, Statement consequent, Statement alternate) {
+    public static IfStatement ifStatement(Expression test, Statement consequent, Statement alternate) {
         return new IfStatement(test,consequent, alternate);
     }
-    public static Statement If(Expression test, Statement consequent) {
-        return IfStatement.If(test,consequent, null);
+
+    public static Statement ifStatement(Expression test, Statement consequent) {
+        return IfStatement.ifStatement(test, consequent, null);
     }
 
-    public static Statement If(Expression test, int value) {
+    public static Statement ifStatement(Expression test, int value) {
         return new IfStatement(test, NumberLiteral.of(value), null);
     }
 
-    public static Statement If(Expression test, double value) {
+    public static Statement ifStatement(Expression test, double value) {
         return new IfStatement(test, NumberLiteral.of(value), null);
     }
 
-    public static Statement If() {
+    public static Statement ifStatement() {
         return new IfStatement();
     }
 
-    public static Statement If(Expression test, float value) {
+    public static Statement ifStatement(Expression test, float value) {
         return new IfStatement(test, NumberLiteral.of(value), null);
     }
 
-    public static Statement If(Expression test, String value) {
+    public static Statement ifStatement(Expression test, String value) {
         return new IfStatement(test, StringLiteral.of(value), null);
     }
 

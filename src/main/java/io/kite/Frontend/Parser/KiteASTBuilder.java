@@ -238,22 +238,28 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     @Override
     public IfStatement visitIfStatement(IfStatementContext ctx) {
         Expression test = (Expression) visit(ctx.expression());
-        Statement consequent = (Statement) visit(ctx.statement());
+        Statement consequent = ExpressionStatement.expressionStatement(
+                (Expression) visit(ctx.blockExpression())
+        );
         Statement alternate = ctx.elseStatement() != null ?
                 (Statement) visit(ctx.elseStatement()) : null;
 
-        return IfStatement.If(test, consequent, alternate);
+        return IfStatement.ifStatement(test, consequent, alternate);
     }
 
     @Override
     public Statement visitElseStatement(ElseStatementContext ctx) {
-        return (Statement) visit(ctx.statement());
+        return ExpressionStatement.expressionStatement(
+                (Expression) visit(ctx.blockExpression())
+        );
     }
 
     @Override
     public WhileStatement visitWhileStatement(WhileStatementContext ctx) {
         Expression test = (Expression) visit(ctx.expression());
-        Statement body = (Statement) visit(ctx.statement());
+        Statement body = ExpressionStatement.expressionStatement(
+                (Expression) visit(ctx.blockExpression())
+        );
 
         return WhileStatement.of(test, body);
     }

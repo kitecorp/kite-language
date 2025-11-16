@@ -4,6 +4,7 @@ import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.BlockExpression;
 import io.kite.Frontend.Parser.Statements.ForStatement;
+import io.kite.Frontend.Parser.Statements.IfStatement;
 import io.kite.Frontend.Parser.Statements.WhileStatement;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Range;
@@ -21,7 +22,6 @@ import static io.kite.Frontend.Parser.Expressions.ResourceStatement.resource;
 import static io.kite.Frontend.Parser.Expressions.VarDeclaration.var;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.kite.Frontend.Parser.Statements.IfStatement.If;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -101,7 +101,7 @@ public class ForLoopTest extends ParserTest {
                                 .item(id("i"))
                                 .range(Range.of(0, 10))
                                 .body(
-                                        If(binary(">", "i", 2),
+                                        IfStatement.ifStatement(binary(">", "i", 2),
                                                 expressionStatement(assign("+=", id("i"), number(1)))
                                         )
                                 )
