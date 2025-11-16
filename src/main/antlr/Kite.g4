@@ -165,7 +165,7 @@ expressionStatement
 
 // Decorators/Annotations
 decoratorList
-    : decorator+
+    : decorator (NL* decorator)*
     ;
 
 decorator

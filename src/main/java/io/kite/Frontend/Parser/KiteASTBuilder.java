@@ -82,10 +82,8 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
     @Override
     public Statement visitDeclaration(DeclarationContext ctx) {
-        // Extract decorators first
         Set<AnnotationDeclaration> annotations = extractDecorators(ctx.decoratorList());
 
-        // Delegate to specific declaration type
         Statement result;
         if (ctx.resourceDeclaration() != null) {
             result = visitResourceDeclaration(ctx.resourceDeclaration());
@@ -102,7 +100,15 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
         } else if (ctx.outputDeclaration() != null) {
             result = visitOutputDeclaration(ctx.outputDeclaration());
         } else if (ctx.varDeclaration() != null) {
-            result = visitVarDeclaration(ctx.varDeclaration());
+            VarStatement varStmt = visitVarDeclaration(ctx.varDeclaration());
+
+            // Attach annotations to each VarDeclaration
+            if (!annotations.isEmpty()) {
+                for (VarDeclaration varDecl : varStmt.getDeclarations()) {
+                    setAnnotations(varDecl, annotations);
+                }
+            }
+            return varStmt;
         } else {
             return null;
         }
