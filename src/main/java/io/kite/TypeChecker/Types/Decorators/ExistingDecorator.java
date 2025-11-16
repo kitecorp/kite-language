@@ -1,6 +1,5 @@
 package io.kite.TypeChecker.Types.Decorators;
 
-import io.kite.Frontend.Parse.Literals.ObjectLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeChecker;
@@ -28,7 +27,7 @@ public class ExistingDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        var value = declaration.getObject();
+        var value = declaration.getValue();
         if (value == null) {
             throwIfInvalidArgs(declaration);
         }
@@ -62,21 +61,27 @@ public class ExistingDecorator extends DecoratorChecker {
 //        private static final Pattern LOG_GROUP_ARN = Pattern.compile(
 //                "^arn:(aws|aws-cn|aws-us-gov):logs:[a-z0-9-]+:(?<account>\\d{12}):log-group:(?<group>[^:*]+)(?::.*)?$"
 //        );
-        for (ObjectLiteral property : value.getProperties()) {
-            switch (property.getKey()) {
-                case StringLiteral literal -> {
-                    if (StringUtils.isBlank(literal.getValue())) {
-                        throwIfInvalidArgs(declaration);
-                    }
-                    var ref = ImportParsers.detect(literal.getValue());
-                    if (ref == null) {
-                        throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
-                    }
-
+        switch (value) {
+            case StringLiteral literal -> {
+                if (StringUtils.isBlank(literal.getValue())) {
+                    throwIfInvalidArgs(declaration);
+                }
+                var ref = ImportParsers.detect(literal.getValue());
+                if (ref == null) {
+                    throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
                 }
 
-                default -> throwInvalidArgument(declaration, value);
             }
+            case String string -> {
+                if (StringUtils.isBlank(string)) {
+                    throwIfInvalidArgs(declaration);
+                }
+                var ref = ImportParsers.detect(string);
+                if (ref == null) {
+                    throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
+                }
+            }
+            default -> throwInvalidArgument(declaration, value);
         }
 
         return null;
@@ -89,8 +94,6 @@ public class ExistingDecorator extends DecoratorChecker {
     private void throwIfInvalidArgs(AnnotationDeclaration declaration) {
         throw new TypeError("%s must have a non-empty string as argument".formatted(printer.visit(declaration)));
     }
-
-    public enum ImportKind {ARN, SERVICE_ID, NAME, URL, TAGS}
 
     public static final class ImportParsers {
         // Common patterns
@@ -153,7 +156,8 @@ public class ExistingDecorator extends DecoratorChecker {
         }
     }
 
+    public enum ImportKind {ARN, SERVICE_ID, NAME, URL, TAGS }
+
     public record ImportRef(ImportKind kind, String service, String value,
-                            String region, String account) {
-    }
+                            String region, String account) {}
 }

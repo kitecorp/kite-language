@@ -3,7 +3,6 @@ package io.kite.TypeChecker.Decorators;
 import io.kite.Base.CheckerTest;
 import io.kite.TypeChecker.TypeError;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -142,14 +141,12 @@ public class ExistingTest extends CheckerTest {
     }
 
     @Test
-    @Disabled
     void existingInValidKeyFormatMinus() {
-        var error = Assertions.assertThrows(TypeError.class, () -> eval("""
+        Assertions.assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
                 @existing({ "env stage": "prod" })
                 resource vm something {}""")
         );
-        Assertions.assertEquals("Invalid key format: `env stage`. Keys must be alphanumeric.", error.getMessage());
     }
 
 }
