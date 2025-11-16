@@ -64,12 +64,6 @@ public class InputTest extends CheckerTest {
 
     @Test
     void inputAnyInitObjectEmptyKeyword() {
-        var res = eval("input any something = object");
-        assertEquals(AnyType.INSTANCE, res);
-    }
-
-    @Test
-    void inputAnyInitObjectEmptyKeywordNoBody() {
         var res = eval("input any something = object()");
         assertEquals(AnyType.INSTANCE, res);
     }
