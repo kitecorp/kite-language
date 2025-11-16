@@ -1,8 +1,6 @@
 package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.errors.ErrorList;
-import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.TypeChecker.TypeError;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -223,17 +221,8 @@ public class ProviderTest extends CheckerTest {
     }
 
     @Test
-    void providerMultipleArguments() {
-        assertThrows(ErrorList.class, () -> eval("""
-                schema vm {}
-                @provider("aws", "azure")
-                resource vm something {}
-                """));
-    }
-
-    @Test
     void providerNull() {
-        assertThrows(ParseError.class, () -> eval("""
+        assertThrows(TypeError.class, () -> eval("""
                 schema vm {}
                 @provider(null)
                 resource vm something {}

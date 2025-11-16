@@ -483,5 +483,13 @@ public class DecoratorTest extends ParserTest {
         assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {'.', ')', '[', ','}", err.getMessage());
     }
 
+    @Test
+    void providerMultipleArguments() {
+        assertThrows(ValidationException.class, () -> eval("""
+                schema vm {}
+                @provider("aws", "azure")
+                resource vm something {}
+                """));
+    }
 
 }
