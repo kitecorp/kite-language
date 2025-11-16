@@ -38,14 +38,14 @@ emptyStatement
 
 // Declarations
 declaration
-    : decoratorList? functionDeclaration
-    | decoratorList? typeDeclaration
-    | decoratorList? schemaDeclaration
-    | decoratorList? resourceDeclaration
-    | decoratorList? componentDeclaration
-    | decoratorList? inputDeclaration
-    | decoratorList? outputDeclaration
-    | decoratorList? varDeclaration
+    : decoratorList? NL* functionDeclaration
+    | decoratorList? NL* typeDeclaration
+    | decoratorList? NL* schemaDeclaration
+    | decoratorList? NL* resourceDeclaration
+    | decoratorList? NL* componentDeclaration
+    | decoratorList? NL* inputDeclaration
+    | decoratorList? NL* outputDeclaration
+    | decoratorList? NL* varDeclaration
     ;
 
 functionDeclaration
