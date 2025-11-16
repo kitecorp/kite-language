@@ -226,8 +226,12 @@ multiplicativeExpression
     ;
 
 unaryExpression
-    : ('-' | '++' | '--' | '!') unaryExpression
-    | leftHandSideExpression
+    : ('-' | '++' | '--' | '!') unaryExpression  // Prefix: --x
+    | postfixExpression
+    ;
+
+postfixExpression
+    : leftHandSideExpression ('++' | '--')?      // Postfix: x++
     ;
 
 leftHandSideExpression

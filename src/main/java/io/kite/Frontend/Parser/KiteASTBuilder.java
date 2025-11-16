@@ -542,14 +542,31 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
     @Override
     public Expression visitUnaryExpression(UnaryExpressionContext ctx) {
-        if (ctx.getChildCount() > 1) {
-            // Has unary operator
-            String operator = ctx.getChild(0).getText(); // -, ++, --, !
+        if (ctx.getChildCount() > 1 &&
+            (ctx.getChild(0).getText().equals("-") ||
+             ctx.getChild(0).getText().equals("++") ||
+             ctx.getChild(0).getText().equals("--") ||
+             ctx.getChild(0).getText().equals("!"))) {
+            // Prefix operator
+            String operator = ctx.getChild(0).getText();
             Expression operand = (Expression) visit(ctx.unaryExpression());
             return UnaryExpression.of(operator, operand);
         }
 
-        return (Expression) visit(ctx.leftHandSideExpression());
+        return (Expression) visit(ctx.postfixExpression());
+    }
+
+    @Override
+    public Expression visitPostfixExpression(PostfixExpressionContext ctx) {
+        Expression expr = (Expression) visit(ctx.leftHandSideExpression());
+
+        if (ctx.getChildCount() > 1) {
+            // Has postfix operator
+            String operator = ctx.getChild(1).getText(); // ++ or --
+            return UnaryExpression.of(operator, expr); // Mark as postfix
+        }
+
+        return expr;
     }
 
     @Override
