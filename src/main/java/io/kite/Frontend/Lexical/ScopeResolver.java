@@ -2,9 +2,9 @@ package io.kite.Frontend.Lexical;
 
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.Visitors.Visitor;
@@ -73,7 +73,7 @@ public final class ScopeResolver implements Visitor<Void> {
     public Void visit(/* VariableExpression*/ Identifier identifier) {
         if (!scopes.isEmpty()) {
             if (scopes.peek().get(identifier.string()) == Boolean.FALSE) {
-                throw ParserErrors.error("Can't read local variable in its own initializer: " + identifier.string());
+                throw new ValidationException("Can't read local variable in its own initializer: " + identifier.string());
             }
         }
 
@@ -425,7 +425,7 @@ public final class ScopeResolver implements Visitor<Void> {
     @Override
     public Void visit(ReturnStatement statement) {
         if (currentFunction == FunctionType.NONE) {
-            throw ParserErrors.error("Can't return from top level code");
+            throw new ValidationException("Can't return from top level code");
         }
         if (statement.hasArgument()) {
             resolve(statement.getArgument());

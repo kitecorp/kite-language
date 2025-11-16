@@ -1,6 +1,6 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,7 @@ import static io.kite.Frontend.Parser.Expressions.ValDeclaration.val;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.ValStatement.valStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
 @DisplayName("Parser val")
@@ -24,14 +24,12 @@ public class ValDeclarationTest extends ParserTest {
 
     @Test
     void testDeclaration() {
-        parse("val x");
-        assertTrue(ParserErrors.hadErrors());
+        assertThrows(ValidationException.class, () -> parse("val x"));
     }
 
     @Test
     void testDeclarations() {
-        parse("val x,y");
-        assertTrue(ParserErrors.hadErrors());
+        assertThrows(ValidationException.class, () -> parse("val x,y"));
     }
 
     @Test
@@ -47,8 +45,8 @@ public class ValDeclarationTest extends ParserTest {
 
     @Test
     void testDeclarationsWithValues() {
-        var res = parse("val x,y=2");
-        assertEquals("val \"x\" must be initialized", ParserErrors.getErrors().getFirst().getMessage());
+        var err = assertThrows(ValidationException.class, () -> parse("val x,y=2"));
+        assertEquals("val \"x\" must be initialized", err.getMessage());
     }
 
     @Test

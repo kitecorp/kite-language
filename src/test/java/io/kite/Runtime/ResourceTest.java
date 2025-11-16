@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.Runtime.exceptions.RuntimeError;
@@ -19,13 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ResourceTest extends RuntimeTest {
     @Test
     void newResourceThrowsIfNoNameIsSpecified() {
-        eval("""
+        assertThrows(ValidationException.class, () -> eval("""
                 schema vm { }
                 resource vm {
                 
                 }
-                """);
-        assertFalse(ParserErrors.getErrors().isEmpty());
+                """));
     }
 
     /**
@@ -41,7 +40,7 @@ public class ResourceTest extends RuntimeTest {
         var res = eval("""
                 schema vm { }
                 resource vm main {
-
+                
                 }
                 """);
         log.warn((res));
@@ -104,9 +103,9 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-
+                
                 resource vm main {
-
+                
                 }
                 """);
         log.warn(res);
@@ -141,9 +140,9 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-
+                
                 resource vm main  {
-
+                
                 }
                 var y = main
                 var z = main.x
@@ -176,9 +175,9 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-
+                
                 resource vm  main {
-
+                
                 }
                 main.x = 3
                 """));
@@ -190,7 +189,7 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-
+                
                 resource vm main {
                     x = 3
                 }
@@ -214,7 +213,7 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    number x = 2
                 }
-
+                
                 resource vm main  {
                     x = 3
                 }
@@ -291,7 +290,7 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                    string name
                 }
-
+                
                 resource vm main {
                   name     = 'prod'
                 }
@@ -308,11 +307,11 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                     string name
                 }
-
+                
                 resource vm web {
                     name = "web-server"
                 }
-
+                
                 resource vm db {
                     name = "database"
                 }
@@ -330,7 +329,7 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                     string[] tags
                 }
-
+                
                 resource vm main {
                     tags = ["production", "critical"]
                 }
@@ -348,7 +347,7 @@ public class ResourceTest extends RuntimeTest {
                 schema vm {
                     object config
                 }
-
+                
                 resource vm main {
                     config = {
                         env: "prod",

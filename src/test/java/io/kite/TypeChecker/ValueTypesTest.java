@@ -1,10 +1,8 @@
 package io.kite.TypeChecker;
 
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parse.ParserTest;
 import io.kite.Frontend.Parser.Factory;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -73,14 +71,9 @@ public class ValueTypesTest extends ParserTest {
 
     @Test
     void testNumberInitDouble() {
-        var actual = parse("""
+        parse("""
                 var number x = 0.2
                 """);
-        var errors = ParserErrors.getErrors();
-        log.info(actual);
-        log.info(ParserErrors.errors());
-        Assertions.assertTrue(errors.isEmpty());
-
     }
 
     @Test

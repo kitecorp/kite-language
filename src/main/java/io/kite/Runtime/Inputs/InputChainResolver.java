@@ -1,9 +1,8 @@
 package io.kite.Runtime.Inputs;
 
-import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Parse.Literals.*;
 import io.kite.Frontend.Parser.Expressions.*;
-import io.kite.Frontend.Parser.Parser;
+import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.exceptions.InvalidInitException;
@@ -22,8 +21,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public non-sealed class InputChainResolver extends InputResolver implements Visitor<Object> {
-    private final Tokenizer tokenizer;
-    private final Parser parser;
+    private final KiteCompiler parser;
     private final List<InputResolver> resolvers;
     private final SyntaxPrinter printer = new SyntaxPrinter(new PlainTheme());
 
@@ -33,14 +31,12 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
                 new EnvResolver(),
                 new CliResolver()
         );
-        this.tokenizer = new Tokenizer();
-        this.parser = new Parser();
+        this.parser = new KiteCompiler();
     }
 
     public InputChainResolver(List<InputResolver> resolvers) {
         this.resolvers = resolvers;
-        this.tokenizer = new Tokenizer();
-        this.parser = new Parser();
+        this.parser = new KiteCompiler();
     }
 
     protected static @Nullable String normalizeArrays(@Nullable String value) {
@@ -98,7 +94,7 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
             var input = resolve(inputDeclaration, init);
             var srcCode = normalizeStringInputs(input,inputDeclaration);
 
-            var ast = parser.produceAST(tokenizer.tokenize(srcCode));
+            var ast = parser.parse(srcCode);
             var statement = (ExpressionStatement) ast.getBody().get(0);
             inputDeclaration.setInit(statement.getStatement());
 

@@ -1,5 +1,6 @@
 package io.kite.TypeChecker.Types.Decorators;
 
+import io.kite.Frontend.Parse.Literals.ObjectLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
 import io.kite.TypeChecker.TypeChecker;
@@ -18,7 +19,7 @@ public class ExistingDecorator extends DecoratorChecker {
     public static final String NAME = "existing";
 
     public ExistingDecorator(TypeChecker checker) {
-        super(checker,NAME, decorator(
+        super(checker, NAME, decorator(
                         List.of(ValueType.String),
                         Set.of(DecoratorType.Target.RESOURCE)
                 ), Set.of()
@@ -27,7 +28,7 @@ public class ExistingDecorator extends DecoratorChecker {
 
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
-        var value = declaration.getValue();
+        var value = declaration.getObject();
         if (value == null) {
             throwIfInvalidArgs(declaration);
         }
@@ -61,27 +62,21 @@ public class ExistingDecorator extends DecoratorChecker {
 //        private static final Pattern LOG_GROUP_ARN = Pattern.compile(
 //                "^arn:(aws|aws-cn|aws-us-gov):logs:[a-z0-9-]+:(?<account>\\d{12}):log-group:(?<group>[^:*]+)(?::.*)?$"
 //        );
-        switch (value) {
-            case StringLiteral literal -> {
-                if (StringUtils.isBlank(literal.getValue())) {
-                    throwIfInvalidArgs(declaration);
-                }
-                var ref = ImportParsers.detect(literal.getValue());
-                if (ref == null) {
-                    throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
+        for (ObjectLiteral property : value.getProperties()) {
+            switch (property.getKey()) {
+                case StringLiteral literal -> {
+                    if (StringUtils.isBlank(literal.getValue())) {
+                        throwIfInvalidArgs(declaration);
+                    }
+                    var ref = ImportParsers.detect(literal.getValue());
+                    if (ref == null) {
+                        throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
+                    }
+
                 }
 
+                default -> throwInvalidArgument(declaration, value);
             }
-            case String string -> {
-                if (StringUtils.isBlank(string)) {
-                    throwIfInvalidArgs(declaration);
-                }
-                var ref = ImportParsers.detect(string);
-                if (ref == null) {
-                    throw new TypeError("%s has invalid argument: %s".formatted(printer.visit(declaration), printer.visit(value)));
-                }
-            }
-            default -> throwInvalidArgument(declaration, value);
         }
 
         return null;
@@ -95,6 +90,8 @@ public class ExistingDecorator extends DecoratorChecker {
         throw new TypeError("%s must have a non-empty string as argument".formatted(printer.visit(declaration)));
     }
 
+    public enum ImportKind {ARN, SERVICE_ID, NAME, URL, TAGS}
+
     public static final class ImportParsers {
         // Common patterns
         public static final Pattern ARN = Pattern.compile("^arn:[^:]+:[^:]*:[^:]*:[^:]*:.+$");
@@ -107,17 +104,39 @@ public class ExistingDecorator extends DecoratorChecker {
         public static final Pattern S3_URL = Pattern.compile("^(s3://)(?<bucket>[a-z0-9][a-z0-9.-]{1,61}[a-z0-9])(?<key>/.*)?$");
         public static final Pattern TAGS = Pattern.compile("^(?:[A-Za-z0-9._:/+=@-]+=[^,]+)(?:,(?:[A-Za-z0-9._:/+=@-]+=[^,]+))*$");
 
-        public static boolean looksLikeArn(String s) { return s != null && ARN.matcher(s).matches(); }
-        public static boolean looksLikeEc2InstanceId(String s) { return EC2_INSTANCE_ID.matcher(s).matches(); }
-//        public static boolean looksLikeS3Bucket(String s) { return S3_BUCKET.matcher(s).matches(); }
-        public static boolean looksLikeKmsAlias(String s) { return KMS_ALIAS.matcher(s).matches(); }
-//        public static boolean looksLikeEcrRepo(String s) { return ECR_REPO.matcher(s).matches(); }
-        public static boolean looksLikeLogGroup(String s) { return LOG_GROUP.matcher(s).matches(); }
-        public static boolean looksLikeUrl(String s) { return URL.matcher(s).matches(); }
-        public static boolean looksLikeS3Url(String s) { return S3_URL.matcher(s).matches(); }
-        public static boolean looksLikeTagsClause(String s) { return TAGS.matcher(s).matches(); }
+        public static boolean looksLikeArn(String s) {
+            return s != null && ARN.matcher(s).matches();
+        }
 
-        /** Detect variant. Service/region/account may be filled later via context/flags. */
+        public static boolean looksLikeEc2InstanceId(String s) {
+            return EC2_INSTANCE_ID.matcher(s).matches();
+        }
+
+        //        public static boolean looksLikeS3Bucket(String s) { return S3_BUCKET.matcher(s).matches(); }
+        public static boolean looksLikeKmsAlias(String s) {
+            return KMS_ALIAS.matcher(s).matches();
+        }
+
+        //        public static boolean looksLikeEcrRepo(String s) { return ECR_REPO.matcher(s).matches(); }
+        public static boolean looksLikeLogGroup(String s) {
+            return LOG_GROUP.matcher(s).matches();
+        }
+
+        public static boolean looksLikeUrl(String s) {
+            return URL.matcher(s).matches();
+        }
+
+        public static boolean looksLikeS3Url(String s) {
+            return S3_URL.matcher(s).matches();
+        }
+
+        public static boolean looksLikeTagsClause(String s) {
+            return TAGS.matcher(s).matches();
+        }
+
+        /**
+         * Detect variant. Service/region/account may be filled later via context/flags.
+         */
         public static ImportRef detect(String s) {
             if (StringUtils.isBlank(s)) return null;
             if (looksLikeArn(s)) return new ImportRef(ImportKind.ARN, null, s, null, null);
@@ -133,8 +152,8 @@ public class ExistingDecorator extends DecoratorChecker {
             return new ImportRef(ImportKind.NAME, null, s, null, null);
         }
     }
-    public enum ImportKind { ARN, SERVICE_ID, NAME, URL, TAGS }
 
     public record ImportRef(ImportKind kind, String service, String value,
-                            String region, String account) {}
+                            String region, String account) {
+    }
 }

@@ -2,7 +2,6 @@ package io.kite.Base;
 
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.KiteCompiler;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
@@ -20,7 +19,6 @@ public class RuntimeTest {
     @BeforeEach
     void reset() {
         init();
-        ParserErrors.clear();
     }
 
     protected void init() {
@@ -31,7 +29,6 @@ public class RuntimeTest {
 
     @AfterEach
     void cleanup() {
-        ParserErrors.clear();
         program = null;
     }
 

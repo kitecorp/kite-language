@@ -1,7 +1,7 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.ParserErrors;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import io.kite.TypeChecker.Types.ResourceType;
 import io.kite.TypeChecker.Types.SchemaType;
@@ -18,13 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ResourceTest extends CheckerTest {
     @Test
     void newResourceThrowsIfNoNameIsSpecified() {
-        eval("""
-                schema Server { }
-                resource Server {
-                
-                }
-                """);
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+        assertThrows(ValidationException.class, () ->
+                eval("""
+                        schema Server { }
+                        resource Server {
+                        
+                        }
+                        """)
+        );
     }
 
     /**
@@ -117,6 +118,7 @@ public class ResourceTest extends CheckerTest {
         assertEquals(ValueType.String, second.getProperty("name"));
         assertEquals(ValueType.Number, second.getProperty("maxCount"));
     }
+
     @Test
     void propertyAccessThroughOtherResourceReverseOrder() {
         eval("""
