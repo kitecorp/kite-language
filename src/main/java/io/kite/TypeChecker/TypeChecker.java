@@ -826,6 +826,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(SchemaDeclaration schema) {
+        visitAnnotations(schema.getAnnotations());
         var name = schema.getName();
         var body = schema.getProperties();
 
