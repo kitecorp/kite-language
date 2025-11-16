@@ -6,11 +6,16 @@ grammar Kite;
 
 // Entry point
 program
-    : NL* statementList? EOF
+    : statementTerminator* statementList? EOF
     ;
 
 statementList
-    : nonEmptyStatement (NL+ nonEmptyStatement)* NL*
+    : nonEmptyStatement (statementTerminator+ nonEmptyStatement)* statementTerminator*
+    ;
+
+statementTerminator
+    : NL
+    | ';'
     ;
 
 nonEmptyStatement
@@ -264,7 +269,7 @@ lambdaBody
     ;
 
 blockExpression
-    : '{' NL* statementList? NL* '}'
+    : '{' statementTerminator* statementList? statementTerminator* '}'
     ;
 
 objectExpression
