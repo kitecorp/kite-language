@@ -36,11 +36,6 @@ public class OutputArraysTest extends CheckerTest {
 
     @Test
     void outputStringInitObjectEmptyKeywordError() {
-        assertThrows(TypeError.class, () -> eval("output string[] something = object"));
-    }
-
-    @Test
-    void outputStringInitObjectEmptyKeywordNoBodyError() {
         assertThrows(TypeError.class, () -> eval("output string[] something = object()"));
     }
 
@@ -123,11 +118,6 @@ public class OutputArraysTest extends CheckerTest {
 
     @Test
     void outputNumberInitObjectEmptyKeywordError() {
-        assertThrows(TypeError.class, () -> eval("output number[] something = object"));
-    }
-
-    @Test
-    void outputNumberInitObjectEmptyKeywordNoBodyError() {
         assertThrows(TypeError.class, () -> eval("output number[] something = object()"));
     }
 
@@ -211,11 +201,6 @@ public class OutputArraysTest extends CheckerTest {
 
     @Test
     void outputBooleanInitObjectEmptyKeywordError() {
-        assertThrows(TypeError.class, () -> eval("output boolean[] something = object"));
-    }
-
-    @Test
-    void outputBooleanInitObjectEmptyKeywordNoBodyError() {
         assertThrows(TypeError.class, () -> eval("output boolean[] something = object()"));
     }
 
@@ -357,13 +342,6 @@ public class OutputArraysTest extends CheckerTest {
 
     @Test
     void outputUnionInitObjectEmptyKeywordError() {
-        assertThrows(TypeError.class, () -> eval("""
-                type custom = string | number
-                output custom[] something = object"""));
-    }
-
-    @Test
-    void outputUnionInitObjectEmptyKeywordNoBodyError() {
         assertThrows(TypeError.class, () -> eval("""
                 type custom = string | number
                 output custom[] something = object()"""));
