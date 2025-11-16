@@ -1,7 +1,6 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.TypeChecker.Types.Type;
 import io.kite.TypeChecker.Types.TypeFactory;
 import io.kite.TypeChecker.Types.ValueType;
@@ -29,8 +28,8 @@ public class FunctionTest extends CheckerTest {
 
     @Test
     void testNoParamTypes() {
-        eval(" fun square(x)  number { return x * x } ");
-        Assertions.assertTrue(ParserErrors.hadErrors());
+        var err = assertThrows(IllegalArgumentException.class, () -> eval(" fun square(x)  number { return x * x } "));
+        assertEquals("Missing type for parameter x", err.getMessage());
     }
 
     @Test
@@ -192,7 +191,7 @@ public class FunctionTest extends CheckerTest {
     void testRecursionFun() {
         var actual = eval("""
                 fun recursive(number  x  )  number  {
-                    if (x == 1) return x
+                    if (x == 1) { return x }
                     return recursive(x-1)
                 }
                 recursive(3)

@@ -330,9 +330,15 @@ arrayItem
 
 // Type System
 typeIdentifier
-    : (complexTypeIdentifier | OBJECT | ANY) ('[' NUMBER? ']')*
+    : functionType ('[' NUMBER? ']')*
+    | (complexTypeIdentifier | OBJECT | ANY) ('[' NUMBER? ']')*
     ;
-
+functionType
+    : '(' functionTypeParams? ')' '->' typeIdentifier
+    ;
+functionTypeParams
+    : typeIdentifier (',' typeIdentifier)*
+    ;
 complexTypeIdentifier
     : IDENTIFIER ('.' IDENTIFIER)*
     ;
