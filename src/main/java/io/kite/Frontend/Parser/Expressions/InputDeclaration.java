@@ -154,4 +154,10 @@ public final class InputDeclaration extends Statement implements Annotatable {
         return type.getType();
     }
 
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
+
+
 }

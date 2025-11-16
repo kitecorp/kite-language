@@ -69,4 +69,9 @@ public final class SchemaDeclaration extends Statement implements Annotatable {
     public Type targetType() {
         return SchemaType.INSTANCE;
     }
+
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
 }

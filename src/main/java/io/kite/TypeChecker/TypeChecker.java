@@ -415,6 +415,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(InputDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
         var declaredType = visit(expression.getType());
 
         if (expression.getInit() != null) {
@@ -456,6 +457,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(OutputDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
         var declaredType = visit(expression.getType());
 
         if (expression.getInit() != null) {
@@ -469,6 +471,13 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         onFinalAnnotations(expression.getAnnotations());
         return env.init(expression.getId(), declaredType);
+    }
+
+    private void visitAnnotations(Set<AnnotationDeclaration> annotations) {
+        if (annotations == null || annotations.isEmpty()) {
+            return;
+        }
+        annotations.forEach(this::visit);
     }
 
     private void validateInitializer(OutputDeclaration expression, Type declaredType) {

@@ -19,4 +19,6 @@ public interface Annotatable {
 
     Type targetType();
 
+    boolean hasAnnotations();
+
 }

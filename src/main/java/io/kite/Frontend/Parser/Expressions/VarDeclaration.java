@@ -157,4 +157,9 @@ public final class VarDeclaration extends Expression implements DependencyHolder
     public Type targetType() {
         return type.getType();
     }
+
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
 }
