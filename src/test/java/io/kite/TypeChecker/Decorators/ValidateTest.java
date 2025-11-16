@@ -28,7 +28,7 @@ public class ValidateTest extends CheckerTest {
                 @validate
                 input string something"""
         ));
-        assertEquals("Missing \u001B[33m@validate\u001B[m arguments!", error.getMessage());
+        assertEquals("@validate is missing arguments!", error.getMessage());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ValidateTest extends CheckerTest {
                         input number something"""
                 )
         );
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on number", error.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on number", error.getMessage());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class ValidateTest extends CheckerTest {
                         input string something"""
                 )
         );
-        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+        assertEquals("@validate(regex = 1000) regex argument must be a string literal", error.getMessage());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ValidateTest extends CheckerTest {
                         input boolean something"""
                 )
         );
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on boolean", error.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on boolean", error.getMessage());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class ValidateTest extends CheckerTest {
                         input any something"""
                 )
         );
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on any", error.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on any", error.getMessage());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ValidateTest extends CheckerTest {
                         @validate(regex="^[a-z0-9-]+$")
                         input object something""")
         );
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on object", error.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on object", error.getMessage());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class ValidateTest extends CheckerTest {
                 @validate(regex=true)
                 input string something
                 """));
-        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+        assertEquals("@validate(regex = true) regex argument must be a string literal", error.getMessage());
     }
 
     @Test
@@ -195,7 +195,7 @@ public class ValidateTest extends CheckerTest {
                 @validate(regex=["test"])
                 input string something
                 """));
-        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+        assertEquals("@validate(regex = [\"test\"]) regex argument must be a string literal", error.getMessage());
     }
 
     @Test
@@ -204,7 +204,10 @@ public class ValidateTest extends CheckerTest {
                 @validate(regex={key: "value"})
                 input string something
                 """));
-        assertEquals("regex argument must be a string literal for \u001B[33m@validate\u001B[m", error.getMessage());
+        assertEquals("""
+                @validate(regex = {
+                 "key": "value"\s
+                }) regex argument must be a string literal""", error.getMessage());
     }
 
 

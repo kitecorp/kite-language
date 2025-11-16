@@ -49,9 +49,9 @@ public class ValidateDecorator extends DecoratorChecker {
         Expression regex = namedArgs.get("regex");
         Expression preset = namedArgs.get("preset");
         if (regex == null && preset == null) {
-            throw new TypeError("regex argument or preset argument is required for %s".formatted(printer.visit(declaration)));
+            throw new TypeError("%s regex argument or preset argument is required".formatted(printer.visit(declaration)));
         } else if (!(regex instanceof StringLiteral) && !(preset instanceof StringLiteral)) {
-            throw new TypeError("regex argument must be a string literal for %s".formatted(printer.visit(declaration)));
+            throw new TypeError("%s regex argument must be a string literal".formatted(printer.visit(declaration)));
         }
         if (!isAllowedOn(declaration.getTarget().targetType())) {
             throw new TypeError("%s is not allowed on %s".formatted(printer.visit(declaration), declaration.getTarget().targetType().getValue()));
