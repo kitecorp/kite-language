@@ -173,8 +173,8 @@ decorator
     ;
 
 decoratorArgs
-    : decoratorArg (NL* ',' NL* decoratorArg)* (NL* ',')? NL*
-    | namedArg (NL* ',' NL* namedArg)* (NL* ',')? NL*
+    : decoratorArg                      // Single positional: @provider("aws")
+    | namedArg (NL* ',' NL* namedArg)* (NL* ',')? NL*  // Named args: @provider(first="aws", second="gcp")
     ;
 
 namedArg

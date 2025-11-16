@@ -891,7 +891,7 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
         // Handle positional arguments
         if (!ctx.decoratorArgs().decoratorArg().isEmpty()) {
-            DecoratorArgContext firstArg = ctx.decoratorArgs().decoratorArg(0);
+            DecoratorArgContext firstArg = ctx.decoratorArgs().decoratorArg();
 
             // Object expression: @annotation({key: value})
             if (firstArg.objectExpression() != null) {
