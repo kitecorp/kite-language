@@ -25,7 +25,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type int = 1");
         var expected = program(union("int", number(1)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -33,7 +32,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type int = 1.1");
         var expected = program(union("int", number(1.1)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -41,7 +39,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type bool = true");
         var expected = program(union("bool", bool(true)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -49,7 +46,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type bool = false");
         var expected = program(union("bool", bool(false)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -57,7 +53,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = 'hello'");
         var expected = program(union("hey", string("hello")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -65,7 +60,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type nil = null");
         var expected = program(union("nil", NullLiteral.nullLiteral()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -73,7 +67,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = { env: 'dev' }");
         var expected = program(union("hey", objectExpression(object("env", "dev"))));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -81,7 +74,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = { }");
         var expected = program(union("hey", objectExpression()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -89,7 +81,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = object");
         var expected = program(union("hey", objectExpression()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -97,7 +88,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = object()");
         var expected = program(union("hey", objectExpression()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -105,7 +95,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = object({})");
         var expected = program(union("hey", objectExpression()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -116,7 +105,6 @@ public class UnionTypeTest extends ParserTest {
                 """);
         var expected = program(union("int", number(1)), union("INT", symbol("int")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -124,7 +112,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type ints = 1 | 2");
         var expected = program(UnionTypeStatement.union("ints", number(1), number(2)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -132,7 +119,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type ints = 1.2 | 2.2");
         var expected = program(UnionTypeStatement.union("ints", number(1.2), number(2.2)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -140,7 +126,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type booleans = true | false");
         var expected = program(UnionTypeStatement.union("booleans", bool(true), bool(false)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -148,7 +133,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = 'hello' | \"world\"  ");
         var expected = program(UnionTypeStatement.union("hey", string("hello"), string("world")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
 
@@ -157,7 +141,6 @@ public class UnionTypeTest extends ParserTest {
         var res = parse("type hey = { env: 'dev' } | { env: 'prod' }");
         var expected = program(UnionTypeStatement.union("hey", objectExpression(object("env", "dev")), objectExpression(object("env", "prod"))));
         assertEquals(expected, res);
-        log.info(res);
     }
 
 
@@ -173,7 +156,6 @@ public class UnionTypeTest extends ParserTest {
                 union("two", number(2)),
                 UnionTypeStatement.union("INT", symbol("one"), symbol("two")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -183,7 +165,6 @@ public class UnionTypeTest extends ParserTest {
                 """);
         var expected = program(union("bool", symbol("boolean")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -196,7 +177,6 @@ public class UnionTypeTest extends ParserTest {
                 union("zero", number(0)),
                 UnionTypeStatement.union("INT", number(1), string("hello"), bool(true), objectExpression(object("env", "dev")), symbol("zero")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
 
