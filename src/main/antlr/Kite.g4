@@ -74,7 +74,11 @@ typeKeyword
     ;
 
 schemaDeclaration
-    : SCHEMA identifier '{' NL* (schemaProperty NL*)* '}'
+    : SCHEMA identifier '{' NL* schemaPropertyList? NL* '}'
+    ;
+
+schemaPropertyList
+    : schemaProperty (NL+ schemaProperty)* NL*
     ;
 
 schemaProperty

@@ -147,10 +147,13 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     public SchemaDeclaration visitSchemaDeclaration(SchemaDeclarationContext ctx) {
         Identifier name = (Identifier) visit(ctx.identifier());
 
-        List<SchemaProperty> properties = ctx.schemaProperty()
-                .stream()
-                .map(prop -> (SchemaProperty) visit(prop))
-                .collect(Collectors.toList());
+        List<SchemaProperty> properties = Collections.emptyList();
+        if (ctx.schemaPropertyList() != null) {
+            properties = ctx.schemaPropertyList().schemaProperty()
+                    .stream()
+                    .map(prop -> (SchemaProperty) visit(prop))
+                    .collect(Collectors.toList());
+        }
 
         return SchemaDeclaration.schema(name, properties, Set.of());
     }
