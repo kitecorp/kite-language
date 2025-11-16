@@ -146,7 +146,8 @@ forStatement
     ;
 
 forBody
-    : resourceDeclaration
+    : blockExpression
+    | resourceDeclaration
     | ifStatement
     | expressionStatement
     | emptyStatement
