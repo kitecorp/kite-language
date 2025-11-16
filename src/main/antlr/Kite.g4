@@ -273,7 +273,7 @@ objectDeclaration
     ;
 
 objectPropertyList
-    : objectProperty (NL* ',' NL* objectProperty)* NL*
+    : objectProperty (NL* ',' NL* objectProperty)* (NL* ',')? NL*
     ;
 
 objectProperty
