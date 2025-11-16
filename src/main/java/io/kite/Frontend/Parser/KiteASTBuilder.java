@@ -628,9 +628,38 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
         ArrayExpression array = new ArrayExpression();
 
         if (ctx.FOR() != null) {
-            Identifier item = (Identifier) visit(ctx.identifier(0));
-            Identifier index = ctx.identifier().size() > 1 ?
-                    (Identifier) visit(ctx.identifier(1)) : null;
+            // Determine if we have "item" or "item, index" form by checking the grammar
+            // The grammar is: FOR identifier (',' identifier)? IN ...
+            // So we check how many identifiers come BEFORE the iterable
+
+            List<IdentifierContext> identifiers = ctx.identifier();
+
+            Identifier item;
+            Identifier index;
+
+            // Check if there's a comma (meaning we have item, index form)
+            // We can determine this by counting identifiers before IN
+            // If arrayExpression or rangeExpression is present, the iterable is not an identifier
+            // Otherwise, the last identifier is the iterable
+
+            int loopVarCount;
+            if (ctx.rangeExpression() != null || ctx.arrayExpression() != null) {
+                // Iterable is not an identifier, so all identifiers are loop variables
+                loopVarCount = identifiers.size();
+            } else {
+                // Last identifier is the iterable, rest are loop variables
+                loopVarCount = identifiers.size() - 1;
+            }
+
+            if (loopVarCount == 2) {
+                // for item, index in ...
+                item = (Identifier) visit(identifiers.get(0));
+                index = (Identifier) visit(identifiers.get(1));
+            } else {
+                // for item in ...
+                item = (Identifier) visit(identifiers.get(0));
+                index = null;
+            }
 
             Expression iterable;
             org.apache.commons.lang3.Range<Integer> range = null;
@@ -641,15 +670,14 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
             } else if (ctx.arrayExpression() != null) {
                 iterable = (Expression) visit(ctx.arrayExpression());
             } else {
-                iterable = (Identifier) visit(ctx.identifier(ctx.identifier().size() - 1));
+                // Last identifier is the iterable
+                iterable = (Identifier) visit(identifiers.get(identifiers.size() - 1));
             }
 
             Statement body;
             if (ctx.compactBody() != null) {
-                // Form 1: [for ...: compactBody]
                 body = (Statement) visit(ctx.compactBody());
             } else {
-                // Form 2: [for ...] forBody
                 body = (Statement) visit(ctx.forBody());
             }
 
@@ -663,9 +691,8 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
             array.setForStatement(forStmt);
 
         } else if (ctx.arrayItems() != null) {
-            // Literal array
-            for (var item : ctx.arrayItems().arrayItem()) {
-                array.add((Expression) visit(item));
+            for (var arrayItem : ctx.arrayItems().arrayItem()) {
+                array.add((Expression) visit(arrayItem));
             }
         }
 
