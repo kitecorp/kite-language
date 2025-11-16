@@ -438,7 +438,7 @@ public class DecoratorTest extends ParserTest {
                    @annotation(importable Vm x =1
                 }
                 """));
-        Assertions.assertEquals("Parse error at line 2:26 - missing ')' to close decorator arguments", err.getMessage());
+        Assertions.assertEquals("Parse error at line 2:26 - mismatched input 'Vm' expecting {'.', ')', '[', ','}", err.getMessage());
     }
 
     @Test
@@ -480,7 +480,7 @@ public class DecoratorTest extends ParserTest {
                    @annotation(importable] Vm x =1
                 }
                 """));
-        assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {')', '\\n'}", err.getMessage());
+        assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {'.', ')', '[', ','}", err.getMessage());
     }
 
 
