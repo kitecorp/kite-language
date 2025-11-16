@@ -393,7 +393,7 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     }
 
     @Override
-    public Expression visitLambdaBody(KiteParser.LambdaBodyContext ctx) {
+    public Expression visitLambdaBody(LambdaBodyContext ctx) {
         if (ctx.blockExpression() != null) {
             return visitBlockExpression(ctx.blockExpression());
         } else {
@@ -715,7 +715,10 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
                 visitParameterList(ctx.parameterList()) : Collections.emptyList();
         TypeIdentifier returnType = ctx.typeIdentifier() != null ?
                 (TypeIdentifier) visit(ctx.typeIdentifier()) : null;
-        Statement body = (Statement) visit(ctx.lambdaBody());
+
+        // Lambda body is an Expression, wrap it in ExpressionStatement
+        Expression bodyExpr = (Expression) visit(ctx.lambdaBody());
+        Statement body = ExpressionStatement.expressionStatement(bodyExpr);
 
         return LambdaExpression.lambda(params, body, returnType);
     }
