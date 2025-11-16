@@ -141,18 +141,6 @@ whileStatement
     | WHILE expression NL* blockExpression
     ;
 
-forStatement
-    : FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) (':' | ']' | ')')? NL* forBody
-    ;
-
-forBody
-    : blockExpression
-    | resourceDeclaration
-    | ifStatement
-    | expressionStatement
-    | emptyStatement
-    ;
-
 rangeExpression
     : NUMBER '..' NUMBER
     ;
@@ -302,10 +290,21 @@ objectInitializer
     ;
 
 arrayExpression
-    : '[' forStatement ']'
-    | '[' arrayItems? ']'
+    : '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ':' expression ']'  // Form 1: [for ...: body]
+    | '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ']' NL* forBody     // Form 2: [for ...] body
+    | '[' arrayItems? ']'                                                                                           // Literal
     ;
 
+forStatement
+    : FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) NL* forBody             // Form 2: for ... body
+    ;
+forBody
+    : blockExpression
+    | resourceDeclaration
+    | ifStatement
+    | expressionStatement
+    | emptyStatement
+    ;
 arrayItems
     : arrayItem (',' arrayItem)*
     ;

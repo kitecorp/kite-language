@@ -627,10 +627,45 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     public ArrayExpression visitArrayExpression(ArrayExpressionContext ctx) {
         ArrayExpression array = new ArrayExpression();
 
-        if (ctx.forStatement() != null) {
-            ForStatement forStmt = (ForStatement) visit(ctx.forStatement());
+        if (ctx.FOR() != null) {
+            Identifier item = (Identifier) visit(ctx.identifier(0));
+            Identifier index = ctx.identifier().size() > 1 ?
+                    (Identifier) visit(ctx.identifier(1)) : null;
+
+            Expression iterable;
+            org.apache.commons.lang3.Range<Integer> range = null;
+
+            if (ctx.rangeExpression() != null) {
+                range = visitRangeExpression(ctx.rangeExpression());
+                iterable = null;
+            } else if (ctx.arrayExpression() != null) {
+                iterable = (Expression) visit(ctx.arrayExpression());
+            } else {
+                iterable = (Identifier) visit(ctx.identifier(ctx.identifier().size() - 1));
+            }
+
+            Statement body;
+            if (ctx.expression() != null) {
+                // Form 1: [for ...: expr]
+                body = ExpressionStatement.expressionStatement(
+                        (Expression) visit(ctx.expression())
+                );
+            } else {
+                // Form 2: [for ...] forBody
+                body = (Statement) visit(ctx.forBody());
+            }
+
+            ForStatement forStmt = ForStatement.builder()
+                    .item(item)
+                    .index(index)
+                    .range(range)
+                    .array(iterable)
+                    .body(body)
+                    .build();
             array.setForStatement(forStmt);
+
         } else if (ctx.arrayItems() != null) {
+            // Literal array
             for (var item : ctx.arrayItems().arrayItem()) {
                 array.add((Expression) visit(item));
             }
@@ -638,7 +673,6 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
         return array;
     }
-
     @Override
     public LambdaExpression visitLambdaExpression(LambdaExpressionContext ctx) {
         List<ParameterIdentifier> params = ctx.parameterList() != null ?
