@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Frontend.Parser.generated.KiteParser;
 import io.kite.Frontend.annotations.Annotatable;
 import io.kite.TypeChecker.Types.ValueType;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
@@ -205,8 +206,16 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     public OutputDeclaration visitOutputDeclaration(OutputDeclarationContext ctx) {
         TypeIdentifier type = (TypeIdentifier) visit(ctx.typeIdentifier());
         Identifier name = (Identifier) visit(ctx.identifier());
-        Expression value = (Expression) visit(ctx.expression());
 
+        if (ctx.expression() == null) {
+            // Custom validation error
+            String sourceText = ctx.getStart().getInputStream().getText(
+                    new Interval(ctx.getStart().getStartIndex(), ctx.getStop().getStopIndex())
+            );
+            throw new ValidationException("Missing '=' after: " + sourceText);
+        }
+
+        Expression value = (Expression) visit(ctx.expression());
         return OutputDeclaration.output(name, type, value, Set.of());
     }
 

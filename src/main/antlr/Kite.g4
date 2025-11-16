@@ -102,7 +102,7 @@ inputDeclaration
     ;
 
 outputDeclaration
-    : OUTPUT typeIdentifier identifier '=' expression
+    : OUTPUT typeIdentifier identifier ('=' expression)?
     ;
 
 varDeclaration

@@ -1,10 +1,10 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.ParserErrors;
-import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.TypeChecker.Types.ObjectType;
 import io.kite.TypeChecker.Types.ValueType;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,35 +30,35 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputString() {
-        parse("output string something");
-        assertEquals("Missing '=' after: output string something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output string something"));
+        assertEquals("Missing '=' after: output string something", err.getMessage());
     }
 
     @Test
     void outputNumber() {
-        parse("output number something");
-        assertEquals("Missing '=' after: output number something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output number something"));
+        assertEquals("Missing '=' after: output number something", err.getMessage());
     }
 
     @Test
     void outputBoolean() {
-        parse("output boolean something");
-        assertEquals("Missing '=' after: output boolean something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output boolean something"));
+        assertEquals("Missing '=' after: output boolean something", err.getMessage());
     }
 
     @Test
     void outputObject() {
-        parse("output object something");
-        assertEquals("Missing '=' after: output object something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output object something"));
+        assertEquals("Missing '=' after: output object something", err.getMessage());
     }
 
     @Test
     void outputUnion() {
-        var res = parse("""
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("""
                 type custom = string | number
                 output custom something
-                """);
-        assertEquals("Missing '=' after: output custom something", ParserErrors.errors());
+                """));
+        assertEquals("Missing '=' after: output custom something", err.getMessage());
     }
 
     @Test
@@ -111,35 +111,35 @@ public class OutputTest extends ParserTest {
 
     @Test
     void outputStringArray() {
-        parse("output string[] something");
-        assertEquals("Missing '=' after: output string[] something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output string[] something"));
+        assertEquals("Missing '=' after: output string[] something", err.getMessage());
     }
 
     @Test
     void outputNumberArray() {
-        parse("output number[] something");
-        assertEquals("Missing '=' after: output number[] something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output number[] something"));
+        assertEquals("Missing '=' after: output number[] something", err.getMessage());
     }
 
     @Test
     void outputBooleanArray() {
-        parse("output boolean[] something");
-        assertEquals("Missing '=' after: output boolean[] something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output boolean[] something"));
+        assertEquals("Missing '=' after: output boolean[] something", err.getMessage());
     }
 
     @Test
     void outputObjectArray() {
-        parse("output object[] something");
-        assertEquals("Missing '=' after: output object[] something", ParserErrors.errors());
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("output object[] something"));
+        assertEquals("Missing '=' after: output object[] something", err.getMessage());
     }
 
     @Test
     void outputUnionArray() {
-        parse("""
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("""
                 type custom = string | number
                 output custom[] something
-                """);
-        assertEquals("Missing '=' after: output custom[] something", ParserErrors.errors());
+                """));
+        assertEquals("Missing '=' after: output custom[] something", err.getMessage());
     }
 
     @Test
