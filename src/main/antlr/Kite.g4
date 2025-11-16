@@ -269,11 +269,11 @@ objectExpression
 
 objectDeclaration
     : OBJECT '(' objectPropertyList? ')'
-    | '{' objectPropertyList? '}'
+    | '{' NL* objectPropertyList? NL* '}'
     ;
 
 objectPropertyList
-    : objectProperty (',' objectProperty)*
+    : objectProperty (NL* ',' NL* objectProperty)* NL*
     ;
 
 objectProperty
