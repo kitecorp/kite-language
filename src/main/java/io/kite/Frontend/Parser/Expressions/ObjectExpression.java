@@ -41,6 +41,10 @@ public final class ObjectExpression extends Expression {
         return new ObjectExpression();
     }
 
+    public static ObjectExpression object(List<ObjectLiteral> properties) {
+        return ObjectExpression.objectExpression(properties);
+    }
+
     public boolean isEmpty() {
         return this.properties.isEmpty();
     }

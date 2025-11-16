@@ -1,8 +1,8 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -27,7 +27,7 @@ public final class ExpressionStatement extends Statement {
         this(null);
     }
 
-    public static Statement expressionStatement(Expression expression) {
+    public static ExpressionStatement expressionStatement(Expression expression) {
         return new ExpressionStatement(expression);
     }
 

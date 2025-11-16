@@ -61,7 +61,7 @@ public final class FunctionDeclaration extends Statement {
         return new FunctionDeclaration(test, params, body);
     }
 
-    public static Statement fun(Identifier test, List<ParameterIdentifier> params, TypeIdentifier returnType, Statement body) {
+    public static FunctionDeclaration fun(Identifier test, List<ParameterIdentifier> params, TypeIdentifier returnType, Statement body) {
         return new FunctionDeclaration(test, params, returnType, body);
     }
 

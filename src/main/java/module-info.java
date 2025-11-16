@@ -10,4 +10,6 @@ module kite.io {
     requires java.desktop;
     requires jdk.compiler;
     requires org.fusesource.jansi;
+    requires org.antlr.antlr4.runtime;    // ← ADD THIS LINE
+
 }

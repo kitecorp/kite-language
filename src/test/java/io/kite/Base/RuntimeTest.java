@@ -2,6 +2,7 @@ package io.kite.Base;
 
 import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
+import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
@@ -18,6 +19,7 @@ public class RuntimeTest {
     protected ScopeResolver scopeResolver;
     protected Program program;
     protected SyntaxPrinter printer = new SyntaxPrinter();
+    protected KiteCompiler compiler;
 
     @BeforeEach
     void reset() {
@@ -28,6 +30,7 @@ public class RuntimeTest {
     protected void init() {
         this.tokenizer = new Tokenizer();
         this.parser = new Parser();
+        this.compiler = new KiteCompiler();
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(new Environment<>("global"));
     }
@@ -45,12 +48,12 @@ public class RuntimeTest {
     }
 
     protected Object resolve(String source) {
-        scopeResolver.resolve(parser.produceAST(tokenizer.tokenize(source)));
+        scopeResolver.resolve(compiler.parse(source));
         return null;
     }
 
     protected Program parse(String source) {
-        return parser.produceAST(tokenizer.tokenize(source));
+        return compiler.parse(source);
     }
 
 }

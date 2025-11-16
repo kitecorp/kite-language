@@ -20,7 +20,7 @@ public class LiteralTest extends ParserTest {
     @Test
     void testInteger() {
         var res = parse("1");
-        var expected = Program.of(expressionStatement(NumberLiteral.of(1)));
+        var expected = Program.of(expressionStatement(NumberLiteral.number(1)));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -28,7 +28,7 @@ public class LiteralTest extends ParserTest {
     @Test
     void testDecimal() {
         var res = parse("1.11");
-        var expected = Program.of(expressionStatement(NumberLiteral.of(1.11)));
+        var expected = Program.of(expressionStatement(NumberLiteral.number(1.11)));
         assertEquals(expected, res);
     }
 
@@ -37,9 +37,7 @@ public class LiteralTest extends ParserTest {
         var res = parse("""
                 "Hello"
                 """);
-        var expected = Program.of(
-                expressionStatement("Hello")
-        );
+        var expected = Program.of(expressionStatement("Hello"));
         assertEquals(expected, res);
         log.info(res);
     }

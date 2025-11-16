@@ -1,8 +1,8 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +40,7 @@ public final class IfStatement extends Statement {
         return new IfStatement(test, consequent, alternate);
     }
 
-    public static Statement If(Expression test, Statement consequent, Statement alternate) {
+    public static IfStatement If(Expression test, Statement consequent, Statement alternate) {
         return new IfStatement(test,consequent, alternate);
     }
     public static Statement If(Expression test, Statement consequent) {

@@ -1,8 +1,8 @@
 package io.kite.Frontend.Parser.Statements;
 
-import io.kite.Frontend.Parser.Expressions.Expression;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.StringLiteral;
+import io.kite.Frontend.Parser.Expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +49,7 @@ public non-sealed class BlockExpression extends Expression {
         return new BlockExpression(expression);
     }
 
-    public static Expression block(List<Statement> expression) {
+    public static BlockExpression block(List<Statement> expression) {
         return new BlockExpression(expression);
     }
 

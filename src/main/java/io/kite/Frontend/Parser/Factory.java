@@ -4,7 +4,10 @@ import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parse.Literals.NumberLiteral;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.Expressions.*;
-import io.kite.Frontend.Parser.Statements.*;
+import io.kite.Frontend.Parser.Statements.EmptyStatement;
+import io.kite.Frontend.Parser.Statements.ExpressionStatement;
+import io.kite.Frontend.Parser.Statements.Statement;
+import io.kite.Frontend.Parser.Statements.VarStatement;
 
 import java.util.Arrays;
 
@@ -14,7 +17,7 @@ public class Factory {
     }
 
     public static Program program(Expression... object) {
-        return Program.builder().body(Arrays.stream(object).map(ExpressionStatement::expressionStatement).toList()).build();
+        return Program.builder().body(Arrays.stream(object).map(ExpressionStatement::expressionStatement).map(it -> (Statement) it).toList()).build();
     }
 
     public static Statement expressionStatement(Expression object) {
