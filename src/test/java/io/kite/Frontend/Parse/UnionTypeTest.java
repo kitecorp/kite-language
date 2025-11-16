@@ -11,6 +11,7 @@ import static io.kite.Frontend.Parse.Literals.Identifier.symbol;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
 import static io.kite.Frontend.Parse.Literals.ObjectLiteral.object;
 import static io.kite.Frontend.Parse.Literals.StringLiteral.string;
+import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Expressions.ObjectExpression.objectExpression;
 import static io.kite.Frontend.Parser.Expressions.UnionTypeStatement.union;
 import static io.kite.Frontend.Parser.Program.program;
@@ -79,7 +80,7 @@ public class UnionTypeTest extends ParserTest {
     @Test
     void typeDeclarationAnyObject() {
         var res = parse("type hey = object");
-        var expected = program(union("hey", objectExpression()));
+        var expected = program(union("hey", type("object")));
         assertEquals(expected, res);
     }
 
@@ -92,7 +93,14 @@ public class UnionTypeTest extends ParserTest {
 
     @Test
     void typeDeclarationAnyObjectCurlyEmpty() {
-        var res = parse("type hey = object({})");
+        var res = parse("type hey = object()");
+        var expected = program(union("hey", objectExpression()));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void typeDeclarationEmptyObjectLiteral() {
+        var res = parse("type hey = {}");
         var expected = program(union("hey", objectExpression()));
         assertEquals(expected, res);
     }
