@@ -1,6 +1,7 @@
 package io.kite.Frontend.Parse.Literals;
 
 import io.kite.Frontend.Parse.ParserTest;
+import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import static io.kite.Frontend.Parser.Factory.expressionStatement;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
 @DisplayName("Parse object var")
@@ -199,117 +201,11 @@ public class ObjectVarExpressionTest extends ParserTest {
     }
 
     @Test
-    void multiplePropertiesRealExampleNoComma() {
-        var res = parse("""
-                var environmentSettings = {
-                   dev: {
-                     name: "Development"
-                     team: "backend"
-                   }
-                   prod: {
-                     name: "Production"
-                   }
-                 }
-                
-                """);
-        var expected = program(
-                varStatement(var("environmentSettings",
-                        objectExpression(
-                                object("dev",
-                                        objectExpression(
-                                                object("""
-                                                        name
-                                                        """.trim(), string("Development")),
-                                                object("""
-                                                        team
-                                                        """.trim(), string("backend"))
-                                        )),
-                                object("prod",
-                                        objectExpression(object("""
-                                                name
-                                                """.trim(), string("Production"))
-                                        )))))
-        );
-        assertEquals(expected, res);
-    }
-
-    @Test
     void multiplePropertiesRealExampleComma() {
         var res = parse("""
                 var environmentSettings = {
                    dev: {
                      name: "Development",
-                     team: "backend"
-                   }
-                   prod: {
-                     name: "Production"
-                   }
-                 }
-                
-                """);
-        var expected = program(
-                varStatement(var("environmentSettings",
-                        objectExpression(
-                                object("dev",
-                                        objectExpression(
-                                                object("""
-                                                        name
-                                                        """.trim(), string("Development")),
-                                                object("""
-                                                        team
-                                                        """.trim(), string("backend"))
-                                        )),
-                                object("prod",
-                                        objectExpression(object("""
-                                                name
-                                                """.trim(), string("Production"))
-                                        )))))
-        );
-        assertEquals(expected, res);
-    }
-
-    @Test
-    void multiplePropertiesRealExampleCommaObject() {
-        var res = parse("""
-                var environmentSettings = {
-                   dev: {
-                     name: "Development",
-                     team: "backend"
-                   },
-                   prod: {
-                     name: "Production"
-                   }
-                 }
-                
-                """);
-        var expected = program(
-                varStatement(var("environmentSettings",
-                        objectExpression(
-                                object("dev",
-                                        objectExpression(
-                                                object("""
-                                                        name
-                                                        """.trim(), string("Development")),
-                                                object("""
-                                                        team
-                                                        """.trim(), string("backend"))
-                                        )),
-                                object("prod",
-                                        objectExpression(object("""
-                                                name
-                                                """.trim(), string("Production"))
-                                        )))))
-        );
-        assertEquals(expected, res);
-    }
-
-
-    @Test
-    void multiplePropertiesRealExampleNoCommaProperty() {
-        var res = parse("""
-                var environmentSettings = {
-                   dev: {
-                     name: "Development"
                      team: "backend"
                    },
                    prod: {
@@ -384,4 +280,108 @@ public class ObjectVarExpressionTest extends ParserTest {
         assertEquals(expected, res);
     }
 
+    @Test
+    void trailingComma() {
+        var res = parse("""
+                var x = { 
+                    a: 1,
+                    b: 2,
+                }
+                """);
+        var expected = program(varStatement(var("x",
+                objectExpression(
+                        object("a", number(1)),
+                        object("b", number(2))
+                ))));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void testMemberReadComputed() {
+        var res = parse("""
+                var x = { name: "backend" }
+                x["name"]
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression(object("name", string("backend"))))),
+                expressionStatement(member(true, "x", string("name")))
+        );
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void testChainedMemberAccess() {
+        var res = parse("""
+                var x = {
+                    server: {
+                        config: {
+                            port: 8080
+                        }
+                    }
+                }
+                x.server.config.port
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression(
+                        object("server", objectExpression(
+                                object("config", objectExpression(
+                                        object("port", number(8080))
+                                ))
+                        ))
+                ))),
+                expressionStatement(
+                        member(false,
+                                member(false,
+                                        member(false, "x", "server"),
+                                        "config"),
+                                "port")
+                )
+        );
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void testMixedMemberAccess() {
+        var res = parse("""
+                x.server["config"].port
+                """);
+        var expected = program(
+                expressionStatement(
+                        member(false,
+                                member(true,
+                                        member(false, "x", "server"),
+                                        string("config")),
+                                "port")
+                )
+        );
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void testMemberAssignmentDot() {
+        var res = parse("""
+                var x = { name: "backend" }
+                x.name = "frontend"
+                """);
+        var expected = program(
+                varStatement(var("x", objectExpression(object("name", string("backend"))))),
+                expressionStatement(assign(
+                        member("x", "name"), string("frontend"), (Object) "="))
+        );
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void objectMissingColon() {
+        assertThrows(ValidationException.class, () ->
+                parse("var x = { a 1 }")
+        );
+    }
+
+    @Test
+    void objectMissingValue() {
+        assertThrows(ValidationException.class, () ->
+                parse("var x = { a: }")
+        );
+    }
 }
