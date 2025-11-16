@@ -290,9 +290,14 @@ objectInitializer
     ;
 
 arrayExpression
-    : '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ':' expression ']'  // Form 1: [for ...: body]
-    | '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ']' NL* forBody     // Form 2: [for ...] body
-    | '[' arrayItems? ']'                                                                                           // Literal
+    : '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ':' compactBody ']'  // Form 1: [for ...: body]
+    | '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ']' NL* forBody      // Form 2: [for ...] body
+    | '[' arrayItems? ']'                                                                                            // Literal
+    ;
+
+compactBody
+    : ifStatement
+    | expression
     ;
 
 forStatement

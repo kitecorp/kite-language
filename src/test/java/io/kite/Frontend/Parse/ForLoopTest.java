@@ -93,7 +93,7 @@ public class ForLoopTest extends ParserTest {
     @Test
     void testForConditional() {
         var res = parse("""
-                [for i in 0..10: if i>2 i+=1]
+                [for i in 0..10: if i>2 { i+=1 }]
                 """);
         var expected = Program.of(
                 expressionStatement(array(
@@ -102,13 +102,14 @@ public class ForLoopTest extends ParserTest {
                                 .range(Range.of(0, 10))
                                 .body(
                                         IfStatement.ifStatement(binary(">", "i", 2),
-                                                expressionStatement(assign("+=", id("i"), number(1)))
+                                                expressionStatement(block(
+                                                        expressionStatement(assign("+=", id("i"), number(1)))
+                                                ))
                                         )
                                 )
                                 .build()
                 ))
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 
