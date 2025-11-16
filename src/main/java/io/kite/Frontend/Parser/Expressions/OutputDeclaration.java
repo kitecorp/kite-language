@@ -147,6 +147,11 @@ public final class OutputDeclaration extends Statement implements DependencyHold
         return type.getType();
     }
 
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
+
     public void setSensitive(boolean sensitive) {
         this.sensitive = sensitive;
     }

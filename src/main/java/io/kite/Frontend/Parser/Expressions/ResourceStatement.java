@@ -152,6 +152,11 @@ public final class ResourceStatement
         return ResourceType.INSTANCE;
     }
 
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
+
     public boolean hasIndex() {
         return index != null;
     }

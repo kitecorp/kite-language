@@ -76,4 +76,9 @@ public class SchemaProperty implements Annotatable {
     public Type targetType() {
         return type.getType();
     }
+
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
 }

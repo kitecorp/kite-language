@@ -117,6 +117,11 @@ public final class ComponentStatement extends Statement implements Annotatable, 
         return ComponentType.getInstance();
     }
 
+    @Override
+    public boolean hasAnnotations() {
+        return annotations != null;
+    }
+
     public boolean isDefinition() {
         return getType() != null && name == null;
     }
