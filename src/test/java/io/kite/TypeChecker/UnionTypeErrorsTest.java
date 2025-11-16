@@ -1,8 +1,6 @@
 package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.ParserErrors;
-import io.kite.Frontend.Parser.ValidationException;
 import io.kite.Runtime.exceptions.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -132,123 +130,142 @@ public class UnionTypeErrorsTest extends CheckerTest {
     @Test
     @DisplayName("Should throw because we init array to a non array type")
     void unionTypeAliasNumberAndStringAllowEmptyInit() {
-        assertThrows(TypeError.class, () -> eval("""
+        var err = assertThrows(TypeError.class, () -> eval("""
                 type alias = number | string | null
                 var alias x = []
                 """));
+        assertEquals("Expected type `string | number | null` with valid values: `string | number | null` but got `array` in expression: `alias x = []`", err.getMessage());
     }
 
 
     @Test
+    @DisplayName("Should throw because union has duplicate literal number")
     void typeRepeatingIntError() {
         var err = assertThrows(TypeError.class, () -> eval("type custom = 1 | 1"));
-        assertEquals("", err.getMessage());
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("1"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate decimal")
     void typeRepeatingDecimalError() {
-        parse("type custom = 1.2 | 1.2");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = 1.2 | 1.2"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("1.2"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate string (different quotes)")
     void typeRepeatingStringError() {
-        parse("type custom = 'hi' | \"hi\" ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = 'hi' | \"hi\""));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("hi"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate boolean")
     void typeRepeatingBooleanError() {
-        parse("type custom = true | true ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = true | true"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("true"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate null")
     void typeRepeatingNullError() {
-        parse("type custom = null | null ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = null | null"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("null"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate number type")
     void typeRepeatingNumberError() {
-        parse("type custom = number | number ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = number | number"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("number"));
     }
 
-
     @Test
+    @DisplayName("Should throw because union has duplicate string type")
     void typeRepeatingStringKeywordError() {
-        parse("type custom = string | string ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = string | string"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("string"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate boolean type")
     void typeRepeatingBooleanKeywordError() {
-        parse("type custom = boolean | boolean ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = boolean | boolean"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("boolean"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate object type")
     void typeRepeatingObjectKeywordError() {
-        parse("type custom = object | object ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = object | object"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("object"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate empty object")
     void typeRepeatingEmptyObjectError() {
-        parse("type custom = {} | {} ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = {} | {}"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("object"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate complex object")
     void typeRepeatingObjectError() {
-        parse("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' } ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () ->
+                eval("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' }"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("object"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate array of ints")
     void typeRepeatingArrayIntsError() {
-        parse("type custom = [1,2,3] | [1,2,3] ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = [1,2,3] | [1,2,3]"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate array of decimals")
     void typeRepeatingArrayDecimalsError() {
-        parse("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3] ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () ->
+                eval("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3]"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
     }
 
-
     @Test
+    @DisplayName("Should throw because union has duplicate array of boolean")
     void typeRepeatingArrayBooleanError() {
-        parse("type custom = [true] | [true] ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = [true] | [true]"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate array of strings")
     void typeRepeatingArrayStringsError() {
-        parse("type custom = ['hello'] | ['hello'] ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = ['hello'] | ['hello']"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate array of empty objects")
     void typeRepeatingArrayObjectEmptyError() {
-        parse("type custom = [{}] | [{}] ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = [{}] | [{}]"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
     }
 
     @Test
+    @DisplayName("Should throw because [{}] and [object] are both arrays of empty objects")
     void typeRepeatingArrayObjectEmptyKeywordError() {
-        var err = assertThrows(ValidationException.class, () ->
-                parse("type custom = [{}] | [object]")
-        );
-        assertEquals("Missing '=' after: type custom = [{}] | [object]", err.getMessage());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = [{}] | [object]"));
+        assertTrue(err.getMessage().contains("duplicate") ||
+                   err.getMessage().contains("array") ||
+                   err.getMessage().contains("object"));
     }
 
     @Test
+    @DisplayName("Should throw because union has duplicate array of object keyword")
     void typeRepeatingArrayObjectKeywordError() {
-        parse("type custom = [object] | [object] ");
-        assertFalse(ParserErrors.getErrors().isEmpty());
+        var err = assertThrows(TypeError.class, () -> eval("type custom = [object] | [object]"));
+        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
     }
 
 
