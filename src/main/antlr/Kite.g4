@@ -198,7 +198,7 @@ expression
     ;
 
 assignmentExpression
-    : orExpression (('=' | '+=') assignmentExpression)?
+    : orExpression (('=' | '+=') expression)?
     ;
 
 orExpression
@@ -274,8 +274,8 @@ objectExpression
     ;
 
 objectDeclaration
-    : OBJECT '(' objectPropertyList? ')'
-    | '{' NL* objectPropertyList? NL* '}'
+    : OBJECT '(' ('{' NL* objectPropertyList? NL* '}')? ')'  // object() or object({ key: value })
+    | '{' NL* objectPropertyList? NL* '}'                     // { key: value }
     ;
 
 objectPropertyList

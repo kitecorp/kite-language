@@ -349,7 +349,7 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
         if (ctx.getChildCount() > 1) {
             // Has assignment operator
             String operator = ctx.getChild(1).getText(); // = or +=
-            Expression right = (Expression) visit(ctx.assignmentExpression());
+            Expression right = (Expression) visit(ctx.expression());
             return AssignmentExpression.assign(operator, left, right);
         }
 
