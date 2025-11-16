@@ -29,11 +29,11 @@ class PrintFunctionTest extends RuntimeTest {
 
     @Test
     void printlnMixStrings() {
-        interpreter.visit(parser.produceAST(tokenizer.tokenize("""
+        interpreter.visit(parse("""
                 print(1,2,3)
                 print("hi!","my","name","is","Bob")
                 print("hi! my name is Bob")
-                """)));
+                """));
     }
 
 }

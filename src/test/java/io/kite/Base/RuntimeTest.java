@@ -1,9 +1,7 @@
 package io.kite.Base;
 
-import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.KiteCompiler;
-import io.kite.Frontend.Parser.Parser;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Runtime.Environment.Environment;
@@ -14,8 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class RuntimeTest {
     protected Interpreter interpreter;
-    protected Parser parser;
-    protected Tokenizer tokenizer;
     protected ScopeResolver scopeResolver;
     protected Program program;
     protected SyntaxPrinter printer = new SyntaxPrinter();
@@ -28,8 +24,6 @@ public class RuntimeTest {
     }
 
     protected void init() {
-        this.tokenizer = new Tokenizer();
-        this.parser = new Parser();
         this.compiler = new KiteCompiler();
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(new Environment<>("global"));
