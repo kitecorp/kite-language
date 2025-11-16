@@ -19,6 +19,7 @@ nonEmptyStatement
     | initStatement
     | returnStatement
     | iterationStatement
+    | blockExpression
     | expressionStatement
     ;
 statement
@@ -267,8 +268,7 @@ blockExpression
     ;
 
 objectExpression
-    : blockExpression
-    | objectDeclaration
+    : objectDeclaration
     ;
 
 objectDeclaration

@@ -54,7 +54,6 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
     @Override
     public Statement visitNonEmptyStatement(NonEmptyStatementContext ctx) {
-        // Delegate to the specific statement type
         if (ctx.declaration() != null) {
             return (Statement) visit(ctx.declaration());
         } else if (ctx.ifStatement() != null) {
@@ -65,6 +64,11 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
             return (Statement) visit(ctx.returnStatement());
         } else if (ctx.iterationStatement() != null) {
             return (Statement) visit(ctx.iterationStatement());
+        } else if (ctx.blockExpression() != null) {
+            // Block as a statement - wrap in ExpressionStatement
+            return ExpressionStatement.expressionStatement(
+                    (Expression) visit(ctx.blockExpression())
+            );
         } else if (ctx.expressionStatement() != null) {
             return (Statement) visit(ctx.expressionStatement());
         }
@@ -574,11 +578,7 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
     @Override
     public Expression visitObjectExpression(ObjectExpressionContext ctx) {
-        if (ctx.objectDeclaration() != null) {
-            return (Expression) visit(ctx.objectDeclaration());
-        } else {
-            return (Expression) visit(ctx.blockExpression());
-        }
+        return (Expression) visit(ctx.objectDeclaration());
     }
 
     @Override
