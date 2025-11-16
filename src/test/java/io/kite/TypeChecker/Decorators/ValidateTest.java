@@ -159,7 +159,7 @@ public class ValidateTest extends CheckerTest {
                 @validate()
                 input string something
                 """));
-        assertEquals("@validate() is missing arguments", error.getMessage());
+        assertEquals("@validate is missing arguments!", error.getMessage());
     }
 
     @Test
