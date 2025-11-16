@@ -169,7 +169,7 @@ decoratorList
     ;
 
 decorator
-    : '@' identifier ('(' NL* decoratorArgs NL* ')')?
+    : '@' identifier ('(' NL* decoratorArgs? NL* ')')?
     ;
 
 decoratorArgs
