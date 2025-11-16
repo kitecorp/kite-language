@@ -1,7 +1,6 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
@@ -58,7 +57,6 @@ public class ResourceTest extends ParserTest {
                 """);
         AnnotationDeclaration existing = annotation("existing");
         var expected = program(
-                        ExpressionStatement.expressionStatement(existing),
                         resource("vm", "main", block(
                                 assign("name", "main")
                         ), existing)
