@@ -1,9 +1,7 @@
 package io.kite.Runtime.Decorators;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
-import io.kite.Frontend.Parser.Parser;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeChecker;
@@ -19,8 +17,6 @@ public class DecoratorTests extends RuntimeTest {
 
     @Override
     protected void init() {
-        this.parser = new Parser();
-        this.tokenizer = new Tokenizer();
         this.typeChecker = new TypeChecker();
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(new Environment<>("global"));

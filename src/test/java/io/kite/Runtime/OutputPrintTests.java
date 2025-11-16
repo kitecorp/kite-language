@@ -1,9 +1,8 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Frontend.Lexer.Tokenizer;
 import io.kite.Frontend.Lexical.ScopeResolver;
-import io.kite.Frontend.Parser.Parser;
+import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.tool.JansiHelper;
@@ -29,8 +28,7 @@ public class OutputPrintTests extends RuntimeTest {
 
     @Override
     protected void init() {
-        this.parser = new Parser();
-        this.tokenizer = new Tokenizer();
+        this.compiler = new KiteCompiler();
         this.typeChecker = new TypeChecker();
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(new Environment<>("global"));
