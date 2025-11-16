@@ -64,7 +64,13 @@ unionTypeParam
     : literal
     | objectExpression
     | arrayExpression
+    | typeKeyword
     | identifier
+    ;
+
+typeKeyword
+    : OBJECT
+    | ANY
     ;
 
 schemaDeclaration
@@ -318,6 +324,7 @@ arrayItem
     : callMemberExpression
     | identifier
     | objectExpression
+    | typeKeyword       // Add this
     | literal
     ;
 

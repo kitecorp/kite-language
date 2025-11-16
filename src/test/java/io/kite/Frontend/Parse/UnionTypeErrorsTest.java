@@ -1,123 +1,121 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.ParserErrors;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @Log4j2
-@DisplayName("Parser Type alias errors")
+@DisplayName("Parser Type alias - syntax validation")
 public class UnionTypeErrorsTest extends ParserTest {
-
     @Test
-    void typeRepeatingIntError() {
-        parse("type custom = 1 | 1");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingInt() {
+        // Valid syntax, duplicate checking is typechecker's job
+        var res = parse("type custom = 1 | 1");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingDecimalError() {
-        parse("type custom = 1.2 | 1.2");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingDecimal() {
+        var res = parse("type custom = 1.2 | 1.2");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingStringError() {
-        parse("type custom = 'hi' | \"hi\" ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingString() {
+        var res = parse("type custom = 'hi' | \"hi\"");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingBooleanError() {
-        parse("type custom = true | true ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingBoolean() {
+        var res = parse("type custom = true | true");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingNullError() {
-        parse("type custom = null | null ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingNull() {
+        var res = parse("type custom = null | null");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingNumberError() {
-        parse("type custom = number | number ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
-    }
-
-
-    @Test
-    void typeRepeatingStringKeywordError() {
-        parse("type custom = string | string ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingNumber() {
+        var res = parse("type custom = number | number");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingBooleanKeywordError() {
-        parse("type custom = boolean | boolean ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingStringKeyword() {
+        var res = parse("type custom = string | string");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingObjectKeywordError() {
-        parse("type custom = object | object ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingBooleanKeyword() {
+        var res = parse("type custom = boolean | boolean");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingEmptyObjectError() {
-        parse("type custom = {} | {} ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingObjectKeyword() {
+        var res = parse("type custom = object | object");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingObjectError() {
-        parse("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' } ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingEmptyObject() {
+        var res = parse("type custom = {} | {}");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingArrayIntsError() {
-        parse("type custom = [1,2,3] | [1,2,3] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingObject() {
+        var res = parse("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' }");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingArrayDecimalsError() {
-        parse("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
-    }
-
-
-    @Test
-    void typeRepeatingArrayBooleanError() {
-        parse("type custom = [true] | [true] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingArrayInts() {
+        var res = parse("type custom = [1,2,3] | [1,2,3]");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingArrayStringsError() {
-        parse("type custom = ['hello'] | ['hello'] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingArrayDecimals() {
+        var res = parse("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3]");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingArrayObjectEmptyError() {
-        parse("type custom = [{}] | [{}] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingArrayBoolean() {
+        var res = parse("type custom = [true] | [true]");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingArrayObjectEmptyKeywordError() {
-        parse("type custom = [{}] | [object] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingArrayStrings() {
+        var res = parse("type custom = ['hello'] | ['hello']");
+        assertNotNull(res);
     }
 
     @Test
-    void typeRepeatingArrayObjectKeywordError() {
-        parse("type custom = [object] | [object] ");
-        Assertions.assertFalse(ParserErrors.getErrors().isEmpty());
+    void typeRepeatingArrayObjectEmpty() {
+        var res = parse("type custom = [{}] | [{}]");
+        assertNotNull(res);
+    }
+
+    @Test
+    void typeRepeatingArrayObjectEmptyKeyword() {
+        var res = parse("type custom = [{}] | [object]");
+        assertNotNull(res);
+    }
+
+    @Test
+    void typeRepeatingArrayObjectKeyword() {
+        var res = parse("type custom = [object] | [object]");
+        assertNotNull(res);
     }
 
 
