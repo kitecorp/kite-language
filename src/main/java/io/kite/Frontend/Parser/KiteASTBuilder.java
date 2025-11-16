@@ -645,11 +645,9 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
             }
 
             Statement body;
-            if (ctx.expression() != null) {
-                // Form 1: [for ...: expr]
-                body = ExpressionStatement.expressionStatement(
-                        (Expression) visit(ctx.expression())
-                );
+            if (ctx.compactBody() != null) {
+                // Form 1: [for ...: compactBody]
+                body = (Statement) visit(ctx.compactBody());
             } else {
                 // Form 2: [for ...] forBody
                 body = (Statement) visit(ctx.forBody());
@@ -672,6 +670,17 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
         }
 
         return array;
+    }
+
+    @Override
+    public Statement visitCompactBody(CompactBodyContext ctx) {
+        if (ctx.ifStatement() != null) {
+            return visitIfStatement(ctx.ifStatement());
+        } else {
+            return ExpressionStatement.expressionStatement(
+                    (Expression) visit(ctx.expression())
+            );
+        }
     }
     @Override
     public LambdaExpression visitLambdaExpression(LambdaExpressionContext ctx) {
