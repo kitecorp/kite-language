@@ -916,6 +916,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ComponentStatement expression) {
+        visitAnnotations(expression.getAnnotations());
         validateComponentStatement(expression);
 
         if (isCounted(expression.targetType())) {
