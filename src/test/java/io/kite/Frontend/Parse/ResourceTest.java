@@ -1,9 +1,10 @@
 package io.kite.Frontend.Parse;
 
 import io.kite.Frontend.Parser.Expressions.AnnotationDeclaration;
-import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Statements.ExpressionStatement;
+import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,8 +30,8 @@ public class ResourceTest extends ParserTest {
 
     @Test
     void missingLeftBracketError() {
-        parse("resource vm main   }");
-        var leftErr = ParserErrors.getErrors().get(0);
+        var err = Assertions.assertThrows(ValidationException.class, () -> parse("resource vm main   }"));
+
     }
 
     @Test

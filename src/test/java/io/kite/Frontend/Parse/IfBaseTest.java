@@ -1,23 +1,21 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.ParserErrors;
-import io.kite.Frontend.Lexer.TokenType;
-import io.kite.Frontend.Parser.errors.ParseError;
+import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
-import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.kite.Frontend.Parse.Literals.Identifier.id;
 import static io.kite.Frontend.Parse.Literals.NumberLiteral.number;
+import static io.kite.Frontend.Parser.Expressions.AssignmentExpression.assign;
+import static io.kite.Frontend.Parser.Expressions.BinaryExpression.binary;
 import static io.kite.Frontend.Parser.Program.program;
 import static io.kite.Frontend.Parser.Statements.BlockExpression.block;
 import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionStatement;
-import static io.kite.Frontend.Parser.Statements.IfStatement.If;
+import static io.kite.Frontend.Parser.Statements.IfStatement.ifStatement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Log4j2
 @DisplayName("Parser if case")
@@ -31,7 +29,7 @@ public class IfBaseTest extends ParserTest {
                 }
                 """);
         var expected = program(
-                If(id("x"), expressionStatement(block(
+                ifStatement(id("x"), expressionStatement(block(
                                         expressionStatement(assign("=", id("x"), number(1)))
                                 )
                         )
@@ -44,12 +42,12 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testXNoCurly() {
         var res = parse("""
-                if (x) x=1
+                if (x) { x=1 }
                 """);
         var expected = program(
-                If(id("x"),
+                ifStatement(id("x"),
                         expressionStatement(
-                                assign("=", id("x"), number(1))
+                                block(assign("=", id("x"), number(1)))
                         )
                 )
         );
@@ -58,35 +56,34 @@ public class IfBaseTest extends ParserTest {
     }
 
     @Test
-    @Disabled("Add better error handling")
     void MissingOpenParenthesisError() {
-        parse("""
-                if x) x=1
-                """);
-        ParseError parseError = ParserErrors.getErrors().get(0);
-        Assertions.assertEquals(TokenType.OpenParenthesis, parseError.getExpected());
+        var err = assertThrows(ValidationException.class, () ->
+                parse("""
+                        if x) x=1
+                        """)
+        );
+        assertEquals("Parse error at line 1:4 - unmatched ')' - use both '(' and ')' or neither", err.getMessage());
     }
 
     @Test
-    @Disabled("Add better error handling")
     void MissingCloseParenthesisError() {
-        parse("""
+        var err = assertThrows(ValidationException.class, () -> parse("""
                 if (x x=1
-                """);
-        ParseError parseError = ParserErrors.getErrors().get(0);
-        Assertions.assertEquals(TokenType.CloseParenthesis, parseError.getExpected());
+                """));
+        Assertions.assertEquals("Parse error at line 1:7 - unmatched '(' - use both '(' and ')' or neither", err.getMessage());
     }
 
     @Test
     void testNoCurly() {
         var res = parse("""
-                if (x) 
+                if (x) {
                     x=1
+                }
                 """);
         var expected = program(
-                If(id("x"),
+                ifStatement(id("x"),
                         expressionStatement(
-                                assign("=", id("x"), number(1)))));
+                                block(assign("=", id("x"), number(1))))));
         assertEquals(expected, res);
         log.info(res);
     }
@@ -101,7 +98,7 @@ public class IfBaseTest extends ParserTest {
                 }
                 """);
         var expected = program(
-                If(id("x"),
+                ifStatement(id("x"),
                         block(expressionStatement(number(1))),
                         block(expressionStatement(number(2)))));
         assertEquals(expected, res);
@@ -112,16 +109,17 @@ public class IfBaseTest extends ParserTest {
     void testXBlock() {
         var res = parse("""
                 if (x) {
-                    if(y) x=1
+                    if(y) {x=1}
                 }
                 """);
         var expected = program(
-                If(id("x"),
+                ifStatement(id("x"),
                         expressionStatement(block(
-                                If(
+                                ifStatement(
                                         id("y"),
-                                        expressionStatement(
-                                                assign("=", "x", number(1)))
+                                        expressionStatement(block(  // ← Add block wrapper
+                                                expressionStatement(assign("=", "x", number(1)))  // ← Wrap in expressionStatement
+                                        ))
                                 )
                         ))
                 )
@@ -133,16 +131,18 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testNoBlockY() {
         var res = parse("""
-                if (x) 
-                    if(y) x=1
+                if (x) {
+                    if(y) { x=1 }
+                }
                 """);
         var expected = program(
-                If(id("x"),
-                        If(
+                ifStatement(id("x"),
+                        expressionStatement(block(ifStatement(
                                 id("y"),
-                                expressionStatement(
-                                        assign("=", "x", number(1)))
-                        )
+                                expressionStatement(block(
+                                        expressionStatement(assign("=", "x", number(1)))
+                                ))
+                        )))
                 )
         );
         assertEquals(expected, res);
@@ -152,19 +152,20 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testXCurlyY() {
         var res = parse("""
-                if (x) 
+                if (x) {
                     if(y){ x=1 }
+                }
                 """);
         var expected = program(
-                If(id("x"),
-                        If(
+                ifStatement(id("x"),
+                        expressionStatement(block(ifStatement(
                                 id("y"),
                                 expressionStatement(block(
                                         expressionStatement(
                                                 assign("=", "x", number(1))
                                         )
                                 ))
-                        )
+                        )))
                 )
         );
         assertEquals(expected, res);
@@ -174,17 +175,18 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testNestedElse() {
         var res = parse("""
-                if (x)
-                 if(y) {} else { }
+                   if (x){
+                    if(y) {} else { }
+                }
                 """);
         var expected = program(
-                If(id("x"),
-                        If(
-                                id("y"),
-                                block(),
-                                block()
-                        )
-                )
+                ifStatement(id("x"),
+                        expressionStatement(block(ifStatement(
+                                        id("y"),
+                                        block(),
+                                        block()
+                                ))
+                        ))
         );
         assertEquals(expected, res);
         log.info(res);
@@ -193,17 +195,21 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testNestedElseElse() {
         var res = parse("""
-                if (x) 
-                    if(y) {} else { } else {}
+                if (x) {
+                    if(y) {} else { } 
+                } else {}
                 """);
         var expected = program(
-                If(id("x"),
-                        If(
-                                id("y"),
-                                block(),
-                                block()
-                        ),
-                        expressionStatement(block())
+                ifStatement(
+                        id("x"),
+                        expressionStatement(block(
+                                ifStatement(
+                                        id("y"),
+                                        expressionStatement(block()),
+                                        expressionStatement(block())  // ← This is the inner else
+                                )
+                        )),
+                        expressionStatement(block())  // ← This is the outer else
                 )
         );
         assertEquals(expected, res);
@@ -213,15 +219,17 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testNestedElseElseInline() {
         var res = parse("""
-                if (x) if(y) {} else { } else {}
+                if (x) { if(y) {} else { } } else {}
                 """);
         var expected = program(
-                If(id("x"),
-                        If(
-                                id("y"),
-                                block(),
-                                block()
-                        ),
+                ifStatement(id("x"),
+                        expressionStatement(block(
+                                ifStatement(
+                                        id("y"),
+                                        expressionStatement(block()),
+                                        expressionStatement(block())
+                                )
+                        )),
                         expressionStatement(block())
                 )
         );
@@ -232,18 +240,20 @@ public class IfBaseTest extends ParserTest {
     @Test
     void testNestedElseElseAssignInline() {
         var res = parse("""
-                if (x) if(y) {} else { } else { x=2}
+                if (x) {if(y) {} else { }} else { x=2}
                 """);
         var expected = program(
-                If(id("x"),
-                        If(
-                                id("y"),
-                                block(),
-                                block()
-                        ),
-                        expressionStatement(block(expressionStatement(
-                                assign("=", id("x"), number(2))
-                        )))
+                ifStatement(id("x"),
+                        expressionStatement(block(
+                                ifStatement(
+                                        id("y"),
+                                        expressionStatement(block()),
+                                        expressionStatement(block())
+                                )
+                        )),
+                        expressionStatement(block(
+                                expressionStatement(assign("=", id("x"), number(2)))
+                        ))
                 )
         );
         assertEquals(expected, res);
@@ -260,7 +270,7 @@ public class IfBaseTest extends ParserTest {
                 }
                 """);
         var expected = program(
-                If(
+                ifStatement(
                         binary("x", 1, ">"),
                         block(expressionStatement(
                                 assign("=", id("x"), number(2)))
@@ -282,7 +292,7 @@ public class IfBaseTest extends ParserTest {
                 }
                 """);
         var expected = program(
-                If(
+                ifStatement(
                         binary(id("x"), number(1), ">="),
                         block(expressionStatement(
                                 assign("=", id("x"), number(2)))
@@ -304,7 +314,7 @@ public class IfBaseTest extends ParserTest {
                 }
                 """);
         var expected = program(
-                If(
+                ifStatement(
                         binary(id("x"), number(1), "<"),
                         block(expressionStatement(
                                 assign("=", id("x"), number(2)))
@@ -326,7 +336,7 @@ public class IfBaseTest extends ParserTest {
                 }
                 """);
         var expected = program(
-                If(
+                ifStatement(
                         binary(id("x"), number(1), "<="),
                         block(expressionStatement(
                                 assign("=", id("x"), number(2)))

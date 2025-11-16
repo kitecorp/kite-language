@@ -123,11 +123,12 @@ varInitializer
 
 // Statements
 ifStatement
-    : IF '('? expression ')'? statement elseStatement?
+    : IF '(' expression ')' NL* blockExpression elseStatement?
+    | IF expression NL* blockExpression elseStatement?
     ;
 
 elseStatement
-    : ELSE statement
+    : ELSE NL* blockExpression
     ;
 
 iterationStatement
@@ -136,7 +137,8 @@ iterationStatement
     ;
 
 whileStatement
-    : WHILE '(' expression ')' NL? statement
+    : WHILE '(' expression ')' NL* blockExpression
+    | WHILE expression NL* blockExpression
     ;
 
 forStatement

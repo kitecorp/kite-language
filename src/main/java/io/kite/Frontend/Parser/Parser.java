@@ -814,7 +814,7 @@ public class Parser {
         Statement ifBlock = Statement();
         Statement elseBlock = ElseStatement();
         contextStack.pop();
-        return IfStatement.If(test, ifBlock, elseBlock);
+        return IfStatement.ifStatement(test, ifBlock, elseBlock);
     }
 
     private Statement ElseStatement() {

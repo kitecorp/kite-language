@@ -3,19 +3,19 @@ package io.kite.Frontend.Parser;
 import io.kite.Frontend.Parser.generated.KiteLexer;
 import io.kite.Frontend.Parser.generated.KiteParser;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Parser;
+
+import java.util.List;
 
 public class KiteCompiler {
 
     public Program parse(String source) {
-        // Step 1: Tokenize
-        var input = CharStreams.fromString(source);
-        var lexer = new KiteLexer(input);
-        var tokens = new CommonTokenStream(lexer);
+        CharStream input = CharStreams.fromString(source);
+        KiteLexer lexer = new KiteLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-        // Step 2: Parse
-        var parser = new KiteParser(tokens);
+        KiteParser parser = new KiteParser(tokens);
 
-        // Step 3: Error handling
         parser.removeErrorListeners();
         parser.addErrorListener(new BaseErrorListener() {
             @Override
@@ -23,18 +23,74 @@ public class KiteCompiler {
                                     Object offendingSymbol,
                                     int line, int charPositionInLine,
                                     String msg, RecognitionException e) {
-                throw new RuntimeException(
+
+                String improvedMsg = improveErrorMessage(
+                        msg,
+                        (org.antlr.v4.runtime.Parser) recognizer,
+                        (Token) offendingSymbol
+                );
+
+                throw new ValidationException(
                         String.format("Parse error at line %d:%d - %s",
-                                line, charPositionInLine, msg)
+                                line, charPositionInLine, improvedMsg)
                 );
             }
         });
 
-        // Step 4: Generate parse tree
-        var tree = parser.program();
-
-        // Step 5: Build AST
-        var builder = new KiteASTBuilder();
+        KiteParser.ProgramContext tree = parser.program();
+        KiteASTBuilder builder = new KiteASTBuilder();
         return builder.visitProgram(tree);
+    }
+
+    private String improveErrorMessage(String originalMsg, Parser parser, Token token) {
+        List<String> ruleStack = parser.getRuleInvocationStack();
+        String rules = String.join(",", ruleStack);
+
+        // Missing ')' - if we see '=' or '{' while parsing condition
+        if ((rules.contains("ifStatement") ||
+             rules.contains("whileStatement") ||
+             rules.contains("forStatement")) &&
+            (token.getType() == KiteLexer.ASSIGN ||
+             token.getType() == KiteLexer.LBRACE) &&
+            originalMsg.contains("expecting")) {
+            return "unmatched '(' - use both '(' and ')' or neither";
+        }
+
+        // Mismatched ')' in if/while without '('
+        if ((rules.contains("ifStatement") || rules.contains("whileStatement")) &&
+            token.getType() == KiteLexer.RPAREN &&
+            (originalMsg.contains("mismatched input ')'") ||
+             originalMsg.contains("extraneous input ')'"))) {
+            return "unmatched ')' - use both '(' and ')' or neither";
+        }
+
+        // 2. Missing '=' in output declaration
+        if (rules.contains("outputDeclaration") &&
+            originalMsg.contains("expecting '='")) {
+            return "output declaration requires '=' and value";
+        }
+
+        // 3. Missing closing brace
+        if (originalMsg.contains("expecting '}'") &&
+            (rules.contains("blockExpression") ||
+             rules.contains("objectDeclaration"))) {
+            return "missing closing '}'";
+        }
+
+        // 4. Missing opening brace for blocks (if/while/for)
+        if ((rules.contains("ifStatement") ||
+             rules.contains("whileStatement")) &&
+            originalMsg.contains("expecting '{'")) {
+            return "if/while statements require block { }";
+        }
+
+        // 5. Missing closing bracket in arrays
+        if (rules.contains("arrayExpression") &&
+            originalMsg.contains("expecting ']'")) {
+            return "missing ']' to close array";
+        }
+
+        // Default: use ANTLR's message (good enough for edge cases)
+        return originalMsg;
     }
 }
