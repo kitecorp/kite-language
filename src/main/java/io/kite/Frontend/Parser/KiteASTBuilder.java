@@ -365,8 +365,12 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     }
 
     @Override
-    public Statement visitForBody(KiteParser.ForBodyContext ctx) {
-        if (ctx.resourceDeclaration() != null) {
+    public Statement visitForBody(ForBodyContext ctx) {
+        if (ctx.blockExpression() != null) {
+            return ExpressionStatement.expressionStatement(
+                    (Expression) visit(ctx.blockExpression())
+            );
+        } else if (ctx.resourceDeclaration() != null) {
             return visitResourceDeclaration(ctx.resourceDeclaration());
         } else if (ctx.ifStatement() != null) {
             return visitIfStatement(ctx.ifStatement());
