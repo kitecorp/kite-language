@@ -21,6 +21,7 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -711,7 +712,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var collect = new HashMap<String, Type>(params.size());
         for (ParameterIdentifier identifier : params) {
             if (identifier.getType() == null) {
-                throw new IllegalArgumentException("Missing type for parameter " + identifier.getName().string() + "(" + printer.visit(identifier) + ")");
+                throw new IllegalArgumentException(MessageFormat.format("Missing type for parameter {0}", printer.visit(identifier)));
             }
             Type type = identifier.getType().getType();
             if (collect.put(identifier.getName().getSymbol(), type) != null) {

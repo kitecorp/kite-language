@@ -5,6 +5,8 @@ import io.kite.Frontend.Parser.Expressions.*;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Frontend.Parser.generated.KiteParser;
 import io.kite.Frontend.annotations.Annotatable;
+import io.kite.TypeChecker.Types.FunType;
+import io.kite.TypeChecker.Types.Type;
 import io.kite.TypeChecker.Types.ValueType;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -752,7 +754,10 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     public TypeIdentifier visitTypeIdentifier(TypeIdentifierContext ctx) {
         TypeIdentifier base;
 
-        if (ctx.complexTypeIdentifier() != null) {
+        // Handle function type: (number) -> string
+        if (ctx.functionType() != null) {
+            base = (TypeIdentifier) visit(ctx.functionType());
+        } else if (ctx.complexTypeIdentifier() != null) {
             base = (TypeIdentifier) visit(ctx.complexTypeIdentifier());
         } else if (ctx.OBJECT() != null) {
             base = TypeIdentifier.type("object");
@@ -763,8 +768,8 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
         }
 
         // Handle array brackets
-        int arrayDimensions = ctx.getChildCount() - 1; // Subtract base type
-        for (int i = 0; i < arrayDimensions / 2; i++) { // Each [] is 2 children
+        int arrayDimensions = ctx.getChildCount() - 1;
+        for (int i = 0; i < arrayDimensions / 2; i++) {
             base = ArrayTypeIdentifier.arrayType(base);
         }
 
@@ -844,6 +849,26 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
                 .stream()
                 .map(this::visitDecorator)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public TypeIdentifier visitFunctionType(FunctionTypeContext ctx) {
+        // Parse parameter types
+        List<Type> paramTypes = new ArrayList<>();
+        if (ctx.functionTypeParams() != null) {
+            for (var paramTypeCtx : ctx.functionTypeParams().typeIdentifier()) {
+                TypeIdentifier paramTypeId = (TypeIdentifier) visit(paramTypeCtx);
+                paramTypes.add(paramTypeId.getType());
+            }
+        }
+
+        // Parse return type
+        var returnTypeId = (TypeIdentifier) visit(ctx.typeIdentifier());
+        var returnType = returnTypeId.getType();
+
+        // Create FunType and wrap in TypeIdentifier
+        var funType = FunType.fun(paramTypes, returnType);
+        return TypeIdentifier.type(funType);
     }
 
     public AnnotationDeclaration visitDecorator(DecoratorContext ctx) {
