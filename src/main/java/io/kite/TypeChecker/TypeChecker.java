@@ -843,6 +843,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ResourceStatement resource) {
+        visitAnnotations(resource.getAnnotations());
         validateResourceName(resource);
 
         var installedSchema = lookupSchema(resource);
