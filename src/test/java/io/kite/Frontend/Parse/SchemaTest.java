@@ -1,6 +1,5 @@
 package io.kite.Frontend.Parse;
 
-import io.kite.Frontend.Parser.Program;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import static io.kite.Frontend.Parse.Literals.Identifier.id;
 import static io.kite.Frontend.Parse.Literals.TypeIdentifier.type;
 import static io.kite.Frontend.Parser.Factory.program;
-import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
+import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
@@ -18,7 +17,7 @@ public class SchemaTest extends ParserTest {
 
     @Test
     void schemaDeclaration() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    Vm x =1
                    Vm y =1
@@ -37,7 +36,7 @@ public class SchemaTest extends ParserTest {
 
     @Test
     void schemaDeclarationVar() {
-        var actual = (Program) parse("""
+        var actual = parse("""
                 schema square { 
                    Vm x =1
                 }

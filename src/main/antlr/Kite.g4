@@ -6,7 +6,7 @@ grammar Kite;
 
 // Entry point
 program
-    : statementList EOF
+    : NL* statementList? EOF
     ;
 
 statementList
@@ -62,7 +62,7 @@ unionTypeParam
     ;
 
 schemaDeclaration
-    : SCHEMA identifier '{' schemaProperty* '}'
+    : SCHEMA identifier '{' NL* (schemaProperty NL*)* '}'
     ;
 
 schemaProperty
@@ -267,8 +267,8 @@ blockExpression
     ;
 
 objectExpression
-    : objectDeclaration
-    | blockExpression
+    : blockExpression
+    | objectDeclaration
     ;
 
 objectDeclaration
