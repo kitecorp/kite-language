@@ -853,9 +853,59 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
             return AnnotationDeclaration.annotation(name);
         }
 
-        // Handle decorator arguments
-        // This gets complex - you'll need to handle named args vs positional args
-        // For now, return simple annotation
+        // Handle named arguments (convert to Map)
+        if (!ctx.decoratorArgs().namedArg().isEmpty()) {
+            Map<String, Expression> namedArgs = ctx.decoratorArgs().namedArg()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            namedArg -> ((Identifier) visit(namedArg.identifier())).string(),
+                            namedArg -> (Expression) visit(namedArg.expression())
+                    ));
+            return AnnotationDeclaration.annotation(name, namedArgs);
+        }
+
+        // Handle positional arguments
+        if (!ctx.decoratorArgs().decoratorArg().isEmpty()) {
+            DecoratorArgContext firstArg = ctx.decoratorArgs().decoratorArg(0);
+
+            // Object expression: @annotation({key: value})
+            if (firstArg.objectExpression() != null) {
+                ObjectExpression obj = (ObjectExpression) visit(firstArg.objectExpression());
+                return AnnotationDeclaration.annotation(name, obj);
+            }
+
+            // Array expression: @annotation([1, 2, 3])
+            if (firstArg.arrayExpression() != null) {
+                ArrayExpression arr = (ArrayExpression) visit(firstArg.arrayExpression());
+                return AnnotationDeclaration.annotation(name, arr);
+            }
+
+            // CallMemberExpression: @annotation(foo.bar())
+            if (firstArg.callMemberExpression() != null) {
+                Expression expr = (Expression) visit(firstArg.callMemberExpression());
+                return AnnotationDeclaration.annotation(name, expr);
+            }
+
+            // Identifier: @annotation(myVar)
+            if (firstArg.identifier() != null) {
+                Identifier id = (Identifier) visit(firstArg.identifier());
+                return AnnotationDeclaration.annotation(name, id);
+            }
+
+            // Literal: @annotation(2), @annotation("test"), @annotation(true)
+            if (firstArg.literal() != null) {
+                Expression lit = (Expression) visit(firstArg.literal());
+                return AnnotationDeclaration.annotation(name, lit);
+            }
+
+            // Negative number: @annotation(-5)
+            if (firstArg.NUMBER() != null) {
+                NumberLiteral num = NumberLiteral.number("-" + firstArg.NUMBER().getText());
+                return AnnotationDeclaration.annotation(name, num);
+            }
+        }
+
+        // No arguments or unhandled case
         return AnnotationDeclaration.annotation(name);
     }
 
