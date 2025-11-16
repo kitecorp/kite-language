@@ -281,7 +281,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             case ANY -> actualType; // Accept any actual type without validation
             case null, default -> throw new TypeError(format(
                     "Expected type `{0}` but got `{1}` in expression: {2}",
-                    expectedType, actualType, printer.visit(expectedVal)
+                    printer.visit(expectedType), actualType, printer.visit(expectedVal)
             ));
         };
     }

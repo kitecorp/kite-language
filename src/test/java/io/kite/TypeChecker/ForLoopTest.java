@@ -54,7 +54,7 @@ public class ForLoopTest extends CheckerTest {
     @Test
     void testForConditional() {
         var res = eval("""
-                [for i in 0..10: if i>2 i+=1]
+                [for i in 0..10: if i>2 {i+=1}]
                 """);
         assertInstanceOf(ArrayType.class, res);
         var varType = (ArrayType) res;

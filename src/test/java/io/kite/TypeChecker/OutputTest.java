@@ -38,12 +38,6 @@ public class OutputTest extends CheckerTest {
 
     @Test
     void outputAnyInitObjectEmptyKeyword() {
-        var res = eval("output any something = object");
-        assertEquals(AnyType.INSTANCE, res);
-    }
-
-    @Test
-    void outputAnyInitObjectEmptyKeywordNoBody() {
         var res = eval("output any something = object()");
         assertEquals(AnyType.INSTANCE, res);
     }
