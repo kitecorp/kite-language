@@ -6,6 +6,7 @@ import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Frontend.Parser.Factory;
 import io.kite.Frontend.Parser.ParserErrors;
 import io.kite.Frontend.Parser.Program;
+import io.kite.Frontend.Parser.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +36,7 @@ import static io.kite.Frontend.Parser.Statements.ExpressionStatement.expressionS
 import static io.kite.Frontend.Parser.Statements.SchemaDeclaration.schema;
 import static io.kite.Frontend.Parser.Statements.SchemaProperty.schemaProperty;
 import static io.kite.Frontend.Parser.Statements.VarStatement.varStatement;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Annotations can be attached to:
@@ -58,7 +59,6 @@ public class DecoratorTest extends ParserTest {
                 output string something = 10
                 """);
         Program annotation = program(
-                expressionStatement(annotation("annotation")),
                 output(symbol("something"), type("string"), number(10), Set.of(annotation("annotation"))));
         Assertions.assertEquals(annotation, res);
     }
@@ -70,7 +70,6 @@ public class DecoratorTest extends ParserTest {
                 var string something = 10
                 """);
         var program = program(
-                expressionStatement(annotation("annotation")),
                 varStatement(var("something", type("string"), number(10), annotation("annotation")))
         );
         Assertions.assertEquals(program, res);
@@ -83,7 +82,6 @@ public class DecoratorTest extends ParserTest {
                 input string something = 10
                 """);
         var program = program(
-                expressionStatement(annotation("annotation")),
                 input("something", type("string"), 10, annotation("annotation"))
         );
         Assertions.assertEquals(program, res);
@@ -96,7 +94,6 @@ public class DecoratorTest extends ParserTest {
                 resource vm something { }
                 """);
         var program = program(
-                expressionStatement(annotation("annotation")),
                 ResourceStatement.resource(type("vm"), symbol("something"), Set.of(annotation("annotation")), block())
         );
         Assertions.assertEquals(program, res);
@@ -109,7 +106,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation")),
                 component("Backend", "api", block(), annotation("annotation"))
         );
         Assertions.assertEquals(program, res);
@@ -147,7 +143,6 @@ public class DecoratorTest extends ParserTest {
                 """);
 
         var program = Factory.program(
-                expressionStatement(annotation("annotation")),
                 schema(
                         id("Backend"),
                         List.of(schemaProperty(type("string"), "name", 0, annotation("sensitive"), annotation("deprecated"))),
@@ -165,7 +160,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", number(2))),
                 component("Backend", "api", block(), annotation("annotation", number(2)))
         );
         Assertions.assertEquals(program, res);
@@ -178,7 +172,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", number(2.2))),
                 component("Backend", "api", block(), annotation("annotation", number(2.2)))
         );
         Assertions.assertEquals(program, res);
@@ -191,7 +184,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", string("2.2"))),
                 component("Backend", "api", block(), annotation("annotation", string("2.2")))
         );
         Assertions.assertEquals(program, res);
@@ -204,7 +196,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", bool(true))),
                 component("Backend", "api", block(), annotation("annotation", bool(true)))
         );
         Assertions.assertEquals(program, res);
@@ -217,7 +208,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", bool(false))),
                 component("Backend", "api", block(), annotation("annotation", bool(false)))
         );
         Assertions.assertEquals(program, res);
@@ -230,7 +220,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", array(1, 2, 3))),
                 component("Backend", "api", block(),
                         annotation("annotation", array(1, 2, 3))));
         Assertions.assertEquals(program, res);
@@ -243,7 +232,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", array())),
                 component("Backend", "api", block(),
                         annotation("annotation", array())));
         Assertions.assertEquals(program, res);
@@ -256,7 +244,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", objectExpression())),
                 component("Backend", "api", block(),
                         annotation("annotation", objectExpression())));
         Assertions.assertEquals(program, res);
@@ -268,9 +255,8 @@ public class DecoratorTest extends ParserTest {
                 @annotation(regex="^[a-z0-9-]+$")
                 component Backend api { }
                 """);
-        var annotation = annotation("annotation",  Map.of("regex", string("^[a-z0-9-]+$")));
+        var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$")));
         var program = Factory.program(
-                expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
@@ -283,7 +269,6 @@ public class DecoratorTest extends ParserTest {
                 """);
         var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", number(1)));
         var program = Factory.program(
-                expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
@@ -296,7 +281,6 @@ public class DecoratorTest extends ParserTest {
                 """);
         var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", string("m")));
         var program = Factory.program(
-                expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
@@ -309,7 +293,6 @@ public class DecoratorTest extends ParserTest {
                 """);
         var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", bool(true)));
         var program = Factory.program(
-                expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
@@ -322,7 +305,6 @@ public class DecoratorTest extends ParserTest {
                 """);
         var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", ArrayExpression.array(number(1), number(2), number(3))));
         var program = Factory.program(
-                expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
@@ -333,13 +315,12 @@ public class DecoratorTest extends ParserTest {
                 @annotation(
                     regex = "^[a-z0-9-]+$", 
                     flags = [1,2,3], 
-                    
+                
                 )
                 component Backend api { }
                 """);
         var annotation = annotation("annotation", Map.of("regex", string("^[a-z0-9-]+$"), "flags", ArrayExpression.array(number(1), number(2), number(3))));
         var program = Factory.program(
-                expressionStatement(annotation),
                 component("Backend", "api", block(), annotation));
         Assertions.assertEquals(program, res);
     }
@@ -351,7 +332,6 @@ public class DecoratorTest extends ParserTest {
                 component Backend api { }
                 """);
         var program = Factory.program(
-                expressionStatement(annotation("annotation", objectExpression(object("env", "prod")))),
                 component("Backend", "api", block(),
                         annotation("annotation", objectExpression(object("env", "prod")))));
         Assertions.assertEquals(program, res);
@@ -378,7 +358,7 @@ public class DecoratorTest extends ParserTest {
     void schemaObjectVar() {
         var actual = parse("""
                 schema square { 
-                   @annotation({env="test"}) Vm x =1
+                   @annotation({env: "test"}) Vm x =1
                 }
                 """);
         var expected = Factory.program(
@@ -461,52 +441,50 @@ public class DecoratorTest extends ParserTest {
                    @annotation(importable Vm x =1
                 }
                 """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
+        assertTrue(ParserErrors.hadErrors());
         Assertions.assertEquals("Expected token ) but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
     }
 
     @Test
     void decoratorMissingClosingBracesBrackets() {
-        parse("""
-                schema square { 
-                   @annotation([importable Vm x =1
-                }
-                """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
-        Assertions.assertEquals("Expected token ] but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
+        var err = assertThrows(ValidationException.class, () ->
+                parse("""
+                        schema square { 
+                           @annotation([importable Vm x =1
+                        }
+                        """)
+        );
+        assertEquals("Parse error at line 2:27 - missing ']' to close decorator array argument", err.getMessage());
     }
 
     @Test
     void decoratorMissingClosingBracket() {
-        parse("""
+        var err = assertThrows(ValidationException.class, () -> parse("""
                 schema square { 
                    @annotation([importable) Vm x =1
                 }
-                """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
-        Assertions.assertEquals("Expected token ] but it was ')'", ParserErrors.getErrors().getFirst().getMessage());
+                """));
+        assertEquals("Parse error at line 2:26 - missing ']' at ')'", err.getMessage());
     }
 
     @Test
     void decoratorMissingParanthesis() {
-        parse("""
+        var err = assertThrows(ValidationException.class, () -> parse("""
                 schema square { 
                    @annotation([importable] Vm x =1
                 }
-                """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
-        Assertions.assertEquals("Expected token ) but it was 'Vm'", ParserErrors.getErrors().getFirst().getMessage());
+                """));
+        assertEquals("Parse error at line 2:28 - missing ')' at 'Vm'", err.getMessage());
     }
 
     @Test
     void decoratorMissingCloseBrackets() {
-        parse("""
+        var err = assertThrows(ValidationException.class, () -> parse("""
                 schema square { 
                    @annotation(importable] Vm x =1
                 }
-                """);
-        Assertions.assertTrue(ParserErrors.hadErrors());
-        Assertions.assertEquals("Expected token ) but it was ']'", ParserErrors.getErrors().getFirst().getMessage());
+                """));
+        assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {'.', '(', ')', '[', ','}", err.getMessage());
     }
 
 
