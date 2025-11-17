@@ -1,6 +1,6 @@
 package io.kite.Runtime.Decorators;
 
-import io.kite.Frontend.Parser.errors.ParseError;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ public class ValidateTests extends DecoratorTests {
                 @validate(regex="^[a-z0-9-]+$")
                 input number[] something = []
                 """));
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on number", err.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on number", err.getMessage());
     }
 
     @Test
@@ -92,7 +92,7 @@ public class ValidateTests extends DecoratorTests {
                 @validate(regex="^[a-z0-9-]+$")
                 input any[] something = []
                 """));
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on any", err.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on any", err.getMessage());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class ValidateTests extends DecoratorTests {
                 @validate(regex="^[a-z0-9-]+$")
                 input object[] something = []
                 """));
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on object", err.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on object", err.getMessage());
     }
 
     @Test
@@ -148,8 +148,8 @@ public class ValidateTests extends DecoratorTests {
 
     @Test
     void validateInvalidRegexRejectedEarly() {
-        assertThrows(ParseError.class, () -> eval("""
-                    @validate(regex="(unclosed")
+        assertThrows(ValidationException.class, () -> eval("""
+                    @validate(regex="(unclosed"
                     input string name
                 """));
     }

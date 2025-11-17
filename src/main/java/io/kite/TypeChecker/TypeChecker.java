@@ -34,7 +34,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
     private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
     @Getter
-    private final SyntaxPrinter printer = new SyntaxPrinter();
+    private SyntaxPrinter printer = new SyntaxPrinter();
     private final Set<String> vals = new HashSet<>();
     private final Map<String, DecoratorChecker> decoratorInfoMap;
     private final ComponentRegistry componentRegistry;
@@ -43,11 +43,16 @@ public final class TypeChecker extends StackVisitor<Type> {
     private TypeEnvironment env;
 
     public TypeChecker() {
-        this(new TypeEnvironment("global"));
+        this(new TypeEnvironment("global"), new SyntaxPrinter());
     }
 
-    public TypeChecker(TypeEnvironment environment) {
+    public TypeChecker(SyntaxPrinter printer) {
+        this(new TypeEnvironment("global"), printer);
+    }
+
+    public TypeChecker(TypeEnvironment environment, SyntaxPrinter printer) {
         this.env = environment;
+        this.printer = printer;
         for (var value : ValueType.values()) {
             env.init(value.getValue(), value);
         }

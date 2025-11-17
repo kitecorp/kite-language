@@ -7,6 +7,7 @@ import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.Visitors.PlainTheme;
+import io.kite.Visitors.SyntaxPrinter;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -19,10 +20,11 @@ public class DecoratorTests extends RuntimeTest {
     @Override
     protected void init() {
         this.compiler = new KiteCompiler();
-        this.typeChecker = new TypeChecker();
+        this.printer = new SyntaxPrinter(new PlainTheme());
+        this.typeChecker = new TypeChecker(printer);
         this.scopeResolver = new ScopeResolver();
         this.interpreter = new Interpreter(new Environment<>("global"));
-        this.interpreter.getPrinter().setTheme(new PlainTheme());
+        this.interpreter.setPrinter(printer);
     }
 
 
