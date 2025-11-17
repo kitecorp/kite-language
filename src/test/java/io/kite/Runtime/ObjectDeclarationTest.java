@@ -102,7 +102,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varMultiDeclaration() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     color: "white"
                 }
                 """);
@@ -116,7 +116,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varPropertyAccess() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     color: "white"
                 }
                 var y = x.color
