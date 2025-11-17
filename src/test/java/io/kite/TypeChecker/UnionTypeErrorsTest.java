@@ -2,6 +2,7 @@ package io.kite.TypeChecker;
 
 import io.kite.Base.CheckerTest;
 import io.kite.Runtime.exceptions.NotFoundException;
+import io.kite.TypeChecker.Types.UnionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -134,139 +135,223 @@ public class UnionTypeErrorsTest extends CheckerTest {
                 type alias = number | string | null
                 var alias x = []
                 """));
-        assertEquals("Expected type `string | number | null` with valid values: `string | number | null` but got `array` in expression: `alias x = []`", err.getMessage());
+        assertEquals("Expected type `string | null | number` with valid values: `string | null | number` but got `array` in expression: `alias x = []`", err.getMessage());
     }
 
 
-    @Test
-    @DisplayName("Should throw because union has duplicate literal number")
-    void typeRepeatingIntError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = 1 | 1"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("1"));
-    }
+    /* ****************
+     * DEDUPLICATION *
+     * ****************
+     **/
 
     @Test
-    @DisplayName("Should throw because union has duplicate decimal")
-    void typeRepeatingDecimalError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = 1.2 | 1.2"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("1.2"));
-    }
-
-    @Test
-    @DisplayName("Should throw because union has duplicate string (different quotes)")
-    void typeRepeatingStringError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = 'hi' | \"hi\""));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("hi"));
+    @DisplayName("Union deduplicates duplicate literal number")
+    void typeRepeatingInt() {
+        eval("type custom = 1 | 1");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate 1 | 1 to just 1");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate boolean")
-    void typeRepeatingBooleanError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = true | true"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("true"));
+    @DisplayName("Union deduplicates duplicate decimal")
+    void typeRepeatingDecimal() {
+        eval("type custom = 1.2 | 1.2");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate 1.2 | 1.2 to just 1.2");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate null")
-    void typeRepeatingNullError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = null | null"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("null"));
+    @DisplayName("Union deduplicates duplicate string (different quotes)")
+    void typeRepeatingString() {
+        eval("type custom = 'hi' | \"hi\"");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate 'hi' | \"hi\" to just one string");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate number type")
-    void typeRepeatingNumberError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = number | number"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("number"));
+    @DisplayName("Union deduplicates duplicate boolean")
+    void typeRepeatingBoolean() {
+        eval("type custom = true | true");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate true | true to just true");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate string type")
-    void typeRepeatingStringKeywordError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = string | string"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("string"));
+    @DisplayName("Union deduplicates duplicate null")
+    void typeRepeatingNull() {
+        eval("type custom = null | null");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate null | null to just null");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate boolean type")
-    void typeRepeatingBooleanKeywordError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = boolean | boolean"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("boolean"));
+    @DisplayName("Union deduplicates duplicate number type")
+    void typeRepeatingNumber() {
+        eval("type custom = number | number");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate number | number to just number");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate object type")
-    void typeRepeatingObjectKeywordError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = object | object"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("object"));
+    @DisplayName("Union deduplicates duplicate string type")
+    void typeRepeatingStringKeyword() {
+        eval("type custom = string | string");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate string | string to just string");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate empty object")
-    void typeRepeatingEmptyObjectError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = {} | {}"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("object"));
+    @DisplayName("Union deduplicates duplicate boolean type")
+    void typeRepeatingBooleanKeyword() {
+        eval("type custom = boolean | boolean");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate boolean | boolean to just boolean");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate complex object")
-    void typeRepeatingObjectError() {
-        var err = assertThrows(TypeError.class, () ->
-                eval("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' }"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("object"));
+    @DisplayName("Union deduplicates duplicate object type")
+    void typeRepeatingObjectKeyword() {
+        eval("type custom = object | object");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate object | object to just object");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate array of ints")
-    void typeRepeatingArrayIntsError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = [1,2,3] | [1,2,3]"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
+    @DisplayName("Union deduplicates duplicate empty object")
+    void typeRepeatingEmptyObject() {
+        eval("type custom = {} | {}");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(), "Should deduplicate {} | {} to just one empty object");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate array of decimals")
-    void typeRepeatingArrayDecimalsError() {
-        var err = assertThrows(TypeError.class, () ->
-                eval("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3]"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
+    @DisplayName("Union deduplicates duplicate complex object")
+    void typeRepeatingObject() {
+        eval("type custom = { env: 123, color: 'red' } | { env: 123, color: 'red' }");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate identical objects with same properties");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate array of boolean")
-    void typeRepeatingArrayBooleanError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = [true] | [true]"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
+    @DisplayName("Union deduplicates duplicate array of ints")
+    void typeRepeatingArrayInts() {
+        eval("type custom = [1,2,3] | [1,2,3]");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate [1,2,3] | [1,2,3] to just one array");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate array of strings")
-    void typeRepeatingArrayStringsError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = ['hello'] | ['hello']"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
+    @DisplayName("Union deduplicates duplicate array of decimals")
+    void typeRepeatingArrayDecimals() {
+        eval("type custom = [1.1, 2.2, 3.3] | [1.1, 2.2, 3.3]");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate arrays with same decimal values");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate array of empty objects")
-    void typeRepeatingArrayObjectEmptyError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = [{}] | [{}]"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
+    @DisplayName("Union deduplicates duplicate array of boolean")
+    void typeRepeatingArrayBoolean() {
+        eval("type custom = [true] | [true]");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate [true] | [true] to just one array");
     }
 
     @Test
-    @DisplayName("Should throw because [{}] and [object] are both arrays of empty objects")
-    void typeRepeatingArrayObjectEmptyKeywordError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = [{}] | [object]"));
-        assertTrue(err.getMessage().contains("duplicate") ||
-                   err.getMessage().contains("array") ||
-                   err.getMessage().contains("object"));
+    @DisplayName("Union deduplicates duplicate array of strings")
+    void typeRepeatingArrayStrings() {
+        eval("type custom = ['hello'] | ['hello']");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate ['hello'] | ['hello'] to just one array");
     }
 
     @Test
-    @DisplayName("Should throw because union has duplicate array of object keyword")
-    void typeRepeatingArrayObjectKeywordError() {
-        var err = assertThrows(TypeError.class, () -> eval("type custom = [object] | [object]"));
-        assertTrue(err.getMessage().contains("duplicate") || err.getMessage().contains("array"));
+    @DisplayName("Union deduplicates duplicate array of empty objects")
+    void typeRepeatingArrayObjectEmpty() {
+        eval("type custom = [{}] | [{}]");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate [{}] | [{}] to just one array of empty objects");
     }
 
+    @Test
+    @DisplayName("Union deduplicates [{}] and [object] as same type")
+    void typeRepeatingArrayObjectEmptyKeyword() {
+        eval("type custom = [{}] | [object]");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should normalize [{}] and [object] to the same type");
+    }
+
+    @Test
+    @DisplayName("Union deduplicates duplicate array of object keyword")
+    void typeRepeatingArrayObjectKeyword() {
+        eval("type custom = [object] | [object]");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate [object] | [object] to just one array");
+    }
+
+    @Test
+    @DisplayName("Union keeps distinct types")
+    void typeDistinctTypes() {
+        eval("type custom = 1 | 2 | 3");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should keep all distinct literal types");
+    }
+
+    @Test
+    @DisplayName("Union deduplicates mixed with distinct types")
+    void typeMixedDuplicatesAndDistinct() {
+        eval("type custom = 1 | 1 | 2 | 2 | 3");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should deduplicate to 1 | 2 | 3");
+    }
+
+    @Test
+    @DisplayName("Union deduplicates string type and keeps literals separate")
+    void typeStringTypeVsLiteral() {
+        eval("type custom = string | 'hello' | string");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should have string type and 'hello' literal (deduplicating second string)");
+    }
+
+    @Test
+    @DisplayName("Union with empty objects and object keyword")
+    void typeEmptyObjectsNormalization() {
+        eval("type custom = {} | object | {}");
+        var unionType = (UnionType) checker.getEnv().lookup("custom");
+        assertNotNull(unionType);
+        assertEquals(1, unionType.getTypes().size(),
+                "Should normalize all empty objects to one type");
+    }
 
 }

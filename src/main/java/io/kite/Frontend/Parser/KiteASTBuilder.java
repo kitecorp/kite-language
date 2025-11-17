@@ -233,7 +233,7 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
     @Override
     public UnionTypeStatement visitTypeDeclaration(TypeDeclarationContext ctx) {
         Identifier name = (Identifier) visit(ctx.identifier());
-        HashSet<Expression> types = new HashSet<>();
+        List<Expression> types = new ArrayList<>();
 
         for (var typeParam : ctx.typeParams().unionTypeParam()) {
             types.add((Expression) visit(typeParam));
