@@ -20,11 +20,7 @@ public class UniqueDecorator extends DecoratorChecker {
     public static final String NAME = "unique";
 
     public UniqueDecorator(TypeChecker checker) {
-        super(checker, NAME, decorator(List.of(),
-                        Set.of(DecoratorType.Target.INPUT)
-                ),
-                Set.of(SystemType.ARRAY)
-        );
+        super(checker, NAME, decorator(List.of(), Set.of(DecoratorType.Target.INPUT)), Set.of(SystemType.ARRAY));
     }
 
     @Override
