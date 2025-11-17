@@ -126,11 +126,14 @@ while condition { body }
 - Commas **required** between properties (standard across languages except Bicep)
 - Trailing commas **allowed** (modern language feature)
 - Newlines allowed for formatting
+- **Keywords allowed as property names** (e.g., `type`, `for`, `if`)
 
 ```kite
 var config = {
   env: "production",
   port: 8080,
+  type: "web",      // Keywords allowed as keys
+  for: "production", // 'for' is a keyword but valid here
   features: {
     auth: true,
     logging: false,
@@ -233,11 +236,23 @@ literals allow any string keys, but decorator arguments require structured ident
 
 - Newlines (`\n`) **or** semicolons (`;`) separate statements
 - Both are interchangeable (like Kotlin, Swift)
+- Works consistently across all contexts: statements, schema properties, object properties
 
 ```kite
+// Variable declarations
 var x = 1; var y = 2  // Semicolons
 var x = 1
 var y = 2             // Newlines
+
+// Schema properties - both work
+schema User {
+  string name; number age  // Semicolons
+}
+
+schema User {
+  string name
+  number age               // Newlines
+}
 ```
 
 ### Type Aliases
@@ -716,47 +731,26 @@ lang/src/main/java/io/kite/
 
 ## Recent Grammar Changes (January 2025)
 
-**Function Types:**
+**See:** `lang/src/main/antlr/Kite.g4` for the complete, authoritative grammar.
 
-```antlr
-functionType
-    : '(' functionTypeParams? ')' '->' typeIdentifier
-    ;
-```
+**Key additions:**
 
-**Postfix Operators:**
+- **Function types:** `(param1Type, param2Type) -> returnType` syntax
+- **Postfix operators:** `x++`, `x--` support
+- **Flexible object syntax:** `object()`, `object({})`, and `{}` all valid
+- **Decorator arguments:** Single positional OR multiple named (enforced at parse time)
+- **Assignment flexibility:** Arrays/objects allowed on right-hand side
+- **Keywords as object keys:** Reserved words like `type`, `for`, `if` allowed as property names
+- **Consistent separators:** `statementTerminator` (`;` or `\n`) used throughout schemas and properties
 
-```antlr
-postfixExpression
-    : leftHandSideExpression ('++' | '--')?
-    ;
-```
+**Key grammar rules to reference:**
 
-**Object Syntax Flexibility:**
-
-```antlr
-objectDeclaration
-    : OBJECT '(' ('{' NL* objectPropertyList? NL* '}')? ')'  // object() or object({...})
-    | '{' NL* objectPropertyList? NL* '}'                     // {...}
-    ;
-```
-
-**Decorator Arguments:**
-
-```antlr
-decoratorArgs
-    : decoratorArg                      // Single positional only
-    | namedArg (',' namedArg)*          // OR multiple named
-    ;
-```
-
-**Assignment Expressions:**
-
-```antlr
-assignmentExpression
-    : orExpression (('=' | '+=') expression)?  // Allow arrays/objects on right
-    ;
-```
+- `functionType` - Function type syntax
+- `postfixExpression` - Postfix increment/decrement
+- `objectDeclaration` - Object literal forms
+- `decoratorArgs` - Decorator argument rules
+- `objectKey` - Allows keywords via `keyword` rule
+- `schemaPropertyList` - Uses `statementTerminator` for consistency
 
 ## Code Style
 
@@ -895,6 +889,56 @@ Kite has comprehensive internal documentation with ASCII diagrams for terminal-f
 
 ## Key Design Insights
 
+### Keyword Flexibility in Object Literals
+
+**Keywords can be used as object property names:**
+
+```kite
+// Valid - keywords as property names
+var resource = {
+  type: "web",
+  for: "production",
+  if: true
+}
+
+// Especially useful in decorators
+@tags({type: "database", env: "prod"})
+```
+
+**Why this works:**
+
+- Context matters: `type` in `type Foo = ...` is a declaration keyword
+- In object literals, `{type: "value"}`, it's clearly a property name
+- Parser uses context to disambiguate
+- Common in modern languages (JavaScript, Python, Rust)
+
+**Implementation:** Grammar uses a `keyword` rule listing all reserved words, allowing them in `objectKey` positions.
+
+### Consistent Statement Separators
+
+**Semicolons and newlines are interchangeable everywhere:**
+
+```kite
+// Variables
+var x = 1; var y = 2
+
+// Schema properties
+schema User { string name; number age }
+
+// Resource properties
+resource VM server { name = "prod"; size = "large" }
+```
+
+**Why consistency matters:**
+
+- Developer experience: No mental context switching
+- Copy-paste friendly: Code snippets work regardless of separator
+- Tooling simplicity: Formatters don't need special cases
+- Aligns with Kotlin/Swift philosophy
+
+**Implementation:** Use `statementTerminator` (`NL | ';'`) consistently across all grammar rules for property/statement
+lists.
+
 ### Type System Philosophy
 
 **TypeChecker works with TYPE KINDS, not literal values:**
@@ -984,6 +1028,8 @@ typechecker.
 - ✅ Flexible object syntax (`object()`, `object({})`, `{}`)
 - ✅ Comprehensive decorator validation
 - ✅ Parser/typechecker separation fully implemented
+- ✅ Keywords allowed as object property names (e.g., `{type: "web"}`)
+- ✅ Consistent statement separators (`;` or `\n`) across all contexts
 
 **Production Readiness:**
 
