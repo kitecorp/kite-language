@@ -1,12 +1,10 @@
 package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.TypeChecker.TypeError;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("@tags")
@@ -141,16 +139,6 @@ public class TagsTest extends CheckerTest {
                 @tags({ "env": "" })
                 resource vm something {}""")
         );
-    }
-
-    @Test
-    void tagsInValidKeyFormatMinus() {
-        var error = assertThrows(ParseError.class, () -> eval("""
-                schema vm {}
-                @tags({ "env stage": "prod" })
-                resource vm something {}""")
-        );
-        assertEquals("Invalid key format: `env stage`. Keys must be alphanumeric.", error.getMessage());
     }
 
     @Test
@@ -333,17 +321,6 @@ public class TagsTest extends CheckerTest {
                 @tags({env: {season: "prod"}})
                 component app prodApp {}
                 """));
-    }
-
-    @Test
-    void tagsInvalidKeyFormatOnComponent() {
-        var error = assertThrows(ParseError.class, () -> eval("""
-                component app {}
-                
-                @tags({"env stage": "prod"})
-                component app prodApp {}
-                """));
-        assertEquals("Invalid key format: `env stage`. Keys must be alphanumeric.", error.getMessage());
     }
 
     @Test

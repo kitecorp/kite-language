@@ -297,6 +297,16 @@ objectProperty
 objectKey
     : STRING
     | IDENTIFIER
+    | keyword
+    ;
+
+// Allow keywords as object property names (e.g., {type: "value"})
+keyword
+    : RESOURCE | COMPONENT | SCHEMA | INPUT | OUTPUT
+    | IF | ELSE | WHILE | FOR | IN | RETURN
+    | FUN | VAR | TYPE | INIT | THIS
+    | OBJECT | ANY
+    | TRUE | FALSE | NULL
     ;
 
 objectInitializer
