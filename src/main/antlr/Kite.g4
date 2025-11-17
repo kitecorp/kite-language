@@ -74,11 +74,11 @@ typeKeyword
     ;
 
 schemaDeclaration
-    : SCHEMA identifier '{' NL* schemaPropertyList? NL* '}'
+    : SCHEMA identifier '{' statementTerminator* schemaPropertyList? statementTerminator* '}'
     ;
 
 schemaPropertyList
-    : schemaProperty (NL+ schemaProperty)* NL*
+    : schemaProperty (statementTerminator+ schemaProperty)* statementTerminator*
     ;
 
 schemaProperty
