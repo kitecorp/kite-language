@@ -410,15 +410,24 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(ComponentStatement expression) {
+        visitAnnotations(expression.getAnnotations());
         throw new RuntimeException("Invalid component statement");
     }
 
     @Override
     public Object visit(InputDeclaration input) {
+        visitAnnotations(input.getAnnotations());
         if (input.hasInit() && env.get(input.name()) == null) {
             return env.initOrAssign(input.getId().string(), visit(input.getInit()));
         }
         return env.lookup(input.name());
+    }
+
+    private void visitAnnotations(Set<AnnotationDeclaration> annotations) {
+        if (annotations == null || annotations.isEmpty()) {
+            return;
+        }
+        annotations.forEach(this::visit);
     }
 
     @Override
@@ -637,6 +646,8 @@ public final class Interpreter extends StackVisitor<Object> {
     public Object visit(ResourceStatement statement) {
         if (statement.isCounted()) {
             return statement;
+        } else {
+            visitAnnotations(statement.getAnnotations());
         }
 
         validate(statement);
@@ -954,6 +965,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(SchemaDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
         var environment = new Environment<>(env);
         push(ContextStack.Schema);
 
@@ -1020,6 +1032,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(VarDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
         String symbol = expression.getId().string();
         Object value = null;
         if (expression.hasInit()) {
@@ -1070,12 +1083,13 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     @Override
-    public Object visit(OutputDeclaration input) {
-        outputs.add(input); // just collect the outputs since they need to be evaluated after the program is run
-        if (!input.hasInit()) {
-            throw new MissingOutputException("Output type without an init value: " + printer.visit(input));
+    public Object visit(OutputDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
+        outputs.add(expression); // just collect the outputs since they need to be evaluated after the program is run
+        if (!expression.hasInit()) {
+            throw new MissingOutputException("Output type without an init value: " + printer.visit(expression));
         }
-        var res = visit(input.getInit());
+        var res = visit(expression.getInit());
         if (res instanceof Dependency value && value.value() == null) {
             return value;
         } else {
