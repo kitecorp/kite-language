@@ -1,7 +1,7 @@
 package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.errors.ErrorList;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.TypeChecker.TypeError;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -106,19 +106,19 @@ public class UniqueTest extends CheckerTest {
 
     @Test
     void uniqueWithEmptyParentheses() {
-        var error = assertThrows(TypeError.class, () -> eval("""
+        eval("""
                 @unique()
                 input string[] something
-                """));
-        assertEquals("@unique() must not have any arguments", error.getMessage());
+                """);
     }
 
     @Test
     void uniqueWithMultipleArgs() {
-        var error = assertThrows(ErrorList.class, () -> eval("""
+        var err = assertThrows(ValidationException.class, () -> eval("""
                 @unique(1, 2)
                 input string[] something
                 """));
+        assertEquals("Parse error at line 1:9 - no viable alternative at input '@unique(1,'", err.getMessage());
     }
 
     @Test
