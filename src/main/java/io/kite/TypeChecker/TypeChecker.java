@@ -234,7 +234,12 @@ public final class TypeChecker extends StackVisitor<Type> {
         var unionType = new UnionType(expression.name(), env);
         for (Expression it : expression.getExpressions()) {
             var type = visit(it);
-            unionType.getTypes().add(type);
+            Set<Expression> types = unionType.getTypes();
+            if (types.contains(type)) {
+                log.warn("Duplicate type '{}' in union `{}`", type.getValue(), printer.visit(expression));
+            } else {
+                types.add(type);
+            }
         }
 
         env.init(expression.getName(), unionType);
