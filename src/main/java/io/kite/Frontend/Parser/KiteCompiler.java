@@ -3,18 +3,17 @@ package io.kite.Frontend.Parser;
 import io.kite.Frontend.Parser.generated.KiteLexer;
 import io.kite.Frontend.Parser.generated.KiteParser;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.Parser;
 
 import java.util.List;
 
 public class KiteCompiler {
 
     public Program parse(String source) {
-        CharStream input = CharStreams.fromString(source);
-        KiteLexer lexer = new KiteLexer(input);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        var input = CharStreams.fromString(source);
+        var lexer = new KiteLexer(input);
+        var tokens = new CommonTokenStream(lexer);
 
-        KiteParser parser = new KiteParser(tokens);
+        var parser = new KiteParser(tokens);
 
         parser.removeErrorListeners();
         parser.addErrorListener(new BaseErrorListener() {
@@ -37,8 +36,8 @@ public class KiteCompiler {
             }
         });
 
-        KiteParser.ProgramContext tree = parser.program();
-        KiteASTBuilder builder = new KiteASTBuilder();
+        var tree = parser.program();
+        var builder = new KiteASTBuilder();
         return builder.visitProgram(tree);
     }
 

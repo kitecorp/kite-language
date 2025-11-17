@@ -47,8 +47,6 @@ import static java.text.MessageFormat.format;
 
 @Log4j2
 public final class Interpreter extends StackVisitor<Object> {
-    @Getter
-    private final SyntaxPrinter printer;
     private final DeferredObservable deferredObservable;
     @Getter
     private final List<OutputDeclaration> outputs;
@@ -56,6 +54,9 @@ public final class Interpreter extends StackVisitor<Object> {
     private final Map<String, DecoratorInterpreter> decorators;
     @Getter
     private final List<RuntimeException> errors;
+    @Getter
+    @Setter
+    private SyntaxPrinter printer;
     private KiteCompiler parser = new KiteCompiler();
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

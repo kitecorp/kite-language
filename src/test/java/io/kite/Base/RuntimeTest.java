@@ -13,7 +13,7 @@ public class RuntimeTest {
     protected Interpreter interpreter;
     protected ScopeResolver scopeResolver;
     protected Program program;
-    protected SyntaxPrinter printer = new SyntaxPrinter();
+    protected SyntaxPrinter printer;
     protected KiteCompiler compiler;
 
     @BeforeEach
@@ -24,7 +24,9 @@ public class RuntimeTest {
     protected void init() {
         this.compiler = new KiteCompiler();
         this.scopeResolver = new ScopeResolver();
+        this.printer = new SyntaxPrinter();
         this.interpreter = new Interpreter(new Environment<>("global"));
+        this.interpreter.setPrinter(printer);
     }
 
     @AfterEach
