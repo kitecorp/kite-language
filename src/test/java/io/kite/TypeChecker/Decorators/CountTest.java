@@ -1,7 +1,7 @@
 package io.kite.TypeChecker.Decorators;
 
 import io.kite.Base.CheckerTest;
-import io.kite.Frontend.Parser.errors.ErrorList;
+import io.kite.Frontend.Parser.ValidationException;
 import io.kite.TypeChecker.TypeError;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.DisplayName;
@@ -15,16 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CountTest extends CheckerTest {
     @Test
     void decoratorCount() {
-        var res = eval("""
+        eval("""
                 schema vm {}
                 @count(2)
                 resource vm something {}""");
-
     }
 
     @Test
     void decoratorCountReference() {
-        var res = eval("""
+        eval("""
                 schema vm { string name; }
                 @count(2)
                 resource vm something {
@@ -35,7 +34,7 @@ public class CountTest extends CheckerTest {
     @Test
     @Description("! we don't actually check vm.something[count]. We just say")
     void decoratorMultipleResources() {
-        var res = eval("""
+        eval("""
                 schema vm { string name; }
                 @count(2)
                 resource vm something {
@@ -52,7 +51,7 @@ public class CountTest extends CheckerTest {
     @Test
     @Description("! we don't actually check something[count]. We just say")
     void decoratorMultipleResourcesNumber() {
-        var res = eval("""
+        eval("""
                 schema vm { number name; }
                 @count(2)
                 resource vm something {
@@ -294,7 +293,7 @@ public class CountTest extends CheckerTest {
 
     @Test
     void decoratorCountMultipleArguments() {
-        assertThrows(ErrorList.class, () -> eval("""
+        assertThrows(ValidationException.class, () -> eval("""
                 schema vm {}
                 @count(2, 3)
                 resource vm something {}
