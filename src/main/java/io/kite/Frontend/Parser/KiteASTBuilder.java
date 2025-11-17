@@ -438,9 +438,13 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
             String value = ctx.STRING().getText();
             value = value.substring(1, value.length() - 1); // Remove quotes
             return new StringLiteral(value);
-        } else {
+        } else if (ctx.IDENTIFIER() != null) {
             return new StringLiteral(ctx.IDENTIFIER().getText());
+        } else if (ctx.keyword() != null) {
+            // Allow keywords as object property names (e.g., {type: "value"})
+            return new StringLiteral(ctx.keyword().getText());
         }
+        return null;
     }
 
     @Override

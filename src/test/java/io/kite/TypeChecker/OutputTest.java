@@ -15,10 +15,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class OutputTest extends CheckerTest {
 
     @Test
-    void outputUnion() {
+    void outputUnionNumber() {
         var res = eval("""
                 type custom = string | number
-                output custom something
+                output custom something = 2
+                """);
+        assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
+    }
+
+    @Test
+    void outputUnionString() {
+        var res = eval("""
+                type custom = string | number
+                output custom something = "str"
                 """);
         assertEquals(unionType("custom", ValueType.String, ValueType.Number), res);
     }
