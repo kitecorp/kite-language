@@ -298,7 +298,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
     void varMultiDeclarationObject() {
         var res = eval("""
                 var x = { 
-                    size: 2
+                    size: 2,
                     env: {
                         color: "white"
                     }
