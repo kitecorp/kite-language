@@ -57,7 +57,16 @@ kite/
 - Union types: `type Status = "active" | "inactive" | "pending"`
 - Array types with multi-dimensional support
 - Object types (literal and keyword forms)
+- Function types: `(number, string) -> boolean`
 - Type aliases
+
+**Union Type Deduplication:**
+Unions normalize based on **type kind**, not literal values:
+
+- `type Numbers = 1 | 2 | 3` → normalized to `number` (single type)
+- `type Mixed = 1 | "hello" | true` → `number | string | boolean` (three types)
+- Literal value constraints are interpreter/runtime concerns, not typechecker concerns
+- Warning logged for duplicates (can be disabled)
 
 ## Grammar Documentation
 
@@ -159,8 +168,27 @@ Kite has a **comprehensive decorator system** with 15 built-in decorators:
 
 **Syntax Features:**
 - Allow newlines between multiple decorators
-- Support object and array arguments
+- Support single positional argument OR multiple named arguments
+- Empty parentheses allowed: `@existing()`
 - Trailing commas allowed in arguments
+
+**Argument Rules (enforced at parse time):**
+
+```kite
+// Valid - single positional argument
+@provider("aws")
+@provider(["aws", "azure"])  // Array is ONE argument
+
+// Valid - multiple NAMED arguments  
+@annotation(first: "aws", second: "gcp")
+@validate(regex: "^[a-z]+$", flags: ["i"])
+
+// Invalid - multiple positional arguments (parse error)
+@provider("aws", "azure")  // ❌ Use array: ["aws", "azure"]
+```
+
+**Design rationale:** Decorators are data-like (declarative metadata), not function-like. Multiple values require
+explicit structure (arrays/objects) to avoid ambiguity.
 
 ```kite
 @existing
@@ -181,6 +209,25 @@ input string name
 
 **Implementation:** Decorators are validated at type-check time by `DecoratorChecker` subclasses in
 `io.kite.TypeChecker.Types.Decorators/`
+
+**Object Key Validation:**
+Decorator object keys must be alphanumeric (enforced at type-check time):
+
+```kite
+// Valid decorator keys
+@existing({ env_stage: "prod" })      // ✅ underscore
+@existing({ cloud-provider: "aws" })  // ✅ hyphen  
+@tags({ Environment: "production" })  // ✅ PascalCase
+
+// Invalid decorator keys (TypeError)
+@existing({ "env stage": "prod" })    // ❌ space (not alphanumeric)
+@existing({ "123start": "value" })    // ❌ starts with number
+```
+
+**Pattern:** `^[a-zA-Z][a-zA-Z0-9_-]*$` (must start with letter)
+
+**Rationale:** Decorator keys map to cloud provider tags/labels which enforce similar restrictions. General object
+literals allow any string keys, but decorator arguments require structured identifiers.
 
 ### Statement Separators
 
@@ -242,7 +289,24 @@ type Config = object()    // Keyword with parens
 
 - Parser validates **syntax** (is it grammatically correct?)
 - Typechecker validates **semantics** (does it make sense?)
-- Example: `type T = 1 | 1` parses successfully, typechecker catches duplicate
+
+**Examples:**
+
+| Code                                 | Parser         | Typechecker                                    |
+|--------------------------------------|----------------|------------------------------------------------|
+| `type T = 1 \| 1`                    | ✅ Valid syntax | Warns about duplicate (normalizes to `number`) |
+| `type T = number \| number`          | ✅ Valid syntax | Warns about duplicate                          |
+| `@provider("aws", "azure")`          | ❌ Parse error  | N/A (rejected before typechecker)              |
+| `@provider(["aws", "azure"])`        | ✅ Valid syntax | ✅ Valid semantics                              |
+| `@existing({ "env stage": "prod" })` | ✅ Valid syntax | ❌ TypeError (non-alphanumeric key)             |
+| `var number x = "string"`            | ✅ Valid syntax | ❌ TypeError (type mismatch)                    |
+
+**Principle:** Keep parser concerns (syntax) separate from typechecker concerns (semantics) for:
+
+- Cleaner architecture
+- Better error messages
+- Easier language evolution
+- Clear separation of responsibilities
 
 ## Architecture
 
@@ -416,6 +480,84 @@ type Config = {
 }
 ```
 
+### Function Types
+
+Kite supports first-class functions with explicit type signatures:
+
+```kite
+// Function declarations with return types
+fun add(number x, number y) number {
+  return x + y
+}
+
+// Higher-order functions
+fun outer(number x, number y) (number) -> number {
+  fun inner(number p) number {
+    return p + x + y
+  }
+  return inner
+}
+
+// Function type aliases
+type MathOp = (number, number) -> number
+type Predicate = (string) -> boolean
+
+// Lambda expressions
+var double = (x: number) -> x * 2
+```
+
+**Type syntax:** `(param1Type, param2Type) -> returnType`
+
+### Unary Operators
+
+Kite supports both prefix and postfix increment/decrement operators:
+
+```kite
+var x = 5
+
+// Prefix (increment/decrement before use)
+++x  // x becomes 6, expression evaluates to 6
+--x  // x becomes 5, expression evaluates to 5
+
+// Postfix (increment/decrement after use)  
+x++  // expression evaluates to 5, then x becomes 6
+x--  // expression evaluates to 6, then x becomes 5
+
+// Also supports unary minus and logical not
+-x   // negation
+!condition  // logical NOT
+```
+
+### Object Syntax
+
+Kite provides flexible object literal syntax:
+
+```kite
+// Literal form (shorthand)
+var config1 = {
+  env: "production",
+  port: 8080
+}
+
+// Keyword form with braces (explicit)
+var config2 = object({
+  env: "production",
+  port: 8080
+})
+
+// Empty object - two forms
+var empty1 = {}
+var empty2 = object()
+var empty3 = object({})
+
+// In type declarations
+type EmptyObject = object      // keyword without parens
+type EmptyObject = object()    // keyword with empty parens
+type EmptyObject = {}          // literal form
+```
+
+**Note:** Prefer literal `{}` syntax for values, keyword `object` for type declarations.
+
 ## Known Issues / TODOs
 
 ### Completed ✅
@@ -570,25 +712,50 @@ lang/src/main/java/io/kite/
 - Visitor pattern (not listener) for AST construction
 - Lazy evaluation using `Supplier<T>` interfaces
 - Minimal dependencies for fast startup
+- Union type deduplication uses HashSet for O(1) lookups
 
-## Testing Examples
+## Recent Grammar Changes (January 2025)
 
-```java
-// Parser test - verify syntax
-@Test
-void testIfStatement() {
-    var res = parse("if x > 5 { doSomething() }");
-    assertNotNull(res);
-}
+**Function Types:**
 
-// Typechecker test - verify semantics
-@Test
-void testTypeMismatch() {
-    var err = assertThrows(TypeError.class, () -> 
-        eval("var number x = \"string\"")
-    );
-    assertTrue(err.getMessage().contains("type mismatch"));
-}
+```antlr
+functionType
+    : '(' functionTypeParams? ')' '->' typeIdentifier
+    ;
+```
+
+**Postfix Operators:**
+
+```antlr
+postfixExpression
+    : leftHandSideExpression ('++' | '--')?
+    ;
+```
+
+**Object Syntax Flexibility:**
+
+```antlr
+objectDeclaration
+    : OBJECT '(' ('{' NL* objectPropertyList? NL* '}')? ')'  // object() or object({...})
+    | '{' NL* objectPropertyList? NL* '}'                     // {...}
+    ;
+```
+
+**Decorator Arguments:**
+
+```antlr
+decoratorArgs
+    : decoratorArg                      // Single positional only
+    | namedArg (',' namedArg)*          // OR multiple named
+    ;
+```
+
+**Assignment Expressions:**
+
+```antlr
+assignmentExpression
+    : orExpression (('=' | '+=') expression)?  // Allow arrays/objects on right
+    ;
 ```
 
 ## Code Style
@@ -598,6 +765,102 @@ void testTypeMismatch() {
 - **Static constants** for repeated values
 - **Explicit null checks** before operations
 - **Comprehensive test coverage** for both happy and error paths
+
+## Testing Strategy
+
+### Parser Tests (Syntax Validation)
+
+**Location:** `lang/src/test/java/io/kite/Frontend/Parse/`
+
+**Purpose:** Verify grammar accepts/rejects syntax correctly
+
+```java
+
+@Test
+void unionWithKeywords() {
+    var res = parse("type custom = object | string | number");
+    assertNotNull(res); // Just verify it parses
+}
+
+@Test
+void decoratorMultiplePositionalArgs() {
+    // Should reject at parse time
+    assertThrows(ValidationException.class, () ->
+            parse("@provider(\"aws\", \"azure\")")
+    );
+}
+```
+
+**Key principle:** Parser tests verify **grammar correctness**, not semantic meaning.
+
+### Typechecker Tests (Semantic Validation)
+
+**Location:** `lang/src/test/java/io/kite/TypeChecker/`
+
+**Purpose:** Verify type rules, decorator validation, and semantic correctness
+
+```java
+
+@Test
+void typeMismatch() {
+    assertThrows(TypeError.class, () ->
+            eval("var number x = \"string\"")
+    );
+}
+
+@Test
+void unionDeduplication() {
+    eval("type custom = 1 | 2 | 3");
+    var unionType = (UnionType) checker.getEnv().lookup("custom");
+    assertEquals(1, unionType.getTypes().size()); // All normalize to 'number'
+}
+
+@Test
+void decoratorInvalidKey() {
+    assertThrows(TypeError.class, () ->
+            eval("@existing({ \"env stage\": \"prod\" })")
+    );
+}
+```
+
+**Key principle:** Typechecker tests verify **semantic rules** after successful parsing.
+
+### Integration Tests
+
+**Location:** `lang/src/test/java/io/kite/Base/RuntimeTest.java`
+
+**Purpose:** End-to-end evaluation including interpreter
+
+```java
+
+@Test
+void componentWithDependencies() {
+    var result = eval("""
+            component WebApp api {
+                resource Server main { }
+                output string url = main.endpoint
+            }
+            """);
+    assertNotNull(result);
+}
+```
+
+### Test Organization
+
+```
+lang/src/test/java/io/kite/
+├── Frontend/Parse/          # Parser tests (syntax)
+│   ├── UnionTypeSyntaxTest.java
+│   ├── DecoratorSyntaxTest.java
+│   └── ...
+├── TypeChecker/             # Semantic validation tests
+│   ├── UnionTypeDeduplicationTest.java
+│   ├── Decorators/
+│   │   └── ExistingTest.java
+│   └── ...
+└── Base/
+    └── RuntimeTest.java     # Integration test base class
+```
 
 ## Documentation
 
@@ -630,6 +893,67 @@ Kite has comprehensive internal documentation with ASCII diagrams for terminal-f
 - Follow "When to read this" sections for targeted learning
 - Check "Key classes" sections for code navigation
 
+## Key Design Insights
+
+### Type System Philosophy
+
+**TypeChecker works with TYPE KINDS, not literal values:**
+
+```kite
+// All normalize to 'number' type (single type in union)
+type Numbers = 1 | 2 | 3
+
+// Normalizes to 'number | string | boolean' (three types)
+type Mixed = 1 | "hello" | true
+```
+
+**Rationale:**
+
+- Literal value constraints (`x must be 1, 2, or 3`) are runtime/interpreter concerns
+- TypeChecker ensures type safety (`x must be a number`)
+- Keeps type checking fast and simple
+- Aligns with mainstream type systems (TypeScript, Rust, etc.)
+
+### Decorator Design
+
+**Decorators are data-like (declarative), not function-like:**
+
+```kite
+// ✅ Explicit structure for multiple values
+@provider(["aws", "azure"])
+@tags({ env: "prod", team: "platform" })
+
+// ❌ Ambiguous - use array instead
+@provider("aws", "azure")
+```
+
+**Why this matters:**
+
+- Infrastructure metadata should be **explicit and unambiguous**
+- `@provider("aws", "azure")` - is this two args or a tuple?
+- Enforcing structure (arrays/objects) removes ambiguity
+- Maps naturally to cloud provider APIs (tags, labels)
+
+### Parser vs Typechecker Trade-offs
+
+**When to enforce in parser (syntax):**
+
+- Grammar structure: "Must use blocks for if/while"
+- Token patterns: "Parentheses must match"
+- Argument count: "Single positional OR multiple named"
+
+**When to enforce in typechecker (semantics):**
+
+- Type compatibility: "Can't assign string to number"
+- Business rules: "Decorator keys must be alphanumeric"
+- Duplicate detection: "Union types should deduplicate"
+- Context-dependent rules: "Component initialization not allowed in definition"
+
+**Golden rule:** If it requires **understanding the meaning** of the code (not just its structure), it belongs in the
+typechecker.
+
+---
+
 ## References
 
 - Authoritative documentation sources are preferred over tutorials
@@ -640,24 +964,41 @@ Kite has comprehensive internal documentation with ASCII diagrams for terminal-f
 
 ## Project Status
 
-**Last Updated:** January 2025
-**Java Version:** 25
-**Parser:** ANTLR4 (migration completed ✅)
-**Test Suite:** 121 test files, ~28,675 lines of test code
-**Test Status:** 280+ tests passing ✅
-**Modules:** 5 (api, lang, engine, cli, plugins)
-**Decorators:** 15 built-in validators and metadata annotations
+**Last Updated:** January 2025  
+**Java Version:** 25  
+**Parser:** ANTLR4 (migration completed ✅)  
+**Test Suite:** 121 test files, ~28,675 lines of test code  
+**Test Status:** 280+ tests passing ✅  
+**Modules:** 5 (api, lang, engine, cli, plugins)  
+**Decorators:** 15 built-in validators and metadata annotations  
 **Documentation:** Comprehensive internal docs with diagrams
 
 **Current Phase:** ✅ Core language features complete, advanced features in development
 
+**Recent Achievements (January 2025):**
+
+- ✅ ANTLR4 migration complete (~1,700 lines manual parser → 500 lines grammar)
+- ✅ Function types for higher-order functions
+- ✅ Postfix operators (`x++`, `x--`)
+- ✅ Union type deduplication (type-kind based)
+- ✅ Flexible object syntax (`object()`, `object({})`, `{}`)
+- ✅ Comprehensive decorator validation
+- ✅ Parser/typechecker separation fully implemented
+
 **Production Readiness:**
 
 - ✅ Parser (ANTLR4)
-- ✅ Type system
+- ✅ Type system with function types
 - ✅ Decorator system (15 decorators)
 - ✅ Dependency resolution (Observer pattern, cycle detection)
 - ✅ Loop resource handling
+- ✅ Union type deduplication
 - 🔄 LSP support (planned)
 - 🔄 Cloud provider plugins (AWS in development)
 - 🔄 Documentation website (planned)
+
+**Test Coverage:**
+
+- Parser: ~80 tests (syntax validation)
+- Typechecker: ~120 tests (semantic validation)
+- Integration: ~80 tests (end-to-end evaluation)
