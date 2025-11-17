@@ -1044,6 +1044,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(VarDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
         String var = expression.getId().string();
         if (expression.hasInit()) {
             return initType(expression, expression.getInit(), expression.getType(), var);
