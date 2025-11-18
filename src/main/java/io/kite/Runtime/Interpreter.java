@@ -647,8 +647,9 @@ public final class Interpreter extends StackVisitor<Object> {
     public Object visit(ResourceStatement statement) {
         if (statement.isCounted()) {
             return statement;
-        } else {
+        } else if (!contextStackContains(ContextStack.Decorator)) {
             visitAnnotations(statement.getAnnotations());
+            return statement;
         }
 
         validate(statement);
@@ -1164,12 +1165,14 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(AnnotationDeclaration expression) {
+        push(ContextStack.Decorator);
         var decorator = decorators.get(expression.name());
         if (decorator != null) {
             decorator.execute(expression);
         } else {
             log.warn("Unknown decorator: {}", expression.name());
         }
+        pop(ContextStack.Decorator);
         if (expression.getValue() != null) {
             return expression.getValue();
         } else if (expression.getArgs() != null) {
