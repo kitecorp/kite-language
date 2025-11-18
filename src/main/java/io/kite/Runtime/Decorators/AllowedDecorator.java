@@ -23,7 +23,7 @@ public class AllowedDecorator extends DecoratorInterpreter {
     private Object throwValueNotAllowed(AnnotationDeclaration declaration) {
         var value = declaration.getTarget();
         return switch (value) {
-            case InputDeclaration input -> interpreter.visit(input);
+            case InputDeclaration input -> interpreter.visit(input.getInit());
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
     }
