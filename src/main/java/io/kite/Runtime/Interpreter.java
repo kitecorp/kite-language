@@ -649,7 +649,6 @@ public final class Interpreter extends StackVisitor<Object> {
             return statement;
         } else if (!contextStackContains(ContextStack.Decorator)) {
             visitAnnotations(statement.getAnnotations());
-            return statement;
         }
 
         validate(statement);
