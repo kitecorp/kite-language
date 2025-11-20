@@ -34,7 +34,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
     private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
     @Getter
-    private SyntaxPrinter printer = new SyntaxPrinter();
+    private SyntaxPrinter printer;
     private final Set<String> vals = new HashSet<>();
     private final Map<String, DecoratorChecker> decoratorInfoMap;
     private final ComponentRegistry componentRegistry;

@@ -70,9 +70,17 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     public Interpreter(Environment<Object> environment) {
+        this(environment, new SyntaxPrinter());
+    }
+
+    public Interpreter(SyntaxPrinter printer) {
+        this(new Environment<>("global"), printer);
+    }
+
+    public Interpreter(Environment<Object> environment, SyntaxPrinter printer) {
         this.env = environment;
         this.outputs = new ArrayList<>();
-        this.printer = new SyntaxPrinter();
+        this.printer = printer;
         this.deferredObservable = new DeferredObservable();
         this.instances = new LinkedHashMap<>();
 
