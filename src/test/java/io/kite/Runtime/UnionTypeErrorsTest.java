@@ -82,7 +82,7 @@ public class UnionTypeErrorsTest extends RuntimeTest {
         assertThrows(IllegalArgumentException.class, () -> {
             eval("""
                     type customNumbers = 1 | 2 | 5
-                    var customNumbers numbers = object
+                    var customNumbers numbers = object()
                     """);
         });
     }
