@@ -92,7 +92,7 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     private Object parseInput(InputDeclaration inputDeclaration, Object init) {
         try {
             var input = resolve(inputDeclaration, init);
-            var srcCode = normalizeStringInputs(input,inputDeclaration);
+            var srcCode = normalizeStringInputs(input, inputDeclaration);
 
             var ast = parser.parse(srcCode);
             var statement = (ExpressionStatement) ast.getBody().get(0);
@@ -108,14 +108,22 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
         if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
             throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
         }
+        string = string.trim();
         boolean keepOriginal = NumberUtils.isCreatable(string) ||
                                BooleanUtils.toBoolean(string) ||
-                               StringUtils.startsWith(string, "{") ||
-                               StringUtils.startsWith(string, "[");
+                               looksLikeExpression(string);
         if (!keepOriginal && !string.equals("false")) {
             string = "\"%s\"".formatted(string);
         }
         return string;
+    }
+
+    private boolean looksLikeExpression(String input) {
+        // Starts with expression-like patterns
+        return input.startsWith("{") ||
+               input.startsWith("[") ||
+               input.startsWith("object(") ||
+               input.startsWith("object()");
     }
 
     @Override
