@@ -153,9 +153,9 @@ public class AssignmentTest extends RuntimeTest {
     @Test
     void stringConcatNewLineFront() {
         var res = eval("""
-                "\n" + "hello " + "world"
+                "\\n" + "hello " + "world"
                 """);
-        assertEquals("\nhello world", res);
+        assertEquals("\\nhello world", res);
     }
 
     @Test

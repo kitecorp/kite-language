@@ -3,7 +3,6 @@ package io.kite.Runtime.Decorators;
 import io.kite.Base.RuntimeTest;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.KiteCompiler;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.Visitors.PlainTheme;
@@ -23,7 +22,7 @@ public class DecoratorTests extends RuntimeTest {
         this.printer = new SyntaxPrinter(new PlainTheme());
         this.typeChecker = new TypeChecker(printer);
         this.scopeResolver = new ScopeResolver();
-        this.interpreter = new Interpreter(new Environment<>("global"));
+        this.interpreter = new Interpreter(printer);
         this.interpreter.setPrinter(printer);
     }
 
