@@ -151,6 +151,7 @@ public class AssignmentTest extends RuntimeTest {
     }
 
     @Test
+        // todo maybe it is \n instead of \\n
     void stringConcatNewLineFront() {
         var res = eval("""
                 "\\n" + "hello " + "world"
