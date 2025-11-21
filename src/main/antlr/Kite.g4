@@ -282,8 +282,8 @@ objectExpression
     ;
 
 objectDeclaration
-    : OBJECT '(' ('{' NL* objectPropertyList? NL* '}')? ')'  // object() or object({ key: value })
-    | '{' NL* objectPropertyList? NL* '}'                     // { key: value }
+    : OBJECT '(' NL* ('{' NL* objectPropertyList? NL* '}')? NL* ')'  // object() or object({ key: value })
+    | '{' NL* objectPropertyList? NL* '}'                             // { key: value }
     ;
 
 objectPropertyList
