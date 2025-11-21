@@ -304,8 +304,8 @@ public class DecoratorTest extends ParserTest {
     void annotationNamedMultipleFieldsNumberArrayLastComa() {
         var res = parse("""
                 @annotation(
-                    regex = "^[a-z0-9-]+$", 
-                    flags = [1,2,3], 
+                    regex = "^[a-z0-9-]+$",
+                    flags = [1,2,3],
                 
                 )
                 component Backend api { }
@@ -331,7 +331,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void schemaCloudStringsVar() {
         var actual = parse("""
-                schema square { 
+                schema square {
                    @annotation(["test"]) Vm x =1
                 }
                 """);
@@ -348,7 +348,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void schemaObjectVar() {
         var actual = parse("""
-                schema square { 
+                schema square {
                    @annotation({env: "test"}) Vm x =1
                 }
                 """);
@@ -364,7 +364,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void schemaCloudNumbersVar() {
         var actual = parse("""
-                schema square { 
+                schema square {
                    @annotation([1,2,3]) Vm x =1
                 }
                 """);
@@ -381,7 +381,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void schemaCloudArrayVar() {
         var actual = parse("""
-                schema square { 
+                schema square {
                    @annotation([importable]) Vm x =1
                 }
                 """);
@@ -398,7 +398,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void schemaCloudVar() {
         var actual = parse("""
-                schema square { 
+                schema square {
                    @annotation Vm x =1
                 }
                 """);
@@ -413,7 +413,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void schemaCloudWithArgsVar() {
         var actual = parse("""
-                schema square { 
+                schema square {
                    @annotation(importable) Vm x =1
                 }
                 """);
@@ -428,7 +428,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void decoratorMissingClosingParanthesis() {
         var err = assertThrows(ValidationException.class, () -> parse("""
-                schema square { 
+                schema square {
                    @annotation(importable Vm x =1
                 }
                 """));
@@ -443,7 +443,7 @@ public class DecoratorTest extends ParserTest {
     void decoratorMissingClosingBracesBrackets() {
         var err = assertThrows(ValidationException.class, () ->
                 parse("""
-                        schema square { 
+                        schema square {
                            @annotation([importable Vm x =1
                         }
                         """)
@@ -458,7 +458,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void decoratorMissingClosingBracket() {
         var err = assertThrows(ValidationException.class, () -> parse("""
-                schema square { 
+                schema square {
                    @annotation([importable) Vm x =1
                 }
                 """));
@@ -472,7 +472,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void decoratorMissingParanthesis() {
         var err = assertThrows(ValidationException.class, () -> parse("""
-                schema square { 
+                schema square {
                    @annotation([importable] Vm x =1
                 }
                 """));
@@ -486,7 +486,7 @@ public class DecoratorTest extends ParserTest {
     @Test
     void decoratorMissingCloseBrackets() {
         var err = assertThrows(ValidationException.class, () -> parse("""
-                schema square { 
+                schema square {
                    @annotation(importable] Vm x =1
                 }
                 """));
