@@ -42,7 +42,7 @@ public abstract class InputTests extends RuntimeTest {
     @Override
     protected void init() {
         super.init();
-        this.typeChecker = new TypeChecker();
+        this.typeChecker = new TypeChecker(printer);
         this.inputChainResolver = getChainResolver();
     }
 
