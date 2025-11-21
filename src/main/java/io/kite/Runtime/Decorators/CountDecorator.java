@@ -7,7 +7,6 @@ import io.kite.Frontend.Parser.Expressions.ComponentStatement;
 import io.kite.Frontend.Parser.Expressions.ResourceStatement;
 import io.kite.Frontend.Parser.Statements.ExpressionStatement;
 import io.kite.Frontend.Parser.Statements.ForStatement;
-import io.kite.Frontend.Parser.Statements.Statement;
 import io.kite.Frontend.annotations.CountAnnotatable;
 import io.kite.Runtime.Interpreter;
 import org.apache.commons.lang3.Range;
@@ -23,7 +22,7 @@ public class CountDecorator extends NumberDecorator {
     public Object execute(AnnotationDeclaration declaration) {
         var numberLiteral = (NumberLiteral) declaration.getValue();
         var count = (Integer) interpreter.visit(numberLiteral);
-        Statement body = switch (declaration.getTarget()) {
+        var body = switch (declaration.getTarget()) {
             case ResourceStatement expression -> expression;
             case ComponentStatement statement -> statement;
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());

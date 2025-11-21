@@ -144,6 +144,7 @@ public final class Interpreter extends StackVisitor<Object> {
         this.env.init(segmentName, instance);
         this.instances.put(segmentName, instance);
         if (ExecutionContextIn(ForStatement.class)) {
+            // make resource name {..} accessible through .name instead of .name[count]
             env.initOrAssign(instance.getPath().getName(), instance);
         }
         return instance;
@@ -653,10 +654,11 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(ResourceStatement statement) {
+        if (!contextStackContains(ContextStack.Decorator)) {
+            visitAnnotations(statement.getAnnotations());
+        }
         if (statement.isCounted()) {
             return statement;
-        } else if (!contextStackContains(ContextStack.Decorator)) {
-            visitAnnotations(statement.getAnnotations());
         }
 
         validate(statement);
