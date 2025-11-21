@@ -125,9 +125,9 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(OutputDeclaration expression) {
         var head = theme.kw("output ") + visit(expression.getType()) + " " + visit(expression.getId()) + " = ";
         if (expression.isSensitive()) {
-            return head + theme.normal("<sensitive value>") + "\n";
+            return head + theme.normal("<sensitive value>");
         }
-        return head + visit(expression.resolvedValue()) + "\n";
+        return head + visit(expression.resolvedValue());
     }
 
     public Object visit(Object value) {

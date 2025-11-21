@@ -1,11 +1,11 @@
 package io.kite.execution;
 
+import io.kite.analysis.visitors.SyntaxPrinter;
 import io.kite.base.RuntimeTest;
-import io.kite.execution.environment.Environment;
 import io.kite.semantics.TypeChecker;
 import io.kite.semantics.scope.ScopeResolver;
 import io.kite.syntax.ast.KiteCompiler;
-import io.kite.tool.JansiHelper;
+import io.kite.tool.theme.PlainTheme;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 
@@ -29,9 +29,10 @@ public class OutputPrintTests extends RuntimeTest {
     @Override
     protected void init() {
         this.compiler = new KiteCompiler();
-        this.typeChecker = new TypeChecker();
+        this.printer = new SyntaxPrinter(new PlainTheme());
+        this.typeChecker = new TypeChecker(printer);
         this.scopeResolver = new ScopeResolver();
-        this.interpreter = new Interpreter(new Environment<>("global"));
+        this.interpreter = new Interpreter(printer);
     }
 
 
@@ -60,7 +61,7 @@ public class OutputPrintTests extends RuntimeTest {
         var value = interpreter.printOutputs(main);
         assertEquals("""
                 output string something = "arn::"
-                """.trim(), JansiHelper.strip(value));
+                """.trim(), value);
     }
 
     @Test
@@ -79,7 +80,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 10));
         var value = interpreter.printOutputs(main);
-        assertEquals("output number something = 10", JansiHelper.strip(value));
+        assertEquals("output number something = 10", value);
     }
 
     @Test
@@ -98,7 +99,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 0.2));
         var value = interpreter.printOutputs(main);
-        assertEquals("output number something = 0.2", JansiHelper.strip(value));
+        assertEquals("output number something = 0.2", value);
     }
 
     @Test
@@ -117,7 +118,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", true));
         var value = interpreter.printOutputs(main);
-        assertEquals("output boolean something = true", JansiHelper.strip(value));
+        assertEquals("output boolean something = true", value);
     }
 
     @Test
@@ -136,7 +137,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
-        assertEquals("output boolean something = false", JansiHelper.strip(value));
+        assertEquals("output boolean something = false", value);
     }
 
     @Test
@@ -155,7 +156,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any something = false", JansiHelper.strip(value));
+        assertEquals("output any something = false", value);
     }
 
     @Test
@@ -174,7 +175,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", false));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any something = false", JansiHelper.strip(value));
+        assertEquals("output any something = false", value);
     }
 
     @Test
@@ -195,7 +196,7 @@ public class OutputPrintTests extends RuntimeTest {
         var value = interpreter.printOutputs(main);
         assertEquals("""
                 output any something = "arn::"
-                """.trim(), JansiHelper.strip(value));
+                """.trim(), value);
 
     }
 
@@ -215,7 +216,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 10));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any something = 10", JansiHelper.strip(value));
+        assertEquals("output any something = 10", value);
     }
 
     @Test
@@ -234,7 +235,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", 0.2));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any something = 0.2", JansiHelper.strip(value));
+        assertEquals("output any something = 0.2", value);
     }
 
     @Test
@@ -253,7 +254,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(10)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any[] something = [10]", JansiHelper.strip(value));
+        assertEquals("output any[] something = [10]", value);
     }
 
     @Test
@@ -272,7 +273,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(0.2)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any[] something = [0.2]", JansiHelper.strip(value));
+        assertEquals("output any[] something = [0.2]", value);
     }
 
     @Test
@@ -292,7 +293,7 @@ public class OutputPrintTests extends RuntimeTest {
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of("hello")));
         var value = interpreter.printOutputs(main);
         assertEquals("""
-                output any[] something = ["hello"]""", JansiHelper.strip(value));
+                output any[] something = ["hello"]""", value);
     }
 
     @Test
@@ -311,7 +312,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(true)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any[] something = [true]", JansiHelper.strip(value));
+        assertEquals("output any[] something = [true]", value);
     }
 
     @Test
@@ -330,7 +331,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(false)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output any[] something = [false]", JansiHelper.strip(value));
+        assertEquals("output any[] something = [false]", value);
     }
 
     @Test
@@ -349,7 +350,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(10)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output number[] something = [10]", JansiHelper.strip(value));
+        assertEquals("output number[] something = [10]", value);
     }
 
     @Test
@@ -368,7 +369,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(0.2)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output number[] something = [0.2]", JansiHelper.strip(value));
+        assertEquals("output number[] something = [0.2]", value);
     }
 
     @Test
@@ -387,7 +388,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(true)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output boolean[] something = [true]", JansiHelper.strip(value));
+        assertEquals("output boolean[] something = [true]", value);
     }
 
     @Test
@@ -406,7 +407,7 @@ public class OutputPrintTests extends RuntimeTest {
                 """);
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(false)));
         var value = interpreter.printOutputs(main);
-        assertEquals("output boolean[] something = [false]", JansiHelper.strip(value));
+        assertEquals("output boolean[] something = [false]", value);
     }
 
     @Test
@@ -426,7 +427,7 @@ public class OutputPrintTests extends RuntimeTest {
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of("arn::")));
         var value = interpreter.printOutputs(main);
         assertEquals("""
-                output string[] something = ["arn::"]""", JansiHelper.strip(value));
+                output string[] something = ["arn::"]""", value);
     }
 
     @Test
@@ -446,7 +447,7 @@ public class OutputPrintTests extends RuntimeTest {
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", Map.of("env", "dev")));
         var value = interpreter.printOutputs(main);
         assertEquals("""
-                output object something = {"env": "dev"}""", JansiHelper.strip(value));
+                output object something = {"env": "dev"}""", value);
     }
 
     @Test
@@ -464,7 +465,7 @@ public class OutputPrintTests extends RuntimeTest {
         Map<String, Map<String, Object>> main = Map.of("main", Map.of("arn", List.of(Map.of("env", "dev"))));
         var value = interpreter.printOutputs(main);
         assertEquals("""
-                output object[] something = [{"env": "dev"}]""", JansiHelper.strip(value));
+                output object[] something = [{"env": "dev"}]""", value);
     }
 
 
