@@ -20,7 +20,6 @@ import io.kite.syntax.ast.KiteCompiler;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
 import io.kite.syntax.ast.statements.*;
-import io.kite.syntax.lexer.TokenType;
 import io.kite.syntax.literals.*;
 import io.kite.syntax.literals.ObjectLiteral.ObjectLiteralPair;
 import lombok.EqualsAndHashCode;
@@ -41,6 +40,7 @@ import static io.kite.execution.CycleDetection.topologySort;
 import static io.kite.execution.CycleDetectionSupport.propertyOrDeferred;
 import static io.kite.execution.interpreter.OperatorComparator.compare;
 import static io.kite.syntax.ast.statements.FunctionDeclaration.fun;
+import static io.kite.syntax.lexer.TokenType.Equal_Complex;
 import static io.kite.utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
 
@@ -480,7 +480,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
     private @Nullable Object assignmentSymbol(AssignmentExpression expression, SymbolIdentifier identifier) {
         Object right = executeBlock(expression.getRight(), env);
-        if (Objects.equals(expression.getOperator(), TokenType.Equal_Complex.getField())) {
+        if (Objects.equals(expression.getOperator(), Equal_Complex.getField())) {
             return equalComplexAssignment(identifier, right);
         } else if (right instanceof Dependency dependency) {
             var res = env.assign(identifier.string(), dependency.value());
