@@ -1,6 +1,8 @@
 package io.kite.Runtime;
 
 import io.kite.ContextStack;
+import io.kite.Environment.ActivationEnvironment;
+import io.kite.Environment.Environment;
 import io.kite.Frontend.Lexer.Token;
 import io.kite.Frontend.Lexer.TokenType;
 import io.kite.Frontend.Parse.Literals.*;
@@ -10,8 +12,6 @@ import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Frontend.Parser.Statements.*;
 import io.kite.Runtime.Decorators.*;
-import io.kite.Runtime.Environment.ActivationEnvironment;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Functions.Cast.*;
 import io.kite.Runtime.Functions.DateFunction;
 import io.kite.Runtime.Functions.Numeric.*;

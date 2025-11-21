@@ -1,6 +1,6 @@
 package io.kite.TypeChecker;
 
-import io.kite.Runtime.Environment.Environment;
+import io.kite.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.TypeChecker.Types.Type;
 import lombok.extern.log4j.Log4j2;

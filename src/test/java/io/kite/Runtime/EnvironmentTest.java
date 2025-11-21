@@ -1,8 +1,8 @@
 package io.kite.Runtime;
 
+import io.kite.Environment.Environment;
 import io.kite.Frontend.Parse.Literals.Identifier;
 import io.kite.Frontend.Parser.Statements.ExpressionStatement;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.exceptions.NotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;

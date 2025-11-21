@@ -1,11 +1,11 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
+import io.kite.Environment.Environment;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parse.Literals.ArrayTypeIdentifier;
 import io.kite.Frontend.Parse.Literals.TypeIdentifier;
 import io.kite.Frontend.Parser.KiteCompiler;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.exceptions.MissingOutputException;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.TypeChecker.Types.AnyType;

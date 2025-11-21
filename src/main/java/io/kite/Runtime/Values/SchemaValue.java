@@ -1,8 +1,8 @@
 package io.kite.Runtime.Values;
 
+import io.kite.Environment.Environment;
+import io.kite.Environment.IEnvironment;
 import io.kite.Frontend.Parse.Literals.Identifier;
-import io.kite.Runtime.Environment.Environment;
-import io.kite.Runtime.Environment.IEnvironment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

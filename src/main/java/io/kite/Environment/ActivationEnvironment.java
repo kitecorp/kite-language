@@ -1,4 +1,4 @@
-package io.kite.Runtime.Environment;
+package io.kite.Environment;
 
 import io.kite.Frontend.Parse.Literals.ParameterIdentifier;
 import org.jetbrains.annotations.Nullable;

@@ -1,9 +1,9 @@
 package io.kite.Base;
 
+import io.kite.Environment.Environment;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Frontend.Parser.Program;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
 import io.kite.Visitors.PlainTheme;
 import io.kite.Visitors.SyntaxPrinter;
