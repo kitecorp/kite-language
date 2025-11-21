@@ -1,9 +1,9 @@
 package io.kite.Runtime.Values;
 
+import io.kite.Environment.Environment;
 import io.kite.Runtime.Decorators.ProviderSupport;
 import io.kite.Runtime.Decorators.Tags;
 import io.kite.Runtime.Decorators.TagsSupport;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.ResourcePath;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;

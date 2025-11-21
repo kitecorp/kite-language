@@ -1,4 +1,4 @@
-package io.kite.Runtime.Environment;
+package io.kite.Environment;
 
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.exceptions.DeclarationExistsException;

@@ -1,9 +1,9 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
+import io.kite.Environment.Environment;
 import io.kite.Frontend.Lexical.ScopeResolver;
 import io.kite.Frontend.Parser.KiteCompiler;
-import io.kite.Runtime.Environment.Environment;
 import io.kite.TypeChecker.TypeChecker;
 import io.kite.tool.JansiHelper;
 import lombok.extern.log4j.Log4j2;

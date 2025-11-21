@@ -1,7 +1,7 @@
 package io.kite.Runtime;
 
 import io.kite.Base.RuntimeTest;
-import io.kite.Runtime.Environment.Environment;
+import io.kite.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
