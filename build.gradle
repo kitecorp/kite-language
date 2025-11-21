@@ -53,8 +53,8 @@ java {
 }
 generateGrammarSource {
     maxHeapSize = "64m"
-    arguments += ["-visitor", "-Xexact-output-dir", "-package", "io.kite.frontend.parser.generated"]
-    outputDirectory = file("${buildDir}/generated-src/antlr/main/io/kite/frontend/parser/generated")
+    arguments += ["-visitor", "-Xexact-output-dir", "-package", "io.kite.syntax.ast.generated"]
+    outputDirectory = file("${buildDir}/generated-src/antlr/main/io/kite/syntax/ast/generated")
 
     doFirst {
         outputDirectory.mkdirs()

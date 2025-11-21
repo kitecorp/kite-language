@@ -1,10 +1,10 @@
 package io.kite.base;
 
-import io.kite.frontend.parse.ParserTest;
-import io.kite.frontend.parser.Program;
-import io.kite.typechecker.TypeChecker;
-import io.kite.typechecker.types.Type;
-import io.kite.visitors.PlainTheme;
+import io.kite.semantics.TypeChecker;
+import io.kite.semantics.types.Type;
+import io.kite.syntax.ast.Program;
+import io.kite.syntax.parser.ParserTest;
+import io.kite.tool.theme.PlainTheme;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 

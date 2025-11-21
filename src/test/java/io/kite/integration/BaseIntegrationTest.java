@@ -1,8 +1,8 @@
 package io.kite.integration;
 
 import io.kite.base.RuntimeTest;
-import io.kite.runtime.inputs.InputChainResolver;
-import io.kite.typechecker.TypeChecker;
+import io.kite.execution.inputs.InputChainResolver;
+import io.kite.semantics.TypeChecker;
 import org.junit.jupiter.api.AfterEach;
 
 public class BaseIntegrationTest extends RuntimeTest {
