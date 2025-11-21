@@ -460,7 +460,11 @@ public class DecoratorTest extends ParserTest {
                    @annotation([importable) Vm x =1
                 }
                 """));
-        assertEquals("Parse error at line 2:26 - missing ']' at ')'", err.getMessage());
+        assertEquals("""
+                Parse error at line 2:26 - missing ']' to close array
+                  @annotation([importable) Vm x =1
+                                         ^
+                """.trim(), err.getMessage());
     }
 
     @Test

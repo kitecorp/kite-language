@@ -62,7 +62,11 @@ public class IfBaseTest extends ParserTest {
                         if x) x=1
                         """)
         );
-        assertEquals("Parse error at line 1:4 - unmatched ')' - use both '(' and ')' or neither", err.getMessage());
+        assertEquals("""
+                Parse error at line 1:4 - unmatched ')' - use both '(' and ')' or neither
+                  if x) x=1
+                      ^
+                """.trim(), err.getMessage());
     }
 
     @Test
@@ -70,7 +74,11 @@ public class IfBaseTest extends ParserTest {
         var err = assertThrows(ValidationException.class, () -> parse("""
                 if (x x=1
                 """));
-        Assertions.assertEquals("Parse error at line 1:7 - unmatched '(' - use both '(' and ')' or neither", err.getMessage());
+        Assertions.assertEquals("""
+                Parse error at line 1:7 - unmatched '(' - use both '(' and ')' or neither
+                  if (x x=1
+                         ^
+                """.trim(), err.getMessage());
     }
 
     @Test

@@ -655,6 +655,7 @@ public final class Interpreter extends StackVisitor<Object> {
     @Override
     public Object visit(ResourceStatement statement) {
         if (!contextStackContains(ContextStack.Decorator)) {
+            // needs to be above isCounted because @count marks the resourceStatement as counted
             visitAnnotations(statement.getAnnotations());
         }
         if (statement.isCounted()) {
