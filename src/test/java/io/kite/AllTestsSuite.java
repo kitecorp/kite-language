@@ -11,7 +11,8 @@ import org.junit.platform.suite.api.Suite;
         "io.kite.integration",
         "io.kite.syntax.token",
         "io.kite.syntax.ast",
-        "io.kite.semantics.scope"
+        "io.kite.semantics.scope",
+        "io.kite.stdlib"
 })
 public class AllTestsSuite {
 }
