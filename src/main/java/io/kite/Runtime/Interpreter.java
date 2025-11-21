@@ -895,8 +895,8 @@ public final class Interpreter extends StackVisitor<Object> {
         for (int i = 0; i < list.size(); i++) {
             Object item = list.get(i);
 
-            forInit(forEnv, statement.getIndex(), i);
             forInit(forEnv, statement.getItem(), item);
+            forInit(forEnv, statement.getIndex(), i);
 
             // Flatten map properties into the loop environment
             if (item instanceof Map<?, ?> map) {

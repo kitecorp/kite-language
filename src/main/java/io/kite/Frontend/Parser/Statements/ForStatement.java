@@ -24,7 +24,7 @@ import java.util.List;
 public final class ForStatement extends Statement {
     @Nullable
     private Identifier item;
-    private Identifier index; // keeps track of the index of the array: [for index, j in varName]
+    private Identifier index; // keeps track of the index of the array: [for j, index in varName]. Index is always the second variable after first
     private Expression array; // for i in varName (typically array) or an actual array ['a', 'b', 'c']
     private Statement body;
     @Nullable
@@ -32,11 +32,6 @@ public final class ForStatement extends Statement {
 
     public ForStatement() {
     }
-
-    public static Statement of() {
-        return new ForStatement();
-    }
-
 
     public boolean hasInit() {
         return item != null;
