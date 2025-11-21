@@ -612,60 +612,104 @@ type EmptyObject = {}          // literal form
 
 ## Lang Module Structure
 
-The `lang` module is organized into clear phases of compilation:
+The `lang` module is organized by **compiler phases** for clarity and maintainability:
 
 ```
 lang/src/main/java/io/kite/
-├── Frontend/
-│   ├── Parser/
-│   │   ├── generated/          # ANTLR4 generated files
-│   │   │   ├── KiteLexer.java
-│   │   │   ├── KiteParser.java
-│   │   │   └── KiteVisitor.java
-│   │   ├── KiteASTBuilder.java # Visitor → AST transformation
-│   │   ├── Expressions/        # AST node classes
-│   │   └── Statements/
+├── syntax/                     # Phase 1: Syntactic Analysis
+│   ├── lexer/                  # Tokenization
+│   │   ├── Token.java
+│   │   └── TokenType.java
+│   ├── parser/                 # Parser infrastructure
+│   │   ├── KiteCompiler.java  # Main compiler entry point
+│   │   ├── KiteASTBuilder.java # ANTLR visitor → AST transformation
+│   │   └── Factory.java        # AST node factory
+│   ├── ast/                    # Abstract Syntax Tree
+│   │   ├── Program.java
+│   │   ├── expressions/        # Expression nodes
+│   │   ├── statements/         # Statement nodes
+│   │   ├── literals/           # Literal nodes
+│   │   ├── errors/             # Error handling
+│   │   └── generated/          # ANTLR4 generated files
+│   │       ├── KiteLexer.java
+│   │       ├── KiteParser.java
+│   │       └── KiteVisitor.java
 │   └── annotations/
 │       └── Annotatable.java    # Interface for decorated elements
 │
-├── TypeChecker/
-│   ├── TypeChecker.java        # Main type validation engine
-│   ├── Types/
+├── semantics/                  # Phase 2: Semantic Analysis
+│   ├── scope/                  # Scope resolution
+│   │   ├── ScopeResolver.java
+│   │   └── FunctionType.java
+│   ├── types/                  # Type system
 │   │   ├── Type.java           # Type system foundation
-│   │   ├── DecoratorType.java
-│   │   └── Decorators/         # 15 decorator implementations
-│   │       ├── MinValueDecorator.java
-│   │       ├── MaxValueDecorator.java
-│   │       ├── DependsOnDecorator.java
-│   │       └── ...
+│   │   ├── ArrayType.java
+│   │   ├── UnionType.java
+│   │   └── DecoratorType.java
+│   ├── decorators/             # Decorator validation (flattened!)
+│   │   ├── MinValueDecorator.java
+│   │   ├── MaxValueDecorator.java
+│   │   ├── DependsOnDecorator.java
+│   │   └── ... (15 total)
+│   ├── TypeChecker.java        # Main type validation engine
 │   └── TypeError.java
 │
-├── Runtime/
-│   ├── Interpreter.java        # Main evaluation engine
-│   ├── DeferredObservable.java # Observer pattern registry
-│   ├── CycleDetection.java     # Dependency cycle detection
-│   ├── Values/
+├── execution/                  # Phase 3: Execution
+│   ├── interpreter/
+│   │   └── Interpreter.java    # Main evaluation engine
+│   ├── environment/            # Scoped variable storage
+│   │   ├── Environment.java
+│   │   └── ActivationEnvironment.java
+│   ├── values/                 # Runtime values
 │   │   ├── Deferred.java       # Unresolved dependency marker
 │   │   ├── Dependency.java     # Resolved reference
 │   │   └── ResourceValue.java  # Evaluated resource
-│   └── Decorators/
-│       └── DecoratorInterpreter.java
+│   ├── decorators/             # Runtime decorator evaluation
+│   │   └── DecoratorInterpreter.java
+│   ├── inputs/                 # Input handling
+│   │   └── InputChainResolver.java
+│   ├── exceptions/             # Runtime exceptions
+│   └── DeferredObservable.java # Observer pattern registry
 │
-└── Visitors/
-    └── SyntaxPrinter.java      # AST → source code formatting
+├── stdlib/                     # Standard Library
+│   └── functions/              # Built-in functions
+│       ├── cast/               # Type conversion functions
+│       └── numeric/            # Math functions
+│
+├── analysis/                   # Cross-Cutting Concerns
+│   └── visitors/               # Visitor pattern infrastructure
+│       ├── Visitor.java        # Base visitor interface
+│       ├── StackVisitor.java   # Stack-aware visitor base
+│       └── SyntaxPrinter.java  # AST → source code formatting
+│
+├── tool/                       # Tooling & CLI support
+│   └── theme/                  # Terminal output theming
+│       ├── Theme.java
+│       ├── JansiTheme.java
+│       └── PlainTheme.java
+│
+└── utils/                      # Shared utilities
 ```
+
+**Design Philosophy:**
+
+- **Phase-based organization** maps directly to compilation pipeline
+- **Clear separation** between syntax, semantics, and execution
+- **Flattened hierarchies** where beneficial (e.g., `decorators/` not nested under `types/`)
+- **Standard library** separated from execution internals
+- **Analysis tools** grouped for cross-cutting concerns
 
 ## Grammar Location
 
 **Main Grammar:** `lang/src/main/antlr/Kite.g4`
 
-**Generated Files:** `lang/build/generated-src/antlr/main/io/kite/Frontend/Parser/generated/`
+**Generated Files:** `lang/build/generated-src/antlr/main/io/kite/syntax/ast/generated/`
 - `KiteLexer.java`
 - `KiteParser.java`
 - `KiteBaseVisitor.java`
 - `KiteVisitor.java`
 
-**AST Builder:** `lang/src/main/java/io/kite/Frontend/Parser/KiteASTBuilder.java`
+**AST Builder:** `lang/src/main/java/io/kite/syntax/parser/KiteASTBuilder.java`
 
 ### Compilation Pipeline
 
