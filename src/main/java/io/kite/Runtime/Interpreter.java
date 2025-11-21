@@ -61,7 +61,7 @@ public final class Interpreter extends StackVisitor<Object> {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Setter
-    private Map<String, ResourceValue> instances;
+    private Map<String, ResourceValue> instances; // holds the full resource path name
     @Getter
     private Environment<Object> env;
 
