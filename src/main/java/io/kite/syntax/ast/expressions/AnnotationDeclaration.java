@@ -2,8 +2,8 @@ package io.kite.syntax.ast.expressions;
 
 import io.kite.semantics.types.DecoratorType;
 import io.kite.syntax.annotations.Annotatable;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.StringLiteral;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

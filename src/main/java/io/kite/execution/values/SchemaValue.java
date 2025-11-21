@@ -2,7 +2,7 @@ package io.kite.execution.values;
 
 import io.kite.execution.environment.Environment;
 import io.kite.execution.environment.IEnvironment;
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

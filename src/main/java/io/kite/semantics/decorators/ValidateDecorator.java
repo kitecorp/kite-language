@@ -6,7 +6,7 @@ import io.kite.semantics.types.DecoratorType;
 import io.kite.semantics.types.SystemType;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;

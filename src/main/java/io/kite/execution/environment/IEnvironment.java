@@ -1,6 +1,6 @@
 package io.kite.execution.environment;
 
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public interface IEnvironment<T> {

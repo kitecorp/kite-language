@@ -8,9 +8,9 @@ import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
 import io.kite.syntax.ast.expressions.ComponentStatement;
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.ObjectLiteral;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.ObjectLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;

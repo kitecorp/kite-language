@@ -4,7 +4,7 @@ import io.kite.semantics.TypeChecker;
 import io.kite.semantics.TypeError;
 import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;

@@ -14,7 +14,7 @@ import io.kite.syntax.annotations.CountAnnotatable;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
 import io.kite.syntax.ast.statements.*;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.fusesource.jansi.Ansi;

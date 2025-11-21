@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 import static io.kite.syntax.ast.Factory.program;
 import static io.kite.syntax.ast.expressions.VarDeclaration.var;
 import static io.kite.syntax.ast.statements.VarStatement.varStatement;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
-import static io.kite.syntax.parser.literals.TypeIdentifier.id;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
+import static io.kite.syntax.literals.TypeIdentifier.id;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

@@ -1,16 +1,16 @@
 package io.kite.syntax.parser;
 
-import io.kite.syntax.parser.literals.NumberLiteral;
 import io.kite.syntax.ast.Program;
+import io.kite.syntax.literals.NumberLiteral;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
 import static io.kite.syntax.ast.expressions.ArrayExpression.array;
 import static io.kite.syntax.ast.expressions.ObjectExpression.objectExpression;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

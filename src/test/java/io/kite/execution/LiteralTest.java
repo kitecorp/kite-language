@@ -2,15 +2,15 @@ package io.kite.execution;
 
 import io.kite.base.RuntimeTest;
 import io.kite.execution.values.NullValue;
-import io.kite.syntax.parser.literals.SymbolIdentifier;
+import io.kite.syntax.literals.SymbolIdentifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.ObjectLiteral.ObjectLiteralPair;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.ObjectLiteral.ObjectLiteralPair;
+import static io.kite.syntax.literals.ObjectLiteral.object;
 
 @Log4j2
 public class LiteralTest extends RuntimeTest {

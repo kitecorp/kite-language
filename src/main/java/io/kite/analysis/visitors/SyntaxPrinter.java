@@ -6,7 +6,7 @@ import io.kite.semantics.types.UnionType;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
 import io.kite.syntax.ast.statements.*;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import io.kite.tool.theme.JansiTheme;
 import io.kite.tool.theme.Theme;
 import lombok.Setter;

@@ -1,8 +1,8 @@
 package io.kite.syntax.ast.statements;
 
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.ParameterIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.ParameterIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;

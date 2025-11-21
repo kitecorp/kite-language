@@ -4,8 +4,8 @@ import io.kite.analysis.visitors.SyntaxPrinter;
 import io.kite.execution.Interpreter;
 import io.kite.semantics.TypeError;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
-import io.kite.syntax.parser.literals.Literal;
-import io.kite.syntax.parser.literals.NumberLiteral;
+import io.kite.syntax.literals.Literal;
+import io.kite.syntax.literals.NumberLiteral;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

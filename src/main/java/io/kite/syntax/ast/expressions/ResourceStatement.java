@@ -13,8 +13,8 @@ import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.annotations.CountAnnotatable;
 import io.kite.syntax.ast.statements.BlockExpression;
 import io.kite.syntax.ast.statements.Statement;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 

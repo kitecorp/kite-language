@@ -2,7 +2,7 @@ package io.kite.syntax.parser;
 
 import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.statements.ExpressionStatement;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
 import static io.kite.syntax.ast.statements.BlockExpression.block;
 import static io.kite.syntax.ast.statements.FunctionDeclaration.fun;
 import static io.kite.syntax.ast.statements.ReturnStatement.funReturn;
-import static io.kite.syntax.parser.literals.ParameterIdentifier.param;
+import static io.kite.syntax.literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

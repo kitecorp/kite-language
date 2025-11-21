@@ -5,9 +5,9 @@ import io.kite.semantics.types.Type;
 import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.NumberLiteral;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

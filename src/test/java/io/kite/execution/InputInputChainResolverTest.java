@@ -7,7 +7,7 @@ import io.kite.execution.inputs.EnvResolver;
 import io.kite.execution.inputs.InputChainResolver;
 import io.kite.execution.inputs.InputsFilesResolver;
 import io.kite.syntax.ast.expressions.InputDeclaration;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

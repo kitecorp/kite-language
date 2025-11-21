@@ -5,9 +5,9 @@ import io.kite.syntax.ast.statements.EmptyStatement;
 import io.kite.syntax.ast.statements.ExpressionStatement;
 import io.kite.syntax.ast.statements.Statement;
 import io.kite.syntax.ast.statements.VarStatement;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.NumberLiteral;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.TypeIdentifier;
 
 import java.util.Arrays;
 

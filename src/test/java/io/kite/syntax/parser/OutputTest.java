@@ -15,13 +15,13 @@ import static io.kite.syntax.ast.expressions.OutputDeclaration.output;
 import static io.kite.syntax.ast.expressions.UnionTypeStatement.union;
 import static io.kite.syntax.ast.expressions.VarDeclaration.var;
 import static io.kite.syntax.ast.statements.VarStatement.varStatement;
-import static io.kite.syntax.parser.literals.ArrayTypeIdentifier.arrayType;
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.ArrayTypeIdentifier.arrayType;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.StringLiteral.string;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

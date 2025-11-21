@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.syntax.ast.Program.program;
 import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.NumberLiteral.number;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

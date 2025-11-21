@@ -4,7 +4,7 @@ import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.CallExpression;
 import io.kite.syntax.ast.expressions.MemberExpression;
 import io.kite.syntax.ast.statements.ExpressionStatement;
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

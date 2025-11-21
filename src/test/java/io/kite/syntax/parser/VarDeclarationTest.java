@@ -3,7 +3,7 @@ package io.kite.syntax.parser;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.AssignmentExpression;
 import io.kite.syntax.ast.statements.VarStatement;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +13,8 @@ import static io.kite.syntax.ast.Program.program;
 import static io.kite.syntax.ast.expressions.VarDeclaration.var;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
 import static io.kite.syntax.ast.statements.VarStatement.statement;
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.NullLiteral.nullLiteral;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.NullLiteral.nullLiteral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

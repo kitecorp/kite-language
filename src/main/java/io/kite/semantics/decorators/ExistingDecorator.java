@@ -5,7 +5,7 @@ import io.kite.semantics.TypeError;
 import io.kite.semantics.types.DecoratorType;
 import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;

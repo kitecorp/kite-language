@@ -8,7 +8,7 @@ import static io.kite.syntax.ast.Factory.expressionStatement;
 import static io.kite.syntax.ast.Factory.program;
 import static io.kite.syntax.ast.expressions.AssignmentExpression.assign;
 import static io.kite.syntax.ast.expressions.MemberExpression.member;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.StringLiteral.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

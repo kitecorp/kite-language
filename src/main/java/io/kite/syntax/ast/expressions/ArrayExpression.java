@@ -1,18 +1,18 @@
 package io.kite.syntax.ast.expressions;
 
 import io.kite.syntax.ast.statements.ForStatement;
-import io.kite.syntax.parser.literals.ArrayTypeIdentifier;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.Literal;
+import io.kite.syntax.literals.ArrayTypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.Literal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

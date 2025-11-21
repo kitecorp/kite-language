@@ -4,15 +4,15 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.syntax.parser.literals.ArrayTypeIdentifier.arrayType;
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
 import static io.kite.syntax.ast.Factory.program;
 import static io.kite.syntax.ast.expressions.ArrayExpression.array;
 import static io.kite.syntax.ast.expressions.InputDeclaration.input;
 import static io.kite.syntax.ast.expressions.ObjectExpression.objectExpression;
 import static io.kite.syntax.ast.expressions.UnionTypeStatement.union;
+import static io.kite.syntax.literals.ArrayTypeIdentifier.arrayType;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

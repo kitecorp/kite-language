@@ -1,8 +1,8 @@
 package io.kite.execution.values;
 
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.TypeIdentifier;
 
 /**
  * Interface for var, val, outputs to implement generic dependency evaluation

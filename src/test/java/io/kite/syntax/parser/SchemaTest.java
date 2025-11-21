@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import static io.kite.syntax.ast.Factory.program;
 import static io.kite.syntax.ast.statements.SchemaDeclaration.schema;
 import static io.kite.syntax.ast.statements.SchemaProperty.schemaProperty;
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

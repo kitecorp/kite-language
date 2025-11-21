@@ -1,7 +1,7 @@
 package io.kite.syntax.ast.statements;
 
 import io.kite.syntax.ast.expressions.VarDeclaration;
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

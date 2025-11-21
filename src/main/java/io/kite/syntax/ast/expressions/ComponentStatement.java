@@ -9,7 +9,7 @@ import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.annotations.CountAnnotatable;
 import io.kite.syntax.ast.statements.BlockExpression;
 import io.kite.syntax.ast.statements.Statement;
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
@@ -19,8 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 
 /**
  * A component is a collection of resources, inputs and outputs.

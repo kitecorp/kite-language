@@ -7,8 +7,8 @@ import io.kite.semantics.types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TypeChecker Object")

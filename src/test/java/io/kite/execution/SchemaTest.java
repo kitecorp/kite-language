@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.kite.syntax.parser.literals.ParameterIdentifier.param;
+import static io.kite.syntax.literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
