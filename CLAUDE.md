@@ -10,6 +10,13 @@ limitations in existing IaC tools through innovative features while maintaining 
 **Parser:** ANTLR4 (migrated from manual recursive descent parser)
 **Java Version:** 25 (latest)
 
+## Development Guidelines
+
+**AI Assistance:** Automatically use context7 for code generation, setup or configuration steps, or library/API
+documentation. This means
+you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to
+explicitly ask.
+
 ## Project Structure
 
 Kite is a **multi-module Gradle project** with clear separation of concerns:
@@ -64,9 +71,11 @@ kite/
 Unions normalize based on **type kind**, not literal values:
 
 - `type Numbers = 1 | 2 | 3` → normalized to `number` (single type)
-- `type Mixed = 1 | "hello" | true` → `number | string | boolean` (three types)
+- `type Mixed = 1 | "hello" | true` → `null | number | string` (three types, alphabetically sorted)
 - Literal value constraints are interpreter/runtime concerns, not typechecker concerns
 - Warning logged for duplicates (can be disabled)
+- Union types are **alphabetically sorted** in output for consistency (e.g., `number | string | null` →
+  `null | number | string`)
 
 ## Grammar Documentation
 
@@ -742,6 +751,12 @@ lang/src/main/java/io/kite/
 - **Assignment flexibility:** Arrays/objects allowed on right-hand side
 - **Keywords as object keys:** Reserved words like `type`, `for`, `if` allowed as property names
 - **Consistent separators:** `statementTerminator` (`;` or `\n`) used throughout schemas and properties
+- **Whitespace flexibility:** `NL*` (newline) support added throughout grammar for better formatting (November 21,
+  2025):
+    - If/while statements with parentheses: `IF '(' NL* expression NL* ')' NL* blockExpression`
+    - Object declarations: `OBJECT '(' NL* ... NL* ')'` allows newlines after opening paren and before closing paren
+    - Array expressions: `'[' NL* FOR ...` and `... NL* ']'` for all comprehension forms
+    - Improves developer experience by allowing natural code formatting without syntax errors
 
 **Key grammar rules to reference:**
 
@@ -751,6 +766,8 @@ lang/src/main/java/io/kite/
 - `decoratorArgs` - Decorator argument rules
 - `objectKey` - Allows keywords via `keyword` rule
 - `schemaPropertyList` - Uses `statementTerminator` for consistency
+- `ifStatement` / `whileStatement` - Whitespace-flexible control flow
+- `arrayExpression` - Whitespace-flexible array comprehensions
 
 ## Code Style
 
@@ -1008,13 +1025,13 @@ typechecker.
 
 ## Project Status
 
-**Last Updated:** January 2025  
-**Java Version:** 25  
-**Parser:** ANTLR4 (migration completed ✅)  
-**Test Suite:** 121 test files, ~28,675 lines of test code  
-**Test Status:** 280+ tests passing ✅  
-**Modules:** 5 (api, lang, engine, cli, plugins)  
-**Decorators:** 15 built-in validators and metadata annotations  
+**Last Updated:** November 21, 2025
+**Java Version:** 25
+**Parser:** ANTLR4 (migration completed ✅)
+**Test Suite:** 121 test files, ~28,675 lines of test code
+**Test Status:** 280+ tests passing ✅
+**Modules:** 5 (api, lang, engine, cli, plugins)
+**Decorators:** 15 built-in validators and metadata annotations
 **Documentation:** Comprehensive internal docs with diagrams
 
 **Current Phase:** ✅ Core language features complete, advanced features in development
@@ -1030,6 +1047,13 @@ typechecker.
 - ✅ Parser/typechecker separation fully implemented
 - ✅ Keywords allowed as object property names (e.g., `{type: "web"}`)
 - ✅ Consistent statement separators (`;` or `\n`) across all contexts
+
+**Latest Improvements (November 21, 2025):**
+
+- ✅ Enhanced whitespace flexibility in grammar (if/while statements, objects, arrays)
+- ✅ Union type alphabetical sorting for consistent output (`SyntaxPrinter.java`)
+- ✅ Improved code clarity with better inline comments
+- ✅ Test suite updated to reflect sorted union type output
 
 **Production Readiness:**
 
