@@ -181,7 +181,6 @@ public class ForResourceTest extends RuntimeTest {
                     resource vm main { name = item.name }
                   }
                 """);
-        var schema = interpreter.getSchema("vm");
         assertEquals("x", interpreter.getInstance("main[0]").get("name"));
         assertEquals("y", interpreter.getInstance("main[1]").get("name"));
     }
