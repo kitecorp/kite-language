@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static io.kite.syntax.ast.Program.program;
 import static io.kite.syntax.ast.expressions.AssignmentExpression.assignment;
 import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
-import static io.kite.syntax.ast.expressions.Expressions.logical;
+import static io.kite.syntax.ast.expressions.LogicalExpression.logical;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
 import static io.kite.syntax.literals.BooleanLiteral.bool;
 import static org.junit.jupiter.api.Assertions.assertEquals;

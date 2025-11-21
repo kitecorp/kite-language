@@ -2,29 +2,10 @@ package io.kite.syntax.lexer;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.List;
-
 // var x = 40 + (foo * bar)
 // [VarToken, IdentifierToken, EqualsToken, IntegerToken]
 public enum TokenType {
-    /*****   Literal types   *****/
-    Number("number"),
-    Identifier("symbol"),
-    Object("object"),
-    Any("any"),
-    String("string"),
-    //    Type("type"),
-    WhiteSpace("whitespace"),
-    Comment("//"),
-    NewLine(System.lineSeparator()),
-    /**
-     * ;
-     */
-    SemiColon(";"),
-    Colon(":"),
 
-    /******   Expressions   ******/
-    Equal("="),
     Equal_Complex("+="),
     RelationalOperator("<>="),
     LessThanOperator("<"),
@@ -178,58 +159,5 @@ public enum TokenType {
             return toSymbol(token.charAt(0));
         }
     }
-
-    public static boolean isSymbol(char character) {
-        return toSymbol(character) != Unknown;
-    }
-
-    public static TokenType toKeyword(String keyword) {
-        return switch (keyword) {
-            case "var" -> Var;
-            case "input" -> Input;
-            case "this" -> This;
-            case "resource" -> Resource;
-            case "public" -> Public;
-            case "private" -> Private;
-            case "secure" -> Secure;
-            case "module" -> Component;
-            case "null" -> Null;
-            case "and" -> Logical_And;
-            case "or" -> Logical_Or;
-            case "schema" -> Schema;
-            case "return" -> Return;
-            case "fun" -> Fun;
-//            case "val" -> Val;
-            case "if" -> If;
-            case "else" -> Else;
-            case "while" -> While;
-            case "for" -> For;
-            case "true" -> True;
-            case "false" -> False;
-            default -> Identifier;
-        };
-    }
-
-    public static boolean isKeyword(String keyword) {
-        return toKeyword(keyword) != Unknown;
-    }
-
-    public static boolean isLiteral(TokenType keyword) {
-        return isAny(keyword, TokenType.String, TokenType.True, TokenType.False, TokenType.Null, TokenType.Number);
-    }
-
-
-    public static TokenType toNumber(char digit) {
-        if (Character.isDigit(digit)) {
-            return Number;
-        }
-        return Unknown;
-    }
-
-    public static boolean isSkippable(char character) {
-        return Character.isWhitespace(character);
-    }
-
-    public static final List<TokenType> lineTerminator = List.of(NewLine, SemiColon);
 
 }
