@@ -5,7 +5,6 @@ import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Values.ResourceValue;
 import io.kite.Runtime.Values.SchemaValue;
 import io.kite.Runtime.exceptions.DeclarationExistsException;
-import io.kite.Visitors.PlainTheme;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -122,7 +121,7 @@ public class ForResourceTest extends RuntimeTest {
         eval("""
                   schema vm { string name }
                   var cfgs = [{meta: {client: "dev"}}, {meta: {client: "prod"}}]
-                  for i, item in cfgs {
+                  for item, i in cfgs {
                     resource vm main { 
                         name = item.meta.client 
                     }
@@ -177,7 +176,7 @@ public class ForResourceTest extends RuntimeTest {
         eval("""
                   schema vm { string name }
                   var items = [{name:"x"}, {name:"y"}]
-                  for i, item in items {
+                  for item, i in items {
                     resource vm main { name = item.name }
                   }
                 """);
@@ -286,7 +285,7 @@ public class ForResourceTest extends RuntimeTest {
         eval("""
                   schema vm { string name }
                   var items = ["a","b","c"]
-                  for i, v in items {
+                  for v, i in items {
                     resource vm main { name = '$v-$i' }
                   }
                 """);
@@ -782,8 +781,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Create multiple resources in a loop using object properties as index")
     void testMultipleResourcesAreAccessedUsingObjectIndex() {
-        interpreter.getPrinter().setTheme(new PlainTheme());
-        var res = eval("""
+        eval("""
                 schema vm {
                    string name
                    string environment

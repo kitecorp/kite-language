@@ -277,9 +277,21 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
     @Override
     public ForStatement visitForStatement(ForStatementContext ctx) {
-        Identifier item = (Identifier) visit(ctx.identifier(0));
-        Identifier index = ctx.identifier().size() > 1 ?
-                (Identifier) visit(ctx.identifier(1)) : null;
+        List<IdentifierContext> identifiers = ctx.identifier();
+
+        // Determine how many are loop variables vs iterable
+        int loopVarCount;
+        if (ctx.rangeExpression() != null || ctx.arrayExpression() != null) {
+            // Iterable is not an identifier, so all identifiers are loop variables
+            loopVarCount = identifiers.size();
+        } else {
+            // Last identifier is the iterable, rest are loop variables
+            loopVarCount = identifiers.size() - 1;
+        }
+
+        Identifier item = (Identifier) visit(identifiers.get(0));
+        Identifier index = (loopVarCount == 2) ?
+                (Identifier) visit(identifiers.get(1)) : null;
 
         Expression iterable;
         org.apache.commons.lang3.Range<Integer> range = null;
@@ -290,7 +302,8 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
         } else if (ctx.arrayExpression() != null) {
             iterable = (Expression) visit(ctx.arrayExpression());
         } else {
-            iterable = (Identifier) visit(ctx.identifier(ctx.identifier().size() - 1));
+            // Last identifier is the iterable
+            iterable = (Identifier) visit(identifiers.get(identifiers.size() - 1));
         }
 
         Statement body = (Statement) visit(ctx.forBody());
