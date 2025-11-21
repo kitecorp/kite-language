@@ -118,7 +118,11 @@ public class UniqueTest extends CheckerTest {
                 @unique(1, 2)
                 input string[] something
                 """));
-        assertEquals("Parse error at line 1:9 - no viable alternative at input '@unique(1,'", err.getMessage());
+        assertEquals("""
+                Parse error at line 1:9 - no viable alternative at input '@unique(1,'
+                  @unique(1, 2)
+                           ^
+                """.trim(), err.getMessage());
     }
 
     @Test
