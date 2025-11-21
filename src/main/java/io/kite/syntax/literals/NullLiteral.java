@@ -12,12 +12,16 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class NullLiteral extends Literal {
     private static final String value = "null";
+    private static NullLiteral instance;
 
     private NullLiteral() {
     }
 
-    public static Literal nullLiteral() {
-        return new NullLiteral();
+    public synchronized static Literal nullLiteral() {
+        if (instance == null) {
+            instance = new NullLiteral();
+        }
+        return instance;
     }
 
     @Override
