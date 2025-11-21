@@ -3,7 +3,6 @@ package io.kite.runtime;
 import io.kite.ContextStack;
 import io.kite.environment.ActivationEnvironment;
 import io.kite.environment.Environment;
-import io.kite.frontend.lexer.Token;
 import io.kite.frontend.lexer.TokenType;
 import io.kite.frontend.parse.literals.*;
 import io.kite.frontend.parse.literals.ObjectLiteral.ObjectLiteralPair;
@@ -364,7 +363,7 @@ public final class Interpreter extends StackVisitor<Object> {
                 return aReturn.getValue();
             }
         }
-        throw new RuntimeError(new Token(expression.getCallee(), TokenType.Fun), "Can only call functions and classes.");
+        throw new RuntimeError("Can only call functions and classes: " + printer.visit(expression.getCallee()));
     }
 
     public Object Call(FunValue function, List<Object> args) {
