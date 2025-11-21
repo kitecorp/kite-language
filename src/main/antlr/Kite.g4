@@ -316,7 +316,7 @@ objectInitializer
 arrayExpression
     : '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ':' compactBody ']'  // Form 1: [for ...: body]
     | '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ']' NL* forBody      // Form 2: [for ...] body
-    | '[' arrayItems? ']'                                                                                            // Literal
+    | '[' NL* arrayItems? NL* ']'  // Add NL* after [ and before ]
     ;
 
 compactBody
@@ -335,7 +335,7 @@ forBody
     | emptyStatement
     ;
 arrayItems
-    : arrayItem (',' arrayItem)*
+    : arrayItem (NL* ',' NL* arrayItem)* (NL* ',')?  NL*  // Add NL* around commas, support trailing comma
     ;
 
 arrayItem
