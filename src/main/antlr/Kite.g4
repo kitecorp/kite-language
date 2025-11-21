@@ -320,7 +320,9 @@ arrayExpression
     ;
 
 compactBody
-    : ifStatement
+    : IF '(' expression ')' expression (ELSE expression)?  // Inline if
+    | IF expression expression (ELSE expression)?          // Inline if without parens
+    | ifStatement                                          // Block if
     | expression
     ;
 

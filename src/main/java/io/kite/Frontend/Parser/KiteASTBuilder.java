@@ -748,14 +748,24 @@ public class KiteASTBuilder extends io.kite.Frontend.Parser.generated.KiteBaseVi
 
     @Override
     public Statement visitCompactBody(CompactBodyContext ctx) {
-        if (ctx.ifStatement() != null) {
+        if (ctx.IF() != null) {
+            // Inline if expression: if condition result [else alternate]
+            Expression condition = (Expression) visit(ctx.expression(0));
+            Expression thenExpr = (Expression) visit(ctx.expression(1));
+            Expression elseExpr = ctx.ELSE() != null && ctx.expression().size() > 2
+                    ? (Expression) visit(ctx.expression(2))
+                    : null;
+
+            return IfStatement.ifStatement(condition, thenExpr, elseExpr);
+        } else if (ctx.ifStatement() != null) {
             return visitIfStatement(ctx.ifStatement());
         } else {
             return ExpressionStatement.expressionStatement(
-                    (Expression) visit(ctx.expression())
+                    (Expression) visit(ctx.expression(0))
             );
         }
     }
+
     @Override
     public LambdaExpression visitLambdaExpression(LambdaExpressionContext ctx) {
         List<ParameterIdentifier> params = ctx.parameterList() != null ?

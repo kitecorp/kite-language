@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
+@DisplayName("For Loop Interpreter")
 public class ForTest extends RuntimeTest {
 
     @Test
@@ -146,7 +147,7 @@ public class ForTest extends RuntimeTest {
     void testKeyValue() {
         var res = eval("""
                 var res = []
-                for index, item in [{client: "dev"}, {client: "prod"}] {
+                for item, index in [{client: "dev"}, {client: "prod"}] {
                     res += index + " " + item.client
                 }
                 """);
@@ -160,7 +161,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var indices = []
                 var values = []
-                for index, value in [1,2,3] {
+                for value, index in [1,2,3] {
                     indices += index
                     values += value
                 }
@@ -176,7 +177,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var indices = []
                 var values = []
-                for index, value in ["env1","env2"] {
+                for value, index in ["env1","env2"] {
                     indices += index
                     values += value
                 }
@@ -192,7 +193,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var indices = []
                 var values = []
-                for index, value in ["env1", 1] {
+                for value, index in ["env1", 1] {
                     indices += index
                     values += value
                 }
@@ -208,10 +209,10 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var indices = []
                 var values = []
-                for index, value in ["env1","env2"] {
+                for value, index in ["env1","env2"] {
                     indices += index
                     values += value
-                    for index, value in ["client1","client2"] {
+                    for value, index in ["client1","client2"] {
                         indices += index
                         values += value
                     }
@@ -226,7 +227,7 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 var indices = []
                 var values = []
-                for index, value in [{client: "dev"}, {client: "prod"}] {
+                for value, index in [{client: "dev"}, {client: "prod"}] {
                     indices += index
                     values += value.client
                 }
@@ -241,17 +242,16 @@ public class ForTest extends RuntimeTest {
         var res = eval("""
                 [for i in 0..3: i+=1]
                 """);
-
         assertEquals(List.of(1, 2, 3), res);
     }
 
     @Test
     void testForConditional() {
+        // comprehension filters
         var res = eval("""
                 [for i in 0..10: if i>2 i]
                 """);
         assertEquals(List.of(3, 4, 5, 6, 7, 8, 9), res);
-        log.info(res);
     }
 
     @DisplayName("Check variable i is local to the for loop by declaring multiple loops")
