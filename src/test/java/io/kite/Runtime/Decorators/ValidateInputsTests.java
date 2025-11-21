@@ -1,7 +1,7 @@
 package io.kite.Runtime.Decorators;
 
-import io.kite.Frontend.Parser.errors.ParseError;
 import io.kite.Runtime.InputEnvVariableTests;
+import io.kite.Runtime.exceptions.MissingInputException;
 import io.kite.TypeChecker.TypeError;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
                 input string region
                 """));
-        assertEquals("Use letters, numbers, dashes for `\u001B[35minput \u001B[39m\u001B[34mstring\u001B[39m \u001B[39mregion\u001B[39m = \u001B[32m\"bucket.\"\u001B[39m`. Invalid value: \"bucket.\"", err.getMessage());
+        assertEquals("Use letters, numbers, dashes for `input string region = \"bucket.\"`. Invalid value: \"bucket.\"", err.getMessage());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$", message="Use letters, numbers, dashes")
                 input string region 
                 """));
-        assertEquals("Use letters, numbers, dashes for `\u001B[35minput \u001B[39m\u001B[34mstring\u001B[39m \u001B[39mregion\u001B[39m = \u001B[32m\"Bucket\"\u001B[39m`. Invalid value: \"Bucket\"", err.getMessage());
+        assertEquals("Use letters, numbers, dashes for `input string region = \"Bucket\"`. Invalid value: \"Bucket\"", err.getMessage());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$")
                 input number[] region
                 """));
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on number", err.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on number", err.getMessage());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$")
                 input any[] region
                 """));
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on any", err.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on any", err.getMessage());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
                 @validate(regex="^[a-z0-9-]+$")
                 input object[] region
                 """));
-        assertEquals("\u001B[33m@validate\u001B[m is not allowed on object", err.getMessage());
+        assertEquals("@validate(regex = \"^[a-z0-9-]+$\") is not allowed on object", err.getMessage());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class ValidateInputsTests extends InputEnvVariableTests {
 
     @Test
     void validate_invalid_regex_rejected_early() {
-        assertThrows(ParseError.class, () -> eval("""
+        assertThrows(MissingInputException.class, () -> eval("""
                     @validate(regex="(unclosed")
                     input string name
                 """));

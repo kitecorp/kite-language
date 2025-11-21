@@ -5,6 +5,7 @@ import io.kite.Frontend.Parser.KiteCompiler;
 import io.kite.Frontend.Parser.Program;
 import io.kite.Runtime.Environment.Environment;
 import io.kite.Runtime.Interpreter;
+import io.kite.Visitors.PlainTheme;
 import io.kite.Visitors.SyntaxPrinter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ public class RuntimeTest {
         this.compiler = new KiteCompiler();
         this.scopeResolver = new ScopeResolver();
         this.printer = new SyntaxPrinter();
+        this.printer.setTheme(new PlainTheme());
         this.interpreter = new Interpreter(new Environment<>("global"));
         this.interpreter.setPrinter(printer);
     }
