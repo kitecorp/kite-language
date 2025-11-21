@@ -314,9 +314,9 @@ objectInitializer
     ;
 
 arrayExpression
-    : '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ':' compactBody ']'  // Form 1: [for ...: body]
-    | '[' FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ']' NL* forBody      // Form 2: [for ...] body
-    | '[' NL* arrayItems? NL* ']'  // Add NL* after [ and before ]
+    : '[' NL* FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ':' compactBody NL* ']'  // Form 1: [for ...: body]
+    | '[' NL* FOR identifier (',' identifier)? IN (rangeExpression | arrayExpression | identifier) ']' NL* forBody         // Form 2: [for ...] body
+    | '[' NL* arrayItems? NL* ']'                                                                                            // Form 3: literal array
     ;
 
 compactBody
