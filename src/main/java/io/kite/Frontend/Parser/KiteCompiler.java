@@ -22,16 +22,23 @@ public class KiteCompiler {
                                     Object offendingSymbol,
                                     int line, int charPositionInLine,
                                     String msg, RecognitionException e) {
+                // Clean up the message
+                String cleanMsg = msg;
 
-                String improvedMsg = improveErrorMessage(
-                        msg,
-                        (org.antlr.v4.runtime.Parser) recognizer,
-                        (Token) offendingSymbol
-                );
+                // Replace token names with readable descriptions
+                cleanMsg = cleanMsg.replace("'\\n'", "newline");
+                cleanMsg = cleanMsg.replace("{", "");
+                cleanMsg = cleanMsg.replace("}", "");
+                cleanMsg = cleanMsg.replace("<EOF>", "end of file");
+
+                String improvedMsg = improveErrorMessage(cleanMsg, (Parser) recognizer, (Token) offendingSymbol);
+
+                // Add context from the source
+                String context = getErrorContext(source, line, charPositionInLine);
 
                 throw new ValidationException(
-                        String.format("Parse error at line %d:%d - %s",
-                                line, charPositionInLine, improvedMsg)
+                        String.format("Parse error at line %d:%d - %s%s",
+                                line, charPositionInLine, improvedMsg, context)
                 );
             }
         });
@@ -39,6 +46,32 @@ public class KiteCompiler {
         var tree = parser.program();
         var builder = new KiteASTBuilder();
         return builder.visitProgram(tree);
+    }
+
+    private String getErrorContext(String source, int line, int charPos) {
+        String[] lines = source.split("\n");
+        if (line < 1 || line > lines.length) {
+            return "";
+        }
+
+        String errorLine = lines[line - 1];
+
+        // Trim but keep track of leading whitespace for accurate positioning
+        String trimmed = errorLine.trim();
+
+        // Build context string
+        StringBuilder context = new StringBuilder();
+        context.append("\n  ").append(trimmed);
+
+        // Add pointer to error location
+        context.append("\n  ");
+        int adjustedPos = charPos - (errorLine.length() - trimmed.length());
+        for (int i = 0; i < adjustedPos; i++) {
+            context.append(" ");
+        }
+        context.append("^");
+
+        return context.toString();
     }
 
     private String improveErrorMessage(String originalMsg, Parser parser, Token token) {
@@ -88,7 +121,8 @@ public class KiteCompiler {
             originalMsg.contains("expecting ']'")) {
             return "missing ']' to close array";
         }
-// Missing ']' in decorator arguments
+
+        // Missing ']' in decorator arguments
         if (rules.contains("decoratorArgs") &&
             (token.getType() == KiteLexer.IDENTIFIER ||
              token.getType() == KiteLexer.LBRACE) &&
@@ -104,7 +138,9 @@ public class KiteCompiler {
             originalMsg.contains("')'")) {
             return "missing ')' to close decorator arguments";
         }
+
         // Default: use ANTLR's message (good enough for edge cases)
         return originalMsg;
     }
+
 }
