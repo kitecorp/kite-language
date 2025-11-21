@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
-import static io.kite.syntax.parser.literals.ParameterIdentifier.param;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
 import static io.kite.syntax.ast.Program.program;
 import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
 import static io.kite.syntax.ast.expressions.CallExpression.call;
@@ -18,6 +15,9 @@ import static io.kite.syntax.ast.statements.BlockExpression.block;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
 import static io.kite.syntax.ast.statements.LambdaExpression.lambda;
 import static io.kite.syntax.ast.statements.ReturnStatement.funReturn;
+import static io.kite.syntax.literals.ParameterIdentifier.param;
+import static io.kite.syntax.literals.StringLiteral.string;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

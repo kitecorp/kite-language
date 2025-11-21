@@ -2,7 +2,7 @@ package io.kite.syntax.ast.statements;
 
 import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;

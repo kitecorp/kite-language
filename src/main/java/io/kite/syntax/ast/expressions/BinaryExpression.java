@@ -1,8 +1,8 @@
 package io.kite.syntax.ast.expressions;
 
-import io.kite.syntax.parser.literals.BooleanLiteral;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.NumberLiteral;
+import io.kite.syntax.literals.BooleanLiteral;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.NumberLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

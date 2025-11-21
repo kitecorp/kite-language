@@ -1,4 +1,4 @@
-package io.kite.syntax.parser.literals;
+package io.kite.syntax.literals;
 
 import io.kite.semantics.types.ReferenceType;
 import io.kite.semantics.types.Type;

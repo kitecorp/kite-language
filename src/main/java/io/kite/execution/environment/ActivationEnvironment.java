@@ -1,6 +1,6 @@
 package io.kite.execution.environment;
 
-import io.kite.syntax.parser.literals.ParameterIdentifier;
+import io.kite.syntax.literals.ParameterIdentifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package io.kite.execution;
 import io.kite.execution.environment.Environment;
 import io.kite.execution.exceptions.NotFoundException;
 import io.kite.syntax.ast.statements.ExpressionStatement;
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

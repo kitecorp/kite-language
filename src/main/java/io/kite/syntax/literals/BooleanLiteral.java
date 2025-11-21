@@ -1,4 +1,4 @@
-package io.kite.syntax.parser.literals;
+package io.kite.syntax.literals;
 
 import io.kite.syntax.ast.SyntaxError;
 import lombok.Data;

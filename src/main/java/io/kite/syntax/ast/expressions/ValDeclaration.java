@@ -1,12 +1,12 @@
 package io.kite.syntax.ast.expressions;
 
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

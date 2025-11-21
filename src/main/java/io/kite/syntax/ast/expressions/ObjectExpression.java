@@ -1,6 +1,6 @@
 package io.kite.syntax.ast.expressions;
 
-import io.kite.syntax.parser.literals.ObjectLiteral;
+import io.kite.syntax.literals.ObjectLiteral;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -10,11 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.syntax.ast.expressions.ValDeclaration.val;
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

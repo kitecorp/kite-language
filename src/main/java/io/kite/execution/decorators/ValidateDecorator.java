@@ -8,7 +8,7 @@ import io.kite.syntax.ast.expressions.AnnotationDeclaration;
 import io.kite.syntax.ast.expressions.ArrayExpression;
 import io.kite.syntax.ast.expressions.InputDeclaration;
 import io.kite.syntax.ast.expressions.OutputDeclaration;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;

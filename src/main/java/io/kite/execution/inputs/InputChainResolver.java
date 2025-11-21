@@ -9,7 +9,7 @@ import io.kite.syntax.ast.KiteCompiler;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
 import io.kite.syntax.ast.statements.*;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import io.kite.tool.theme.PlainTheme;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;

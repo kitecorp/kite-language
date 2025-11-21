@@ -7,9 +7,9 @@ import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
 import io.kite.syntax.ast.expressions.ComponentStatement;
 import io.kite.syntax.ast.expressions.ResourceStatement;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.NumberLiteral;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.StringLiteral;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;

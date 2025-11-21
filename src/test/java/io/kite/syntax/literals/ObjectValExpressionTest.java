@@ -1,4 +1,4 @@
-package io.kite.syntax.parser.literals;
+package io.kite.syntax.literals;
 
 import io.kite.syntax.parser.ParserTest;
 import lombok.extern.log4j.Log4j2;
@@ -13,11 +13,11 @@ import static io.kite.syntax.ast.expressions.MemberExpression.member;
 import static io.kite.syntax.ast.expressions.ObjectExpression.objectExpression;
 import static io.kite.syntax.ast.expressions.ValDeclaration.val;
 import static io.kite.syntax.ast.statements.ValStatement.valStatement;
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.StringLiteral.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

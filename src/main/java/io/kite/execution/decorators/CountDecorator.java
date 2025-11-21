@@ -7,8 +7,8 @@ import io.kite.syntax.ast.expressions.ComponentStatement;
 import io.kite.syntax.ast.expressions.ResourceStatement;
 import io.kite.syntax.ast.statements.ExpressionStatement;
 import io.kite.syntax.ast.statements.ForStatement;
-import io.kite.syntax.parser.literals.NumberLiteral;
-import io.kite.syntax.parser.literals.SymbolIdentifier;
+import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.SymbolIdentifier;
 import org.apache.commons.lang3.Range;
 
 import static io.kite.syntax.ast.statements.BlockExpression.block;

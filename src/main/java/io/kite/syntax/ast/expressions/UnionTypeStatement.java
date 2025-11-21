@@ -2,8 +2,8 @@ package io.kite.syntax.ast.expressions;
 
 import io.kite.syntax.ast.statements.BlockExpression;
 import io.kite.syntax.ast.statements.Statement;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.SymbolIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.SymbolIdentifier;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 

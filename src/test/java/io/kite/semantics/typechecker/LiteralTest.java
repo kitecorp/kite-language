@@ -2,16 +2,16 @@ package io.kite.semantics;
 
 import io.kite.base.CheckerTest;
 import io.kite.semantics.types.ValueType;
-import io.kite.syntax.parser.literals.NullLiteral;
+import io.kite.syntax.literals.NullLiteral;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
-import static io.kite.syntax.parser.literals.BooleanLiteral.bool;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.BooleanLiteral.bool;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
 
 @Log4j2
 @DisplayName("TypeChecker Literal")

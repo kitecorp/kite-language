@@ -11,9 +11,9 @@ import static io.kite.syntax.ast.expressions.ArrayExpression.array;
 import static io.kite.syntax.ast.expressions.ObjectExpression.objectExpression;
 import static io.kite.syntax.ast.expressions.ValDeclaration.val;
 import static io.kite.syntax.ast.statements.ValStatement.valStatement;
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

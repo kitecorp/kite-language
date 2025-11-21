@@ -6,10 +6,10 @@ import io.kite.semantics.TypeError;
 import io.kite.semantics.types.*;
 import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.ast.expressions.*;
-import io.kite.syntax.parser.literals.BooleanLiteral;
-import io.kite.syntax.parser.literals.NumberLiteral;
-import io.kite.syntax.parser.literals.StringLiteral;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.BooleanLiteral;
+import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.StringLiteral;
+import io.kite.syntax.literals.TypeIdentifier;
 import org.fusesource.jansi.Ansi;
 
 import java.util.HashSet;

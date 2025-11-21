@@ -1,10 +1,10 @@
 package io.kite.syntax.ast.statements;
 
 import io.kite.syntax.ast.expressions.Expression;
-import io.kite.syntax.parser.literals.NumberLiteral;
-import io.kite.syntax.parser.literals.ParameterIdentifier;
-import io.kite.syntax.parser.literals.StringLiteral;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.ParameterIdentifier;
+import io.kite.syntax.literals.StringLiteral;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.Nullable;

@@ -3,7 +3,7 @@ package io.kite.execution.decorators;
 import io.kite.analysis.visitors.SyntaxPrinter;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
 import io.kite.syntax.ast.expressions.ResourceStatement;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 
 public class ExistingDecorator extends DecoratorInterpreter {
     private final SyntaxPrinter printer;

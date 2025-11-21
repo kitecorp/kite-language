@@ -3,7 +3,7 @@ package io.kite.execution.interpreter;
 import io.kite.syntax.ast.expressions.BinaryExpression;
 import io.kite.syntax.ast.expressions.CallExpression;
 import io.kite.syntax.ast.expressions.MemberExpression;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 

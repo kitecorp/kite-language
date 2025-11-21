@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.syntax.parser.literals.Identifier.id;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
 import static io.kite.syntax.ast.Program.program;
 import static io.kite.syntax.ast.expressions.AssignmentExpression.assign;
 import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
 import static io.kite.syntax.ast.statements.BlockExpression.block;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
 import static io.kite.syntax.ast.statements.IfStatement.ifStatement;
+import static io.kite.syntax.literals.Identifier.id;
+import static io.kite.syntax.literals.NumberLiteral.number;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

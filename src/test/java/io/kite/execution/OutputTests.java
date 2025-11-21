@@ -9,8 +9,8 @@ import io.kite.semantics.types.AnyType;
 import io.kite.semantics.types.StringType;
 import io.kite.semantics.types.ValueType;
 import io.kite.syntax.ast.KiteCompiler;
-import io.kite.syntax.parser.literals.ArrayTypeIdentifier;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.ArrayTypeIdentifier;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import static io.kite.syntax.ast.expressions.OutputDeclaration.output;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.StringLiteral.string;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

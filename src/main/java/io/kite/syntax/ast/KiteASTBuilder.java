@@ -7,7 +7,7 @@ import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.ast.expressions.*;
 import io.kite.syntax.ast.generated.KiteParser;
 import io.kite.syntax.ast.statements.*;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 

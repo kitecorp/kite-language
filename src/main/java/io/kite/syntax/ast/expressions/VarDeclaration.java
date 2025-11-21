@@ -5,15 +5,15 @@ import io.kite.semantics.types.DecoratorType;
 import io.kite.semantics.types.Type;
 import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.ast.statements.VarStatement;
-import io.kite.syntax.parser.literals.Identifier;
-import io.kite.syntax.parser.literals.TypeIdentifier;
+import io.kite.syntax.literals.Identifier;
+import io.kite.syntax.literals.TypeIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Set;
 
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

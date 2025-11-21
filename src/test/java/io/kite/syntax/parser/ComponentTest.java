@@ -11,9 +11,9 @@ import static io.kite.syntax.ast.expressions.ComponentStatement.component;
 import static io.kite.syntax.ast.expressions.InputDeclaration.input;
 import static io.kite.syntax.ast.expressions.OutputDeclaration.output;
 import static io.kite.syntax.ast.statements.BlockExpression.block;
-import static io.kite.syntax.parser.literals.NumberLiteral.number;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
-import static io.kite.syntax.parser.literals.TypeIdentifier.type;
+import static io.kite.syntax.literals.NumberLiteral.number;
+import static io.kite.syntax.literals.StringLiteral.string;
+import static io.kite.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2

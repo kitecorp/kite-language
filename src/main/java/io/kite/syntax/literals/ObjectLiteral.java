@@ -1,10 +1,10 @@
-package io.kite.syntax.parser.literals;
+package io.kite.syntax.literals;
 
 import io.kite.syntax.ast.expressions.Expression;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.StringLiteral.string;
 
 /**
  * A Object literal has the form of: { key: value } or empty string {}

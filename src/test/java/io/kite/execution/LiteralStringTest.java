@@ -5,9 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static io.kite.syntax.parser.literals.ObjectLiteral.ObjectLiteralPair;
-import static io.kite.syntax.parser.literals.ObjectLiteral.object;
-import static io.kite.syntax.parser.literals.StringLiteral.string;
+import static io.kite.syntax.literals.ObjectLiteral.ObjectLiteralPair;
+import static io.kite.syntax.literals.ObjectLiteral.object;
+import static io.kite.syntax.literals.StringLiteral.string;
 
 @Log4j2
 public class LiteralStringTest extends RuntimeTest {

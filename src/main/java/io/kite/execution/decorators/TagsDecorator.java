@@ -2,7 +2,7 @@ package io.kite.execution.decorators;
 
 import io.kite.execution.Interpreter;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
-import io.kite.syntax.parser.literals.StringLiteral;
+import io.kite.syntax.literals.StringLiteral;
 
 import java.util.List;
 import java.util.Map;

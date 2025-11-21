@@ -8,7 +8,7 @@ import io.kite.semantics.types.Type;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
 import io.kite.syntax.ast.statements.*;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;

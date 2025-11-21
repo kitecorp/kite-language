@@ -6,7 +6,7 @@ import io.kite.semantics.TypeChecker;
 import io.kite.semantics.TypeError;
 import io.kite.semantics.types.*;
 import io.kite.syntax.ast.expressions.*;
-import io.kite.syntax.parser.literals.Identifier;
+import io.kite.syntax.literals.Identifier;
 import org.fusesource.jansi.Ansi;
 
 import java.util.List;

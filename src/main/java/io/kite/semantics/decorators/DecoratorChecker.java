@@ -8,7 +8,7 @@ import io.kite.semantics.types.SystemType;
 import io.kite.semantics.types.Type;
 import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.ast.expressions.AnnotationDeclaration;
-import io.kite.syntax.parser.literals.*;
+import io.kite.syntax.literals.*;
 import lombok.Data;
 import org.fusesource.jansi.Ansi;
 
