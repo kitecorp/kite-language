@@ -1,0 +1,174 @@
+package io.kite.frontend.parse;
+
+import io.kite.typechecker.types.ValueType;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+import java.util.List;
+
+import static io.kite.frontend.parse.literals.ParameterIdentifier.param;
+import static io.kite.frontend.parse.literals.StringLiteral.string;
+import static io.kite.frontend.parse.literals.TypeIdentifier.type;
+import static io.kite.frontend.parser.Program.program;
+import static io.kite.frontend.parser.expressions.BinaryExpression.binary;
+import static io.kite.frontend.parser.expressions.CallExpression.call;
+import static io.kite.frontend.parser.statements.BlockExpression.block;
+import static io.kite.frontend.parser.statements.ExpressionStatement.expressionStatement;
+import static io.kite.frontend.parser.statements.LambdaExpression.lambda;
+import static io.kite.frontend.parser.statements.ReturnStatement.funReturn;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@Log4j2
+@DisplayName("Parser Lambda")
+public class LambdaTest extends ParserTest {
+
+    @Test
+    void lambdaSimple() {
+        var res = parse("(number x) -> x*x");
+        var expected = program(expressionStatement(
+                        lambda(param("x", type("number")), binary("*", "x", "x"))
+                )
+        );
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void lambdaArgTypeWithReturnType() {
+        var res = parse("(number x ) number -> x*x");
+        var expected = program(expressionStatement(
+                        lambda(param("x", type(ValueType.Number)), binary("*", "x", "x"), type(ValueType.Number))
+                )
+        );
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void lambdaNoReturn() {
+        var res = parse("""
+                (number x ) -> {
+                    print(x)
+                }
+                """);
+        var expected = program(expressionStatement(
+                        lambda(param("x", type(ValueType.Number)),
+                                block(
+                                        expressionStatement(
+                                                call("print", "x")
+                                        )
+                                ))
+                )
+        );
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void lambdaTwoArgs() {
+        var res = parse("(number x,number y) -> x*y");
+        var expected = program(
+                expressionStatement(
+                        lambda(param("x", "number"),
+                                param("y", "number"), binary("*", "x", "y")))
+        );
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void lambdaBlock() {
+        var res = parse("(number x, number y) -> { x*y }");
+        var expected = program(
+                expressionStatement(
+                        lambda(param("x", "number"),
+                                param("y", "number"),
+                                block(expressionStatement(binary("*", "x", "y"))))
+                ));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void testWith2Args() {
+        var res = parse("""
+                (number x) -> { 
+                    return x*x
+                }
+                """);
+        var expected = program(expressionStatement(lambda(param("x", "number"), block(
+                        funReturn(binary("*", "x", "x"))
+                )
+        )));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void testWithoutReturn() {
+        var res = parse("""
+                (object x) -> { 
+                    return
+                }
+                """);
+        var expected = program(expressionStatement(lambda(param("x", "object"), block(
+                        funReturn(expressionStatement(type(ValueType.Void)))
+                )
+        )));
+        assertEquals(expected, res);
+        log.info(res);
+    }
+
+    @Test
+    void testWithoutParamsAndReturn() {
+        var res = parse("""
+                () -> { 
+                }
+                """);
+        var expected = program(expressionStatement(lambda(List.of(), block())));
+        assertEquals(expected, res);
+        log.warn((res));
+    }
+
+    @Test
+    void callExpression() {
+        var res = parse("""
+                ((number x) -> x*x)(2) 
+                
+                """);
+        var expected = program(
+                expressionStatement(call(lambda(param("x", "number"), binary("*", "x", "x")), 2)));
+        log.warn((res));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void callExpressionEmpty() {
+        var res = parse("""
+                ((number x) -> x*x)(2)()
+                
+                """);
+        var expected = program(
+                expressionStatement(
+                        call(call(lambda(param("x","number"), binary("*", "x", "x")), 2), Collections.emptyList())
+                ));
+        log.warn((res));
+        assertEquals(expected, res);
+    }
+
+    @Test
+    void callExpressionHi() {
+        var res = parse("""
+                ((number x) -> x*x)(2)("hi")
+                """);
+        var expected = program(
+                expressionStatement(
+                        call(call(lambda(param("x","number"), binary("*", "x", "x")), 2), string("hi"))
+                ));
+        log.warn((res));
+        assertEquals(expected, res);
+    }
+
+}

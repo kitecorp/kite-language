@@ -16,6 +16,9 @@ limitations in existing IaC tools through innovative features while maintaining 
 documentation. This means
 you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to
 explicitly ask.
+You can use the following context7 explicit libraries or anything outside of the following list:
+
+* /gradle/gradle
 
 ## Project Structure
 
