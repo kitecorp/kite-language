@@ -17,7 +17,7 @@ public class AstGenerator {
         }
         String outputDir = args[0];
 
-//        defineAst(outputDir + "/Expressions", "dev.fangscl.Frontend.Parser.Expressions", "Expr", Arrays.asList(
+//        defineAst(outputDir + "/Expressions", "dev.fangscl.frontend.parser.Expressions", "Expr", Arrays.asList(
 //                "Binary   : Expr left, Token operator, Expr right",
 //                "Grouping : Expr expression",
 //                "Literal  : Object value",
@@ -69,7 +69,7 @@ public class AstGenerator {
                 """.formatted(className, fieldList, constructorInit.toString());
         var imports = "";
         if (fieldList.contains("Token")) {
-            imports = "import io.kite.Frontend.Lexer.Token;";
+            imports = "import io.kite.frontend.lexer.Token;";
         }
 
         // Fields.

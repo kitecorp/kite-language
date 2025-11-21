@@ -5,13 +5,13 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @SelectPackages({
-        "io.kite.Frontend.Parse",
-        "io.kite.TypeChecker",
-        "io.kite.Runtime",
-        "io.kite.Integration",
-        "io.kite.Frontend.Token",
-        "io.kite.Frontend.Parser",
-        "io.kite.Frontend.Lexical"
+        "io.kite.frontend.parse",
+        "io.kite.typechecker",
+        "io.kite.runtime",
+        "io.kite.integration",
+        "io.kite.frontend.token",
+        "io.kite.frontend.parser",
+        "io.kite.frontend.lexical"
 })
 public class AllTestsSuite {
 }

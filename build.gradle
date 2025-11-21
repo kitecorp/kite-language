@@ -53,8 +53,8 @@ java {
 }
 generateGrammarSource {
     maxHeapSize = "64m"
-    arguments += ["-visitor", "-Xexact-output-dir", "-package", "io.kite.Frontend.Parser.generated"]
-    outputDirectory = file("${buildDir}/generated-src/antlr/main/io/kite/Frontend/Parser/generated")
+    arguments += ["-visitor", "-Xexact-output-dir", "-package", "io.kite.frontend.parser.generated"]
+    outputDirectory = file("${buildDir}/generated-src/antlr/main/io/kite/frontend/parser/generated")
 
     doFirst {
         outputDirectory.mkdirs()
@@ -79,7 +79,7 @@ tasks.register('testJar', Jar) {
     archiveClassifier.set('test')
 //    from sourceSets.test.output
     from(sourceSets.test.output) {
-        include 'io/kite/Base/**'
+        include 'io/kite/base/**'
     }
 }
 
