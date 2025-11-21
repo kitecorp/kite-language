@@ -438,7 +438,11 @@ public class DecoratorTest extends ParserTest {
                    @annotation(importable Vm x =1
                 }
                 """));
-        Assertions.assertEquals("Parse error at line 2:26 - mismatched input 'Vm' expecting {'.', ')', '[', ','}", err.getMessage());
+        Assertions.assertEquals("""
+                Parse error at line 2:26 - mismatched input 'Vm' expecting '.', ')', '[', ','
+                  @annotation(importable Vm x =1
+                                         ^
+                """.trim(), err.getMessage());
     }
 
     @Test
@@ -450,7 +454,11 @@ public class DecoratorTest extends ParserTest {
                         }
                         """)
         );
-        assertEquals("Parse error at line 2:27 - missing ']' to close decorator array argument", err.getMessage());
+        assertEquals("""
+                Parse error at line 2:27 - missing ']' to close array
+                  @annotation([importable Vm x =1
+                                          ^
+                """.trim(), err.getMessage());
     }
 
     @Test
@@ -474,7 +482,11 @@ public class DecoratorTest extends ParserTest {
                    @annotation([importable] Vm x =1
                 }
                 """));
-        assertEquals("Parse error at line 2:28 - missing ')' to close decorator arguments", err.getMessage());
+        assertEquals("""
+                Parse error at line 2:28 - missing ')' to close decorator arguments
+                  @annotation([importable] Vm x =1
+                                           ^
+                """.trim(), err.getMessage());
     }
 
     @Test
@@ -484,7 +496,11 @@ public class DecoratorTest extends ParserTest {
                    @annotation(importable] Vm x =1
                 }
                 """));
-        assertEquals("Parse error at line 2:25 - mismatched input ']' expecting {'.', ')', '[', ','}", err.getMessage());
+        assertEquals("""
+                Parse error at line 2:25 - mismatched input ']' expecting '.', ')', '[', ','
+                  @annotation(importable] Vm x =1
+                                        ^
+                """.trim(), err.getMessage());
     }
 
     @Test

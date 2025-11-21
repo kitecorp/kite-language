@@ -34,7 +34,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
     private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
     @Getter
-    private SyntaxPrinter printer;
+    private final SyntaxPrinter printer;
     private final Set<String> vals = new HashSet<>();
     private final Map<String, DecoratorChecker> decoratorInfoMap;
     private final ComponentRegistry componentRegistry;
@@ -529,7 +529,13 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     private Type visitSymbolMember(MemberExpression expression, SymbolIdentifier resourceName) {
-        var objectType = executeBlock(expression.getObject(), env);
+        Type objectType;
+        try {
+            objectType = executeBlock(expression.getObject(), env);
+        } catch (NotFoundException e) {
+            // Forward reference to resource not yet declared - defer validation to interpreter
+            return new AnyType(new Deferred(resourceName.string()));
+        }
 
         return switch (objectType) {
             case SchemaType schemaType -> lookupInstance(resourceName);
