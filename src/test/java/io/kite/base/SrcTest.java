@@ -1,6 +1,6 @@
 package io.kite.base;
 
-import io.kite.typechecker.TypeChecker;
+import io.kite.semantics.TypeChecker;
 import org.junit.jupiter.api.BeforeEach;
 
 public class SrcTest extends RuntimeTest {

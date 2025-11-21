@@ -1,6 +1,6 @@
 package io.kite.utils;
 
-import io.kite.frontend.parse.literals.BooleanLiteral;
+import io.kite.syntax.parser.literals.BooleanLiteral;
 
 public class BoolUtils {
     public static boolean isTruthy(Object object) {

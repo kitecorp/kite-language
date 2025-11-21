@@ -1,12 +1,12 @@
 package io.kite.base;
 
-import io.kite.environment.Environment;
-import io.kite.frontend.lexical.ScopeResolver;
-import io.kite.frontend.parser.KiteCompiler;
-import io.kite.frontend.parser.Program;
-import io.kite.runtime.Interpreter;
-import io.kite.visitors.PlainTheme;
-import io.kite.visitors.SyntaxPrinter;
+import io.kite.analysis.visitors.SyntaxPrinter;
+import io.kite.execution.Interpreter;
+import io.kite.execution.environment.Environment;
+import io.kite.semantics.scope.ScopeResolver;
+import io.kite.syntax.ast.KiteCompiler;
+import io.kite.syntax.ast.Program;
+import io.kite.tool.theme.PlainTheme;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
