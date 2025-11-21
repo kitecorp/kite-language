@@ -135,7 +135,7 @@ public class UnionTypeErrorsTest extends CheckerTest {
                 type alias = number | string | null
                 var alias x = []
                 """));
-        assertEquals("Expected type `string | null | number` with valid values: `string | null | number` but got `array` in expression: `alias x = []`", err.getMessage());
+        assertEquals("Expected type `null | number | string` with valid values: `null | number | string` but got `array` in expression: `alias x = []`", err.getMessage());
     }
 
 

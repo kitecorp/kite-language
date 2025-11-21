@@ -59,7 +59,8 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
                + expression.getExpressions()
                        .stream()
                        .map(this::visit)
-                       .reduce((a, b) -> a + " " + theme.punctuation("|") + " " + b)
+                       .sorted()
+                       .reduce((a, b) -> "%s %s %s".formatted(a, theme.punctuation("|"), b))
                        .orElse("");
     }
 
@@ -302,7 +303,9 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         return switch (type) {
             case ArrayType at -> theme.type(at.getType().getValue() + "[]");
             case UnionType ut -> theme.type(ut.getTypes()
-                    .stream().map(this::visit)
+                    .stream()
+                    .map(this::visit)
+                    .sorted()
                     .collect(Collectors.joining(" | ")));
             default -> theme.type(type.getValue());
         };
