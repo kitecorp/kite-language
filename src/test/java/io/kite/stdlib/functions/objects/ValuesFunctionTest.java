@@ -1,6 +1,7 @@
 package io.kite.stdlib.functions.objects;
 
 import io.kite.base.RuntimeTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Function 'values' removed due to namespace conflict with common variable names")
 class ValuesFunctionTest extends RuntimeTest {
 
     private final ValuesFunction function = new ValuesFunction();

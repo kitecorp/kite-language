@@ -94,12 +94,11 @@ public class FunTest extends RuntimeTest {
     @Test
     void funBody() {
         var res = eval("""
-                fun sqrt(number x){
+                fun sqrts(number x){
                    x*x
                 }
-                sqrt(2)
+                sqrts(2)
                 """);
-        log.warn((res));
         assertEquals(4, res);
     }
 
@@ -117,11 +116,11 @@ public class FunTest extends RuntimeTest {
     @Test
     void funBodyMultiParams() {
         var res = eval("""
-                fun sqrt(number x,number y){
+                fun sqrts(number x,number y){
                    var z = 1
                    x*y+z
                 }
-                sqrt(2,3)
+                sqrts(2,3)
                 """);
         log.warn((res));
         assertEquals(7, res);

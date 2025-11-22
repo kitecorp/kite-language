@@ -2,6 +2,7 @@ package io.kite.stdlib.functions.collections;
 
 import io.kite.base.RuntimeTest;
 import io.kite.execution.values.NullValue;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Function 'find' removed due to namespace conflict with common resource names")
 class FindFunctionTest extends RuntimeTest {
 
     private final FindFunction function = new FindFunction();

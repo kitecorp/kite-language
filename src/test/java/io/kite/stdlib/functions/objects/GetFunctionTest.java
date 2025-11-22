@@ -2,12 +2,14 @@ package io.kite.stdlib.functions.objects;
 
 import io.kite.base.RuntimeTest;
 import io.kite.execution.values.NullValue;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Function 'get' removed due to namespace conflict with common resource names")
 class GetFunctionTest extends RuntimeTest {
 
     private final GetFunction function = new GetFunction();
