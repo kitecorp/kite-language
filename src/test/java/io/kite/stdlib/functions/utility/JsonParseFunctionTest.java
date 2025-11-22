@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonParseFunctionTest extends RuntimeTest {
 
-    private final JsonParseFunction function = new JsonParseFunction();
+    private final FromJsonFunction function = new FromJsonFunction();
 
     @Test
     void jsonParseNotImplemented() {

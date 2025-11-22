@@ -14,8 +14,13 @@ import io.kite.semantics.types.Type;
 import io.kite.stdlib.functions.PrintFunction;
 import io.kite.stdlib.functions.PrintlnFunction;
 import io.kite.stdlib.functions.cast.*;
-import io.kite.stdlib.functions.datetime.DateFunction;
+import io.kite.stdlib.functions.collections.*;
+import io.kite.stdlib.functions.datetime.*;
 import io.kite.stdlib.functions.numeric.*;
+import io.kite.stdlib.functions.objects.*;
+import io.kite.stdlib.functions.string.*;
+import io.kite.stdlib.functions.types.*;
+import io.kite.stdlib.functions.utility.*;
 import io.kite.syntax.ast.KiteCompiler;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
@@ -101,15 +106,105 @@ public final class Interpreter extends StackVisitor<Object> {
         this.env.init("boolean", new BooleanCastFunction());
         this.env.init("any", new AnyCastFunction());
 
-        // number
+        // numeric functions
+        this.env.init("abs", new AbsFunction());
         this.env.init("pow", new PowFunction());
-        this.env.init("min", new MinFunction());
-        this.env.init("max", new MaxFunction());
         this.env.init("ceil", new CeilFunction());
         this.env.init("floor", new FloorFunction());
-        this.env.init("abs", new AbsFunction());
+        this.env.init("min", new MinFunction());
+        this.env.init("max", new MaxFunction());
+        this.env.init("round", new RoundFunction());
+        this.env.init("sqrt", new SqrtFunction());
+        this.env.init("random", new RandomFunction());
+        this.env.init("clamp", new ClampFunction());
+        this.env.init("sign", new SignFunction());
+        this.env.init("mod", new ModFunction());
+
+        // collection functions
+        this.env.init("isEmpty", new IsEmptyFunction());
+        this.env.init("contains", new ContainsFunction());
+        this.env.init("first", new FirstFunction());
+        this.env.init("last", new LastFunction());
+        this.env.init("join", new JoinFunction());
+        this.env.init("sort", new SortFunction());
+        this.env.init("push", new PushFunction());
+        this.env.init("pop", new PopFunction());
+        this.env.init("reverse", new ReverseFunction());
+        this.env.init("slice", new SliceFunction());
+        this.env.init("find", new FindFunction());
+        this.env.init("distinct", new DistinctFunction());
+        this.env.init("flatten", new FlattenFunction());
+        this.env.init("take", new TakeFunction());
+        this.env.init("drop", new DropFunction());
+        this.env.init("sum", new SumFunction());
+        this.env.init("range", new RangeFunction());
+        this.env.init("zip", new ZipFunction());
+        this.env.init("average", new AverageFunction());
+        this.env.init("findIndex", new FindIndexFunction());
+
+        // string functions
+        this.env.init("length", new LengthFunction());
+        this.env.init("substring", new SubstringFunction());
+        this.env.init("toUpperCase", new ToUpperCaseFunction());
+        this.env.init("toLowerCase", new ToLowerCaseFunction());
+        this.env.init("trim", new TrimFunction());
+        this.env.init("replace", new ReplaceFunction());
+        this.env.init("split", new SplitFunction());
+        this.env.init("indexOf", new IndexOfFunction());
+        this.env.init("startsWith", new StartsWithFunction());
+        this.env.init("endsWith", new EndsWithFunction());
+        this.env.init("repeat", new RepeatFunction());
+        this.env.init("padStart", new PadStartFunction());
+        this.env.init("padEnd", new PadEndFunction());
+        this.env.init("charAt", new CharAtFunction());
+        this.env.init("matches", new MatchesFunction());
+        this.env.init("format", new FormatFunction());
+
+        // datetime functions
+        this.env.init("now", new NowFunction());
+        this.env.init("year", new YearFunction());
+        this.env.init("month", new MonthFunction());
+        this.env.init("day", new DayFunction());
+        this.env.init("hour", new HourFunction());
+        this.env.init("minute", new MinuteFunction());
+        this.env.init("second", new SecondFunction());
+        this.env.init("formatDate", new FormatDateFunction());
+        this.env.init("timestamp", new TimestampFunction());
         this.env.init("date", new DateFunction());
-//        this.globals.init("Vm", SchemaValue.of("Vm", new Environment(env, new Vm())));
+        this.env.init("addDays", new AddDaysFunction());
+        this.env.init("diffDays", new DiffDaysFunction());
+        this.env.init("isLeapYear", new IsLeapYearFunction());
+        this.env.init("dayOfWeek", new DayOfWeekFunction());
+        this.env.init("parseDate", new ParseDateFunction());
+        this.env.init("toISOString", new ToISOStringFunction());
+
+        // type checking functions
+        this.env.init("isString", new IsStringFunction());
+        this.env.init("isNumber", new IsNumberFunction());
+        this.env.init("isBoolean", new IsBooleanFunction());
+        this.env.init("isArray", new IsArrayFunction());
+        this.env.init("isObject", new IsObjectFunction());
+        this.env.init("isNull", new IsNullFunction());
+        this.env.init("toNumber", new ToNumberFunction());
+
+        // object manipulation functions
+        this.env.init("keys", new KeysFunction());
+        this.env.init("values", new ValuesFunction());
+        this.env.init("entries", new EntriesFunction());
+        this.env.init("merge", new MergeFunction());
+        this.env.init("hasKey", new HasKeyFunction());
+        this.env.init("get", new GetFunction());
+
+        // utility functions
+        this.env.init("uuid", new UuidFunction());
+        this.env.init("base64Encode", new Base64EncodeFunction());
+        this.env.init("base64Decode", new Base64DecodeFunction());
+        this.env.init("hash", new HashFunction());
+        this.env.init("env", new EnvFunction());
+        this.env.init("fileExists", new FileExistsFunction());
+        this.env.init("readFile", new ReadFileFunction());
+        this.env.init("fromJson", new FromJsonFunction());
+        this.env.init("toJson", new ToJsonFunction());
 
         this.decorators.put("minValue", new MinValueDecorator(this));
         this.decorators.put("maxValue", new MaxValueDecorator(this));
