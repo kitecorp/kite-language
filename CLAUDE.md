@@ -12,12 +12,12 @@ limitations in existing IaC tools through innovative features while maintaining 
 
 ## Development Guidelines
 
-**AI Assistance:** Automatically use context7 for code generation, setup or configuration steps, or library/API
-documentation. This means
-you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to
-explicitly ask.
-You can use the following context7 explicit libraries or anything outside of the following list:
+We develop Kite using the following Engineering Practices:
 
+* test-driven development (TDD)
+* clean architecture
+* dry
+* yagni
 * /gradle/gradle
 
 ## Project Structure
