@@ -1,6 +1,7 @@
 package io.kite.stdlib.functions.collections;
 
 import io.kite.base.RuntimeTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Disabled("Function 'first' removed due to namespace conflict with common resource names")
 class FirstFunctionTest extends RuntimeTest {
 
     private final FirstFunction function = new FirstFunction();

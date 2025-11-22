@@ -820,7 +820,7 @@ public class ForResourceTest extends RuntimeTest {
     @Test
     @DisplayName("Create multiple resources with mixed numeric and string indices")
     void testMultipleResourcesWithMixedIndices() {
-        var res = eval("""
+        eval("""
                 schema vm {
                    string name
                 }

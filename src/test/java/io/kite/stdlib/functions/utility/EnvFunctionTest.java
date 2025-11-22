@@ -2,10 +2,12 @@ package io.kite.stdlib.functions.utility;
 
 import io.kite.base.RuntimeTest;
 import io.kite.execution.values.NullValue;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Function 'env' removed due to namespace conflict with common variable names")
 class EnvFunctionTest extends RuntimeTest {
 
     private final EnvFunction function = new EnvFunction();
