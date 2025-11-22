@@ -19,7 +19,8 @@ statementTerminator
     ;
 
 nonEmptyStatement
-    : declaration
+    : importStatement
+    | declaration
     | ifStatement
     | initStatement
     | returnStatement
@@ -34,6 +35,11 @@ statement
 
 emptyStatement
     : NL
+    ;
+
+// Import Statement
+importStatement
+    : IMPORT '*' FROM STRING
     ;
 
 // Declarations
@@ -412,6 +418,8 @@ IN          : 'in' ;
 RETURN      : 'return' ;
 
 // Keywords - Declarations
+IMPORT      : 'import' ;
+FROM        : 'from' ;
 FUN         : 'fun' ;
 VAR         : 'var' ;
 TYPE        : 'type' ;

@@ -434,6 +434,12 @@ public final class ScopeResolver implements Visitor<Void> {
     }
 
     @Override
+    public Void visit(ImportStatement statement) {
+        // Import statements are handled by the interpreter
+        return null;
+    }
+
+    @Override
     public Void visit(VarDeclaration declaration) {
         declare(declaration.getId());
         if (declaration.hasInit()) {

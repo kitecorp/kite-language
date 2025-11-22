@@ -10,6 +10,7 @@ import io.kite.execution.exceptions.*;
 import io.kite.execution.interpreter.OperatorComparator;
 import io.kite.execution.values.*;
 import io.kite.semantics.TypeError;
+import io.kite.semantics.scope.ScopeResolver;
 import io.kite.semantics.types.Type;
 import io.kite.stdlib.functions.PrintFunction;
 import io.kite.stdlib.functions.PrintlnFunction;
@@ -41,6 +42,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,10 +64,10 @@ public final class Interpreter extends StackVisitor<Object> {
     private final Map<String, DecoratorInterpreter> decorators;
     @Getter
     private final List<RuntimeException> errors;
+    private final KiteCompiler parser = new KiteCompiler();
     @Getter
     @Setter
     private SyntaxPrinter printer;
-    private final KiteCompiler parser = new KiteCompiler();
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Setter
@@ -309,8 +312,8 @@ public final class Interpreter extends StackVisitor<Object> {
         }
         try {
             return env.lookup(expression.string(), expression.getHops());
-        } catch (
-                NotFoundException e) { // when not finding the variable in the correct scope, try the most nested scope again
+        } catch (NotFoundException e) {
+            // when not finding the variable in the correct scope, try the most nested scope again
             return env.lookup(expression.string(), 0);
         }
     }
@@ -434,8 +437,7 @@ public final class Interpreter extends StackVisitor<Object> {
                 case null, default -> values.add(o);
             }
         }
-        var res = getEnv().init(expression.getName(), values);
-        return res;
+        return getEnv().init(expression.getName(), values);
     }
 
     private void expectOperatorType(Object type, List<Class> allowedTypes, BinaryExpression expression) {
@@ -508,6 +510,43 @@ public final class Interpreter extends StackVisitor<Object> {
             value = visit(statement.getArgument());
         }
         throw new Return(value);
+    }
+
+    @Override
+    public Object visit(ImportStatement statement) {
+        try {
+            // Read the file content
+            String content = Files.readString(Paths.get(statement.getFilePath()));
+
+            // Parse the file into an AST
+            Program program = parser.parse(content);
+
+            // Resolve scopes in the imported program
+            var scopeResolver = new ScopeResolver();
+            scopeResolver.resolve(program);
+
+            // Create a new interpreter with a new environment to execute the imported file
+            Interpreter importInterpreter = new Interpreter(new Environment<>("import"), printer);
+
+            // Get the built-in function names from the new interpreter to exclude them from import
+            Set<String> stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
+
+            // Execute the program in the isolated environment
+            importInterpreter.visit(program);
+
+            // Merge only user-defined variables (exclude stdlib functions that were auto-initialized)
+            Environment<Object> importedEnv = importInterpreter.getEnv();
+            for (Map.Entry<String, Object> entry : importedEnv.getVariables().entrySet()) {
+                // Skip stdlib functions that were auto-initialized in the constructor
+                if (!stdlibNames.contains(entry.getKey())) {
+                    env.initOrAssign(entry.getKey(), entry.getValue());
+                }
+            }
+
+            return null;
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Cannot import file '" + statement.getFilePath() + "': " + e.getMessage());
+        }
     }
 
     @Override

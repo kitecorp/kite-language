@@ -57,7 +57,9 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteBaseVisitor
 
     @Override
     public Statement visitNonEmptyStatement(NonEmptyStatementContext ctx) {
-        if (ctx.declaration() != null) {
+        if (ctx.importStatement() != null) {
+            return (Statement) visit(ctx.importStatement());
+        } else if (ctx.declaration() != null) {
             return (Statement) visit(ctx.declaration());
         } else if (ctx.ifStatement() != null) {
             return (Statement) visit(ctx.ifStatement());
@@ -340,6 +342,14 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteBaseVisitor
                 (Expression) visit(ctx.blockExpression()));
 
         return InitStatement.of(params, body);
+    }
+
+    @Override
+    public ImportStatement visitImportStatement(ImportStatementContext ctx) {
+        String filePath = ctx.STRING().getText();
+        // Remove quotes from string literal
+        filePath = filePath.substring(1, filePath.length() - 1);
+        return ImportStatement.of(filePath);
     }
 
     // ========================================================================

@@ -60,6 +60,7 @@ public sealed interface Visitor<R>
             case ForStatement forStatement -> visit(forStatement);
             case FunctionDeclaration functionDeclaration -> visit(functionDeclaration);
             case IfStatement ifStatement -> visit(ifStatement);
+            case ImportStatement importStatement -> visit(importStatement);
             case InitStatement initStatement -> visit(initStatement);
             case ReturnStatement returnStatement -> visit(returnStatement);
             case SchemaDeclaration schemaDeclaration -> visit(schemaDeclaration);
@@ -165,6 +166,8 @@ public sealed interface Visitor<R>
     R visit(SchemaDeclaration statement);
 
     R visit(ReturnStatement statement);
+
+    R visit(ImportStatement statement);
 
     /**
      * An instance of a Schema is an Environment!

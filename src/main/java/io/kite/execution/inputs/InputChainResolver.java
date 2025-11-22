@@ -350,6 +350,12 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     }
 
     @Override
+    public Object visit(ImportStatement statement) {
+        // Import statements are handled by the interpreter
+        return null;
+    }
+
+    @Override
     public Object visit(ResourceStatement expression) {
         return null;
     }
