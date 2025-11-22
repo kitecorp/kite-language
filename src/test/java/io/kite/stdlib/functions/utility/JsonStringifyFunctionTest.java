@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonStringifyFunctionTest extends RuntimeTest {
 
-    private final JsonStringifyFunction function = new JsonStringifyFunction();
+    private final ToJsonFunction function = new ToJsonFunction();
 
     @Test
     void jsonStringifyNotImplemented() {
