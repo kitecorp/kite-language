@@ -74,6 +74,8 @@ public final class Interpreter extends StackVisitor<Object> {
     private Map<String, ResourceValue> instances; // holds the full resource path name
     @Getter
     private Environment<Object> env;
+    // Track currently importing files to detect circular imports
+    private final Set<String> importChain;
 
     public Interpreter() {
         this(new Environment<>());
@@ -88,11 +90,17 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     public Interpreter(Environment<Object> environment, SyntaxPrinter printer) {
+        this(environment, printer, new HashSet<>());
+    }
+
+    // Constructor with importChain for sharing across nested imports
+    private Interpreter(Environment<Object> environment, SyntaxPrinter printer, Set<String> importChain) {
         this.env = environment;
         this.outputs = new ArrayList<>();
         this.printer = printer;
         this.deferredObservable = new DeferredObservable();
         this.instances = new LinkedHashMap<>();
+        this.importChain = importChain; // Share the import chain
 
         this.errors = new ArrayList<>();
         this.decorators = new HashMap<>();
@@ -515,35 +523,53 @@ public final class Interpreter extends StackVisitor<Object> {
     @Override
     public Object visit(ImportStatement statement) {
         try {
-            // Read the file content
-            String content = Files.readString(Paths.get(statement.getFilePath()));
+            // Normalize the file path to absolute path for cycle detection
+            var filePath = Paths.get(statement.getFilePath()).toAbsolutePath().normalize().toString();
 
-            // Parse the file into an AST
-            Program program = parser.parse(content);
-
-            // Resolve scopes in the imported program
-            var scopeResolver = new ScopeResolver();
-            scopeResolver.resolve(program);
-
-            // Create a new interpreter with a new environment to execute the imported file
-            Interpreter importInterpreter = new Interpreter(new Environment<>("import", env), printer);
-
-            // Get the built-in function names from the new interpreter to exclude them from import
-            Set<String> stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
-
-            // Execute the program in the isolated environment
-            importInterpreter.visit(program);
-
-            // Merge only user-defined variables (exclude stdlib functions that were auto-initialized)
-            Environment<Object> importedEnv = importInterpreter.getEnv();
-            for (Map.Entry<String, Object> entry : importedEnv.getVariables().entrySet()) {
-                // Skip stdlib functions that were auto-initialized in the constructor
-                if (!stdlibNames.contains(entry.getKey())) {
-                    env.initOrAssign(entry.getKey(), entry.getValue());
-                }
+            // Check for circular imports
+            if (importChain.contains(filePath)) {
+                var chain = new ArrayList<>(importChain);
+                chain.add(filePath);
+                throw new RuntimeException("Circular import detected: " + String.join(" -> ", chain));
             }
 
-            return null;
+            // Add this file to the import chain
+            importChain.add(filePath);
+
+            try {
+                // Read the file content
+                String content = Files.readString(Paths.get(statement.getFilePath()));
+
+                // Parse the file into an AST
+                Program program = parser.parse(content);
+
+                // Resolve scopes in the imported program
+                var scopeResolver = new ScopeResolver();
+                scopeResolver.resolve(program);
+
+                // Create a new interpreter with shared import chain
+                Interpreter importInterpreter = new Interpreter(new Environment<>("import", env), printer, importChain);
+
+                // Get the built-in function names from the new interpreter to exclude them from import
+                Set<String> stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
+
+                // Execute the program in the isolated environment
+                importInterpreter.visit(program);
+
+                // Merge only user-defined variables (exclude stdlib functions that were auto-initialized)
+                Environment<Object> importedEnv = importInterpreter.getEnv();
+                for (Map.Entry<String, Object> entry : importedEnv.getVariables().entrySet()) {
+                    // Skip stdlib functions that were auto-initialized in the constructor
+                    if (!stdlibNames.contains(entry.getKey())) {
+                        env.initOrAssign(entry.getKey(), entry.getValue());
+                    }
+                }
+
+                return null;
+            } finally {
+                // Remove this file from the import chain after execution completes
+                importChain.remove(filePath);
+            }
         } catch (java.io.IOException e) {
             throw new RuntimeException("Cannot import file '" + statement.getFilePath() + "': " + e.getMessage());
         }
