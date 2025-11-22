@@ -47,11 +47,10 @@ class ImportStatementParseTest {
 
     @Test
     void parseMultipleImports() {
-        var code = """
+        var program = compiler.parse("""
                 import * from "file1.kite"
                 import * from "file2.kite"
-                """;
-        var program = compiler.parse(code);
+                """);
 
         assertEquals(2, program.getBody().size());
         assertTrue(program.getBody().get(0) instanceof ImportStatement);
