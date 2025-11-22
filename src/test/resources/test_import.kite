@@ -1,0 +1,7 @@
+// Test file that imports stdlib
+import * from "src/test/resources/stdlib.kite"
+
+// Now we should be able to use the functions from stdlib
+var result1 = double(5)
+var result2 = triple(10)
+var msg = greeting

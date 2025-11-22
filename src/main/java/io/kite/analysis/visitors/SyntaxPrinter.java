@@ -425,6 +425,11 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(ImportStatement statement) {
+        return theme.kw("import ") + "* " + theme.kw("from ") + "\"" + statement.getFilePath() + "\"";
+    }
+
+    @Override
     public String visit(ResourceStatement expression) {
         return theme.kw("resource ") +
                theme.type(visit(expression.getType())) + " " +

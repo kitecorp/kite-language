@@ -778,6 +778,12 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     @Override
+    public Type visit(ImportStatement statement) {
+        // Import statements are handled by the interpreter
+        return ValueType.Void;
+    }
+
+    @Override
     public Type visit(ExpressionStatement statement) {
         return executeBlock(statement.getStatement(), env);
     }
