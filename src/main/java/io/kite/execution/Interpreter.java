@@ -526,7 +526,7 @@ public final class Interpreter extends StackVisitor<Object> {
             scopeResolver.resolve(program);
 
             // Create a new interpreter with a new environment to execute the imported file
-            Interpreter importInterpreter = new Interpreter(new Environment<>("import"), printer);
+            Interpreter importInterpreter = new Interpreter(new Environment<>("import", env), printer);
 
             // Get the built-in function names from the new interpreter to exclude them from import
             Set<String> stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
