@@ -59,6 +59,7 @@ kite/
 - **Components:** Collections of resources with inputs/outputs
 - **Schemas:** Type definitions for structured data
 - **Modules:** Versioned packages
+- **Imports:** File-based code reuse with environment merging
 - **Decorators:** Comprehensive annotation system (`@existing`, `@sensitive`, etc.)
 
 ### Type System
@@ -131,6 +132,83 @@ Same rules as if statements (blocks required, parens optional).
 while (condition) { body }
 while condition { body }
 ```
+
+### Import Statements
+
+Kite supports file-based code reuse through import statements, enabling modular code organization.
+
+**Syntax:**
+
+```kite
+import * from "filepath"
+```
+
+**Key Features:**
+
+- **Environment Isolation:** Imported files execute in their own isolated environment
+- **Selective Merging:** Only user-defined variables and functions are imported (stdlib functions excluded)
+- **Parent Chain Access:** Imported files can access variables from the calling scope through the environment chain
+- **Path Resolution:** Supports both relative and absolute file paths
+
+**Implementation Details:**
+
+The import mechanism (Interpreter.java:516-550) follows these steps:
+
+1. **Read & Parse:** Load the file content and parse it into an AST
+2. **Scope Resolution:** Resolve all scopes in the imported program
+3. **Isolated Execution:** Create a new interpreter with a child environment that has access to the parent scope
+4. **Stdlib Filtering:** Capture names of auto-initialized stdlib functions (88 functions)
+5. **Selective Merge:** Import only user-defined variables/functions, excluding stdlib
+
+**Example:**
+
+```kite
+// stdlib.kite
+fun double(number x) number {
+    return x * 2
+}
+
+fun triple(number x) number {
+    return x * 3
+}
+
+var greeting = "Hello from stdlib!"
+
+// main.kite
+import * from "stdlib.kite"
+
+var result = double(5)      // result = 10
+var msg = greeting          // msg = "Hello from stdlib!"
+var tripled = triple(7)     // tripled = 21
+```
+
+**Technical Implementation:**
+
+- **Parser:** Import statements handled in `KiteASTBuilder.java` via `visitImportStatement`
+- **Critical Bug Fix (Nov 2025):** `visitNonEmptyStatement` was missing the `importStatement` check, causing imports to
+  be silently dropped
+- **Interpreter:** `Interpreter.java:516` executes import with environment merging
+- **Environment Chain:** `new Environment<>("import", env)` creates child environment with parent access
+
+**Test Coverage:**
+
+- **Parsing Tests (4/4):** `ImportStatementParseTest.java`
+    - Basic import syntax
+    - Absolute path imports
+    - Multiple imports
+    - Import followed by code
+
+- **Integration Tests (4/4):** `ImportStatementTest.java` (in `io.kite.execution/`)
+    - Import and call functions
+    - Import variables
+    - Import multiple functions
+    - Error handling for non-existent files
+
+**Design Rationale:**
+
+- **Explicit imports:** Aligns with "explicit over implicit" philosophy
+- **Stdlib filtering:** Prevents circular references and 88+ stdlib functions from polluting imported namespace
+- **Parent chain:** Allows imported code to reference calling context when needed (similar to Python's import behavior)
 
 ### Object Literals
 
@@ -1115,8 +1193,13 @@ typechecker.
 - ✅ Keywords allowed as object property names (e.g., `{type: "web"}`)
 - ✅ Consistent statement separators (`;` or `\n`) across all contexts
 
-**Latest Improvements (November 21, 2025):**
+**Latest Improvements (November 22, 2025):**
 
+- ✅ **Import statement implementation** - File-based code reuse with environment merging
+    - Critical bug fix: `visitNonEmptyStatement` missing `importStatement` check
+    - Stdlib filtering prevents circular references (88 stdlib functions excluded)
+    - Environment chain allows imported code to access calling scope
+    - 8 tests covering parsing and integration scenarios
 - ✅ Enhanced whitespace flexibility in grammar (if/while statements, objects, arrays)
 - ✅ Union type alphabetical sorting for consistent output (`SyntaxPrinter.java`)
 - ✅ Improved code clarity with better inline comments
