@@ -77,7 +77,7 @@ class ImportStatementTest extends RuntimeTest {
 
         // valueB should be 10 (from nested_b.kite)
         // which uses valueA (6 from nested_a.kite, which is double(3) from stdlib)
-        assertEquals(10, interpreter.getEnv().lookup("result"));
+        assertEquals(10, interpreter.getVar("result"));
     }
 
     @Test
@@ -90,6 +90,8 @@ class ImportStatementTest extends RuntimeTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> eval(code));
         assertTrue(exception.getMessage().contains("Circular import detected"),
-                "Expected circular import error but got: " + exception.getMessage());
+                exception.getMessage());
+        assertTrue(exception.getMessage().contains("circular_a.kite -> /Users/mimedia/IdeaProjects/kite/lang/src/test/resources/circular_b.kite -> /Users/mimedia/IdeaProjects/kite/lang/src/test/resources/circular_a.kite"),
+                exception.getMessage());
     }
 }

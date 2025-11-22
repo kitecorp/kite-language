@@ -90,7 +90,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     public Interpreter(Environment<Object> environment, SyntaxPrinter printer) {
-        this(environment, printer, new HashSet<>());
+        this(environment, printer, new LinkedHashSet<>());
     }
 
     // Constructor with importChain for sharing across nested imports
