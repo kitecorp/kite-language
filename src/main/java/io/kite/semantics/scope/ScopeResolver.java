@@ -564,4 +564,15 @@ public final class ScopeResolver implements Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visit(StringInterpolation expression) {
+        // Resolve scopes in each interpolated expression
+        for (var part : expression.getParts()) {
+            if (part instanceof StringInterpolation.Expr expr) {
+                visit(expr.expression());
+            }
+        }
+        return null;
+    }
+
 }

@@ -5,9 +5,12 @@ import io.kite.semantics.types.Type;
 import io.kite.semantics.types.ValueType;
 import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.ast.expressions.*;
+import io.kite.syntax.ast.generated.KiteLexer;
 import io.kite.syntax.ast.generated.KiteParser;
 import io.kite.syntax.ast.statements.*;
 import io.kite.syntax.literals.*;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -875,13 +878,17 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteBaseVisitor
     // ========================================================================
 
     @Override
-    public Literal visitLiteral(LiteralContext ctx) {
+    public Expression visitLiteral(LiteralContext ctx) {
         if (ctx.NUMBER() != null) {
             return NumberLiteral.number(ctx.NUMBER().getText());
         } else if (ctx.STRING() != null) {
-            String value = ctx.STRING().getText();
+            String rawValue = ctx.STRING().getText();
             // Remove quotes
-            value = value.substring(1, value.length() - 1);
+            String value = rawValue.substring(1, rawValue.length() - 1);
+            // Check for string interpolation syntax
+            if (value.contains("${")) {
+                return parseInterpolatedString(value);
+            }
             return StringLiteral.string(value);
         } else if (ctx.TRUE() != null) {
             return BooleanLiteral.bool(true);
@@ -891,6 +898,89 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteBaseVisitor
             return NullLiteral.nullLiteral();
         }
         return null;
+    }
+
+    /**
+     * Parses an interpolated string like "Hello ${name}, you have ${count} items"
+     * into a StringInterpolation with Text and Expr parts.
+     */
+    private StringInterpolation parseInterpolatedString(String value) {
+        var interpolation = new StringInterpolation();
+        var sb = new StringBuilder();
+        int i = 0;
+
+        while (i < value.length()) {
+            if (i < value.length() - 1 && value.charAt(i) == '$' && value.charAt(i + 1) == '{') {
+                // Found ${, flush accumulated text
+                if (!sb.isEmpty()) {
+                    interpolation.addText(sb.toString());
+                    sb.setLength(0);
+                }
+
+                // Find matching closing brace (handle nested braces)
+                int braceDepth = 1;
+                int start = i + 2;
+                int end = start;
+                while (end < value.length() && braceDepth > 0) {
+                    char c = value.charAt(end);
+                    if (c == '{') braceDepth++;
+                    else if (c == '}') braceDepth--;
+                    if (braceDepth > 0) end++;
+                }
+
+                if (braceDepth == 0) {
+                    // Extract expression content and parse it
+                    String exprContent = value.substring(start, end);
+                    Expression expr = parseExpression(exprContent);
+                    interpolation.addExpression(expr);
+                    i = end + 1;
+                } else {
+                    // Unclosed brace, treat as literal
+                    sb.append(value.charAt(i));
+                    i++;
+                }
+            } else if (value.charAt(i) == '\\' && i + 1 < value.length()) {
+                // Handle escape sequences
+                char next = value.charAt(i + 1);
+                if (next == '$') {
+                    sb.append('$');
+                    i += 2;
+                } else {
+                    sb.append(value.charAt(i));
+                    i++;
+                }
+            } else {
+                sb.append(value.charAt(i));
+                i++;
+            }
+        }
+
+        // Flush remaining text
+        if (!sb.isEmpty()) {
+            interpolation.addText(sb.toString());
+        }
+
+        return interpolation;
+    }
+
+    /**
+     * Parses an expression string into an Expression AST node.
+     * Uses ANTLR parser directly to parse just the expression (no program context).
+     */
+    private Expression parseExpression(String exprContent) {
+        try {
+            var input = CharStreams.fromString(exprContent);
+            var lexer = new KiteLexer(input);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new KiteParser(tokens);
+
+            // Parse as expression
+            var tree = parser.expression();
+            return visitExpression(tree);
+        } catch (Exception e) {
+            // If parsing fails, wrap in an error expression
+            return new ErrorExpression("Failed to parse interpolation: " + exprContent);
+        }
     }
 
     // ========================================================================
