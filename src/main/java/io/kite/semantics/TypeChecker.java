@@ -140,6 +140,8 @@ public final class TypeChecker extends StackVisitor<Type> {
         return ValueType.String;
     }
 
+    private static final Set<String> MAGIC_VARIABLES = Set.of("count");
+
     @Override
     public Type visit(BlockExpression expression) {
         var env = new TypeEnvironment(this.env);
@@ -916,18 +918,44 @@ public final class TypeChecker extends StackVisitor<Type> {
         return false;
     }
 
+    @Override
+    public Type visit(StringInterpolation expression) {
+        // Type-check each interpolated expression
+        for (var part : expression.getParts()) {
+            if (part instanceof StringInterpolation.Expr expr) {
+                visit(expr.expression());
+            }
+        }
+        // Interpolated strings evaluate to String type
+        return ValueType.String;
+    }
+
     private TypeEnvironment createResourceEnvironment(SchemaType installedSchema, ResourceStatement resource, String resourceName) {
         var schemaEnv = installedSchema.getEnvironment();
         // Clone/inherit all default properties from schema properties to the new resource
         var resourceEnv = new TypeEnvironment(resourceName, env, schemaEnv.getVariables());
+        // If resource has @count decorator, inject 'count' variable into scope for interpolation
+        if (hasCountAnnotation(resource)) {
+            resourceEnv.init("count", ValueType.Number);
+        }
         // Init resource environment with values defined by the user
         executeBlock(resource.getArguments(), resourceEnv);
         return resourceEnv;
     }
 
+    private boolean hasCountAnnotation(ResourceStatement resource) {
+        if (!resource.hasAnnotations()) return false;
+        return resource.getAnnotations().stream()
+                .anyMatch(ann -> "count".equals(ann.getName().string()));
+    }
+
     private void validateResourceProperties(TypeEnvironment resourceEnv, SchemaType installedSchema, ResourceStatement resource) {
         // Validate each property in the resource matches the type defined in the schema
         for (var argument : resourceEnv.getVariables().entrySet()) {
+            // Skip magic variables like 'count' that are injected by decorators
+            if (MAGIC_VARIABLES.contains(argument.getKey())) {
+                continue;
+            }
             if (!Objects.equals(installedSchema.getProperty(argument.getKey()), argument.getValue())) {
                 throw new InvalidInitException(
                         "Property type mismatch for " + argument.getKey() + " in:\n " + printer.visit(resource)

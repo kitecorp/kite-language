@@ -169,6 +169,21 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     }
 
     @Override
+    public Object visit(StringInterpolation expression) {
+        var result = new StringBuilder();
+        for (var part : expression.getParts()) {
+            switch (part) {
+                case StringInterpolation.Text text -> result.append(text.value());
+                case StringInterpolation.Expr expr -> {
+                    var value = visit(expr.expression());
+                    result.append(value != null ? value.toString() : "null");
+                }
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
     public Object visit(LambdaExpression expression) {
         return null;
     }

@@ -25,6 +25,7 @@ public sealed interface Visitor<R>
             case GroupExpression expression -> visit(expression);
             case LogicalExpression expression -> visit(expression);
             case MemberExpression expression -> visit(expression);
+            case StringInterpolation expression -> visit(expression);
             case ThisExpression expression -> visit(expression);
             case UnaryExpression expression -> visit(expression);
             case VarDeclaration expression -> visit(expression);
@@ -87,6 +88,8 @@ public sealed interface Visitor<R>
     R visit(ObjectLiteral expression);
 
     R visit(StringLiteral expression);
+
+    R visit(StringInterpolation expression);
 
     R visit(LambdaExpression expression);
 

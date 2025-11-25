@@ -478,6 +478,24 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(StringInterpolation expression) {
+        var sb = new StringBuilder();
+        sb.append(theme.string("\""));
+        for (var part : expression.getParts()) {
+            switch (part) {
+                case StringInterpolation.Text text -> sb.append(theme.string(text.value()));
+                case StringInterpolation.Expr expr -> {
+                    sb.append(theme.kw("${"));
+                    sb.append(visit(expr.expression()));
+                    sb.append(theme.kw("}"));
+                }
+            }
+        }
+        sb.append(theme.string("\""));
+        return sb.toString();
+    }
+
+    @Override
     public String visit(BlockExpression expression) {
         StringBuilder result = new StringBuilder();
         for (Statement statement : expression.getExpression()) {
