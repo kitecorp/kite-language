@@ -153,16 +153,27 @@ public class VarDeclarationTest extends ParserTest {
                 var x="world";
                 var y="hello $x";
                 """);
-        var expected = program(
-                statement(var("x", "world")),
-                statement(var("y", "hello $x"))
-        );
-        assertEquals(expected, res);
-        var statement = (VarStatement) res.getBody().get(1);
-        var x = statement.getDeclarations().get(0);
-        var literal = (StringLiteral) x.getInit();
-        Assertions.assertTrue(literal.isInterpolated());
-        Assertions.assertEquals("x", literal.getInterpolationVars().get(0));
+        // First variable is still a simple StringLiteral
+        var statement1 = (VarStatement) res.getBody().get(0);
+        var decl1 = statement1.getDeclarations().get(0);
+        Assertions.assertInstanceOf(StringLiteral.class, decl1.getInit());
+
+        // Second variable should be a StringInterpolation with "hello " text and $x identifier
+        var statement2 = (VarStatement) res.getBody().get(1);
+        var decl2 = statement2.getDeclarations().get(0);
+        Assertions.assertInstanceOf(io.kite.syntax.ast.expressions.StringInterpolation.class, decl2.getInit());
+        var interpolation = (io.kite.syntax.ast.expressions.StringInterpolation) decl2.getInit();
+        Assertions.assertEquals(2, interpolation.getParts().size());
+
+        // First part is text "hello "
+        var textPart = (io.kite.syntax.ast.expressions.StringInterpolation.Text) interpolation.getParts().get(0);
+        Assertions.assertEquals("hello ", textPart.value());
+
+        // Second part is expression $x
+        var exprPart = (io.kite.syntax.ast.expressions.StringInterpolation.Expr) interpolation.getParts().get(1);
+        var identifier = (io.kite.syntax.literals.SymbolIdentifier) exprPart.expression();
+        Assertions.assertEquals("x", identifier.string());
+
         log.info(res);
     }
 

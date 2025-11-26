@@ -412,6 +412,7 @@ stringPart
     | STRING_ESCAPE                         // Escaped character
     | STRING_DOLLAR                         // Lone $ not followed by {
     | INTERP_START expression INTERP_END    // ${expression}
+    | INTERP_SIMPLE                         // $identifier (shorthand)
     ;
 
 // ============================================================================
