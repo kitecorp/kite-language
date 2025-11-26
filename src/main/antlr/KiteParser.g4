@@ -82,7 +82,7 @@ typeKeyword
     ;
 
 schemaDeclaration
-    : SCHEMA identifier '{' statementTerminator* schemaPropertyList? statementTerminator* '}'
+    : SCHEMA identifier LBRACE statementTerminator* schemaPropertyList? statementTerminator* RBRACE
     ;
 
 schemaPropertyList
@@ -282,7 +282,7 @@ lambdaBody
     ;
 
 blockExpression
-    : '{' statementTerminator* statementList? statementTerminator* '}'
+    : LBRACE statementTerminator* statementList? statementTerminator* RBRACE
     ;
 
 objectExpression
@@ -290,8 +290,8 @@ objectExpression
     ;
 
 objectDeclaration
-    : OBJECT '(' NL* ('{' NL* objectPropertyList? NL* '}')? NL* ')'  // object() or object({ key: value })
-    | '{' NL* objectPropertyList? NL* '}'                             // { key: value }
+    : OBJECT LPAREN NL* (LBRACE NL* objectPropertyList? NL* RBRACE)? NL* RPAREN  // object() or object({ key: value })
+    | LBRACE NL* objectPropertyList? NL* RBRACE                                   // { key: value }
     ;
 
 objectPropertyList
@@ -411,7 +411,7 @@ stringPart
     : STRING_TEXT                           // Regular text
     | STRING_ESCAPE                         // Escaped character
     | STRING_DOLLAR                         // Lone $ not followed by {
-    | INTERP_START expression RBRACE        // ${expression}
+    | INTERP_START expression INTERP_END    // ${expression}
     ;
 
 // ============================================================================

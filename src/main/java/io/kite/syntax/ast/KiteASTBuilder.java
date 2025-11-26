@@ -477,8 +477,8 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteParserBaseV
     @Override
     public Expression visitObjectKey(KiteParser.ObjectKeyContext ctx) {
         if (ctx.stringLiteral() != null) {
-            String value = extractStringValue(ctx.stringLiteral());
-            return new StringLiteral(value);
+            // Use visitStringLiteral to properly handle interpolated strings
+            return visitStringLiteral(ctx.stringLiteral());
         } else if (ctx.IDENTIFIER() != null) {
             return new StringLiteral(ctx.IDENTIFIER().getText());
         } else if (ctx.keyword() != null) {
@@ -500,8 +500,13 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteParserBaseV
         } else if (ctx.callMemberExpression() != null) {
             return (Expression) visit(ctx.callMemberExpression());
         } else if (ctx.stringLiteral() != null) {
-            String value = extractStringValue(ctx.stringLiteral());
-            return new SymbolIdentifier(value);
+            // Use visitStringLiteral to properly handle interpolated strings
+            Expression stringExpr = visitStringLiteral(ctx.stringLiteral());
+            if (stringExpr instanceof StringLiteral sl) {
+                return new SymbolIdentifier(sl.getValue());
+            }
+            // For interpolated strings, return the expression directly
+            return stringExpr;
         }
         return null;
     }

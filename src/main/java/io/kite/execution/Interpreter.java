@@ -339,6 +339,7 @@ public final class Interpreter extends StackVisitor<Object> {
         var res = switch (expression.getKey()) {
             case SymbolIdentifier id -> new ObjectLiteralPair(id.string(), visit(expression.getValue()));
             case StringLiteral literal -> new ObjectLiteralPair((String) visit(literal), visit(expression.getValue()));
+            case StringInterpolation interpolation -> new ObjectLiteralPair((String) visit(interpolation), visit(expression.getValue()));
             default -> throw new IllegalArgumentException("Invalid object literal key: " + expression.getKey());
         };
         return res;

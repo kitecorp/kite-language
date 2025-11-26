@@ -1,6 +1,7 @@
 package io.kite.syntax.literals;
 
 import io.kite.syntax.ast.expressions.Expression;
+import io.kite.syntax.ast.expressions.StringInterpolation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -52,6 +53,7 @@ public class ObjectLiteral extends Literal {
         return switch (key) {
             case StringLiteral literal -> literal.getValue();
             case SymbolIdentifier identifier -> identifier.string();
+            case StringInterpolation _ -> null;  // Dynamic keys need runtime evaluation
             default -> null;
         };
     }
@@ -61,6 +63,8 @@ public class ObjectLiteral extends Literal {
             this.key = literal;
         } else if (key instanceof SymbolIdentifier identifier) {
             this.key = identifier;
+        } else if (key instanceof StringInterpolation interpolation) {
+            this.key = interpolation;  // Dynamic keys will be evaluated at runtime
         } else {
             throw new IllegalArgumentException("Invalid key type: " + key);
         }

@@ -1,5 +1,10 @@
 lexer grammar KiteLexer;
 
+// Track interpolation depth to know when RBRACE should pop the mode
+@members {
+    private int interpolationDepth = 0;
+}
+
 // ============================================================================
 // DEFAULT MODE - Normal Kite code
 // ============================================================================
@@ -77,7 +82,10 @@ UNION       : '|' ;
 LPAREN      : '(' ;
 RPAREN      : ')' ;
 LBRACE      : '{' ;
-RBRACE      : '}' ;
+// RBRACE pops mode if we're inside a string interpolation (interpolationDepth > 0)
+// When closing an interpolation, emit INTERP_END token instead of RBRACE
+RBRACE      : '}' { if (interpolationDepth > 0) { interpolationDepth--; setType(INTERP_END); popMode(); } } ;
+INTERP_END  : '}' { false }? ;  // Never matches directly - only via setType from RBRACE
 LBRACK      : '[' ;
 RBRACK      : ']' ;
 COMMA       : ',' ;
@@ -138,13 +146,14 @@ mode STRING_MODE;
 STRING_DQUOTE   : '"' -> popMode ;
 
 // Start of interpolation ${...} - push back to default mode for expression
-INTERP_START    : '${' -> pushMode(DEFAULT_MODE) ;
+INTERP_START    : '${' { interpolationDepth++; } -> pushMode(DEFAULT_MODE) ;
 
 // Escaped characters
 STRING_ESCAPE   : '\\' . ;
 
 // Regular text (anything except ", \, ${ )
-STRING_TEXT     : (~["\\$] | '$' ~'{')+ ;
+// Note: '$' ~["{] means $ followed by anything except { or " (to not consume closing quote)
+STRING_TEXT     : (~["\\$] | '$' ~["{])+ ;
 
 // Lone $ followed by non-{ (handled as text)
 STRING_DOLLAR   : '$' ;
