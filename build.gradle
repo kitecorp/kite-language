@@ -60,6 +60,11 @@ generateGrammarSource {
         outputDirectory.mkdirs()
     }
 }
+
+// Ensure compileJava depends on grammar generation
+compileJava {
+    dependsOn generateGrammarSource
+}
 sourceSets {
     main {
         java {

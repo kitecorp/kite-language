@@ -5,20 +5,15 @@ import io.kite.syntax.ast.statements.ForStatement;
 import io.kite.syntax.ast.statements.IfStatement;
 import io.kite.syntax.ast.statements.WhileStatement;
 import io.kite.syntax.literals.NumberLiteral;
-import io.kite.syntax.literals.SymbolIdentifier;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static io.kite.syntax.ast.expressions.ArrayExpression.array;
 import static io.kite.syntax.ast.expressions.AssignmentExpression.assign;
 import static io.kite.syntax.ast.expressions.BinaryExpression.binary;
-import static io.kite.syntax.ast.expressions.MemberExpression.member;
 import static io.kite.syntax.ast.expressions.ObjectExpression.objectExpression;
 import static io.kite.syntax.ast.expressions.ResourceStatement.resource;
-import static io.kite.syntax.ast.expressions.StringInterpolation.*;
 import static io.kite.syntax.ast.expressions.VarDeclaration.var;
 import static io.kite.syntax.ast.statements.BlockExpression.block;
 import static io.kite.syntax.ast.statements.ExpressionStatement.expressionStatement;
@@ -171,9 +166,8 @@ public class ForLoopTest extends ParserTest {
                         .array(id("envs"))
                         .body(
                                 resource("Bucket", "photos",
-                                        block(assign("name",
-                                                of(List.of(new Text("name-"), new Expr(member(SymbolIdentifier.id("index"), SymbolIdentifier.id("value")))))))
-                                ))
+                                        block(assign("name", "'name-${index.value}'")))
+                        )
                         .build()))
         );
         log.info(res);
