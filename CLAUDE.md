@@ -272,6 +272,22 @@ var call = "Upper: ${name.toUpperCase()}"  // Method calls
 - **AST:** `StringInterpolation` node with `Text` and `Expr` parts
 - **Interpreter:** Evaluates each part and concatenates results
 
+**Magic Variables:**
+
+The `@count` decorator injects a special `count` variable (0-indexed) into scope:
+
+```kite
+@count(3)
+resource vm server {
+    name = "server-$count"  // "server-0", "server-1", "server-2"
+}
+
+@count(2)
+component app myApp {
+    appName = "app-$count"  // "app-0", "app-1"
+}
+```
+
 **Note:** Object keys can also use interpolated strings for dynamic property names.
 
 ### Decorators/Annotations
@@ -300,7 +316,7 @@ Kite has a **comprehensive decorator system** with 15 built-in decorators:
 **Metadata Decorators:**
 
 - `@description("text")` - Documentation for inputs/outputs
-- `@count(n)` - Create N instances of a resource
+- `@count(n)` - Create N instances of a resource/component (injects `$count` variable, 0-indexed)
 
 **Syntax Features:**
 - Allow newlines between multiple decorators
@@ -938,6 +954,8 @@ lang/src/main/java/io/kite/
 - `schemaPropertyList` - Uses `statementTerminator` for consistency
 - `ifStatement` / `whileStatement` - Whitespace-flexible control flow
 - `arrayExpression` - Whitespace-flexible array comprehensions
+- `stringPart` - String interpolation (`$var` and `${expr}`) in KiteParser.g4
+- `INTERP_SIMPLE` / `INTERP_START` - Interpolation tokens in KiteLexer.g4
 
 ## Code Style
 
