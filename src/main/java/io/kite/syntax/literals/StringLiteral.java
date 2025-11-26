@@ -12,9 +12,15 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * A string literal has the form of: "hello" or empty string ""
- * StringLiteral
- * : STRING
- * ;
+ *
+ * <h2>Interpolation</h2>
+ * Two interpolation syntaxes are supported:
+ * <ul>
+ *   <li>{@code ${expr}} - Brace syntax: Parsed at AST build time into {@link io.kite.syntax.ast.expressions.StringInterpolation}
+ *       nodes for proper type checking. Complex expressions like {@code ${obj.prop}} are fully supported.</li>
+ *   <li>{@code $var} - Bare dollar syntax: Handled at runtime by this class for backward compatibility.
+ *       Only simple identifiers are supported (no member access or method calls).</li>
+ * </ul>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
