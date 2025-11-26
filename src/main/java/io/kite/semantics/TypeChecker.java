@@ -10,6 +10,7 @@ import io.kite.execution.exceptions.OperationNotImplementedException;
 import io.kite.execution.values.Deferred;
 import io.kite.semantics.decorators.*;
 import io.kite.semantics.types.*;
+import io.kite.syntax.annotations.Annotatable;
 import io.kite.syntax.annotations.CountAnnotatable;
 import io.kite.syntax.ast.Program;
 import io.kite.syntax.ast.expressions.*;
@@ -934,18 +935,22 @@ public final class TypeChecker extends StackVisitor<Type> {
         var schemaEnv = installedSchema.getEnvironment();
         // Clone/inherit all default properties from schema properties to the new resource
         var resourceEnv = new TypeEnvironment(resourceName, env, schemaEnv.getVariables());
-        // If resource has @count decorator, inject 'count' variable into scope for interpolation
-        if (hasCountAnnotation(resource)) {
-            resourceEnv.init("count", ValueType.Number);
-        }
+        handleCountAnnotation(resource, resourceEnv);
         // Init resource environment with values defined by the user
         executeBlock(resource.getArguments(), resourceEnv);
         return resourceEnv;
     }
 
-    private boolean hasCountAnnotation(ResourceStatement resource) {
-        if (!resource.hasAnnotations()) return false;
-        return resource.getAnnotations().stream()
+    private void handleCountAnnotation(Annotatable resource, TypeEnvironment resourceEnv) {
+        // If resource has @count decorator, inject 'count' variable into scope for interpolation
+        if (hasCountAnnotation(resource)) {
+            resourceEnv.init("count", ValueType.Number);
+        }
+    }
+
+    private boolean hasCountAnnotation(Annotatable component) {
+        if (!component.hasAnnotations()) return false;
+        return component.getAnnotations().stream()
                 .anyMatch(ann -> "count".equals(ann.getName().string()));
     }
 
@@ -1039,7 +1044,9 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         // Create instance with its own environment
-        var instance = new ComponentType(componentType, instanceName, new TypeEnvironment(env));
+        var environment = new TypeEnvironment(env);
+        var instance = new ComponentType(componentType, instanceName, environment);
+        handleCountAnnotation(expression, environment);
 
         try {
             var result = env.init(instanceName, instance);
@@ -1249,6 +1256,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     public Type visit(AnnotationDeclaration declaration) {
         var decoratorInfo = decoratorInfoMap.get(declaration.name());
         if (decoratorInfo == null) {
+            // todo replace with printer
             var message = Ansi.ansi().fgYellow().a("@").a(declaration.name()).reset().a(" decorator is unknown").toString();
             throw new TypeError(message);
         }

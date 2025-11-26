@@ -148,12 +148,15 @@ STRING_DQUOTE   : '"' -> popMode ;
 // Start of interpolation ${...} - push back to default mode for expression
 INTERP_START    : '${' { interpolationDepth++; } -> pushMode(DEFAULT_MODE) ;
 
+// Simple interpolation $identifier - captures the variable name directly
+INTERP_SIMPLE   : '$' [a-zA-Z_][a-zA-Z0-9_]* ;
+
 // Escaped characters
 STRING_ESCAPE   : '\\' . ;
 
-// Regular text (anything except ", \, ${ )
-// Note: '$' ~["{] means $ followed by anything except { or " (to not consume closing quote)
-STRING_TEXT     : (~["\\$] | '$' ~["{])+ ;
+// Regular text (anything except ", \, $ followed by { or identifier start)
+// Note: '$' ~["{a-zA-Z_] means $ followed by anything except {, ", or identifier start
+STRING_TEXT     : (~["\\$] | '$' ~["{a-zA-Z_])+ ;
 
-// Lone $ followed by non-{ (handled as text)
+// Lone $ at end of string or followed by digit/special char (handled as text)
 STRING_DOLLAR   : '$' ;

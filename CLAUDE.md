@@ -231,6 +231,49 @@ var config = {
 }
 ```
 
+### String Interpolation
+
+Kite supports string interpolation in **double-quoted strings** with two syntaxes:
+
+```kite
+var name = "World"
+var count = 42
+
+// Short form: $identifier
+var greeting = "Hello $name!"              // "Hello World!"
+
+// Full form: ${expression} - for any expression
+var msg = "Count is ${count}"              // "Count is 42"
+var calc = "Double: ${count * 2}"          // "Double: 84"
+var access = "Name: ${user.name}"          // Member access
+var call = "Upper: ${name.toUpperCase()}"  // Method calls
+```
+
+**Key Features:**
+
+- **Lexer-level implementation** using ANTLR4 modes for proper parsing
+- **Grammar split** (`KiteLexer.g4` / `KiteParser.g4`) for IntelliJ plugin compatibility
+- **Brace counting** for nested expressions inside `${...}`
+- **Single-quoted strings** have no interpolation (literal strings)
+
+**Syntax Rules:**
+
+| Syntax | Description | Example |
+|--------|-------------|---------|
+| `$identifier` | Simple variable reference | `"Hello $name"` |
+| `${expression}` | Any expression | `"Sum: ${a + b}"` |
+| `\$` | Escaped dollar (literal) | `"Price: \$100"` |
+| `'...'` | No interpolation | `'$name stays literal'` |
+
+**Implementation:**
+
+- **Lexer:** `STRING_MODE` with `INTERP_START` (`${`) and `INTERP_SIMPLE` (`$identifier`)
+- **Parser:** `stringPart` rule handles text, escapes, and interpolation
+- **AST:** `StringInterpolation` node with `Text` and `Expr` parts
+- **Interpreter:** Evaluates each part and concatenates results
+
+**Note:** Object keys can also use interpolated strings for dynamic property names.
+
 ### Decorators/Annotations
 
 Kite has a **comprehensive decorator system** with 15 built-in decorators:
@@ -779,7 +822,9 @@ lang/src/main/java/io/kite/
 
 ## Grammar Location
 
-**Main Grammar:** `lang/src/main/antlr/Kite.g4`
+**Grammar Files (Split for IntelliJ Plugin Compatibility):**
+- `lang/src/main/antlr/KiteLexer.g4` - Lexer grammar with modes for string interpolation
+- `lang/src/main/antlr/KiteParser.g4` - Parser grammar
 
 **Generated Files:** `lang/build/generated-src/antlr/main/io/kite/syntax/ast/generated/`
 - `KiteLexer.java`
@@ -1157,7 +1202,7 @@ typechecker.
 
 ## Project Status
 
-**Last Updated:** November 22, 2025
+**Last Updated:** November 26, 2025
 **Java Version:** 25
 **Parser:** ANTLR4 (migration completed ✅)
 **Package Structure:** Phase-based organization ✅
@@ -1193,7 +1238,16 @@ typechecker.
 - ✅ Keywords allowed as object property names (e.g., `{type: "web"}`)
 - ✅ Consistent statement separators (`;` or `\n`) across all contexts
 
-**Latest Improvements (November 22, 2025):**
+**Latest Improvements (November 26, 2025):**
+
+- ✅ **Grammar-level string interpolation** - Full lexer/parser implementation
+    - Split grammar into `KiteLexer.g4` and `KiteParser.g4` for IntelliJ plugin compatibility
+    - Lexer modes (`STRING_MODE`) with brace counting for nested expressions
+    - Two syntaxes: `$identifier` (simple) and `${expression}` (full)
+    - `StringInterpolation` AST node with `Text` and `Expr` parts
+    - Proper support for interpolated strings as object keys
+
+**Previous Improvements (November 22, 2025):**
 
 - ✅ **Import statement implementation** - File-based code reuse with environment merging
     - Critical bug fix: `visitNonEmptyStatement` missing `importStatement` check
@@ -1207,12 +1261,13 @@ typechecker.
 
 **Production Readiness:**
 
-- ✅ Parser (ANTLR4)
+- ✅ Parser (ANTLR4 with split grammar)
 - ✅ Type system with function types
 - ✅ Decorator system (15 decorators)
 - ✅ Dependency resolution (Observer pattern, cycle detection)
 - ✅ Loop resource handling
 - ✅ Union type deduplication
+- ✅ String interpolation (`$var` and `${expr}`)
 - 🔄 LSP support (planned)
 - 🔄 Cloud provider plugins (AWS in development)
 - 🔄 Documentation website (planned)

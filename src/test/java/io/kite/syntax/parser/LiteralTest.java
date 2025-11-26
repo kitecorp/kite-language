@@ -1,7 +1,10 @@
 package io.kite.syntax.parser;
 
 import io.kite.syntax.ast.Program;
+import io.kite.syntax.ast.expressions.StringInterpolation;
+import io.kite.syntax.ast.statements.ExpressionStatement;
 import io.kite.syntax.literals.NumberLiteral;
+import io.kite.syntax.literals.SymbolIdentifier;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +25,6 @@ public class LiteralTest extends ParserTest {
         var res = parse("1");
         var expected = Program.of(expressionStatement(NumberLiteral.number(1)));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -39,7 +41,6 @@ public class LiteralTest extends ParserTest {
                 """);
         var expected = Program.of(expressionStatement("Hello"));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -53,7 +54,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(1)
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
 
@@ -66,7 +66,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("42")
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -78,7 +77,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("42")
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -90,19 +88,22 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("  42  ")
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
     void testInterpolationChar() {
-        var res = parse(""" 
+        var res = parse("""
                 "$i"
                 """);
-        var expected = Program.of(
-                expressionStatement("$i")
-        );
-        assertEquals(expected, res);
-        log.info(res);
+        // With grammar-level interpolation, "$i" is now parsed as StringInterpolation
+        var statement = (ExpressionStatement) res.getBody().get(0);
+        var interpolation = (StringInterpolation) statement.getStatement();
+        assertEquals(1, interpolation.getParts().size());
+        var part = interpolation.getParts().get(0);
+        assertEquals(StringInterpolation.Expr.class, part.getClass());
+        var expr = (StringInterpolation.Expr) part;
+        var identifier = (SymbolIdentifier) expr.expression();
+        assertEquals("i", identifier.string());
     }
 
     @Test
@@ -112,7 +113,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(42)
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -204,7 +204,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement("  42  ")
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
 }

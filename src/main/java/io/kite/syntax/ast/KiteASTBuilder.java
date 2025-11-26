@@ -927,9 +927,9 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteParserBaseV
     public Expression visitInterpolatedString(InterpolatedStringContext ctx) {
         var parts = ctx.stringPart();
 
-        // Check if there are any interpolations
+        // Check if there are any interpolations (${expr} or $identifier)
         boolean hasInterpolation = parts.stream()
-                .anyMatch(p -> p.INTERP_START() != null);
+                .anyMatch(p -> p.INTERP_START() != null || p.INTERP_SIMPLE() != null);
 
         if (!hasInterpolation) {
             // No interpolation - create a simple StringLiteral
@@ -954,6 +954,15 @@ public class KiteASTBuilder extends io.kite.syntax.ast.generated.KiteParserBaseV
                 // Visit the expression inside ${...}
                 Expression expr = visitExpression(part.expression());
                 interpolation.addExpression(expr);
+            } else if (part.INTERP_SIMPLE() != null) {
+                // Flush accumulated text
+                if (!textBuffer.isEmpty()) {
+                    interpolation.addText(textBuffer.toString());
+                    textBuffer.setLength(0);
+                }
+                // Simple interpolation $identifier - extract the identifier name (strip $)
+                String identifierName = part.INTERP_SIMPLE().getText().substring(1);
+                interpolation.addExpression(new SymbolIdentifier(identifierName));
             } else {
                 // Accumulate text
                 textBuffer.append(getStringPartText(part));
