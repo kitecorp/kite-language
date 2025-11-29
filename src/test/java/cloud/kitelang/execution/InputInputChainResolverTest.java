@@ -1,0 +1,66 @@
+package cloud.kitelang.execution;
+
+import cloud.kitelang.base.RuntimeTest;
+import cloud.kitelang.execution.exceptions.MissingInputException;
+import cloud.kitelang.execution.inputs.CliResolver;
+import cloud.kitelang.execution.inputs.EnvResolver;
+import cloud.kitelang.execution.inputs.InputChainResolver;
+import cloud.kitelang.execution.inputs.InputsFilesResolver;
+import cloud.kitelang.syntax.ast.expressions.InputDeclaration;
+import cloud.kitelang.syntax.literals.TypeIdentifier;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Log4j2
+public class InputInputChainResolverTest extends RuntimeTest {
+    private InputChainResolver inputChainResolver;
+    private Map<String, Object> envVariables;
+
+    @BeforeEach
+    void initChain() {
+        envVariables = new HashMap<>();
+        inputChainResolver = new InputChainResolver(List.of(new EnvResolver(envVariables), new InputsFilesResolver(), new CliResolver()));
+        InputsFilesResolver.deleteDefaults();
+    }
+
+    @Test
+    @DisplayName("Env+File skipped throws on last step")
+    void testThrowsOnLastStepCLI() {
+        Assertions.assertThrows(MissingInputException.class, () -> inputChainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string"))));
+    }
+
+    @Test
+    @DisplayName("Test Env is present and rest are absent")
+    void testEnvPresentFileAndCliAbsent() {
+        envVariables.put("client", "env");
+        var res = inputChainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
+        Assertions.assertEquals("env", res);
+    }
+
+    @Test
+    @DisplayName("Test Env and File is present and Cli absent. File overrides env")
+    void testEnvAndFilePresentButCliAbsent() {
+        envVariables.put("client", "env");
+        InputsFilesResolver.writeToDefaults(Map.of("client", "file"));
+
+        var res = inputChainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
+        Assertions.assertEquals("file", res);
+    }
+
+    @Test
+    @DisplayName("Test File is present and Env Cli absent. File overrides env")
+    void testFilePresentButEnvCliAbsent() {
+        InputsFilesResolver.writeToDefaults(Map.of("client", "file"));
+
+        var res = inputChainResolver.visit(InputDeclaration.input("client", TypeIdentifier.type("string")));
+        Assertions.assertEquals("file", res);
+    }
+
+}

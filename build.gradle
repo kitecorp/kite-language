@@ -4,7 +4,7 @@ plugins {
     id 'antlr'
 }
 
-group 'io.kite'
+group 'cloud.kitelang'
 version '0.1.0'
 
 repositories {
@@ -53,8 +53,8 @@ java {
 }
 generateGrammarSource {
     maxHeapSize = "128m"
-    arguments += ["-visitor", "-Xexact-output-dir", "-package", "io.kite.syntax.ast.generated"]
-    outputDirectory = file("${buildDir}/generated-src/antlr/main/io/kite/syntax/ast/generated")
+    arguments += ["-visitor", "-Xexact-output-dir", "-package", "cloud.kitelang.syntax.ast.generated"]
+    outputDirectory = file("${buildDir}/generated-src/antlr/main/cloud/kitelang/syntax/ast/generated")
 
     doFirst {
         outputDirectory.mkdirs()
@@ -87,7 +87,7 @@ tasks.register('testJar', Jar) {
     archiveClassifier.set('test')
 //    from sourceSets.test.output
     from(sourceSets.test.output) {
-        include 'io/kite/base/**'
+        include 'cloud/kitelang/base/**'
     }
 }
 
