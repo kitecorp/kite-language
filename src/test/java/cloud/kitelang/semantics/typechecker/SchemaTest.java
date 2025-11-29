@@ -151,5 +151,66 @@ public class SchemaTest extends CheckerTest {
         assertEquals(vm, actual);
     }
 
+    @Test
+    void schemaWithExplicitInput() {
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                   input string name
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        var bucket = new SchemaType("Bucket", checker.getEnv());
+        bucket.setProperty("name", ValueType.String);
+        assertEquals(bucket, actual);
+    }
+
+    @Test
+    void schemaWithOutput() {
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                   output string arn
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        var bucket = new SchemaType("Bucket", checker.getEnv());
+        bucket.setProperty("arn", ValueType.String);
+        assertEquals(bucket, actual);
+    }
+
+    @Test
+    void schemaWithInputAndOutput() {
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                   input string name
+                   string region
+                   output string arn
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        var bucket = new SchemaType("Bucket", checker.getEnv());
+        bucket.setProperty("name", ValueType.String);
+        bucket.setProperty("region", ValueType.String);
+        bucket.setProperty("arn", ValueType.String);
+        assertEquals(bucket, actual);
+    }
+
+    @Test
+    void schemaOutputWithComputedInit() {
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                   input string name
+                   output string url = "https://" + name
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+
+        var bucket = new SchemaType("Bucket", checker.getEnv());
+        bucket.setProperty("name", ValueType.String);
+        bucket.setProperty("url", ValueType.String);
+        assertEquals(bucket, actual);
+    }
 
 }

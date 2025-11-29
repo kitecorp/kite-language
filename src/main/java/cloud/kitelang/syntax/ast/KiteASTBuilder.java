@@ -162,13 +162,21 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
 
     @Override
     public SchemaProperty visitSchemaProperty(SchemaPropertyContext ctx) {
+        SchemaProperty.PropertyKind kind;
+        if (ctx.INPUT() != null) {
+            kind = SchemaProperty.PropertyKind.INPUT;
+        } else if (ctx.OUTPUT() != null) {
+            kind = SchemaProperty.PropertyKind.OUTPUT;
+        } else {
+            kind = SchemaProperty.PropertyKind.REGULAR;
+        }
         Set<AnnotationDeclaration> annotations = extractDecorators(ctx.decoratorList());
         TypeIdentifier type = (TypeIdentifier) visit(ctx.typeIdentifier());
         Identifier name = (Identifier) visit(ctx.identifier());
         Expression init = ctx.propertyInitializer() != null ?
                 (Expression) visit(ctx.propertyInitializer()) : null;
 
-        return SchemaProperty.schemaProperty(type, name, init, annotations);
+        return SchemaProperty.schemaProperty(kind, type, name, init, annotations);
     }
 
     @Override
