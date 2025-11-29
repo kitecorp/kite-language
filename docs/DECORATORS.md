@@ -1,6 +1,6 @@
 # Kite Decorator System
 
-Kite has a comprehensive decorator system with 15 built-in decorators.
+Kite has a comprehensive decorator system with 16 built-in decorators.
 
 ## Validation Decorators
 
@@ -266,6 +266,25 @@ resource RDS.Instance database { ... }
 schema Config { ... }
 ```
 
+### @cloud
+
+Mark schema property as cloud-provided (value set by cloud provider, not user).
+
+| Property | Value |
+|----------|-------|
+| **Argument** | none |
+| **Targets** | `schema property` |
+
+```kite
+schema Instance {
+    string id
+    @cloud
+    string publicIp
+    @cloud
+    string privateIp
+}
+```
+
 ### @count(n)
 
 Create N instances of a resource or component. Injects `count` variable (0-indexed).
@@ -370,10 +389,11 @@ input string name
 | `@tags({...})` | object/array/string | resource, component |
 | `@provider("...")` | string/array | resource, component |
 | `@description("...")` | string | all declarations |
+| `@cloud` | none | schema property |
 | `@count(n)` | number | resource, component |
 
 ## Implementation
 
 - **Type-check time validation:** `DecoratorChecker` subclasses in `cloud.kitelang.semantics.decorators/`
 - **Runtime evaluation:** `DecoratorInterpreter` in `cloud.kitelang.execution.decorators/`
-- 15 decorator implementations total
+- 16 decorator implementations total
