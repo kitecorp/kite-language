@@ -30,7 +30,7 @@ kite/
 ## Lang Module Structure
 
 ```
-lang/src/main/java/io/kite/
+lang/src/main/java/cloud/kitelang/
 ├── syntax/      # Lexer, parser, AST (KiteCompiler.java, KiteASTBuilder.java)
 ├── semantics/   # TypeChecker, scope, decorators (15 validators)
 ├── execution/   # Interpreter, environment, values

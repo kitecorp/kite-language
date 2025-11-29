@@ -1,4 +1,4 @@
-module kite.io {
+module cloud.kitelang {
     requires java.net.http;
     requires static lombok;
     requires org.apache.commons.lang3;
