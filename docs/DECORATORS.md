@@ -27,10 +27,11 @@ Kite has a comprehensive decorator system with 15 built-in decorators.
 
 ## Metadata Decorators
 
-| Decorator | Purpose | Example |
-|-----------|---------|---------|
-| `@description("text")` | Documentation for inputs/outputs | `@description("Port number")` |
-| `@count(n)` | Create N instances (injects `$count` 0-indexed) | `@count(3)` |
+| Decorator              | Purpose                                         | Example                       |
+|------------------------|-------------------------------------------------|-------------------------------|
+| `@description("text")` | Documentation for inputs/outputs                | `@description("Port number")` |
+| `@count(n)`            | Create N instances (injects `$count` 0-indexed) | `@count(3)`                   |
+| `@cloud`               | property is being set by cloud provider         | `@cloud`                      |
 
 ## Syntax Rules
 
