@@ -48,7 +48,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud string arn
+                    output string arn
                  }
                 
                  resource vm main {
@@ -69,7 +69,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud number arn
+                    output number arn
                  }
                 
                  resource vm main {
@@ -88,7 +88,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud number arn
+                    output number arn
                  }
                 
                  resource vm main {
@@ -107,7 +107,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud boolean arn
+                    output boolean arn
                  }
                 
                  resource vm main {
@@ -126,7 +126,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud boolean arn
+                    output boolean arn
                  }
                 
                  resource vm main {
@@ -145,7 +145,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any arn
+                    output any arn
                  }
                 
                  resource vm main {
@@ -164,7 +164,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any arn
+                    output any arn
                  }
                 
                  resource vm main {
@@ -183,7 +183,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any arn
+                    output any arn
                  }
                 
                  resource vm main {
@@ -205,7 +205,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any arn
+                    output any arn
                  }
                 
                  resource vm main {
@@ -224,7 +224,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any arn
+                    output any arn
                  }
                 
                  resource vm main {
@@ -243,7 +243,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any[] arn
+                    output any[] arn
                  }
                 
                  resource vm main {
@@ -262,7 +262,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any[] arn
+                    output any[] arn
                  }
                 
                  resource vm main {
@@ -281,7 +281,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any[] arn
+                    output any[] arn
                  }
                 
                  resource vm main {
@@ -301,7 +301,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any[] arn
+                    output any[] arn
                  }
                 
                  resource vm main {
@@ -320,7 +320,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud any[] arn
+                    output any[] arn
                  }
                 
                  resource vm main {
@@ -339,7 +339,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud number[] arn
+                    output number[] arn
                  }
                 
                  resource vm main {
@@ -358,7 +358,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud number[] arn
+                    output number[] arn
                  }
                 
                  resource vm main {
@@ -377,7 +377,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud boolean[] arn
+                    output boolean[] arn
                  }
                 
                  resource vm main {
@@ -396,7 +396,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud boolean[] arn
+                    output boolean[] arn
                  }
                 
                  resource vm main {
@@ -415,7 +415,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud string[] arn
+                    output string[] arn
                  }
                 
                  resource vm main {
@@ -435,7 +435,7 @@ public class OutputPrintTests extends RuntimeTest {
         var res = eval("""
                 schema vm {
                     string name
-                    @cloud object arn
+                    output object arn
                  }
                 
                  resource vm main {
@@ -454,7 +454,7 @@ public class OutputPrintTests extends RuntimeTest {
     void outputResourceObjectArray() {
         var res = eval("""
                 schema vm {
-                    @cloud object[] arn
+                    output object[] arn
                  }
                 
                  resource vm main {
