@@ -51,8 +51,6 @@ import static cloud.kitelang.execution.CycleDetection.topologySort;
 import static cloud.kitelang.execution.CycleDetectionSupport.propertyOrDeferred;
 import static cloud.kitelang.execution.interpreter.OperatorComparator.compare;
 import static cloud.kitelang.syntax.ast.statements.FunctionDeclaration.fun;
-import static cloud.kitelang.syntax.lexer.TokenType.Equal_Complex;
-import static cloud.kitelang.utils.BoolUtils.isTruthy;
 import static java.text.MessageFormat.format;
 
 @Log4j2
@@ -240,6 +238,16 @@ public final class Interpreter extends StackVisitor<Object> {
     private static void forInit(Environment<Object> forEnv, Identifier index, Object i) {
         if (index != null) {
             forEnv.initOrAssign(index.string(), i);
+        }
+    }
+
+    public static boolean isTruthy(Object object) {
+        if (object == null) {
+            return false;
+        } else if (object instanceof Boolean b) {
+            return b;
+        } else {
+            return object instanceof BooleanLiteral;
         }
     }
 
@@ -626,8 +634,8 @@ public final class Interpreter extends StackVisitor<Object> {
         validateLogicalOperands(expression, left, right);
 
         return switch (expression.getOperator()) {
-            case Logical_Or -> isTruthy(left) ? left : right;
-            case Logical_And -> isTruthy(left) ? right : left;
+            case "||" -> isTruthy(left) ? left : right;
+            case "&&" -> isTruthy(left) ? right : left;
             default -> throw new IllegalArgumentException(
                     "Unknown logical operator in expression: " + printer.visit(expression)
             );
@@ -659,7 +667,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
     private @Nullable Object assignmentSymbol(AssignmentExpression expression, SymbolIdentifier identifier) {
         Object right = executeBlock(expression.getRight(), env);
-        if (Objects.equals(expression.getOperator(), Equal_Complex.getField())) {
+        if (Objects.equals(expression.getOperator(), "+=")) {
             return equalComplexAssignment(identifier, right);
         } else if (right instanceof Dependency dependency) {
             var res = env.assign(identifier.string(), dependency.value());
