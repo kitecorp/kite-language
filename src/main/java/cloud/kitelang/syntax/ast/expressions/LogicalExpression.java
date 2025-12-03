@@ -1,6 +1,5 @@
 package cloud.kitelang.syntax.ast.expressions;
 
-import cloud.kitelang.syntax.lexer.TokenType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -9,12 +8,12 @@ import lombok.EqualsAndHashCode;
 public final class LogicalExpression extends Expression {
     private Expression left;
     private Expression right;
-    private TokenType operator;
+    private String operator;
 
     public LogicalExpression() {
     }
 
-    public LogicalExpression(Expression left, Expression right, TokenType operator) {
+    public LogicalExpression(Expression left, Expression right, String operator) {
         this();
         this.left = left;
         this.right = right;
@@ -22,7 +21,7 @@ public final class LogicalExpression extends Expression {
     }
 
     public static Expression of(Object operator, Expression left, Expression right) {
-        return new LogicalExpression(left, right, TokenType.toSymbol(operator.toString()));
+        return new LogicalExpression(left, right, operator.toString());
     }
 
     public static Expression logical(Object operator, Expression left, Expression right) {
@@ -30,11 +29,11 @@ public final class LogicalExpression extends Expression {
     }
 
     public static Expression or(Expression left, Expression right) {
-        return new LogicalExpression(left, right, TokenType.Logical_Or);
+        return new LogicalExpression(left, right, "||");
     }
 
     public static Expression and(Expression left, Expression right) {
-        return new LogicalExpression(left, right, TokenType.Logical_And);
+        return new LogicalExpression(left, right, "&&");
     }
 
 }
