@@ -1,0 +1,96 @@
+plugins {
+    id 'java'
+    id('org.gradlex.extra-java-module-info') version "1.12"
+    id 'antlr'
+}
+
+group 'cloud.kitelang'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+def lombok = '1.18.42'
+
+dependencies {
+    implementation project(':api')
+    antlr "org.antlr:antlr4:4.13.1"
+    implementation "org.antlr:antlr4-runtime:4.13.1"
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.24.2'
+    testImplementation 'org.slf4j:slf4j-jdk14:2.0.16'
+    implementation 'org.fusesource.jansi:jansi:2.4.2'
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation 'org.jetbrains:annotations:26.0.1'
+
+    compileOnly "org.projectlombok:lombok:${lombok}"
+    annotationProcessor "org.projectlombok:lombok:${lombok}"
+
+    testCompileOnly "org.projectlombok:lombok:${lombok}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombok}"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.13.4'
+    testImplementation 'org.junit.platform:junit-platform-suite-engine:1.13.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.4'
+    testImplementation 'com.h2database:h2:2.3.232'
+    testImplementation "org.mockito:mockito-core:3.+"
+}
+
+test {
+    useJUnitPlatform()
+//    maxParallelForks = Runtime.runtime.availableProcessors() // commented as it doesn't improve performance right now
+//    testLogging { events "started", "passed", "skipped", "failed" }
+}
+extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+generateGrammarSource {
+    maxHeapSize = "128m"
+    arguments += ["-visitor", "-Xexact-output-dir", "-package", "cloud.kitelang.syntax.ast.generated"]
+    outputDirectory = file("${buildDir}/generated-src/antlr/main/cloud/kitelang/syntax/ast/generated")
+
+    doFirst {
+        outputDirectory.mkdirs()
+    }
+}
+
+// Ensure compileJava depends on grammar generation
+compileJava {
+    dependsOn generateGrammarSource
+}
+sourceSets {
+    main {
+        antlr {
+            srcDirs = ["grammar"]
+        }
+        java {
+            srcDirs += ["${buildDir}/generated-src/antlr/main"]
+        }
+    }
+}
+configurations {
+    testClasses {
+        canBeResolved = true  // ✅ this is key
+        canBeConsumed = true
+        extendsFrom(testImplementation)
+    }
+}
+
+tasks.register('testJar', Jar) {
+    archiveClassifier.set('test')
+//    from sourceSets.test.output
+    from(sourceSets.test.output) {
+        include 'cloud/kitelang/base/**'
+    }
+}
+
+artifacts {
+    testClasses testJar
+}

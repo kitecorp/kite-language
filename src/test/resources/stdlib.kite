@@ -1,0 +1,10 @@
+// Simple stdlib file with function definitions
+fun double(number x) number {
+    return x * 2
+}
+
+fun triple(number x) number {
+    return x * 3
+}
+
+var greeting = "Hello from stdlib!"

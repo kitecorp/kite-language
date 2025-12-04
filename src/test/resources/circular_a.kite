@@ -1,0 +1,4 @@
+// circular_a.kite imports circular_b.kite
+import * from "src/test/resources/circular_b.kite"
+
+var varA = "from A"
