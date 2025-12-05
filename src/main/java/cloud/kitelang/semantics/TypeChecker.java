@@ -24,9 +24,6 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -791,7 +788,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var resolver = new ImportResolver(parser, importedFiles);
 
         try {
-            resolver.resolve(statement, env, Set.of(), program -> {
+            resolver.resolve(statement, env, program -> {
                 var importChecker = new TypeChecker(new TypeEnvironment("import", env), printer, importedFiles);
                 importChecker.visit(program);
                 return importChecker.getEnv();

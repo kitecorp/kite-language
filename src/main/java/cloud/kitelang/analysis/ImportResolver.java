@@ -10,21 +10,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
  * Shared utility for handling import statements in both TypeChecker and Interpreter.
  * Handles file resolution, circular import detection, parsing, and environment merging.
+ * Includes a static cache to avoid re-parsing the same file multiple times.
  */
 public class ImportResolver {
+    /**
+     * Static cache for parsed programs. Shared across all ImportResolver instances
+     * so that TypeChecker and Interpreter can reuse parsed ASTs.
+     * Key: normalized absolute file path, Value: parsed Program AST
+     */
+    private static final Map<String, Program> PARSE_CACHE = new ConcurrentHashMap<>();
+
     private final KiteCompiler parser;
     private final Set<String> importChain;
-
-    public ImportResolver(Set<String> importChain) {
-        this.parser = new KiteCompiler();
-        this.importChain = importChain;
-    }
 
     public ImportResolver(KiteCompiler parser, Set<String> importChain) {
         this.parser = parser;
@@ -32,19 +37,31 @@ public class ImportResolver {
     }
 
     /**
+     * Clears the parse cache. Useful for testing or when files have changed.
+     */
+    public static void clearCache() {
+        PARSE_CACHE.clear();
+    }
+
+    /**
+     * Returns the current cache size. Useful for testing and debugging.
+     */
+    public static int getCacheSize() {
+        return PARSE_CACHE.size();
+    }
+
+    /**
      * Resolves an import statement by parsing the file and delegating to the visitor.
      *
+     * @param <T>            The type of values in the environment
      * @param statement      The import statement to resolve
      * @param currentEnv     The current environment to merge into
-     * @param stdlibNames    Names to exclude from merging (built-in functions/types)
      * @param visitorFactory Factory that creates the visitor environment from the parsed program
-     * @param <T>            The type of values in the environment
      * @throws ImportException if the import fails (file not found, circular import, IO error)
      */
     public <T> void resolve(
             ImportStatement statement,
             Environment<T> currentEnv,
-            Set<String> stdlibNames,
             Function<Program, Environment<T>> visitorFactory
     ) {
         var filePath = normalizeFilePath(statement.getFilePath());
@@ -57,7 +74,7 @@ public class ImportResolver {
             var program = readAndParse(statement.getFilePath());
             var importedEnv = visitorFactory.apply(program);
 
-            mergeEnvironment(importedEnv, currentEnv, stdlibNames);
+            mergeEnvironment(importedEnv, currentEnv);
         } finally {
             importChain.remove(filePath);
         }
@@ -93,24 +110,27 @@ public class ImportResolver {
 
     /**
      * Reads and parses a file into a Program AST.
+     * Uses caching to avoid re-parsing the same file multiple times.
      */
     public Program readAndParse(String filePath) {
-        try {
-            var content = Files.readString(Path.of(filePath));
-            return parser.parse(content);
-        } catch (IOException e) {
-            throw new ImportException("Failed to read import: " + e.getMessage(), e);
-        }
+        var normalizedPath = normalizeFilePath(filePath);
+
+        return PARSE_CACHE.computeIfAbsent(normalizedPath, path -> {
+            try {
+                var content = Files.readString(Path.of(filePath));
+                return parser.parse(content);
+            } catch (IOException e) {
+                throw new ImportException("Failed to read import: " + e.getMessage(), e);
+            }
+        });
     }
 
     /**
      * Merges variables from source environment into target, excluding specified names.
      */
-    public <T> void mergeEnvironment(Environment<T> source, Environment<T> target, Set<String> excludeNames) {
+    public <T> void mergeEnvironment(Environment<T> source, Environment<T> target) {
         for (var entry : source.getVariables().entrySet()) {
-            if (!excludeNames.contains(entry.getKey())) {
-                target.initOrAssign(entry.getKey(), entry.getValue());
-            }
+            target.initOrAssign(entry.getKey(), entry.getValue());
         }
     }
 

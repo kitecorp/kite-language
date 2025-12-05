@@ -43,8 +43,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -549,7 +547,7 @@ public final class Interpreter extends StackVisitor<Object> {
     public Object visit(ImportStatement statement) {
         var resolver = new ImportResolver(parser, importChain);
 
-        resolver.resolve(statement, env, Set.of(), program -> {
+        resolver.resolve(statement, env, program -> {
             // Resolve scopes in the imported program
             var scopeResolver = new ScopeResolver();
             scopeResolver.resolve(program);

@@ -1,9 +1,11 @@
 package cloud.kitelang.semantics.typechecker;
 
+import cloud.kitelang.analysis.ImportResolver;
 import cloud.kitelang.base.CheckerTest;
 import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.FunType;
 import cloud.kitelang.semantics.types.ValueType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,9 +26,37 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("TypeChecker Import Statement")
 class ImportStatementTest extends CheckerTest {
 
+    @BeforeEach
+    void clearImportCache() {
+        ImportResolver.clearCache();
+    }
+
     private String getTestResourcePath(String filename) {
         Path resourcePath = Paths.get("src/test/resources", filename).toAbsolutePath();
         return resourcePath.toString();
+    }
+
+    @Test
+    @DisplayName("should cache parsed programs to avoid re-parsing")
+    void shouldCacheParsedPrograms() {
+        String stdlibPath = getTestResourcePath("stdlib.kite");
+
+        assertEquals(0, ImportResolver.getCacheSize(), "Cache should be empty initially");
+
+        eval("""
+                import * from "%s"
+                """.formatted(stdlibPath));
+
+        // Cache should have entries after import
+        assertTrue(ImportResolver.getCacheSize() > 0, "Cache should have entries after import");
+        int cacheSize = ImportResolver.getCacheSize();
+
+        // Import the same file again - cache size should not change
+        eval("""
+                import * from "%s"
+                """.formatted(stdlibPath));
+
+        assertEquals(cacheSize, ImportResolver.getCacheSize(), "Cache size should not increase for same file");
     }
 
     @Test
