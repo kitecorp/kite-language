@@ -1,0 +1,8 @@
+// Component definition for import testing
+input string inputValue
+
+component MyComponent {
+    input string componentInput
+
+    output string result = componentInput
+}

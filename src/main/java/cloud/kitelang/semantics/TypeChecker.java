@@ -12,6 +12,7 @@ import cloud.kitelang.semantics.decorators.*;
 import cloud.kitelang.semantics.types.*;
 import cloud.kitelang.syntax.annotations.Annotatable;
 import cloud.kitelang.syntax.annotations.CountAnnotatable;
+import cloud.kitelang.syntax.ast.KiteCompiler;
 import cloud.kitelang.syntax.ast.Program;
 import cloud.kitelang.syntax.ast.expressions.*;
 import cloud.kitelang.syntax.ast.statements.*;
@@ -22,6 +23,9 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,24 +38,26 @@ public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> ADDITIVE_OPS = List.of(SystemType.NUMBER, SystemType.STRING);
     private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
     private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
+    private static final Set<String> MAGIC_VARIABLES = Set.of("count");
     @Getter
     private final SyntaxPrinter printer;
     private final Set<String> vals = new HashSet<>();
     private final Map<String, DecoratorChecker> decoratorInfoMap;
     private final ComponentRegistry componentRegistry;
-
+    private final Set<String> importedFiles;
+    private final KiteCompiler parser = new KiteCompiler();
     @Getter
     private TypeEnvironment env;
 
     public TypeChecker() {
-        this(new TypeEnvironment("global"), new SyntaxPrinter());
+        this(new TypeEnvironment("global"), new SyntaxPrinter(), new LinkedHashSet<>());
     }
 
     public TypeChecker(SyntaxPrinter printer) {
-        this(new TypeEnvironment("global"), printer);
+        this(new TypeEnvironment("global"), printer, new LinkedHashSet<>());
     }
 
-    public TypeChecker(TypeEnvironment environment, SyntaxPrinter printer) {
+    public TypeChecker(TypeEnvironment environment, SyntaxPrinter printer, Set<String> importedFiles) {
         this.env = environment;
         this.printer = printer;
         for (var value : ValueType.values()) {
@@ -60,6 +66,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         for (var value : ReferenceType.values()) {
             env.init(value.getValue(), value);
         }
+        this.importedFiles = importedFiles;
         env.init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));
         env.init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
         env.init("print", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
@@ -140,8 +147,6 @@ public final class TypeChecker extends StackVisitor<Type> {
     public Type visit(StringLiteral expression) {
         return ValueType.String;
     }
-
-    private static final Set<String> MAGIC_VARIABLES = Set.of("count");
 
     @Override
     public Type visit(BlockExpression expression) {
@@ -782,8 +787,42 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ImportStatement statement) {
-        // Import statements are handled by the interpreter
-        return ValueType.Void;
+        var filePath = Paths.get(statement.getFilePath()).toAbsolutePath().normalize().toString();
+
+        // Check for circular imports (would need an importChain field like Interpreter has)
+        if (importedFiles.contains(filePath)) {
+            throw new TypeError("Circular import detected: " + filePath);
+        }
+
+        // Validate file exists
+        if (!Files.exists(Paths.get(statement.getFilePath()))) {
+            throw new TypeError("Import file not found: " + statement.getFilePath());
+        }
+
+        importedFiles.add(filePath);
+
+        try {
+            // Parse and type-check the imported file
+            var content = Files.readString(Paths.get(statement.getFilePath()));
+            var program = parser.parse(content);
+
+            // Type-check imported program with a child TypeChecker
+            var importChecker = new TypeChecker(new TypeEnvironment("import", env), printer, importedFiles);
+
+            importChecker.visit(program);
+
+            // Merge only user-defined types (exclude stdlib that was auto-initialized)
+            for (var entry : importChecker.getEnv().getVariables().entrySet()) {
+                env.initOrAssign(entry.getKey(), entry.getValue());
+            }
+
+            return ValueType.Void;
+        } catch (IOException e) {
+            throw new TypeError("Failed to read import: " + e.getMessage());
+        } finally {
+            // Remove from import chain after processing (allows same file to be imported in different branches)
+            importedFiles.remove(filePath);
+        }
     }
 
     @Override

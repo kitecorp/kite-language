@@ -565,24 +565,24 @@ public final class Interpreter extends StackVisitor<Object> {
                 String content = Files.readString(Paths.get(statement.getFilePath()));
 
                 // Parse the file into an AST
-                Program program = parser.parse(content);
+                var program = parser.parse(content);
 
                 // Resolve scopes in the imported program
                 var scopeResolver = new ScopeResolver();
                 scopeResolver.resolve(program);
 
                 // Create a new interpreter with shared import chain
-                Interpreter importInterpreter = new Interpreter(new Environment<>("import", env), printer, importChain);
+                var importInterpreter = new Interpreter(new Environment<>("import", env), printer, importChain);
 
                 // Get the built-in function names from the new interpreter to exclude them from import
-                Set<String> stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
+                var stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
 
                 // Execute the program in the isolated environment
                 importInterpreter.visit(program);
 
                 // Merge only user-defined variables (exclude stdlib functions that were auto-initialized)
-                Environment<Object> importedEnv = importInterpreter.getEnv();
-                for (Map.Entry<String, Object> entry : importedEnv.getVariables().entrySet()) {
+                var importedEnv = importInterpreter.getEnv();
+                for (var entry : importedEnv.getVariables().entrySet()) {
                     // Skip stdlib functions that were auto-initialized in the constructor
                     if (!stdlibNames.contains(entry.getKey())) {
                         env.initOrAssign(entry.getKey(), entry.getValue());

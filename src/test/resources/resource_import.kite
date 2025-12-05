@@ -1,0 +1,10 @@
+// Schema definition for import testing
+schema vm {
+    string name
+    number cpu = 1
+    number memory = 512
+}
+
+resource vm test {
+    name = "test"
+}
