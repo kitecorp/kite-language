@@ -48,3 +48,62 @@ var area = PI * r * r   // PI constant is available
 - `src/test/java/cloud/kitelang/syntax/parser/ImportStatementParseTest.java`
 - `src/test/java/cloud/kitelang/semantics/typechecker/ImportStatementTest.java`
 - `src/test/java/cloud/kitelang/execution/ImportStatementTest.java`
+
+## Component Declaration
+
+Supports defining reusable component types with inputs, outputs, and resources, and creating instances with customized values.
+
+### Component Type Declaration
+
+Declares a component type with inputs/outputs/resources but no instance name.
+
+**Example:**
+```kite
+component server {
+    input string hostname
+    input number port = 8080
+}
+```
+
+### Component Instance
+
+Creates an instance of a declared component type with a name.
+
+**Example:**
+```kite
+component server main {
+    hostname = "localhost"
+    port = 3000
+}
+
+component server api {
+    hostname = "api.example.com"
+    port = main.port  // Reference another instance's property
+}
+```
+
+### Accessing Component Properties
+
+Component instance properties are accessed via `instanceName.propertyName`.
+
+**Example:**
+```kite
+var endpoint = main.hostname  // Access property on instance
+```
+
+**Features:**
+- Component type declaration (`component Type { ... }`) - defines inputs/outputs/resources
+- Component instantiation (`component Type name { ... }`) - creates instance with overrides
+- Instances inherit default values from type declaration
+- Instance properties override declaration defaults
+- Properties accessed via `instanceName.propertyName`
+- Input/output/resource names must be unique within a component (enforced by Environment)
+- Components cannot be modified outside their block (throws RuntimeError)
+- Supports string interpolation, computed values, and cross-instance references
+
+**Reference:**
+- `src/main/java/cloud/kitelang/syntax/ast/expressions/ComponentStatement.java`
+- `src/main/java/cloud/kitelang/execution/Interpreter.java` (visit(ComponentStatement), declareComponent, initializeComponent)
+
+**Tests:**
+- `src/test/java/cloud/kitelang/execution/ComponentTest.java`

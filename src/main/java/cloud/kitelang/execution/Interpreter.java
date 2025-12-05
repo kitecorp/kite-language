@@ -73,6 +73,8 @@ public final class Interpreter extends StackVisitor<Object> {
     private Environment<Object> env;
     // Track currently importing files to detect circular imports
     private final Set<String> importChain;
+    // Track component declarations for later instantiation (similar to TypeChecker's ComponentRegistry)
+    private final Map<String, ComponentStatement> componentDeclarations;
 
     public Interpreter() {
         this(new Environment<>());
@@ -98,6 +100,7 @@ public final class Interpreter extends StackVisitor<Object> {
         this.deferredObservable = new DeferredObservable();
         this.instances = new LinkedHashMap<>();
         this.importChain = importChain; // Share the import chain
+        this.componentDeclarations = new HashMap<>();
 
         this.errors = new ArrayList<>();
         this.decorators = new HashMap<>();
@@ -569,16 +572,139 @@ public final class Interpreter extends StackVisitor<Object> {
     @Override
     public Object visit(ComponentStatement expression) {
         visitAnnotations(expression.getAnnotations());
-        throw new RuntimeException("Invalid component statement");
+
+        if (!expression.hasType()) {
+            throw new RuntimeException("Invalid component declaration: component must have a type");
+        }
+
+        var typeName = expression.getType().string();
+        var isDefinition = expression.isDefinition();
+        var typeExists = componentDeclarations.containsKey(typeName);
+
+        if (isDefinition) {
+            return declareComponent(expression, typeName, typeExists);
+        } else {
+            return initializeComponent(expression, typeName, typeExists);
+        }
+    }
+
+    /**
+     * Declares a component type (component server { ... }).
+     * Registers the declaration for later instantiation.
+     */
+    private ComponentValue declareComponent(ComponentStatement expression, String typeName, boolean typeExists) {
+        if (typeExists) {
+            throw new RuntimeException("Duplicate component definition: " + typeName);
+        }
+
+        // Register the declaration for later instantiation
+        componentDeclarations.put(typeName, expression);
+
+        // Create component value with its own environment
+        var componentEnv = new Environment<>(typeName, env);
+        var componentValue = ComponentValue.builder()
+                .name(null) // No name for type definitions
+                .properties(componentEnv)
+                .build();
+
+        // Execute the declaration block to initialize inputs/outputs with defaults
+        for (var stmt : expression.getArguments()) {
+            executeBlock(stmt, componentEnv);
+        }
+
+        // Register in global environment
+        env.init(typeName, componentValue);
+
+        return componentValue;
+    }
+
+    /**
+     * Creates an instance of a declared component type (component server main { ... }).
+     * Inherits defaults from declaration and applies instance-specific values.
+     * Instance is registered by its name only (not qualified with type).
+     * Only outputs can be accessed on the instance via instanceName.outputName.
+     */
+    private ComponentValue initializeComponent(ComponentStatement expression, String typeName, boolean typeExists) {
+        if (!typeExists) {
+            throw new RuntimeException("Component type not declared: " + typeName);
+        }
+
+        var instanceName = expression.name();
+        var declaration = componentDeclarations.get(typeName);
+
+        // Build a map of input declarations for validation lookup
+        var inputDeclarations = new HashMap<String, InputDeclaration>();
+        for (Statement stmt : declaration.getArguments()) {
+            if (stmt instanceof InputDeclaration input) {
+                inputDeclarations.put(input.name(), input);
+            }
+        }
+
+        // Create instance environment as child of global env
+        var instanceEnv = new Environment<>(instanceName, env);
+        var componentValue = ComponentValue.builder()
+                .name(instanceName)
+                .properties(instanceEnv)
+                .build();
+
+        // First, execute declaration block to initialize defaults
+        for (var stmt : declaration.getArguments()) {
+            executeBlock(stmt, instanceEnv);
+        }
+
+        // Then, execute instance block to override values
+        // Use instanceEnv so component properties can be referenced in expressions
+        for (var stmt : expression.getArguments()) {
+            if (stmt instanceof ExpressionStatement exprStmt) {
+                handleAssignment(typeName, stmt, exprStmt, instanceEnv);
+            } else {
+                executeBlock(stmt, instanceEnv);
+            }
+        }
+
+        // Register instance by name only (new pattern)
+        env.init(instanceName, componentValue);
+
+        return componentValue;
+    }
+
+    private void handleAssignment(String typeName, Statement stmt, ExpressionStatement exprStmt, Environment<Object> instanceEnv) {
+        if (exprStmt.getStatement() instanceof AssignmentExpression assignment) {
+            // Handle assignment: property = value
+            var propertyName = getPropertyName(assignment.getLeft());
+            if (!instanceEnv.hasVar(propertyName)) {
+                throw new NotFoundException("Property '" + propertyName + "' not defined in component type '" + typeName + "'");
+            }
+            // Evaluate in instanceEnv so component properties are accessible
+            var value = executeBlock(assignment.getRight(), instanceEnv);
+            instanceEnv.assign(propertyName, value);
+
+            // TODO: Re-apply decorators from the input declaration for validation
+            // This is complex because we need to create temp annotations with correct targets
+            // For now, validation happens only on the declaration's default value
+        } else {
+            executeBlock(stmt, instanceEnv);
+        }
     }
 
     @Override
     public Object visit(InputDeclaration input) {
         visitAnnotations(input.getAnnotations());
-        if (input.hasInit() && env.get(input.name()) == null) {
-            return env.initOrAssign(input.getId().string(), visit(input.getInit()));
+        var name = input.getId().string();
+
+        if (input.hasInit()) {
+            // Has a default value - use it if not already set
+            if (env.get(name) == null) {
+                return env.initOrAssign(name, visit(input.getInit()));
+            }
+            return env.lookup(name);
         }
-        return env.lookup(input.name());
+
+        // No initializer - declare as null if not already set (for component declarations)
+        if (env.get(name) == null) {
+            return env.init(name, null);
+        }
+        return env.lookup(name);
     }
 
     private void visitAnnotations(Set<AnnotationDeclaration> annotations) {
@@ -620,6 +746,8 @@ public final class Interpreter extends StackVisitor<Object> {
             var instanceEnv = executeBlock(memberExpression.getObject(), env);
             if (instanceEnv instanceof ResourceValue resourceValue) {
                 throw new RuntimeError("Resources can only be updated inside their block: " + resourceValue.getName());
+            } else if (instanceEnv instanceof ComponentValue componentValue) {
+                throw new RuntimeError("Components can only be updated inside their block: " + componentValue.getName());
             }
         } else if (expression.getLeft() instanceof SymbolIdentifier identifier) {
             return assignmentSymbol(expression, identifier);
@@ -687,6 +815,7 @@ public final class Interpreter extends StackVisitor<Object> {
             return switch (object) {
                 case SchemaValue schemaValue -> visitSchemaMember(expression);
                 case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
+                case ComponentValue componentValue -> visitComponentMember(expression, componentValue);
                 case Map<?, ?> map -> visitMapMember(expression, map);
                 case Deferred deferred -> visitDeferredMember(expression, deferred);
                 case Dependency dependency -> {
@@ -779,6 +908,17 @@ public final class Interpreter extends StackVisitor<Object> {
     private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
         var propertyName = getPropertyName(expression.getProperty());
         return map.get(propertyName);
+    }
+
+    /**
+     * Handles property access on component instances.
+     * Only inputs/outputs can be accessed via instanceName.outputName.
+     */
+    private Object visitComponentMember(MemberExpression expression, ComponentValue componentValue) {
+        var propertyName = getPropertyName(expression.getProperty());
+        // Look up the property in the component's properties environment
+        // TODO: Restrict to inputs/outputs
+        return componentValue.lookup(propertyName);
     }
 
     private Object visitDeferredMember(MemberExpression expression, Deferred deferred) {

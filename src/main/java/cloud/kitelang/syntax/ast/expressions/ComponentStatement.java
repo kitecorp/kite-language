@@ -123,7 +123,7 @@ public final class ComponentStatement extends Statement implements Annotatable, 
     }
 
     public boolean isDefinition() {
-        return getType() != null && name == null;
+        return hasType() && !hasName();
     }
 
     @Override

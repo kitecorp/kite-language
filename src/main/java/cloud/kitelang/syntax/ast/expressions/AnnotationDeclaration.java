@@ -156,4 +156,12 @@ public final class AnnotationDeclaration extends Expression {
     public boolean hasArgs() {
         return getArgs() != null && !getArgs().isEmpty();
     }
+
+    /**
+     * Creates a shallow copy of this annotation with a new target.
+     * Used for re-validating decorators when overriding values in component instances.
+     */
+    public AnnotationDeclaration copy() {
+        return AnnotationDeclaration.annotation(name, value, args, object, namedArgs, null);
+    }
 }

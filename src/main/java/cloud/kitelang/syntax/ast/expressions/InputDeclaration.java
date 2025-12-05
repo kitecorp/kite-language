@@ -140,6 +140,14 @@ public final class InputDeclaration extends Statement implements Annotatable {
         return init != null;
     }
 
+    /**
+     * Returns a copy of this InputDeclaration with a different init value.
+     * Used for re-validating decorators when overriding values in component instances.
+     */
+    public InputDeclaration withInit(Expression newInit) {
+        return new InputDeclaration(this.id, this.type, newInit, this.annotations);
+    }
+
     public boolean hasType() {
         return type != null;
     }

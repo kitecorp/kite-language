@@ -6,11 +6,11 @@ import cloud.kitelang.execution.exceptions.RuntimeError;
 import cloud.kitelang.execution.values.ComponentValue;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,10 +38,10 @@ public class ComponentTest extends RuntimeTest {
 
     /**
      * This checks for the following syntax
-     * server.main
-     * Component instances are accessible through lookup
+     * main
+     * Component instances are accessible through lookup by instance name
      * global env{
-     * server.main -> ComponentValue (instance)
+     * main -> ComponentValue (instance)
      * }
      */
     @Test
@@ -52,8 +52,7 @@ public class ComponentTest extends RuntimeTest {
                 
                 }
                 """);
-        log.warn((res));
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
         assertNotNull(instance);
         assertEquals("main", instance.getName());
@@ -61,8 +60,8 @@ public class ComponentTest extends RuntimeTest {
 
     @Test
     void componentInstanceIsDefinedWithInputs() {
-        var res = eval("""
-                component server { 
+        eval("""
+                component server {
                     input string hostname
                     input number port = 8080
                 }
@@ -72,19 +71,18 @@ public class ComponentTest extends RuntimeTest {
                 }
                 component server api {
                     hostname = "api.example.com"
-                    port = server.main.port
+                    port = main.port
                 }
                 """);
-        log.warn((res));
 
-        var main = interpreter.getComponent("server.main");
+        var main = interpreter.getComponent("main");
 
         assertNotNull(main);
         assertEquals("main", main.getName());
         assertEquals("localhost", main.argVal("hostname"));
         assertEquals(3000, main.argVal("port"));
 
-        var api = interpreter.getComponent("server.api");
+        var api = interpreter.getComponent("api");
 
         assertNotNull(api);
         assertEquals("api", api.getName());
@@ -109,7 +107,7 @@ public class ComponentTest extends RuntimeTest {
 
     @Test
     void componentInstanceInheritsDefaultInputValue() {
-        var res = eval("""
+        eval("""
                 component server {
                    input number x = 2
                 }
@@ -118,28 +116,9 @@ public class ComponentTest extends RuntimeTest {
                 
                 }
                 """);
-        log.warn(res);
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
-        assertEquals(2, instance.getProperties().lookup("x"));
-    }
-
-    @Test
-    @Disabled
-    void componentInstanceInheritsDefaultInputValueVal() {
-        var res = eval("""
-                component server {
-                   input number x = 2
-                }
-                
-                component server main {
-                
-                }
-                """);
-        log.warn((res));
-        var instance = interpreter.getComponent("server.main");
-
-        assertEquals(2, instance.getProperties().lookup("x"));
+        assertEquals(2, instance.argVal("x"));
     }
 
     @Test
@@ -152,17 +131,16 @@ public class ComponentTest extends RuntimeTest {
                 component server main  {
                 
                 }
-                var y = server.main
-                var z = server.main.x
+                var y = main
+                var z = main.x
                 z
                 """);
-        log.warn((res));
-        var instance = interpreter.getComponent("server.main");
-        assertSame(2, instance.getProperties().get("x"));
+        var instance = interpreter.getComponent("main");
+        assertSame(2, instance.argVal("x"));
         // make sure main's x has been changed
-        assertEquals(2, instance.getProperties().get("x"));
+        assertEquals(2, instance.argVal("x"));
 
-        // assert y holds reference to server.main
+        // assert y holds reference to main
         var y = interpreter.getVar("y");
         assertSame(y, instance);
         // assert z holds reference to the value of x (which is 2)
@@ -187,13 +165,13 @@ public class ComponentTest extends RuntimeTest {
                 component server main {
                 
                 }
-                server.main.x = 3
+                main.x = 3
                 """));
     }
 
     @Test
     void componentInstanceInit() {
-        var res = eval("""
+        eval("""
                 component server {
                    input number x = 2
                 }
@@ -202,8 +180,7 @@ public class ComponentTest extends RuntimeTest {
                     x = 3
                 }
                 """);
-        log.warn((res));
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
         // x of main instance was updated with a new value
         var x = instance.get("x");
@@ -222,8 +199,7 @@ public class ComponentTest extends RuntimeTest {
                     x = 3
                 }
                 """);
-        log.warn((res));
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
         assertInstanceOf(ComponentValue.class, instance);
     }
@@ -241,7 +217,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
         assertInstanceOf(ComponentValue.class, instance);
         assertEquals(instance, res);
@@ -261,7 +237,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
         assertInstanceOf(ComponentValue.class, instance);
         assertEquals(instance, res);
@@ -281,7 +257,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
 
         assertInstanceOf(ComponentValue.class, instance);
         assertEquals(instance, res);
@@ -299,7 +275,7 @@ public class ComponentTest extends RuntimeTest {
                   environment = 'production'
                 }
                 
-                var env = server.main.environment
+                var env = main.environment
                 """);
 
         assertEquals("production", res);
@@ -307,7 +283,7 @@ public class ComponentTest extends RuntimeTest {
 
     @Test
     void multipleComponentInstancesSameDefinition() {
-        var res = eval("""
+        eval("""
                 component server {
                     input string hostname
                 }
@@ -321,8 +297,8 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var web = interpreter.getComponent("server.web");
-        var database = interpreter.getComponent("server.database");
+        var web = interpreter.getComponent("web");
+        var database = interpreter.getComponent("database");
 
         assertEquals("web-server", web.argVal("hostname"));
         assertEquals("db-server", database.argVal("hostname"));
@@ -330,7 +306,7 @@ public class ComponentTest extends RuntimeTest {
 
     @Test
     void componentWithArrayProperty() {
-        var res = eval("""
+        eval("""
                 component server {
                     input string[] services
                 }
@@ -340,15 +316,17 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         var services = (List<?>) instance.argVal("services");
         assertEquals(3, services.size());
         assertEquals("api", services.get(0));
+        assertEquals("web", services.get(1));
+        assertEquals("worker", services.get(2));
     }
 
     @Test
     void componentWithObjectProperty() {
-        var res = eval("""
+        eval("""
                 component server {
                     input object metadata
                 }
@@ -361,13 +339,15 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
-        assertNotNull(instance.argVal("metadata"));
+        var instance = interpreter.getComponent("main");
+        var actual = instance.argVal("metadata");
+        assertNotNull(actual);
+        assertEquals(Map.of("version", "1.0", "author", "dev-team"), actual);
     }
 
     @Test
     void componentWithComputedValue() {
-        var res = eval("""
+        eval("""
                 component server {
                     input number replicas
                 }
@@ -379,13 +359,13 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         assertEquals(6, instance.argVal("replicas"));
     }
 
     @Test
     void componentReferencingArray() {
-        var res = eval("""
+        eval("""
                 component server {
                     input string[] endpoints
                     input string primaryEndpoint
@@ -396,17 +376,17 @@ public class ComponentTest extends RuntimeTest {
                 }
                 
                 component server target {
-                    primaryEndpoint = server.source.endpoints[0]
+                    primaryEndpoint = source.endpoints[0]
                 }
                 """);
 
-        var target = interpreter.getComponent("server.target");
+        var target = interpreter.getComponent("target");
         assertEquals("/api", target.argVal("primaryEndpoint"));
     }
 
     @Test
     void componentWithNullValue() {
-        var res = eval("""
+        eval("""
                 component server {
                     input any config
                 }
@@ -416,13 +396,13 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         assertNull(instance.argVal("config"));
     }
 
     @Test
     void componentChainedReferences() {
-        var res = eval("""
+        eval("""
                 component server {
                     input string id
                     input string parentId
@@ -434,17 +414,17 @@ public class ComponentTest extends RuntimeTest {
                 
                 component server secondary {
                     id = "secondary-id"
-                    parentId = server.primary.id
+                    parentId = primary.id
                 }
                 
                 component server tertiary {
                     id = "tertiary-id"
-                    parentId = server.secondary.id
+                    parentId = secondary.id
                 }
                 """);
 
-        var secondary = interpreter.getComponent("server.secondary");
-        var tertiary = interpreter.getComponent("server.tertiary");
+        var secondary = interpreter.getComponent("secondary");
+        var tertiary = interpreter.getComponent("tertiary");
 
         assertEquals("primary-id", secondary.argVal("parentId"));
         assertEquals("secondary-id", tertiary.argVal("parentId"));
@@ -464,13 +444,13 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         assertEquals("api-service", instance.argVal("fullName"));
     }
 
     @Test
     void componentAccessingGlobalVariable() {
-        var res = eval("""
+        eval("""
                 component server {
                     input string region
                 }
@@ -482,13 +462,13 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         assertEquals("us-west-2", instance.argVal("region"));
     }
 
     @Test
     void componentWithNestedPropertyAccess() {
-        var res = eval("""
+        eval("""
                 component server {
                     input object settings
                     input string value
@@ -499,17 +479,17 @@ public class ComponentTest extends RuntimeTest {
                 }
                 
                 component server target {
-                    value = server.source.settings.database.host
+                    value = source.settings.database.host
                 }
                 """);
 
-        var target = interpreter.getComponent("server.target");
+        var target = interpreter.getComponent("target");
         assertEquals("localhost", target.argVal("value"));
     }
 
     @Test
     void componentPropertyUsedInExpression() {
-        var res = eval("""
+        eval("""
                 component server {
                     input number threads
                     input number maxThreads
@@ -521,13 +501,13 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         assertEquals(8, instance.argVal("maxThreads"));
     }
 
     @Test
     void componentWithAllPropertyTypes() {
-        var res = eval("""
+        eval("""
                 component server {
                     input string str
                     input number num
@@ -547,7 +527,7 @@ public class ComponentTest extends RuntimeTest {
                 }
                 """);
 
-        var instance = interpreter.getComponent("server.main");
+        var instance = interpreter.getComponent("main");
         assertEquals("test", instance.argVal("str"));
         assertEquals(42, instance.argVal("num"));
         assertEquals(true, instance.argVal("bool"));
