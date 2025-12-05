@@ -14,7 +14,7 @@ repositories {
 def lombok = '1.18.42'
 
 dependencies {
-    implementation project(':kite-api')
+    implementation 'cloud.kitelang:kite-api'
     antlr "org.antlr:antlr4:4.13.1"
     implementation "org.antlr:antlr4-runtime:4.13.1"
 
@@ -22,7 +22,7 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.24.2'
     testImplementation 'org.slf4j:slf4j-jdk14:2.0.16'
     implementation 'org.fusesource.jansi:jansi:2.4.2'
-    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation 'org.apache.commons:commons-lang3:3.20.0'
     implementation 'org.jetbrains:annotations:26.0.1'
 
     compileOnly "org.projectlombok:lombok:${lombok}"

@@ -1,0 +1,8 @@
+rootProject.name = 'kite-language'
+
+// Include sibling kite-api as a composite build
+includeBuild('../kite-api') {
+    dependencySubstitution {
+        substitute(module('cloud.kitelang:kite-api')).using(project(':'))
+    }
+}
