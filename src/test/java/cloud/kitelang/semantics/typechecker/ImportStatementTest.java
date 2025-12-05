@@ -345,4 +345,116 @@ class ImportStatementTest extends CheckerTest {
                 var result = greet(add(1, 2))
                 """.formatted(mathPath, stringPath)));
     }
+
+    // ========== Named Import Tests ==========
+
+    @Test
+    @DisplayName("should import only specified symbol with named import")
+    void namedImportSingleSymbol() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import add from "%s"
+
+                var result = add(1, 2)
+                """.formatted(mathPath));
+
+        // add should be available
+        var addType = checker.getEnv().lookup("add");
+        assertNotNull(addType, "Function 'add' should be imported");
+        assertInstanceOf(FunType.class, addType);
+        assertEquals(ValueType.Number, checker.getEnv().lookup("result"));
+
+        // multiply and PI should NOT be available
+        assertFalse(checker.getEnv().lookupKey("multiply"), "multiply should NOT be imported");
+        assertFalse(checker.getEnv().lookupKey("PI"), "PI should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should import multiple specified symbols with named import")
+    void namedImportMultipleSymbols() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import add, PI from "%s"
+
+                var result = add(1, 2)
+                var myPi = PI
+                """.formatted(mathPath));
+
+        // add and PI should be available
+        assertNotNull(checker.getEnv().lookup("add"), "Function 'add' should be imported");
+        assertEquals(ValueType.Number, checker.getEnv().lookup("myPi"));
+
+        // multiply should NOT be available
+        assertFalse(checker.getEnv().lookupKey("multiply"), "multiply should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should error when importing non-existent symbol")
+    void namedImportNonExistentSymbol() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        var exception = assertThrows(TypeError.class, () -> eval("""
+                import nonExistent from "%s"
+                """.formatted(mathPath)));
+
+        assertTrue(exception.getMessage().contains("nonExistent") ||
+                   exception.getMessage().contains("not found"),
+                "Error should mention missing symbol: " + exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should mix named import with wildcard import")
+    void mixNamedAndWildcardImports() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+        String stringPath = getTestResourcePath("imports/string_utils.kite");
+
+        eval("""
+                import add from "%s"
+                import * from "%s"
+
+                var sum = add(1, 2)
+                var msg = greet("World")
+                """.formatted(mathPath, stringPath));
+
+        // add from named import should work
+        assertNotNull(checker.getEnv().lookup("add"));
+        assertEquals(ValueType.Number, checker.getEnv().lookup("sum"));
+
+        // All string_utils symbols should be available via wildcard
+        assertNotNull(checker.getEnv().lookup("greet"));
+        assertNotNull(checker.getEnv().lookup("DEFAULT_GREETING"));
+        assertEquals(ValueType.String, checker.getEnv().lookup("msg"));
+
+        // multiply from math should NOT be available (only add was imported)
+        assertFalse(checker.getEnv().lookupKey("multiply"));
+    }
+
+    @Test
+    @DisplayName("should type check function calls from named import")
+    void typeCheckNamedImportFunctionCalls() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        // Calling add with wrong argument type should fail
+        assertThrows(TypeError.class, () -> eval("""
+                import add from "%s"
+
+                var result = add("not", "numbers")
+                """.formatted(mathPath)));
+    }
+
+    @Test
+    @DisplayName("should import variable with named import")
+    void namedImportVariable() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import PI from "%s"
+
+                var myPi = PI
+                """.formatted(mathPath));
+
+        assertEquals(ValueType.Number, checker.getEnv().lookup("myPi"));
+    }
 }

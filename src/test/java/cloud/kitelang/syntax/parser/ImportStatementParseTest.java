@@ -67,12 +67,87 @@ class ImportStatementParseTest {
     void parseImportWithCodeAfter() {
         var code = """
                 import * from "stdlib.kite"
-                
+
                 var x = 10
                 """;
         var program = compiler.parse(code);
 
         assertEquals(2, program.getBody().size());
         assertTrue(program.getBody().get(0) instanceof ImportStatement);
+    }
+
+    // ========== Named Import Tests ==========
+
+    @Test
+    void parseNamedImportSingleSymbol() {
+        var code = """
+                import myFunc from "utils.kite"
+                """;
+        var program = compiler.parse(code);
+
+        assertEquals(1, program.getBody().size());
+        assertTrue(program.getBody().get(0) instanceof ImportStatement);
+
+        ImportStatement importStmt = (ImportStatement) program.getBody().get(0);
+        assertEquals("utils.kite", importStmt.getFilePath());
+        assertEquals(1, importStmt.getSymbols().size());
+        assertEquals("myFunc", importStmt.getSymbols().get(0));
+        assertTrue(!importStmt.isImportAll(), "Named import should not be import all");
+    }
+
+    @Test
+    void parseNamedImportMultipleSymbols() {
+        var code = """
+                import add, multiply, PI from "math.kite"
+                """;
+        var program = compiler.parse(code);
+
+        assertEquals(1, program.getBody().size());
+        ImportStatement importStmt = (ImportStatement) program.getBody().get(0);
+
+        assertEquals("math.kite", importStmt.getFilePath());
+        assertEquals(3, importStmt.getSymbols().size());
+        assertTrue(importStmt.getSymbols().contains("add"));
+        assertTrue(importStmt.getSymbols().contains("multiply"));
+        assertTrue(importStmt.getSymbols().contains("PI"));
+        assertTrue(!importStmt.isImportAll());
+    }
+
+    @Test
+    void parseImportAllIsImportAll() {
+        var code = """
+                import * from "stdlib.kite"
+                """;
+        var program = compiler.parse(code);
+
+        ImportStatement importStmt = (ImportStatement) program.getBody().get(0);
+        assertTrue(importStmt.isImportAll(), "Import * should be import all");
+        assertTrue(importStmt.getSymbols().isEmpty(), "Import * should have empty symbols list");
+    }
+
+    @Test
+    void parseMixedImports() {
+        var code = """
+                import * from "stdlib.kite"
+                import add, multiply from "math.kite"
+                import greet from "strings.kite"
+                """;
+        var program = compiler.parse(code);
+
+        assertEquals(3, program.getBody().size());
+
+        ImportStatement import1 = (ImportStatement) program.getBody().get(0);
+        assertTrue(import1.isImportAll());
+        assertEquals("stdlib.kite", import1.getFilePath());
+
+        ImportStatement import2 = (ImportStatement) program.getBody().get(1);
+        assertTrue(!import2.isImportAll());
+        assertEquals(2, import2.getSymbols().size());
+        assertEquals("math.kite", import2.getFilePath());
+
+        ImportStatement import3 = (ImportStatement) program.getBody().get(2);
+        assertTrue(!import3.isImportAll());
+        assertEquals(1, import3.getSymbols().size());
+        assertEquals("greet", import3.getSymbols().get(0));
     }
 }

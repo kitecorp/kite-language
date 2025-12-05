@@ -286,4 +286,114 @@ class ImportStatementTest extends RuntimeTest {
         assertEquals(6, interpreter.getVar("a"));
         assertEquals(10, interpreter.getVar("b"));
     }
+
+    // ========== Named Import Tests ==========
+
+    @Test
+    @DisplayName("should import only specified symbol with named import")
+    void namedImportSingleSymbol() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import add from "%s"
+
+                var result = add(1, 2)
+                """.formatted(mathPath));
+
+        // add should work
+        assertEquals(3, interpreter.getVar("result"));
+
+        // multiply and PI should NOT be available
+        assertFalse(interpreter.getEnv().hasVar("multiply"), "multiply should NOT be imported");
+        assertFalse(interpreter.getEnv().hasVar("PI"), "PI should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should import multiple specified symbols with named import")
+    void namedImportMultipleSymbols() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import add, PI from "%s"
+
+                var result = add(1, 2)
+                var myPi = PI
+                """.formatted(mathPath));
+
+        // add and PI should work
+        assertEquals(3, interpreter.getVar("result"));
+        assertEquals(3.14159, interpreter.getVar("myPi"));
+
+        // multiply should NOT be available
+        assertFalse(interpreter.getEnv().hasVar("multiply"), "multiply should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should error when importing non-existent symbol")
+    void namedImportNonExistentSymbol() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        var exception = assertThrows(RuntimeException.class, () -> eval("""
+                import nonExistent from "%s"
+                """.formatted(mathPath)));
+
+        assertTrue(exception.getMessage().contains("nonExistent") ||
+                   exception.getMessage().contains("not found"),
+                "Error should mention missing symbol: " + exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should mix named import with wildcard import")
+    void mixNamedAndWildcardImports() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+        String stringPath = getTestResourcePath("imports/string_utils.kite");
+
+        eval("""
+                import add from "%s"
+                import * from "%s"
+
+                var mySum = add(1, 2)
+                var msg = greet("World")
+                var greeting = DEFAULT_GREETING
+                """.formatted(mathPath, stringPath));
+
+        // add from named import should work
+        assertEquals(3, interpreter.getVar("mySum"));
+
+        // All string_utils symbols should be available via wildcard
+        assertEquals("Hello, World", interpreter.getVar("msg"));
+        assertEquals("Welcome", interpreter.getVar("greeting"));
+
+        // multiply from math should NOT be available (only add was imported)
+        assertFalse(interpreter.getEnv().hasVar("multiply"));
+    }
+
+    @Test
+    @DisplayName("should import variable with named import")
+    void namedImportVariable() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import PI from "%s"
+
+                var myPi = PI
+                """.formatted(mathPath));
+
+        assertEquals(3.14159, interpreter.getVar("myPi"));
+    }
+
+    @Test
+    @DisplayName("should import function and use with computed values")
+    void namedImportFunctionWithComputedValues() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        eval("""
+                import add, multiply from "%s"
+
+                var result = add(multiply(2, 3), multiply(4, 5))
+                """.formatted(mathPath));
+
+        // (2 * 3) + (4 * 5) = 6 + 20 = 26
+        assertEquals(26, interpreter.getVar("result"));
+    }
 }

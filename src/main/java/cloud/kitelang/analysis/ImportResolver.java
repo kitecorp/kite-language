@@ -74,7 +74,7 @@ public class ImportResolver {
             var program = readAndParse(statement.getFilePath());
             var importedEnv = visitorFactory.apply(program);
 
-            mergeEnvironment(importedEnv, currentEnv);
+            mergeEnvironment(statement, importedEnv, currentEnv);
         } finally {
             importChain.remove(filePath);
         }
@@ -126,11 +126,32 @@ public class ImportResolver {
     }
 
     /**
-     * Merges variables from source environment into target, excluding specified names.
+     * Merges variables from source environment into target.
+     * If the import statement specifies symbols, only those symbols are imported.
+     * If it's an "import all" (*), all variables are imported.
+     *
+     * @param statement  The import statement (determines which symbols to import)
+     * @param source     The source environment from the imported file
+     * @param target     The target environment to merge into
+     * @throws ImportException if a named import symbol is not found in the source
      */
-    public <T> void mergeEnvironment(Environment<T> source, Environment<T> target) {
-        for (var entry : source.getVariables().entrySet()) {
-            target.initOrAssign(entry.getKey(), entry.getValue());
+    public <T> void mergeEnvironment(ImportStatement statement, Environment<T> source, Environment<T> target) {
+        if (statement.isImportAll()) {
+            // Import all symbols
+            for (var entry : source.getVariables().entrySet()) {
+                target.initOrAssign(entry.getKey(), entry.getValue());
+            }
+        } else {
+            // Import only specified symbols
+            var sourceVars = source.getVariables();
+            for (var symbol : statement.getSymbols()) {
+                if (!sourceVars.containsKey(symbol)) {
+                    throw new ImportException(
+                            "Symbol '" + symbol + "' not found in '" + statement.getFilePath() + "'. " +
+                            "Available symbols: " + sourceVars.keySet());
+                }
+                target.initOrAssign(symbol, sourceVars.get(symbol));
+            }
         }
     }
 

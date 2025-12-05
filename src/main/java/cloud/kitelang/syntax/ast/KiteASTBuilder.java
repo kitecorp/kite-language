@@ -356,7 +356,21 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
     public ImportStatement visitImportStatement(ImportStatementContext ctx) {
         // Extract file path from string literal
         String filePath = extractStringValue(ctx.stringLiteral());
-        return ImportStatement.of(filePath);
+
+        // Check if this is "import * from" or "import symbols from"
+        if (ctx.MULTIPLY() != null) {
+            // import * from "file"
+            return ImportStatement.all(filePath);
+        } else if (ctx.importSymbolList() != null) {
+            // import symbol1, symbol2 from "file"
+            var symbols = ctx.importSymbolList().IDENTIFIER().stream()
+                    .map(id -> id.getText())
+                    .toList();
+            return ImportStatement.named(filePath, symbols);
+        }
+
+        // Fallback to import all
+        return ImportStatement.all(filePath);
     }
 
     /**
