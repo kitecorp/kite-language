@@ -1,5 +1,6 @@
 package cloud.kitelang.semantics;
 
+import cloud.kitelang.analysis.ImportResolver;
 import cloud.kitelang.analysis.visitors.StackVisitor;
 import cloud.kitelang.analysis.visitors.SyntaxPrinter;
 import cloud.kitelang.execution.CycleDetectionSupport;
@@ -787,42 +788,19 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     @Override
     public Type visit(ImportStatement statement) {
-        var filePath = Paths.get(statement.getFilePath()).toAbsolutePath().normalize().toString();
-
-        // Check for circular imports (would need an importChain field like Interpreter has)
-        if (importedFiles.contains(filePath)) {
-            throw new TypeError("Circular import detected: " + filePath);
-        }
-
-        // Validate file exists
-        if (!Files.exists(Paths.get(statement.getFilePath()))) {
-            throw new TypeError("Import file not found: " + statement.getFilePath());
-        }
-
-        importedFiles.add(filePath);
+        var resolver = new ImportResolver(parser, importedFiles);
 
         try {
-            // Parse and type-check the imported file
-            var content = Files.readString(Paths.get(statement.getFilePath()));
-            var program = parser.parse(content);
-
-            // Type-check imported program with a child TypeChecker
-            var importChecker = new TypeChecker(new TypeEnvironment("import", env), printer, importedFiles);
-
-            importChecker.visit(program);
-
-            // Merge only user-defined types (exclude stdlib that was auto-initialized)
-            for (var entry : importChecker.getEnv().getVariables().entrySet()) {
-                env.initOrAssign(entry.getKey(), entry.getValue());
-            }
-
-            return ValueType.Void;
-        } catch (IOException e) {
-            throw new TypeError("Failed to read import: " + e.getMessage());
-        } finally {
-            // Remove from import chain after processing (allows same file to be imported in different branches)
-            importedFiles.remove(filePath);
+            resolver.resolve(statement, env, Set.of(), program -> {
+                var importChecker = new TypeChecker(new TypeEnvironment("import", env), printer, importedFiles);
+                importChecker.visit(program);
+                return importChecker.getEnv();
+            });
+        } catch (ImportResolver.ImportException e) {
+            throw new TypeError(e.getMessage());
         }
+
+        return ValueType.Void;
     }
 
     @Override

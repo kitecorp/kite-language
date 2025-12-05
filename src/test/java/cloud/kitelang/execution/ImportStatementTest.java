@@ -91,7 +91,9 @@ class ImportStatementTest extends RuntimeTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> eval(code));
         assertTrue(exception.getMessage().contains("Circular import detected"),
                 exception.getMessage());
-        assertTrue(exception.getMessage().contains("circular_a.kite -> /Users/mimedia/IdeaProjects/kite/lang/src/test/resources/circular_b.kite -> /Users/mimedia/IdeaProjects/kite/lang/src/test/resources/circular_a.kite"),
-                exception.getMessage());
+        // Verify the chain includes both files (path-agnostic check)
+        assertTrue(exception.getMessage().contains("circular_a.kite") &&
+                   exception.getMessage().contains("circular_b.kite"),
+                "Expected circular import chain with both files: " + exception.getMessage());
     }
 }

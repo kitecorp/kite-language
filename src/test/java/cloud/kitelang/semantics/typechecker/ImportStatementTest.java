@@ -118,6 +118,8 @@ class ImportStatementTest extends CheckerTest {
         // valueB should be accessible and typed
         var valueBType = checker.getEnv().lookup("valueB");
         assertNotNull(valueBType, "Variable 'valueB' should be imported from nested file");
+        var valueAType = checker.getEnv().lookup("valueA");
+        assertNotNull(valueAType, "Variable 'valueA' should be imported from nested file");
     }
 
     @Test

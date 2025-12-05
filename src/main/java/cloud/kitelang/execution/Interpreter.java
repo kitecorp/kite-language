@@ -1,6 +1,7 @@
 package cloud.kitelang.execution;
 
 import cloud.kitelang.ContextStack;
+import cloud.kitelang.analysis.ImportResolver;
 import cloud.kitelang.analysis.visitors.StackVisitor;
 import cloud.kitelang.analysis.visitors.SyntaxPrinter;
 import cloud.kitelang.execution.decorators.*;
@@ -546,57 +547,20 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(ImportStatement statement) {
-        try {
-            // Normalize the file path to absolute path for cycle detection
-            var filePath = Paths.get(statement.getFilePath()).toAbsolutePath().normalize().toString();
+        var resolver = new ImportResolver(parser, importChain);
 
-            // Check for circular imports
-            if (importChain.contains(filePath)) {
-                var chain = new ArrayList<>(importChain);
-                chain.add(filePath);
-                throw new RuntimeException("Circular import detected: " + String.join(" -> ", chain));
-            }
+        resolver.resolve(statement, env, Set.of(), program -> {
+            // Resolve scopes in the imported program
+            var scopeResolver = new ScopeResolver();
+            scopeResolver.resolve(program);
 
-            // Add this file to the import chain
-            importChain.add(filePath);
+            // Create a new interpreter with shared import chain
+            var importInterpreter = new Interpreter(new Environment<>("import", env), printer, importChain);
+            importInterpreter.visit(program);
+            return importInterpreter.getEnv();
+        });
 
-            try {
-                // Read the file content
-                String content = Files.readString(Paths.get(statement.getFilePath()));
-
-                // Parse the file into an AST
-                var program = parser.parse(content);
-
-                // Resolve scopes in the imported program
-                var scopeResolver = new ScopeResolver();
-                scopeResolver.resolve(program);
-
-                // Create a new interpreter with shared import chain
-                var importInterpreter = new Interpreter(new Environment<>("import", env), printer, importChain);
-
-                // Get the built-in function names from the new interpreter to exclude them from import
-                var stdlibNames = new HashSet<>(importInterpreter.getEnv().getVariables().keySet());
-
-                // Execute the program in the isolated environment
-                importInterpreter.visit(program);
-
-                // Merge only user-defined variables (exclude stdlib functions that were auto-initialized)
-                var importedEnv = importInterpreter.getEnv();
-                for (var entry : importedEnv.getVariables().entrySet()) {
-                    // Skip stdlib functions that were auto-initialized in the constructor
-                    if (!stdlibNames.contains(entry.getKey())) {
-                        env.initOrAssign(entry.getKey(), entry.getValue());
-                    }
-                }
-
-                return null;
-            } finally {
-                // Remove this file from the import chain after execution completes
-                importChain.remove(filePath);
-            }
-        } catch (java.io.IOException e) {
-            throw new RuntimeException("Cannot import file '" + statement.getFilePath() + "': " + e.getMessage());
-        }
+        return null;
     }
 
     @Override
