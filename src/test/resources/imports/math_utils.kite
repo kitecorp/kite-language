@@ -1,0 +1,10 @@
+// Math utility functions
+fun add(number a, number b) number {
+    return a + b
+}
+
+fun multiply(number a, number b) number {
+    return a * b
+}
+
+var PI = 3.14159

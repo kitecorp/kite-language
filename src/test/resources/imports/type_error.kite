@@ -1,0 +1,4 @@
+// File with a type error - assigning string to number
+fun badFunction(number x) number {
+    return "not a number"
+}

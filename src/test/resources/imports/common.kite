@@ -1,0 +1,7 @@
+// Common shared utilities - imported by both diamond_left and diamond_right
+var SHARED_VALUE = 42
+var SHARED_NAME = "common"
+
+fun identity(number x) number {
+    return x
+}

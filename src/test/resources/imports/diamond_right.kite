@@ -1,0 +1,8 @@
+// Right side of diamond dependency
+import * from "src/test/resources/imports/common.kite"
+
+var RIGHT_VALUE = SHARED_VALUE + 20
+
+fun rightProcess(number x) number {
+    return identity(x) * 3
+}

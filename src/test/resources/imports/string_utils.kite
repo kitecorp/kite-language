@@ -1,0 +1,10 @@
+// String utility functions
+fun greet(string name) string {
+    return "Hello, " + name
+}
+
+fun shout(string msg) string {
+    return msg + "!"
+}
+
+var DEFAULT_GREETING = "Welcome"

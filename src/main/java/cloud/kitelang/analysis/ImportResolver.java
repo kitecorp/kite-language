@@ -115,7 +115,7 @@ public class ImportResolver {
     public Program readAndParse(String filePath) {
         var normalizedPath = normalizeFilePath(filePath);
 
-        return PARSE_CACHE.computeIfAbsent(normalizedPath, path -> {
+        return PARSE_CACHE.computeIfAbsent(normalizedPath, _ -> {
             try {
                 var content = Files.readString(Path.of(filePath));
                 return parser.parse(content);

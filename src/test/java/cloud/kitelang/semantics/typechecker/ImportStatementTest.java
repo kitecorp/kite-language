@@ -206,4 +206,143 @@ class ImportStatementTest extends CheckerTest {
         assertNotNull(doubleType, "User-defined 'double' function should be imported");
         assertNotNull(greetingType, "User-defined 'greeting' variable should be imported");
     }
+
+    // ========== Complex Import Tests ==========
+
+    @Test
+    @DisplayName("should handle multiple imports in same file")
+    void multipleImportsInSameFile() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+        String stringPath = getTestResourcePath("imports/string_utils.kite");
+
+        eval("""
+                import * from "%s"
+                import * from "%s"
+
+                var sum = add(1, 2)
+                var message = greet("World")
+                var pi = PI
+                var greeting = DEFAULT_GREETING
+                """.formatted(mathPath, stringPath));
+
+        // Math functions should be available
+        var addType = checker.getEnv().lookup("add");
+        assertNotNull(addType, "Function 'add' should be imported");
+        assertInstanceOf(FunType.class, addType);
+
+        // String functions should be available
+        var greetType = checker.getEnv().lookup("greet");
+        assertNotNull(greetType, "Function 'greet' should be imported");
+        assertInstanceOf(FunType.class, greetType);
+
+        // Variables from both files should be available
+        assertEquals(ValueType.Number, checker.getEnv().lookup("sum"));
+        assertEquals(ValueType.String, checker.getEnv().lookup("message"));
+        assertEquals(ValueType.Number, checker.getEnv().lookup("pi"));
+        assertEquals(ValueType.String, checker.getEnv().lookup("greeting"));
+    }
+
+    @Test
+    @DisplayName("should handle diamond dependency pattern")
+    void diamondDependencyPattern() {
+        String topPath = getTestResourcePath("imports/diamond_top.kite");
+
+        eval("""
+                import * from "%s"
+
+                var combined = COMBINED
+                var result = process(5)
+                """.formatted(topPath));
+
+        // All symbols from the diamond should be available
+        assertNotNull(checker.getEnv().lookup("SHARED_VALUE"), "SHARED_VALUE from common should be available");
+        assertNotNull(checker.getEnv().lookup("LEFT_VALUE"), "LEFT_VALUE from diamond_left should be available");
+        assertNotNull(checker.getEnv().lookup("RIGHT_VALUE"), "RIGHT_VALUE from diamond_right should be available");
+        assertNotNull(checker.getEnv().lookup("COMBINED"), "COMBINED from diamond_top should be available");
+
+        // Functions should be available
+        assertNotNull(checker.getEnv().lookup("identity"), "identity from common should be available");
+        assertNotNull(checker.getEnv().lookup("leftProcess"), "leftProcess should be available");
+        assertNotNull(checker.getEnv().lookup("rightProcess"), "rightProcess should be available");
+        assertNotNull(checker.getEnv().lookup("process"), "process should be available");
+
+        // Types should be correct
+        assertEquals(ValueType.Number, checker.getEnv().lookup("combined"));
+        assertEquals(ValueType.Number, checker.getEnv().lookup("result"));
+    }
+
+    @Test
+    @DisplayName("should cache shared imports in diamond pattern")
+    void diamondPatternUsesCache() {
+        String topPath = getTestResourcePath("imports/diamond_top.kite");
+
+        assertEquals(0, ImportResolver.getCacheSize(), "Cache should be empty initially");
+
+        eval("""
+                import * from "%s"
+                """.formatted(topPath));
+
+        // Cache should contain: diamond_top, diamond_left, diamond_right, common
+        // common.kite is imported by both left and right but should only be parsed once
+        int cacheSize = ImportResolver.getCacheSize();
+        assertEquals(4, cacheSize, "Cache should have exactly 4 entries (common parsed once)");
+    }
+
+    @Test
+    @DisplayName("should propagate type errors from imported files")
+    void propagateTypeErrorsFromImports() {
+        String errorPath = getTestResourcePath("imports/type_error.kite");
+
+        var exception = assertThrows(TypeError.class, () -> eval("""
+                import * from "%s"
+                """.formatted(errorPath)));
+
+        assertNotNull(exception, "TypeError should be thrown for type errors in imported file");
+    }
+
+    @Test
+    @DisplayName("should allow importing same file multiple times explicitly")
+    void importSameFileMultipleTimes() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+
+        // Importing the same file twice should work (idempotent)
+        eval("""
+                import * from "%s"
+                import * from "%s"
+
+                var result = add(1, multiply(2, 3))
+                """.formatted(mathPath, mathPath));
+
+        assertEquals(ValueType.Number, checker.getEnv().lookup("result"));
+    }
+
+    @Test
+    @DisplayName("should type check function calls across multiple imports")
+    void typeCheckAcrossMultipleImports() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+        String stringPath = getTestResourcePath("imports/string_utils.kite");
+
+        // Using math function with string should fail
+        assertThrows(TypeError.class, () -> eval("""
+                import * from "%s"
+                import * from "%s"
+
+                var bad = add("hello", "world")
+                """.formatted(mathPath, stringPath)));
+    }
+
+    @Test
+    @DisplayName("should type check imported function return types used in expressions")
+    void typeCheckImportedReturnTypesInExpressions() {
+        String mathPath = getTestResourcePath("imports/math_utils.kite");
+        String stringPath = getTestResourcePath("imports/string_utils.kite");
+
+        // Using number function result where string expected should fail
+        assertThrows(TypeError.class, () -> eval("""
+                import * from "%s"
+                import * from "%s"
+
+                var result = greet(add(1, 2))
+                """.formatted(mathPath, stringPath)));
+    }
 }
