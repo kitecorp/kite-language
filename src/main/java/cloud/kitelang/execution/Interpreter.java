@@ -656,7 +656,7 @@ public final class Interpreter extends StackVisitor<Object> {
         // Use instanceEnv so component properties can be referenced in expressions
         for (var stmt : expression.getArguments()) {
             if (stmt instanceof ExpressionStatement exprStmt) {
-                handleAssignment(typeName, stmt, exprStmt, instanceEnv);
+                handleAssignment(typeName, stmt, exprStmt, instanceEnv, inputDeclarations);
             } else {
                 executeBlock(stmt, instanceEnv);
             }
@@ -668,7 +668,8 @@ public final class Interpreter extends StackVisitor<Object> {
         return componentValue;
     }
 
-    private void handleAssignment(String typeName, Statement stmt, ExpressionStatement exprStmt, Environment<Object> instanceEnv) {
+    private void handleAssignment(String typeName, Statement stmt, ExpressionStatement exprStmt,
+                                    Environment<Object> instanceEnv, Map<String, InputDeclaration> inputDeclarations) {
         if (exprStmt.getStatement() instanceof AssignmentExpression assignment) {
             // Handle assignment: property = value
             var propertyName = getPropertyName(assignment.getLeft());
@@ -679,12 +680,74 @@ public final class Interpreter extends StackVisitor<Object> {
             var value = executeBlock(assignment.getRight(), instanceEnv);
             instanceEnv.assign(propertyName, value);
 
-            // TODO: Re-apply decorators from the input declaration for validation
-            // This is complex because we need to create temp annotations with correct targets
-            // For now, validation happens only on the declaration's default value
+            // Re-apply decorators from the input declaration for validation
+            revalidateInputDecorators(inputDeclarations, propertyName, value, instanceEnv);
         } else {
             executeBlock(stmt, instanceEnv);
         }
+    }
+
+    /**
+     * Re-applies decorators (like @validate) when a component input is overridden.
+     * Creates a temporary InputDeclaration with the new value and runs validation.
+     */
+    private void revalidateInputDecorators(Map<String, InputDeclaration> inputDeclarations,
+                                           String propertyName, Object value, Environment<Object> instanceEnv) {
+        var inputDecl = inputDeclarations.get(propertyName);
+        if (inputDecl == null || !inputDecl.hasAnnotations()) {
+            return;
+        }
+
+        // Create a value expression from the evaluated value
+        var valueExpr = createValueExpression(value);
+        var tempInput = inputDecl.withInit(valueExpr);
+
+        // Create new annotations with the temp input as target
+        var tempAnnotations = new LinkedHashSet<AnnotationDeclaration>();
+        for (var annotation : inputDecl.getAnnotations()) {
+            var tempAnnotation = annotation.copy();
+            tempAnnotation.setTarget(tempInput);
+            tempAnnotations.add(tempAnnotation);
+        }
+
+        // Execute annotations in instanceEnv context
+        var previousEnv = this.env;
+        try {
+            this.env = instanceEnv;
+            visitAnnotations(tempAnnotations);
+        } finally {
+            this.env = previousEnv;
+        }
+    }
+
+    /**
+     * Creates an Expression wrapper around an already-evaluated value.
+     * Used for passing evaluated values to decorators that expect an Expression.
+     */
+    private Expression createValueExpression(Object value) {
+        return switch (value) {
+            case String s -> StringLiteral.of(s);
+            case Integer i -> NumberLiteral.of(i);
+            case Double d -> NumberLiteral.of(d);
+            case Boolean b -> BooleanLiteral.bool(b);
+            case List<?> list -> {
+                var items = list.stream()
+                        .map(item -> (Literal) createValueExpression(item))
+                        .toList();
+                yield ArrayExpression.array(items);
+            }
+            case Map<?, ?> map -> {
+                var properties = new ArrayList<ObjectLiteral>();
+                for (var entry : map.entrySet()) {
+                    var key = StringLiteral.of(entry.getKey().toString());
+                    var val = createValueExpression(entry.getValue());
+                    properties.add(ObjectLiteral.object(key, val));
+                }
+                yield ObjectExpression.object(properties);
+            }
+            case null -> NullLiteral.nullLiteral();
+            default -> throw new RuntimeException("Cannot create expression for value: " + value);
+        };
     }
 
     @Override

@@ -440,7 +440,9 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         // Update InputDeclaration type if it differs (important for reference types set by parser)
-        if (expression.getType().getType().getKind() != declaredType.getKind()) {
+        // Skip for ArrayTypeIdentifier - arrays resolve to ArrayType which breaks re-visiting
+        if (!(expression.getType() instanceof ArrayTypeIdentifier) &&
+                expression.getType().getType().getKind() != declaredType.getKind()) {
             expression.getType().setType(declaredType);
         }
 
@@ -482,7 +484,9 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         // Update OutputDeclaration type if it differs (important for reference types set by parser)
-        if (expression.getType().getType().getKind() != declaredType.getKind()) {
+        // Skip for ArrayTypeIdentifier - arrays resolve to ArrayType which breaks re-visiting
+        if (!(expression.getType() instanceof ArrayTypeIdentifier) &&
+                expression.getType().getType().getKind() != declaredType.getKind()) {
             expression.getType().setType(declaredType);
         }
 

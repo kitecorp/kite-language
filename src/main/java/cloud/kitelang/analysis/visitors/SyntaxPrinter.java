@@ -452,7 +452,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(Identifier expression) {
         return switch (expression) {
             case ParameterIdentifier p -> theme.type(formatParameter(p));
-            case ArrayTypeIdentifier a -> theme.type(visit(a.getType()));
+            case ArrayTypeIdentifier a -> theme.type(a.getType().getValue() + "[]");
             case TypeIdentifier t -> theme.type(t.string());
             case PluginIdentifier p -> theme.type(p.string());
             case null -> null;
