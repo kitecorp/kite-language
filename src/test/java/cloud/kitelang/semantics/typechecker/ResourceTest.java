@@ -183,7 +183,6 @@ public class ResourceTest extends CheckerTest {
                 
                 }
                 """);
-        log.warn(res);
         var schema = (SchemaType) checker.getEnv().get("vm");
 
         var resource = (ResourceType) checker.getEnv().get("main");

@@ -16,7 +16,6 @@ public class BlockTest extends RuntimeTest {
                 x*y+30
                 """);
         assertEquals(230, res);
-        log.warn((res));
     }
     @Test
     void nestedBlock() {
@@ -30,7 +29,6 @@ public class BlockTest extends RuntimeTest {
                 }
                 """);
         assertEquals(10, res);
-        log.warn((res));
     }
 
     @Test
@@ -45,6 +43,5 @@ public class BlockTest extends RuntimeTest {
                 }
                 """);
         assertEquals(20, res);
-        log.warn((res));
     }
 }

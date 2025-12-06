@@ -26,7 +26,6 @@ public class LogicalTest extends ParserTest {
                         binary("y", 0, "<")
                 )
         ));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -39,7 +38,6 @@ public class LogicalTest extends ParserTest {
                         binary("y", 0, "<")
                 )
         ));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -53,7 +51,6 @@ public class LogicalTest extends ParserTest {
                                 binary("<", "y", 0),
                                 binary("<", "z", 0))
                 )));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -64,7 +61,6 @@ public class LogicalTest extends ParserTest {
                 assignment("=", Identifier.id("x"),
                         logical("||", bool(true), bool(false))
                 )));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -75,7 +71,6 @@ public class LogicalTest extends ParserTest {
                 assignment("=", Identifier.id("x"),
                         logical("&&", bool(true), bool(false))
                 )));
-        log.info(res);
         assertEquals(expected, res);
     }
 

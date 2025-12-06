@@ -20,7 +20,6 @@ public class RelationalTest extends ParserTest {
         var res = parse("x>2");
         var expected = program(binary("x", 2, ">"));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -28,7 +27,6 @@ public class RelationalTest extends ParserTest {
         var res = parse("x>=2");
         var expected = program(binary("x", 2, ">="));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -36,7 +34,6 @@ public class RelationalTest extends ParserTest {
         var res = parse("x<2");
         var expected = program(binary("x", 2, "<"));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -44,14 +41,12 @@ public class RelationalTest extends ParserTest {
         var res = parse("x<=2");
         var expected = program(binary("x", 2, "<="));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
     void testLessLowerPrecedenceThanAdditive() {
         var res = parse("x+2 > 10");
         var expected = program(BinaryExpression.binary(binary("x", 2, "+"), 10, ">"));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -59,7 +54,6 @@ public class RelationalTest extends ParserTest {
     void testLessLowerPrecedenceThanAdditiveTrue() {
         var res = parse("x > 2 == true");
         var expected = program(BinaryExpression.binary(binary("x", 2, ">"), true, "=="));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -67,7 +61,6 @@ public class RelationalTest extends ParserTest {
     void testLessLowerPrecedenceThanAdditiveFalse() {
         var res = parse("x > 2 == false");
         var expected = program(BinaryExpression.binary(binary("x", 2, ">"), false, "=="));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -75,7 +68,6 @@ public class RelationalTest extends ParserTest {
     void testLessLowerPrecedenceThanAdditiveNotFalse() {
         var res = parse("x > 2 != false");
         var expected = program(BinaryExpression.binary(binary("x", 2, ">"), false, "!="));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -83,7 +75,6 @@ public class RelationalTest extends ParserTest {
     void testLessLowerPrecedenceThanAdditiveNotTrue() {
         var res = parse("x > 2 != true");
         var expected = program(BinaryExpression.binary(binary("x", 2, ">"), true, "!="));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -91,7 +82,6 @@ public class RelationalTest extends ParserTest {
     void testLogicalAnd() {
         var res = parse("x > 0 && y < 0");
         var expected = program(and(binary("x", 0, ">"), binary("y", 0, "<")));
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -104,7 +94,6 @@ public class RelationalTest extends ParserTest {
                         binary("y", 0, "<")
                 )
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 

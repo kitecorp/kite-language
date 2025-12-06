@@ -20,7 +20,6 @@ public class MemberExpressionTest extends ParserTest {
         var res = parse("x.y");
         var expected = program(expressionStatement(member("x", "y")));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -30,7 +29,6 @@ public class MemberExpressionTest extends ParserTest {
                 assign(member("x", "y"), 1, "="))
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -40,7 +38,6 @@ public class MemberExpressionTest extends ParserTest {
                 member(true, "x", 0), 1, "="))
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -51,7 +48,6 @@ public class MemberExpressionTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -63,7 +59,6 @@ public class MemberExpressionTest extends ParserTest {
                         1)
         ));
         assertEquals(expected, res);
-        log.info(res);
     }
 
 }

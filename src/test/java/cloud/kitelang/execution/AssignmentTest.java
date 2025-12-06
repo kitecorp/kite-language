@@ -342,7 +342,6 @@ public class AssignmentTest extends RuntimeTest {
                 x = 1 <= 2
                 """);
         assertTrue(res);
-        log.warn(res);
     }
 
 

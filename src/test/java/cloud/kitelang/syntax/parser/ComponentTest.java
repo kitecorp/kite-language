@@ -25,7 +25,6 @@ public class ComponentTest extends ParserTest {
         var res = parse("component Backend api {}");
         var expected = program(component("Backend", "api", block()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -34,7 +33,6 @@ public class ComponentTest extends ParserTest {
         var res = parse("component 'Backend' api {}");
         var expected = program(component("'Backend'", "api", block()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -47,7 +45,6 @@ public class ComponentTest extends ParserTest {
                 "Backend"
                 """, "api", block()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -63,7 +60,6 @@ public class ComponentTest extends ParserTest {
         var res = parse("component Aws.Storage api {}");
         var expected = program(component("Aws.Storage", "api", block()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Disabled("Component type should not be a string. Use an import statement")
@@ -72,7 +68,6 @@ public class ComponentTest extends ParserTest {
         var res = parse("component 'Aws.Storage/S3.Bucket' api {}");
         var expected = program(component("'Aws.Storage/S3.Bucket'", "api", block()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -81,7 +76,6 @@ public class ComponentTest extends ParserTest {
         var res = parse("component 'Aws.Storage/S3.Bucket@2022-01-20' api {}");
         var expected = program(component("'Aws.Storage/S3.Bucket@2022-01-20'", "api", block()));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -95,7 +89,6 @@ public class ComponentTest extends ParserTest {
                 component("Aws.Storage.S3.Bucket", "api",
                         block(assign("name", "bucket-prod"))));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test

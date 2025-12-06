@@ -43,7 +43,6 @@ public class ResourceTest extends RuntimeTest {
                 
                 }
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
 
         assertNotNull(resource);
@@ -66,7 +65,6 @@ public class ResourceTest extends RuntimeTest {
                     maxCount = main.maxCount
                 }
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
 
         assertNotNull(resource);
@@ -126,7 +124,6 @@ public class ResourceTest extends RuntimeTest {
                 
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
 
         var resource = interpreter.getInstance("main");
@@ -148,7 +145,6 @@ public class ResourceTest extends RuntimeTest {
                 var z = main.x
                 z
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
         assertSame(2, resource.getProperties().get("x"));
         // make sure main's x has been changed
@@ -194,7 +190,6 @@ public class ResourceTest extends RuntimeTest {
                     x = 3
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
         var resource = interpreter.getInstance("main");
 
@@ -218,7 +213,6 @@ public class ResourceTest extends RuntimeTest {
                     x = 3
                 }
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
 
         assertInstanceOf(ResourceValue.class, resource);
@@ -245,7 +239,7 @@ public class ResourceTest extends RuntimeTest {
     }
 
     @Test
-    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    @DisplayName("Resolve var name interpolation inside resource statement")
     void testInterpolationSingleQuotes() {
         var res = eval("""
                 schema vm {
@@ -253,7 +247,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 var name = 'prod'
                 resource vm main {
-                  name     = '$name'
+                  name     = "$name"
                 }
                 """);
 
@@ -265,7 +259,7 @@ public class ResourceTest extends RuntimeTest {
     }
 
     @Test
-    @DisplayName("Resolve var name using double quotes string interpolation inside if statement")
+    @DisplayName("Resolve var name string interpolation inside resource")
     void testInterpolationSingleQuotesCurlyBraces() {
         var res = eval("""
                 schema vm {
@@ -273,7 +267,7 @@ public class ResourceTest extends RuntimeTest {
                 }
                 var name = 'prod'
                 resource vm main {
-                  name     = '${name}'
+                  name     = "${name}"
                 }
                 """);
 

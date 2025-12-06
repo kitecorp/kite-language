@@ -576,10 +576,10 @@ public final class TypeChecker extends StackVisitor<Type> {
             throw new TypeError(format("Component '{0}' does not have member '{1}'", componentType.getType(), name));
         }
 
-        // If accessing a component INSTANCE, only allow outputs (not resources or inputs)
+        // If accessing a component INSTANCE, only allow inputs and outputs (not resources)
         if (member instanceof ResourceType) {
             throw new TypeError(
-                    format("Cannot access resource `{0}` from component instance `{1}`. Only outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
+                    format("Cannot access resource `{0}` from component instance `{1}`. Only inputs and outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
         }
 
 //        // Block direct input access - inputs are private

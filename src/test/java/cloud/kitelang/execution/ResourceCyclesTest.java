@@ -27,7 +27,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     maxCount = main.maxCount
                 }
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
         assertNotNull(resource);
 
@@ -56,7 +55,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     maxCount = 3
                 }
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
         assertNotNull(resource);
 
@@ -86,7 +84,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     maxCount = 3
                 }
                 """);
-        log.warn((res));
         var resource = interpreter.getInstance("main");
         assertNotNull(resource);
 
@@ -116,7 +113,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                 }
 
                 """);
-        log.warn((res));
         var main = interpreter.getInstance("main");
         assertNotNull(main);
         assertEquals(2, main.argVal("maxCount"));
@@ -147,7 +143,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     minCount = 1
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
@@ -187,7 +182,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     maxCount = 2
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
@@ -231,7 +225,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     minCount = 3
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
@@ -283,7 +276,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     maxCount = 3
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);
@@ -334,7 +326,6 @@ public class ResourceCyclesTest extends RuntimeTest {
                     minCount = 2
                 }
                 """);
-        log.warn((res));
         var schema = interpreter.getSchema("vm");
 
         assertNotNull(schema);

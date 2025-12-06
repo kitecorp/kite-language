@@ -1,5 +1,6 @@
 package cloud.kitelang.syntax.ast.expressions;
 
+import cloud.kitelang.syntax.literals.SymbolIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -34,8 +35,29 @@ public final class StringInterpolation extends Expression {
     /**
      * Factory method to create a StringInterpolation from parts.
      */
-    public static StringInterpolation of(List<Part> parts) {
+    public static StringInterpolation interpolation(List<Part> parts) {
         return new StringInterpolation(parts);
+    }
+
+    /**
+     * Factory method to create a StringInterpolation from parts.
+     */
+    public static StringInterpolation interpolation(String string, Expression... expressions) {
+        var text = new StringInterpolation();
+        text.addText(string);
+        for (var it : expressions) {
+            text.addExpression(it);
+        }
+        return text;
+    }
+
+    public static StringInterpolation interpolation(String string, String... expressions) {
+        var text = new StringInterpolation();
+        text.addText(string);
+        for (var it : expressions) {
+            text.addExpression(SymbolIdentifier.id(it));
+        }
+        return text;
     }
 
     public void addText(String text) {

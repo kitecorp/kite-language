@@ -17,7 +17,6 @@ public class UnaryTest extends RuntimeTest {
                     ++x
                 }
                 """);
-        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -29,7 +28,6 @@ public class UnaryTest extends RuntimeTest {
                     --x
                 }
                 """);
-        log.warn((res));
         assertEquals(0, res);
     }
 
@@ -41,7 +39,6 @@ public class UnaryTest extends RuntimeTest {
                     ++x
                 }
                 """);
-        log.warn((res));
         assertEquals(2.1, res);
     }
 
@@ -53,7 +50,6 @@ public class UnaryTest extends RuntimeTest {
                     --x
                 }
                 """);
-        log.warn((res));
         assertEquals(0.1, res);
     }
 
@@ -65,7 +61,6 @@ public class UnaryTest extends RuntimeTest {
                     -x
                 }
                 """);
-        log.warn((res));
         assertEquals(-1, res);
     }
 
@@ -77,7 +72,6 @@ public class UnaryTest extends RuntimeTest {
                     -x
                 }
                 """);
-        log.warn((res));
         assertEquals(-1.5, res);
     }
 
@@ -89,7 +83,6 @@ public class UnaryTest extends RuntimeTest {
                     !x 
                 }
                 """);
-        log.warn((res));
         assertTrue(res);
     }
 
@@ -101,7 +94,6 @@ public class UnaryTest extends RuntimeTest {
                     !x 
                 }
                 """);
-        log.warn((res));
         assertFalse(res);
     }
 

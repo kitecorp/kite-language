@@ -51,6 +51,17 @@ public class StringLiteral extends Literal {
         return new StringLiteral(value);
     }
 
+    /**
+     * Creates a literal string that will NOT be interpolated.
+     * Use this for single-quoted strings where $var should remain as literal text.
+     */
+    public static StringLiteral literal(String value) {
+        var literal = new StringLiteral();
+        literal.value = StringLiteralUtils.quote(value);
+        // Don't extract interpolation vars - this is a literal string
+        return literal;
+    }
+
     public static StringLiteral string(Object value) {
         if (value instanceof String s) {
             return new StringLiteral(s);

@@ -26,7 +26,6 @@ public class DependsOnTests extends DecoratorTests {
                 }
                 """);
         Assertions.assertTrue(res.hasDependency("first"));
-        log.warn(res.getDependencies());
     }
 
     @Test
@@ -54,7 +53,6 @@ public class DependsOnTests extends DecoratorTests {
                 """);
         Assertions.assertTrue(res.hasDependency("first"));
         Assertions.assertTrue(res.hasDependency("main"));
-        log.warn(res.getDependencies());
     }
 
 
@@ -77,7 +75,6 @@ public class DependsOnTests extends DecoratorTests {
         Assertions.assertTrue(res.hasDependency("first"));
         Assertions.assertTrue(res.hasDependency("main"));
         Assertions.assertTrue(res.hasDependency("third"));
-        log.warn(res.getDependencies());
     }
 
     @Test

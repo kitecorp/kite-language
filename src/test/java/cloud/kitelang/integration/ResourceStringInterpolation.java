@@ -23,7 +23,7 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
     }
 
     @Test
-    void interpolationOfCount() {
+    void interpolationInterpolationCount() {
         eval("""
                     schema vm { string name; number size; }
                 

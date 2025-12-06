@@ -22,7 +22,6 @@ public class AssignmentTest extends ParserTest {
         var res = parse("x=2");
         var expected = program(expressionStatement(assign("=", id("x"), of(2))));
         assertEquals(expected, res);
-        log.warn((res));
     }
 
 //    @Test
@@ -30,7 +29,6 @@ public class AssignmentTest extends ParserTest {
 //        var res = parse("x={2}");
 //        var expected = program(expressionStatement(assign("=", id("x"), block(expressionStatement(of(2))))));
 //        assertEquals(expected, res);
-//        log.warn((res));
 //    }
 
 //    @Test
@@ -45,7 +43,6 @@ public class AssignmentTest extends ParserTest {
 //                assign("=", id("x"),
 //                        block(expressionStatement(assign("=", id("y"), number(2))),
 //                                expressionStatement(number(2))))));
-//        log.warn((res));
 //        assertEquals(expected, res);
 //    }
 
@@ -57,7 +54,6 @@ public class AssignmentTest extends ParserTest {
                         assign("=", id("y"), number(2))
                 )));
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -72,7 +68,6 @@ public class AssignmentTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -84,7 +79,6 @@ public class AssignmentTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test

@@ -20,7 +20,6 @@ public class WhileTest extends RuntimeTest {
                     x 
                 }
                 """);
-        log.warn((res));
         assertEquals(5, res);
     }
 
@@ -35,7 +34,6 @@ public class WhileTest extends RuntimeTest {
                     x 
                 }
                 """);
-        log.warn((res));
         assertEquals(6, res);
     }
 

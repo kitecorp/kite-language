@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import static cloud.kitelang.syntax.ast.expressions.ArrayExpression.array;
 import static cloud.kitelang.syntax.ast.expressions.AssignmentExpression.assign;
+import static cloud.kitelang.syntax.ast.expressions.MemberExpression.member;
 import static cloud.kitelang.syntax.ast.expressions.BinaryExpression.binary;
 import static cloud.kitelang.syntax.ast.expressions.ObjectExpression.objectExpression;
 import static cloud.kitelang.syntax.ast.expressions.ResourceStatement.resource;
+import static cloud.kitelang.syntax.ast.expressions.StringInterpolation.interpolation;
 import static cloud.kitelang.syntax.ast.expressions.VarDeclaration.var;
 import static cloud.kitelang.syntax.ast.statements.BlockExpression.block;
 import static cloud.kitelang.syntax.ast.statements.ExpressionStatement.expressionStatement;
@@ -43,7 +45,6 @@ public class ForLoopTest extends ParserTest {
                         )).build()
 
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -65,7 +66,6 @@ public class ForLoopTest extends ParserTest {
                         )))
                         .build()
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -85,7 +85,6 @@ public class ForLoopTest extends ParserTest {
                                 .build()
                 ))
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -115,7 +114,7 @@ public class ForLoopTest extends ParserTest {
     @Test
     void arrayAssignedToVar() {
         var res = parse("""
-                var x = [for index in 1..5: 'item-$index']
+                var x = [for index in 1..5: "item-$index"]
                 """);
         var expected = Program.of(
                 varStatement(var("x",
@@ -123,18 +122,17 @@ public class ForLoopTest extends ParserTest {
                                 ForStatement.builder()
                                         .item(id("index"))
                                         .range(Range.of(1, 5))
-                                        .body(expressionStatement(string("item-$index")))
+                                        .body(expressionStatement(interpolation("item-", id("index"))))
                                         .build()
                         )))
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 
     @Test
     void arrayObjectsAssignedToVar() {
         var res = parse("""
-                var x = [for index in 1..5: { name: 'item-$index'}]
+                var x = [for index in 1..5: { name: "item-$index"}]
                 """);
         var expected = Program.of(
                 varStatement(var("x",
@@ -142,11 +140,10 @@ public class ForLoopTest extends ParserTest {
                                 ForStatement.builder()
                                         .item(id("index"))
                                         .range(Range.of(1, 5))
-                                        .body(expressionStatement(objectExpression(object("name", string("item-$index")))))
+                                        .body(expressionStatement(objectExpression(object("name", interpolation("item-","index")))))
                                         .build()
                         )))
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 
@@ -156,7 +153,7 @@ public class ForLoopTest extends ParserTest {
                 var envs = [{client: 'amazon'},{client: 'bmw'}]
                 [for index in envs]
                 resource Bucket photos {
-                  name     = 'name-${index.value}'
+                  name     = "name-${index.value}"
                 }
                 """);
         var expected = Program.of(
@@ -166,11 +163,10 @@ public class ForLoopTest extends ParserTest {
                         .array(id("envs"))
                         .body(
                                 resource("Bucket", "photos",
-                                        block(assign("name", "'name-${index.value}'")))
+                                        block(assign("name", interpolation("name-", member("index", "value")))))
                         )
                         .build()))
         );
-        log.info(res);
         assertEquals(expected, res);
     }
 

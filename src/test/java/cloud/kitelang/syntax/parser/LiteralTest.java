@@ -122,7 +122,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(objectExpression(object("a", number(2)))
                 ));
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -132,7 +131,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array())
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -142,7 +140,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array(1, 2, 3))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -152,7 +149,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array(1.0, 2.4, 3.5))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -162,7 +158,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array("a", "b", "c"))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -174,7 +169,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array("a", "b", "c"))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -184,7 +178,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array(true, true, true))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test
@@ -194,7 +187,6 @@ public class LiteralTest extends ParserTest {
                 expressionStatement(array(true, false, true))
         );
         assertEquals(expected, res);
-        log.info(printer.visit(res));
     }
 
     @Test

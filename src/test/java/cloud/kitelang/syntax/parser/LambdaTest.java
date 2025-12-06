@@ -32,7 +32,6 @@ public class LambdaTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -43,7 +42,6 @@ public class LambdaTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -63,7 +61,6 @@ public class LambdaTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -75,7 +72,6 @@ public class LambdaTest extends ParserTest {
                                 param("y", "number"), binary("*", "x", "y")))
         );
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -88,7 +84,6 @@ public class LambdaTest extends ParserTest {
                                 block(expressionStatement(binary("*", "x", "y"))))
                 ));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -103,7 +98,6 @@ public class LambdaTest extends ParserTest {
                 )
         )));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -118,7 +112,6 @@ public class LambdaTest extends ParserTest {
                 )
         )));
         assertEquals(expected, res);
-        log.info(res);
     }
 
     @Test
@@ -129,7 +122,6 @@ public class LambdaTest extends ParserTest {
                 """);
         var expected = program(expressionStatement(lambda(List.of(), block())));
         assertEquals(expected, res);
-        log.warn((res));
     }
 
     @Test
@@ -140,7 +132,6 @@ public class LambdaTest extends ParserTest {
                 """);
         var expected = program(
                 expressionStatement(call(lambda(param("x", "number"), binary("*", "x", "x")), 2)));
-        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -154,7 +145,6 @@ public class LambdaTest extends ParserTest {
                 expressionStatement(
                         call(call(lambda(param("x","number"), binary("*", "x", "x")), 2), Collections.emptyList())
                 ));
-        log.warn((res));
         assertEquals(expected, res);
     }
 
@@ -167,7 +157,6 @@ public class LambdaTest extends ParserTest {
                 expressionStatement(
                         call(call(lambda(param("x","number"), binary("*", "x", "x")), 2), string("hi"))
                 ));
-        log.warn((res));
         assertEquals(expected, res);
     }
 

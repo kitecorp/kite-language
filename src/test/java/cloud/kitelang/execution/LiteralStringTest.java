@@ -24,21 +24,18 @@ public class LiteralStringTest extends RuntimeTest {
     void stringEscape() {
         var res = interpreter.visit("what\'s up?");
         Assertions.assertEquals("what's up?", res);
-        log.info(res.toString());
     }
 
     @Test
     void stringEscapeDoubleQuote() {
         var res = interpreter.visit("what\"s up?");
         Assertions.assertEquals("what\"s up?", res);
-        log.info(res.toString());
     }
 
     @Test
     void tab() {
         var res = interpreter.visit("\twhat's up?");
         Assertions.assertEquals("\twhat's up?", res);
-        log.info(res.toString());
     }
 
     @Test

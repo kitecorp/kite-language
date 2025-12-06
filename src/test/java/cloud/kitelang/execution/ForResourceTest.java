@@ -97,7 +97,7 @@ public class ForResourceTest extends RuntimeTest {
                         string name
                       }
                       for i in 5..6 {
-                        resource vm main { name = '$i' }
+                        resource vm main { name = "$i" }
                       }
                 """);
         var schema = interpreter.getSchema("vm");
@@ -190,7 +190,7 @@ public class ForResourceTest extends RuntimeTest {
                   schema vm { string name }
                   for i in 0..2 {
                     resource vm cidr { name = vpc.name }
-                    resource vm vpc  { name = 'vpc-$i' }
+                    resource vm vpc  { name = "vpc-$i" }
                   }
                 """);
         ResourceValue instance = interpreter.getInstance("cidr[0]");
@@ -272,7 +272,7 @@ public class ForResourceTest extends RuntimeTest {
                   for i in 0..1 {
                     var mid = "M"
                     for j in 0..1 {
-                      resource vm main { name = '$outer-$mid-$j' }
+                      resource vm main { name = "$outer-$mid-$j" }
                     }
                   }
                 """);
@@ -286,7 +286,7 @@ public class ForResourceTest extends RuntimeTest {
                   schema vm { string name }
                   var items = ["a","b","c"]
                   for v, i in items {
-                    resource vm main { name = '$v-$i' }
+                    resource vm main { name = "$v-$i" }
                   }
                 """);
         var schema = interpreter.getSchema("vm");
@@ -334,7 +334,7 @@ public class ForResourceTest extends RuntimeTest {
                 for i in 0..2 {
                     var name = 'prod'
                     resource vm main {
-                      name     = '$name-$i'
+                      name     = "$name-$i"
                     }
                 }
                 """);
@@ -359,7 +359,7 @@ public class ForResourceTest extends RuntimeTest {
                       name     = vpc.name
                     }
                     resource vm vpc {
-                      name     = '$name-$i'
+                      name     = "$name-$i"
                     }
                 
                 }
@@ -391,7 +391,7 @@ public class ForResourceTest extends RuntimeTest {
                     var name = 'prod'
                 
                     resource vm vpc {
-                      name     = '$name-$i'
+                      name     = "$name-$i"
                     }
                     resource vm cidr {
                       name     = vpc.name
@@ -425,7 +425,7 @@ public class ForResourceTest extends RuntimeTest {
                     var name = 'prod'
                 
                     resource vm vpc {
-                      name     = '$name-$i'
+                      name     = "$name-$i"
                       color    = cidr.color 
                     }
                     resource vm cidr {
@@ -677,7 +677,7 @@ public class ForResourceTest extends RuntimeTest {
                 var envs = [{client: 'amazon'}, {client: 'bmw'}]
                 [for index in envs]
                 resource Bucket index.client {
-                  name     = 'name-${index.client}'
+                  name     = "name-${index.client}"
                 }
                 """);
 
@@ -717,7 +717,7 @@ public class ForResourceTest extends RuntimeTest {
                 var envs = [1,2,3]
                 [for index in envs]
                 resource Bucket photos {
-                  name     = 'name-${index}'
+                  name     = "name-${index}"
                 }
                 """);
         var instances = interpreter.getInstances();
@@ -735,7 +735,7 @@ public class ForResourceTest extends RuntimeTest {
                 var envs = ['hello', 'world']
                 [for index in envs]
                 resource Bucket photos {
-                  name     = 'name-${index}'
+                  name     = "name-${index}"
                 }
                 """);
 

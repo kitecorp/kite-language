@@ -34,7 +34,6 @@ public class FunTest extends RuntimeTest {
                         VarDeclaration.of(Identifier.id("x"), NumberLiteral.of(1))))),
                 interpreter.getEnv()
         );
-        log.warn((res));
         assertEquals(expected, res);
         Assertions.assertEquals(interpreter.getFun("myFun"), res);
     }
@@ -57,7 +56,6 @@ public class FunTest extends RuntimeTest {
                 interpreter.getEnv()
         );
 
-        log.warn((res));
         assertEquals(expected, res);
         Assertions.assertEquals(interpreter.getFun("myFun"), res);
     }
@@ -70,7 +68,6 @@ public class FunTest extends RuntimeTest {
                 }
                 myFun(2)
                 """);
-        log.warn((res));
         assertEquals(2, res);
     }
     @Test
@@ -122,7 +119,6 @@ public class FunTest extends RuntimeTest {
                 }
                 sqrts(2,3)
                 """);
-        log.warn((res));
         assertEquals(7, res);
     }
 
@@ -142,7 +138,6 @@ public class FunTest extends RuntimeTest {
                     fn(30)
                 }
                 """);
-        log.warn((res));
         assertEquals(160, res);
     }
 
@@ -159,7 +154,6 @@ public class FunTest extends RuntimeTest {
                 println("fib result is: ", x)
                 x
                     """);
-        log.warn((res));
         assertEquals(8, res);
     }
 

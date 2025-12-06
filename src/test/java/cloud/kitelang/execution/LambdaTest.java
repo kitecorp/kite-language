@@ -21,7 +21,6 @@ public class LambdaTest extends RuntimeTest {
                     onClick((number data)->data*10)
                 }""");
 
-        log.warn((res));
         assertEquals(300, res);
     }
 
@@ -32,7 +31,6 @@ public class LambdaTest extends RuntimeTest {
                 f(2)
                 """);
 
-        log.warn((res));
         assertEquals(4, res);
     }
 
@@ -42,7 +40,6 @@ public class LambdaTest extends RuntimeTest {
                 ((number x) -> x*x) (2)
                 """);
 
-        log.warn((res));
         assertEquals(4, res);
     }
 
@@ -57,7 +54,6 @@ public class LambdaTest extends RuntimeTest {
                     }) (2)
                 }""");
 
-        log.warn((res));
         assertEquals(9, res);
     }
 
@@ -73,7 +69,6 @@ public class LambdaTest extends RuntimeTest {
                     }) (2)
                 }""");
 
-        log.warn((res));
         assertEquals(11, res);
     }
 
@@ -94,7 +89,6 @@ public class LambdaTest extends RuntimeTest {
                                 
                 """);
 
-        log.warn((res));
         assertEquals(9, res);
     }
 
@@ -112,7 +106,6 @@ public class LambdaTest extends RuntimeTest {
                 bar()
                 """);
 
-        log.warn((res));
         assertEquals(30, res);
     }
 

@@ -16,10 +16,9 @@ public class ForTest extends RuntimeTest {
 
     @Test
     void increment() {
-        var res = eval("""
-                 var a = [for index in 1..5: 'item-$index']
+       eval("""
+                 var a = [for index in 1..5: "item-$index"]
                 """);
-        log.warn((res));
     }
 
     @Test
@@ -262,7 +261,6 @@ public class ForTest extends RuntimeTest {
                 [for i in 0..10: if i>3 i]
                 """);
         assertEquals(List.of(4, 5, 6, 7, 8, 9), res);
-        log.info(res);
     }
 
     @Test
@@ -285,16 +283,15 @@ public class ForTest extends RuntimeTest {
     @Test
     void arrayAssignedToVar() {
         var res = eval("""
-                var x = [for index in 0..5: 'item-$index']
+                var x = [for index in 0..5: "item-$index"]
                 """);
         assertEquals(List.of("item-0", "item-1", "item-2", "item-3", "item-4"), res);
-        log.info(res);
     }
 
     @Test
     void arrayObjectsAssignedToVar() {
         var res = eval("""
-                var x = [for index in 0..2: { name: 'item-$index'}]
+                var x = [for index in 0..2: { name: "item-$index"}]
                 """);
         assertEquals(List.of(Map.of("name", "item-0"), Map.of("name", "item-1")), res);
     }

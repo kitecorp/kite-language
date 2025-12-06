@@ -21,7 +21,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -37,7 +36,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -53,7 +51,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(2, res);
     }
 
@@ -69,7 +66,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(3, res);
     }
 
@@ -87,7 +83,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(3, res);
     }
 
@@ -105,7 +100,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(3, res);
     }
 
@@ -123,7 +117,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(3  , res);
     }
 
@@ -141,7 +134,6 @@ public class IfStatementTest extends RuntimeTest {
                     x       
                 }
                 """);
-        log.warn((res));
         assertEquals(3, res);
     }
 

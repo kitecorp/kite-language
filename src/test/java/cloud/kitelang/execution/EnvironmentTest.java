@@ -24,7 +24,6 @@ public class EnvironmentTest {
         var expected = 1;
         Assertions.assertEquals(expected, res);
         Assertions.assertEquals(expected, environment.get("x"));
-        log.warn(res);
     }
 
     @Test

@@ -938,7 +938,7 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
             // Single-quoted string - no interpolation
             String rawValue = ctx.SINGLE_STRING().getText();
             String value = rawValue.substring(1, rawValue.length() - 1);
-            return StringLiteral.string(value);
+            return StringLiteral.literal(value);
         } else if (ctx.interpolatedString() != null) {
             return visitInterpolatedString(ctx.interpolatedString());
         }

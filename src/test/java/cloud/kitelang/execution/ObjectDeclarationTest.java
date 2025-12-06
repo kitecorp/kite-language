@@ -20,7 +20,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         Assertions.assertTrue(interpreter.hasVar("x"));
         var o = (Map) interpreter.getVar("x");
         assertTrue(o.isEmpty());
-        log.info(res);
     }
 
     @Test
@@ -29,7 +28,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var o = (Map) interpreter.getVar("x");
         assertFalse(o.isEmpty());
         assertEquals(2, o.get("size"));
-        log.info(res);
     }
 
 
@@ -38,7 +36,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2.1 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(2.1, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -46,7 +43,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: true }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(true, o.get("size"));
-        log.info(res);
     }
 
 
@@ -55,7 +51,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2  +  2 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(4, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -63,7 +58,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2  -  2 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(0, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -71,7 +65,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2  *  2 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(4, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -79,7 +72,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2  /  2 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(1, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -87,7 +79,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2  ==  2 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(true, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -95,7 +86,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var res = eval("var x = { size: 2  ==  1 }");
         var o = (Map) interpreter.getVar("x");
         assertEquals(false, o.get("size"));
-        log.info(res);
     }
 
     @Test
@@ -109,7 +99,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var o = (Map) interpreter.getVar("x");
         assertEquals(2, o.get("size"));
         assertEquals("white", o.get("color"));
-        log.info(res);
     }
 
     @Test
@@ -123,7 +112,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
                 """);
         var y = (String) interpreter.getVar("y");
         assertEquals("white", y);
-        log.info(res);
     }
 
     @Test
@@ -139,7 +127,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
                 """);
         var y = (String) interpreter.getVar("y");
         assertEquals("white", y);
-        log.info(res);
     }
 
     @Test
@@ -153,7 +140,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
                 """);
         var y = (String) interpreter.getVar("y");
         assertEquals("white", y);
-        log.info(res);
     }
 
 
@@ -170,7 +156,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
                 """);
         var y = (String) interpreter.getVar("y");
         assertEquals("white", y);
-        log.info(res);
     }
 
     @Test
@@ -184,7 +169,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var o = (Map) interpreter.getVar("x");
         assertEquals(2, o.get("size"));
         assertEquals("white", o.get("color"));
-        log.info(res);
     }
 
     @Test
@@ -198,23 +182,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var o = (Map) interpreter.getVar("x");
         assertEquals(2, o.get("size"));
         assertEquals("white", o.get("color-name"));
-        log.info(res);
-    }
-
-    @Test
-    void varMultiDeclarationSingleQuoteStringInterpolation() {
-        var res = eval("""
-                var key = "color-name"
-                var value = "white"
-                var x = { 
-                    size: 2,
-                    '$key': '$value'
-                }
-                """);
-        var x = (Map) interpreter.getVar("x");
-        assertEquals(2, x.get("size"));
-        assertEquals("white", x.get("color-name"));
-        log.info(res);
     }
 
     @Test
@@ -233,7 +200,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var keyName = x.get("color-name");
         assertNotNull(keyName);
         assertEquals("white", keyName);
-        log.info(res);
     }
 
     @Test
@@ -252,7 +218,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var keyName = x.get("color-name");
         assertNotNull(keyName);
         assertEquals("white", keyName);
-        log.info(res);
     }
 
     @Test
@@ -262,7 +227,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
                 var value = "white"
                 var x = { 
                     size: 2,
-                    '${key}': '${value}'
+                    "${key}": "${value}"
                 }
                 """);
         var x = (Map) interpreter.getVar("x");
@@ -271,7 +236,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var keyName = x.get("color-name");
         assertNotNull(keyName);
         assertEquals("white", keyName);
-        log.info(res);
     }
 
     @Test
@@ -281,7 +245,7 @@ public class ObjectDeclarationTest extends RuntimeTest {
                 var value = "white"
                 var x = { 
                     size: 2,
-                    '${key}': value
+                    "${key}": value
                 }
                 """);
         var x = (Map) interpreter.getVar("x");
@@ -290,7 +254,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         var keyName = x.get("color-name");
         assertNotNull(keyName);
         assertEquals("white", keyName);
-        log.info(res);
     }
 
 
@@ -308,7 +271,6 @@ public class ObjectDeclarationTest extends RuntimeTest {
         assertEquals(2, o.get("size"));
         var env = (Map<String, Object>) o.get("env");
         assertEquals("white", env.get("color"));
-        log.info(res);
     }
 
 }

@@ -19,7 +19,6 @@ public class FunCoreTest extends RuntimeTest {
                 date()
                 """);
 
-        log.warn((res));
         assertEquals(LocalDate.now().toString(), res);
     }
 
