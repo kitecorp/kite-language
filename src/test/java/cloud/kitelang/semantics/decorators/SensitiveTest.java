@@ -7,7 +7,7 @@ import cloud.kitelang.semantics.types.ValueType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static cloud.kitelang.semantics.ComponentTest.assertIsComponentType;
+import static cloud.kitelang.semantics.typechecker.ComponentTest.assertIsComponentType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

@@ -16,6 +16,13 @@ public class SchemaValue {
     private final Environment environment;
     private final String type;
 
+    /**
+     * Names of properties marked with @cloud annotation.
+     * These are cloud-generated and cannot be set by users.
+     */
+    @EqualsAndHashCode.Exclude
+    private final java.util.Set<String> cloudProperties = new java.util.HashSet<>();
+
     public SchemaValue(Identifier type, Environment<ResourceValue> environment) {
         this.type = type.string();
         this.environment = environment;
@@ -65,6 +72,20 @@ public class SchemaValue {
 
     public Object init(String name, Object value) {
         return environment.init(name, value);
+    }
+
+    /**
+     * Marks a property as cloud-generated (@cloud annotation).
+     */
+    public void addCloudProperty(String propertyName) {
+        cloudProperties.add(propertyName);
+    }
+
+    /**
+     * Checks if a property is cloud-generated and cannot be set by users.
+     */
+    public boolean isCloudProperty(String propertyName) {
+        return cloudProperties.contains(propertyName);
     }
 
 }
