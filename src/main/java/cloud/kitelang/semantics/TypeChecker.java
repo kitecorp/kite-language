@@ -892,6 +892,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         var schemaType = new SchemaType(name.string(), new TypeEnvironment(name.string(), env));
         env.init(name, schemaType);
         for (SchemaProperty property : body) {
+            visitAnnotations(property.getAnnotations());
             var vardeclaration = VarDeclaration.var(property.name(), property.type(), property.init());
             executeBlock(vardeclaration, schemaType.getEnvironment());
         }

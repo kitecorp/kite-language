@@ -168,7 +168,10 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
         Expression init = ctx.propertyInitializer() != null ?
                 (Expression) visit(ctx.propertyInitializer()) : null;
 
-        return SchemaProperty.schemaProperty(type, name, init, annotations);
+        var property = SchemaProperty.schemaProperty(type, name, init, annotations);
+        // Link annotations to their target for decorator validation
+        setAnnotations(property, annotations);
+        return property;
     }
 
     @Override
