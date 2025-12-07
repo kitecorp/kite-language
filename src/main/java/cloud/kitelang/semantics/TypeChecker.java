@@ -286,6 +286,20 @@ public final class TypeChecker extends StackVisitor<Type> {
             return actualType;
         }
 
+        // Deferred types (forward references) are accepted - will be resolved at runtime
+        if (actualType instanceof AnyType) {
+            return expectedType;
+        }
+
+        // Allow ResourceType to match its schema type
+        // e.g., resource Address home can be assigned to a property typed as Address
+        if (actualType instanceof ResourceType resourceType
+                && expectedType instanceof SchemaType expectedSchema) {
+            if (resourceType.getSchema().equals(expectedSchema)) {
+                return expectedType;
+            }
+        }
+
         // Types match exactly
         if (Objects.equals(actualType, expectedType)) {
             return expectArray(actualType, expectedType, expectedVal);

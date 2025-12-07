@@ -199,4 +199,108 @@ public class SchemaTest extends CheckerTest {
         assertEquals(bucket, actual);
     }
 
+    @Test
+    void schemaPropertyWithNestedSchema() {
+        var actual = checker.visit(parse("""
+                schema Address {
+                    string street
+                    string city
+                }
+
+                schema Person {
+                    string name
+                    Address address
+                }
+                """));
+
+        // Person should have 'address' property of type Address (SchemaType)
+        var person = (SchemaType) actual;
+        var addressType = person.getEnvironment().lookup("address");
+        assertEquals(SchemaType.class, addressType.getClass());
+        assertEquals("Address", addressType.name());
+    }
+
+    @Test
+    void resourceWithNestedSchemaPropertyRequiresSchemaType() {
+        // Object literals do NOT structurally match schema types
+        // This is intentional - schemas are nominal types, not structural
+        Assertions.assertThrows(TypeError.class, () -> checker.visit(parse("""
+                schema Address {
+                    string street
+                    string city
+                }
+
+                schema Person {
+                    string name
+                    Address address
+                }
+
+                resource Person john {
+                    name = "John"
+                    address = {
+                        street: "123 Main St",
+                        city: "NYC"
+                    }
+                }
+                """)));
+    }
+
+    @Test
+    void nestedSchemaWithResourceReference() {
+        // Resource references match their schema type
+        // e.g., resource Address home can be assigned to Address-typed property
+        var actual = checker.visit(parse("""
+                schema Address {
+                    string street
+                    string city
+                }
+
+                schema Person {
+                    string name
+                    Address address
+                }
+
+                resource Address home {
+                    street = "123 Main St"
+                    city = "NYC"
+                }
+
+                resource Person john {
+                    name = "John"
+                    address = home
+                }
+                """));
+
+        Assertions.assertNotNull(actual);
+    }
+
+    @Test
+    void nestedSchemaWithWrongResourceType() {
+        // Wrong resource type should fail - Network != Address
+        Assertions.assertThrows(TypeError.class, () -> checker.visit(parse("""
+                schema Address {
+                    string street
+                    string city
+                }
+
+                schema Network {
+                    string cidr
+                }
+
+                schema Person {
+                    string name
+                    Address address
+                }
+
+                resource Network vpc {
+                    cidr = "10.0.0.0/16"
+                }
+
+                resource Person john {
+                    name = "John"
+                    address = vpc
+                }
+                """)));
+    }
+
 }
