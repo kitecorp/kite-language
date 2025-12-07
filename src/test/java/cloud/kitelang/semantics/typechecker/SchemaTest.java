@@ -152,24 +152,10 @@ public class SchemaTest extends CheckerTest {
     }
 
     @Test
-    void schemaWithExplicitInput() {
+    void schemaWithCloudAnnotation() {
         var actual = checker.visit(parse("""
                 schema Bucket {
-                   input string name
-                }
-                """));
-        assertEquals(SchemaType.class, actual.getClass());
-
-        var bucket = new SchemaType("Bucket", checker.getEnv());
-        bucket.setProperty("name", ValueType.String);
-        assertEquals(bucket, actual);
-    }
-
-    @Test
-    void schemaWithOutput() {
-        var actual = checker.visit(parse("""
-                schema Bucket {
-                   output string arn
+                   @cloud string arn
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());
@@ -180,12 +166,12 @@ public class SchemaTest extends CheckerTest {
     }
 
     @Test
-    void schemaWithInputAndOutput() {
+    void schemaWithMixedProperties() {
         var actual = checker.visit(parse("""
                 schema Bucket {
-                   input string name
+                   string name
                    string region
-                   output string arn
+                   @cloud string arn
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());
@@ -198,11 +184,11 @@ public class SchemaTest extends CheckerTest {
     }
 
     @Test
-    void schemaOutputWithComputedInit() {
+    void schemaCloudPropertyWithComputedInit() {
         var actual = checker.visit(parse("""
                 schema Bucket {
-                   input string name
-                   output string url = "https://" + name
+                   string name
+                   @cloud string url = "https://" + name
                 }
                 """));
         assertEquals(SchemaType.class, actual.getClass());

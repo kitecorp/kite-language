@@ -1,6 +1,7 @@
 package cloud.kitelang.integration;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ResourceStringInterpolation extends BaseIntegrationTest {
@@ -9,13 +10,13 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
         eval("""
                         schema vm { string name; number size; }
                 
-                        resource vm main {
+                        resource vm server {
                             name = "main-property"
                             size = 1
                         }
-                
+
                         fun main() {
-                            var x = "Hello ${main.name}! Your number is ${main.size}"
+                            var x = "Hello ${server.name}! Your number is ${server.size}"
                             println(x)
                         }
                         main()

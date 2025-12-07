@@ -17,47 +17,34 @@ import java.util.Set;
 @Data
 public class SchemaProperty implements Annotatable {
 
-    public enum PropertyKind { REGULAR, INPUT, OUTPUT }
-
-    private PropertyKind kind;
     private TypeIdentifier type;
     private Identifier identifier;
     private Expression init;
     private Set<AnnotationDeclaration> annotations;
 
-
     public SchemaProperty(TypeIdentifier typeIdentifier, Identifier identifier, Expression init) {
-        this(PropertyKind.REGULAR, typeIdentifier, identifier, init, Set.of());
+        this(typeIdentifier, identifier, init, Set.of());
     }
 
     public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier,
                                                 Identifier identifier,
                                                 Expression init,
                                                 AnnotationDeclaration... annotation) {
-        return new SchemaProperty(PropertyKind.REGULAR, typeIdentifier, identifier, init, Set.of(annotation));
+        return new SchemaProperty(typeIdentifier, identifier, init, Set.of(annotation));
     }
 
     public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier,
                                                 Expression init, AnnotationDeclaration... annotation) {
-        return new SchemaProperty(PropertyKind.REGULAR, typeIdentifier, Identifier.id(identifier), init, Set.of(annotation));
+        return new SchemaProperty(typeIdentifier, Identifier.id(identifier), init, Set.of(annotation));
     }
 
     public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init,
                                                 AnnotationDeclaration... annotation) {
-        return new SchemaProperty(PropertyKind.REGULAR, typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), Set.of(annotation));
+        return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), Set.of(annotation));
     }
 
     public static SchemaProperty schemaProperty(TypeIdentifier typeIdentifier, String identifier, int init) {
-        return new SchemaProperty(PropertyKind.REGULAR, typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), Set.of());
-    }
-
-    // Factory methods with explicit kind
-    public static SchemaProperty input(TypeIdentifier typeIdentifier, String identifier, Expression init) {
-        return new SchemaProperty(PropertyKind.INPUT, typeIdentifier, Identifier.id(identifier), init, Set.of());
-    }
-
-    public static SchemaProperty output(TypeIdentifier typeIdentifier, String identifier, Expression init) {
-        return new SchemaProperty(PropertyKind.OUTPUT, typeIdentifier, Identifier.id(identifier), init, Set.of());
+        return new SchemaProperty(typeIdentifier, Identifier.id(identifier), NumberLiteral.number(init), Set.of());
     }
 
     public String name() {
@@ -95,15 +82,12 @@ public class SchemaProperty implements Annotatable {
         return annotations != null;
     }
 
-    public boolean isRegular() {
-        return kind == PropertyKind.REGULAR;
-    }
-
-    public boolean isInput() {
-        return kind == PropertyKind.INPUT;
-    }
-
-    public boolean isOutput() {
-        return kind == PropertyKind.OUTPUT;
+    /**
+     * Returns true if this property has the @cloud annotation,
+     * indicating it's set by the cloud provider after apply.
+     */
+    public boolean isCloudGenerated() {
+        return annotations != null && annotations.stream()
+                .anyMatch(a -> "cloud".equals(a.name()));
     }
 }

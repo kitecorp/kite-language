@@ -1062,20 +1062,23 @@ public class ComponentTest extends CheckerTest {
 
     @Test
     void outputBeforeResourceDeclaration() {
-        // Output cannot reference a resource declared later
-        assertThrows(NotFoundException.class, () -> eval("""
+        var res = eval("""
                 schema vm {
                     string id
                 }
-                
+
                 component app {
                     output string serverId = server.id
-                
+
                     resource vm server {
                         id = "server-123"
                     }
                 }
-                """));
+                """);
+        // Verify the component was created and forward reference resolved
+        var appComponent = assertIsComponentType(res, "app");
+        var outputType = appComponent.lookup("serverId");
+        assertEquals(ValueType.String, outputType);
     }
 
     @Test

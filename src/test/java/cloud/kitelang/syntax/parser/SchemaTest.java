@@ -9,7 +9,7 @@ import static cloud.kitelang.syntax.ast.statements.SchemaDeclaration.schema;
 import static cloud.kitelang.syntax.ast.statements.SchemaProperty.*;
 import static cloud.kitelang.syntax.literals.Identifier.id;
 import static cloud.kitelang.syntax.literals.TypeIdentifier.type;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j2
@@ -50,64 +50,51 @@ public class SchemaTest extends ParserTest {
     }
 
     @Test
-    void schemaWithExplicitInput() {
+    void schemaWithCloudAnnotation() {
         var actual = parse("""
                 schema Bucket {
-                   input string name
+                   @cloud string arn
                 }
                 """);
         var schema = (cloud.kitelang.syntax.ast.statements.SchemaDeclaration) actual.getBody().getFirst();
         var prop = schema.getProperties().getFirst();
-        assertTrue(prop.isInput());
-        assertEquals("name", prop.name());
-    }
-
-    @Test
-    void schemaWithOutput() {
-        var actual = parse("""
-                schema Bucket {
-                   output string arn
-                }
-                """);
-        var schema = (cloud.kitelang.syntax.ast.statements.SchemaDeclaration) actual.getBody().getFirst();
-        var prop = schema.getProperties().getFirst();
-        assertTrue(prop.isOutput());
+        assertTrue(prop.isCloudGenerated());  // @cloud marks property as cloud-generated
         assertEquals("arn", prop.name());
     }
 
     @Test
-    void schemaWithInputAndOutput() {
+    void schemaWithMixedProperties() {
         var actual = parse("""
                 schema Bucket {
-                   input string name
+                   string name
                    string region
-                   output string arn
-                   output string endpoint
+                   @cloud string arn
+                   @cloud string endpoint
                 }
                 """);
         var schema = (cloud.kitelang.syntax.ast.statements.SchemaDeclaration) actual.getBody().getFirst();
         var props = schema.getProperties();
 
         assertEquals(4, props.size());
-        assertTrue(props.get(0).isInput());   // input string name
-        assertTrue(props.get(1).isRegular()); // string region (regular property)
-        assertTrue(props.get(2).isOutput());  // output string arn
-        assertTrue(props.get(3).isOutput());  // output string endpoint
+        assertFalse(props.get(0).isCloudGenerated()); // string name (regular property)
+        assertFalse(props.get(1).isCloudGenerated()); // string region (regular property)
+        assertTrue(props.get(2).isCloudGenerated());  // @cloud string arn
+        assertTrue(props.get(3).isCloudGenerated());  // @cloud string endpoint
     }
 
     @Test
-    void schemaOutputWithInitializer() {
+    void schemaCloudPropertyWithInitializer() {
         var actual = parse("""
                 schema Bucket {
-                   input string name
-                   output string url = "https://" + name + ".s3.amazonaws.com"
+                   string name
+                   @cloud string url = "https://" + name + ".s3.amazonaws.com"
                 }
                 """);
         var schema = (cloud.kitelang.syntax.ast.statements.SchemaDeclaration) actual.getBody().getFirst();
         var props = schema.getProperties();
 
-        assertTrue(props.get(0).isInput());
-        assertTrue(props.get(1).isOutput());
+        assertFalse(props.get(0).isCloudGenerated());
+        assertTrue(props.get(1).isCloudGenerated());  // @cloud marks as cloud-generated
         assertTrue(props.get(1).hasInit());
     }
 
