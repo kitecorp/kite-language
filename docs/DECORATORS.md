@@ -1,6 +1,6 @@
 # Kite Decorator System
 
-Kite has a comprehensive decorator system with 16 built-in decorators.
+Kite has a comprehensive decorator system with 17 built-in decorators.
 
 ## Validation Decorators
 
@@ -141,6 +141,49 @@ Ensures array elements are unique.
 @unique
 input string[] tags = ["web", "api"]
 ```
+
+## Schema Decorators
+
+### @cloud
+
+Marks schema properties as cloud-generated. These properties are set by the cloud provider after resource creation (e.g., ARNs, IDs, endpoints) and should NOT be set by the user.
+
+| Property | Value |
+|----------|-------|
+| **Argument** | optional: `importable` (boolean) |
+| **Targets** | `schema property` |
+
+**Syntax forms:**
+- `@cloud` - Cloud-generated, not importable (default)
+- `@cloud(importable)` - Cloud-generated, importable (shorthand for `importable=true`)
+- `@cloud(importable=true)` - Same as `@cloud(importable)`
+- `@cloud(importable=false)` - Same as `@cloud`
+
+```kite
+schema aws_instance {
+    string name                      // User-set property
+    @cloud string arn                // Cloud-generated, not importable
+    @cloud(importable) string id     // Cloud-generated, can be used for import
+    @cloud string publicIp           // Cloud-generated, not importable
+}
+
+resource aws_instance server {
+    name = "web-server"
+    // arn, id, publicIp are NOT set - they come from AWS after apply
+}
+
+// Access cloud-generated properties in outputs
+output string serverArn = server.arn
+```
+
+**The `importable` argument:**
+When `importable=true`, the property can be used to identify existing resources for import operations. Typically used for unique identifiers like `id`, `arn`, or resource names.
+
+**Use cases:**
+- AWS ARNs, resource IDs (often importable)
+- Generated endpoints and URLs
+- Public/private IPs assigned by cloud provider
+- Any value only known after `apply`
 
 ## Resource Decorators
 
@@ -364,6 +407,7 @@ input string name
 | `@validate(regex:, preset:)` | named strings | input, output |
 | `@allowed([...])` | array | input |
 | `@unique` | none | input |
+| `@cloud` | optional: `importable` | schema property |
 | `@existing("ref")` | string | resource |
 | `@sensitive` | none | input, output |
 | `@dependsOn(res)` | reference(s) | resource, component |
@@ -376,4 +420,4 @@ input string name
 
 - **Type-check time validation:** `DecoratorChecker` subclasses in `cloud.kitelang.semantics.decorators/`
 - **Runtime evaluation:** `DecoratorInterpreter` in `cloud.kitelang.execution.decorators/`
-- 16 decorator implementations total
+- 17 decorator implementations total

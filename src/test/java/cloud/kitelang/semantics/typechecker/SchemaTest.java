@@ -303,4 +303,133 @@ public class SchemaTest extends CheckerTest {
                 """)));
     }
 
+    @Test
+    void cloudAnnotationOnlyOnSchemaProperty() {
+        // @cloud is valid on schema properties
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                    string name
+                    @cloud string arn
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+    }
+
+    @Test
+    void cloudAnnotationInvalidOnResource() {
+        // @cloud cannot be used on resources
+        Assertions.assertThrows(TypeError.class, () -> checker.visit(parse("""
+                schema Bucket {
+                    string name
+                }
+
+                @cloud
+                resource Bucket myBucket {
+                    name = "my-bucket"
+                }
+                """)));
+    }
+
+    @Test
+    void cloudAnnotationInvalidOnInput() {
+        // @cloud cannot be used on inputs
+        Assertions.assertThrows(TypeError.class, () -> checker.visit(parse("""
+                component app {
+                    @cloud
+                    input string name
+                }
+                """)));
+    }
+
+    @Test
+    void cloudAnnotationInvalidOnOutput() {
+        // @cloud cannot be used on component outputs
+        Assertions.assertThrows(TypeError.class, () -> checker.visit(parse("""
+                component app {
+                    @cloud
+                    output string result = "test"
+                }
+                """)));
+    }
+
+    @Test
+    void cloudAnnotationWithImportableShorthand() {
+        // @cloud(importable) is valid shorthand for importable=true
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                    string name
+                    @cloud(importable) string id
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+    }
+
+    @Test
+    void cloudAnnotationWithImportableTrue() {
+        // @cloud(importable=true) is valid
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                    string name
+                    @cloud(importable=true) string id
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+    }
+
+    @Test
+    void cloudAnnotationWithImportableFalse() {
+        // @cloud(importable=false) is valid (same as plain @cloud)
+        var actual = checker.visit(parse("""
+                schema Bucket {
+                    string name
+                    @cloud(importable=false) string arn
+                }
+                """));
+        assertEquals(SchemaType.class, actual.getClass());
+    }
+
+    @Test
+    void cloudAnnotationWithUnknownArgument() {
+        // @cloud with unknown argument should fail (at parse or type-check time)
+        Assertions.assertThrows(Exception.class, () -> checker.visit(parse("""
+                schema Bucket {
+                    @cloud(unknown)
+                    string arn
+                }
+                """)));
+    }
+
+    @Test
+    void cloudAnnotationWithStringArgument() {
+        // @cloud("aws") should fail - string not allowed
+        Assertions.assertThrows(Exception.class, () -> checker.visit(parse("""
+                schema Bucket {
+                    @cloud("aws")
+                    string arn
+                }
+                """)));
+    }
+
+    @Test
+    void cloudAnnotationWithUnknownNamedArgument() {
+        // @cloud(provider="aws") should fail - unknown named arg (at parse or type-check time)
+        Assertions.assertThrows(Exception.class, () -> checker.visit(parse("""
+                schema Bucket {
+                    @cloud(provider="aws")
+                    string arn
+                }
+                """)));
+    }
+
+    @Test
+    void cloudAnnotationImportableWithNonBoolean() {
+        // @cloud(importable="yes") should fail - must be boolean (at parse or type-check time)
+        Assertions.assertThrows(Exception.class, () -> checker.visit(parse("""
+                schema Bucket {
+                    @cloud(importable="yes")
+                    string arn
+                }
+                """)));
+    }
+
 }
