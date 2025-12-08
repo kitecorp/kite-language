@@ -570,21 +570,24 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     @Override
-    public Object visit(ComponentStatement expression) {
-        visitAnnotations(expression.getAnnotations());
+    public Object visit(ComponentStatement statement) {
+        if (!contextStackContains(ContextStack.Decorator)) {
+            // needs to be above isCounted because @count marks the resourceStatement as counted
+            visitAnnotations(statement.getAnnotations());
+        }
 
-        if (!expression.hasType()) {
+        if (!statement.hasType()) {
             throw new RuntimeException("Invalid component declaration: component must have a type");
         }
 
-        var typeName = expression.getType().string();
-        var isDefinition = expression.isDefinition();
+        var typeName = statement.getType().string();
+        var isDefinition = statement.isDefinition();
         var typeExists = componentDeclarations.containsKey(typeName);
 
         if (isDefinition) {
-            return declareComponent(expression, typeName, typeExists);
+            return declareComponent(statement, typeName, typeExists);
         } else {
-            return initializeComponent(expression, typeName, typeExists);
+            return initializeComponent(statement, typeName, typeExists);
         }
     }
 

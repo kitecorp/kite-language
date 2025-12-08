@@ -124,9 +124,10 @@ public class CountTests extends DecoratorTests {
     }
 
     @Test
-    @Disabled("not implemented")
     void countComponent() {
         eval("""
+                component vm { }
+                
                 @count(2)
                 component vm main {
                 

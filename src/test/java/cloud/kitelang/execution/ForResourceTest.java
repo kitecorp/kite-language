@@ -254,7 +254,7 @@ public class ForResourceTest extends RuntimeTest {
                   schema vm { string name }
                   for i in 0..2 {
                     for j in 0..2 {
-                      resource vm main { name = '$i-$j' }
+                      resource vm main { name = "$i-$j" }
                     }
                   }
                 """);

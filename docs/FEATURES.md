@@ -107,3 +107,49 @@ var endpoint = main.hostname  // Access property on instance
 
 **Tests:**
 - `src/test/java/cloud/kitelang/execution/ComponentTest.java`
+
+## @cloud Decorator
+
+Marks schema properties as cloud-generated values that cannot be set by users. These properties are populated by the cloud provider after resource creation (e.g., ARNs, IDs, endpoints).
+
+### Basic Usage
+
+```kite
+schema aws_instance {
+    string name                      // User-set property
+    @cloud string arn                // Cloud-generated, not importable
+    @cloud(importable) string id     // Cloud-generated, can be used for import
+}
+
+resource aws_instance server {
+    name = "web-server"
+    // arn and id are NOT set - they come from AWS after apply
+}
+```
+
+### Importable Argument
+
+The optional `importable` argument indicates properties that can identify existing resources for import operations.
+
+**Syntax forms:**
+- `@cloud` - Cloud-generated, not importable (default)
+- `@cloud(importable)` - Shorthand for importable=true
+- `@cloud(importable=true)` - Explicit true
+- `@cloud(importable=false)` - Same as plain @cloud
+
+**Features:**
+- Only valid on schema properties (enforced at type-check time)
+- Blocks initialization in schema declarations (e.g., `@cloud string arn = "..."` is an error)
+- Blocks assignment in resource declarations (e.g., `arn = "..."` in resource block is an error)
+- Cloud properties are initialized to `null` and populated after apply
+- Multiple properties can be marked as `@cloud(importable)`
+
+**Reference:**
+- `src/main/java/cloud/kitelang/semantics/decorators/CloudDecorator.java` (type checking)
+- `src/main/java/cloud/kitelang/execution/values/SchemaValue.java` (cloud property tracking)
+- `src/main/java/cloud/kitelang/execution/Interpreter.java` (runtime validation)
+- `docs/DECORATORS.md` (full decorator documentation)
+
+**Tests:**
+- `src/test/java/cloud/kitelang/semantics/typechecker/SchemaTest.java` (type-check tests)
+- `src/test/java/cloud/kitelang/integration/CloudDecoratorTest.java` (integration tests)

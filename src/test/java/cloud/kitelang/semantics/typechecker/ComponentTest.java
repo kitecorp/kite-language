@@ -1,9 +1,11 @@
-package cloud.kitelang.semantics;
+package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
 import cloud.kitelang.execution.exceptions.DeclarationExistsException;
 import cloud.kitelang.execution.exceptions.InvalidInitException;
 import cloud.kitelang.execution.exceptions.NotFoundException;
+import cloud.kitelang.semantics.TypeEnvironment;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.*;
 import cloud.kitelang.tool.theme.PlainTheme;
 import lombok.extern.log4j.Log4j2;
@@ -1118,7 +1120,6 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
-    @Disabled
     void componentInputsNotAccessibleFromOutside() {
         assertThrows(TypeError.class, () -> eval("""
                 component app {
