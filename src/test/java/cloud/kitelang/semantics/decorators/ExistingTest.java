@@ -1,4 +1,4 @@
-package cloud.kitelang.semantics.Decorators;
+package cloud.kitelang.semantics.decorators;
 
 import cloud.kitelang.base.CheckerTest;
 import cloud.kitelang.semantics.TypeError;
