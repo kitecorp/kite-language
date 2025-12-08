@@ -1,9 +1,11 @@
 package cloud.kitelang.integration;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ResourceStringInterpolation extends BaseIntegrationTest {
+@DisplayName("Resource string interpolation")
+public class ResourceStringInterpolationTest extends BaseIntegrationTest {
     @Test
     void stringInterpolationMemberAccess() {
         eval("""
@@ -29,14 +31,14 @@ public class ResourceStringInterpolation extends BaseIntegrationTest {
                 
                     @count(2)
                     resource vm main {
-                        name = "main-property-${count}"
+                        name = "property-${count}"
                         size = 1
                     }
                 
                     var x = main[0].name
                     var y = main[1].name
                 """);
-        Assertions.assertEquals("main-property-0", interpreter.getEnv().get("x"));
-        Assertions.assertEquals("main-property-1", interpreter.getEnv().get("y"));
+        Assertions.assertEquals("property-0", interpreter.getEnv().get("x"));
+        Assertions.assertEquals("property-1", interpreter.getEnv().get("y"));
     }
 }

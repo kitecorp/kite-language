@@ -1,6 +1,8 @@
-package cloud.kitelang.semantics;
+package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
+import cloud.kitelang.semantics.TypeEnvironment;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.ArrayType;
 import cloud.kitelang.semantics.types.ObjectType;
 import cloud.kitelang.semantics.types.StringType;

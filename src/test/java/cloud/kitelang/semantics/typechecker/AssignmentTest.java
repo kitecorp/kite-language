@@ -1,6 +1,7 @@
-package cloud.kitelang.semantics;
+package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.ValueType;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;

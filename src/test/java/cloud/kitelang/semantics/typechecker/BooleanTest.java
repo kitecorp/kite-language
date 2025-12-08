@@ -1,6 +1,7 @@
-package cloud.kitelang.semantics;
+package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.ValueType;
 import cloud.kitelang.syntax.literals.NullLiteral;
 import lombok.extern.log4j.Log4j2;

@@ -1,7 +1,8 @@
-package cloud.kitelang.semantics;
+package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
 import cloud.kitelang.execution.exceptions.NotFoundException;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.ResourceType;
 import cloud.kitelang.semantics.types.SchemaType;
 import cloud.kitelang.semantics.types.ValueType;

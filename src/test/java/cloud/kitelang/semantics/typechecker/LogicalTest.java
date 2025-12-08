@@ -1,6 +1,7 @@
-package cloud.kitelang.semantics;
+package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.ValueType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
