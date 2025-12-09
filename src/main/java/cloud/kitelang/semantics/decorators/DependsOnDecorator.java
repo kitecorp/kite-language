@@ -1,7 +1,7 @@
 package cloud.kitelang.semantics.decorators;
 
 import cloud.kitelang.analysis.visitors.SyntaxPrinter;
-import cloud.kitelang.execution.values.Deferred;
+import cloud.kitelang.execution.values.ResourceRef;
 import cloud.kitelang.semantics.TypeChecker;
 import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.*;
@@ -89,7 +89,7 @@ public class DependsOnDecorator extends DecoratorChecker {
                     throw new TypeError(message);
                 }
             }
-            case AnyType anyType when anyType.getAny() instanceof Deferred -> {
+            case AnyType anyType when anyType.getAny() instanceof ResourceRef.Pending -> {
             }
             default -> throwErrorForInvalidArgument(item);
         }

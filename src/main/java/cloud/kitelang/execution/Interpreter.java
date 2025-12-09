@@ -821,9 +821,9 @@ public final class Interpreter extends StackVisitor<Object> {
         Object right = executeBlock(expression.getRight(), env);
         if (Objects.equals(expression.getOperator(), "+=")) {
             return equalComplexAssignment(identifier, right);
-        } else if (right instanceof Dependency dependency) {
-            var res = env.assign(identifier.string(), dependency.value());
-            return dependency;
+        } else if (right instanceof ResourceRef.Resolved resolved) {
+            var res = env.assign(identifier.string(), resolved.value());
+            return resolved;
         } else {
             return env.assign(identifier.string(), right);
         }
@@ -861,14 +861,14 @@ public final class Interpreter extends StackVisitor<Object> {
                 case Map<?, ?> map -> visitMapMember(expression, map);
 //                case ObjectValue objVal -> objVal.getProperties().get(index.toString());
                 case ResourceValue resourceVal -> visitResourceArray(expression);
-                case Dependency dependency -> {
-                    if (dependency.value() instanceof List<?> list) {
+                case ResourceRef.Resolved resolved -> {
+                    if (resolved.value() instanceof List<?> list) {
                         yield visitListMember(index, list);
                     } else {
-                        yield dependency.value();
+                        yield resolved.value();
                     }
                 }
-                case Deferred deferred -> {
+                case ResourceRef.Pending pending -> {
                     // When base name doesn't exist (e.g., 'main' for @count resources),
                     // try direct lookup of the full indexed name 'main[0]'
                     var propertyName = getPropertyName(expression.getObject());
@@ -885,12 +885,12 @@ public final class Interpreter extends StackVisitor<Object> {
                 case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
                 case ComponentValue componentValue -> visitComponentMember(expression, componentValue);
                 case Map<?, ?> map -> visitMapMember(expression, map);
-                case Deferred deferred -> visitDeferredMember(expression, deferred);
-                case Dependency dependency -> {
-                    if (dependency.value() instanceof Map<?, ?> list) {
-                        yield visitMapMember(expression, list);
+                case ResourceRef.Pending pending -> visitPendingMember(expression, pending);
+                case ResourceRef.Resolved resolved -> {
+                    if (resolved.value() instanceof Map<?, ?> map2) {
+                        yield visitMapMember(expression, map2);
                     } else {
-                        yield dependency.value();
+                        yield resolved.value();
                     }
                 }
                 case null, default -> object;
@@ -950,7 +950,7 @@ public final class Interpreter extends StackVisitor<Object> {
             return propertyOrDeferred(resources, propertyName);
         }
 
-        if (indexedResource instanceof Deferred && propertyOrDeferred(resources, propertyName) instanceof ResourceValue resourceValue) {
+        if (indexedResource instanceof ResourceRef.Pending && propertyOrDeferred(resources, propertyName) instanceof ResourceValue resourceValue) {
             return resourceValue;
         }
 
@@ -969,8 +969,8 @@ public final class Interpreter extends StackVisitor<Object> {
             return resourceValue.lookup(propertyName);
         } else {
             var propertyValue = resourceValue.lookup(propertyName);
-            // When retrieving the type of a resource through member expression, return a Dependency
-            return new Dependency(resourceValue, propertyValue);
+            // When retrieving the type of a resource through member expression, return a Resolved reference
+            return ResourceRef.resolved(resourceValue, propertyValue);
         }
     }
 
@@ -990,14 +990,14 @@ public final class Interpreter extends StackVisitor<Object> {
         return componentValue.lookup(propertyName);
     }
 
-    private Object visitDeferredMember(MemberExpression expression, Deferred deferred) {
+    private Object visitPendingMember(MemberExpression expression, ResourceRef.Pending pending) {
         if (expression.getObject() instanceof MemberExpression memberExpression) {
             var key = executeBlock(expression.getProperty(), env);
-            var computedProperty = deferred.resource() + "[" + key + "]";
+            var computedProperty = pending.resourceName() + "[" + key + "]";
             memberExpression.setProperty(SymbolIdentifier.id(computedProperty));
             return visit(memberExpression);
         }
-        return deferred;
+        return pending;
     }
 
     private @NotNull String getPropertyName(Expression expression) {
@@ -1114,10 +1114,10 @@ public final class Interpreter extends StackVisitor<Object> {
 
     /**
      * Collects all dependencies from resource properties and @dependsOn decorators.
-     * Returns a list of deferred (unresolved) dependencies.
+     * Returns a list of pending (unresolved) dependencies.
      */
-    private List<Deferred> collectResourceDependencies(ResourceStatement resource, ResourceValue instance) {
-        var deferredList = new ArrayList<Deferred>();
+    private List<ResourceRef.Pending> collectResourceDependencies(ResourceStatement resource, ResourceValue instance) {
+        var deferredList = new ArrayList<ResourceRef.Pending>();
 
         // Collect dependencies from property evaluations
         for (Statement it : resource.getArguments()) {
@@ -1132,7 +1132,7 @@ public final class Interpreter extends StackVisitor<Object> {
             if (it instanceof Identifier identifier) {
                 result = env.containsKey(identifier.string())
                         ? executeBlock(it, env)
-                        : new Deferred(identifier.string());
+                        : ResourceRef.pending(identifier.string(), null, ResourceRef.RefSource.DEPENDS_ON);
             } else {
                 result = executeBlock(it, env);
             }
@@ -1153,12 +1153,12 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     /**
-     * Registers this resource as an observer for all deferred dependencies.
-     * Increments the unresolved dependency counter for each deferred dependency.
+     * Registers this resource as an observer for all pending dependencies.
+     * Increments the unresolved dependency counter for each pending dependency.
      */
-    private void registerDeferredObservers(ResourceStatement resource, List<Deferred> deferredDependencies) {
-        for (Deferred deferred : deferredDependencies) {
-            deferredObservable.addObserver(resource, deferred);
+    private void registerDeferredObservers(ResourceStatement resource, List<ResourceRef.Pending> pendingDependencies) {
+        for (ResourceRef.Pending pending : pendingDependencies) {
+            deferredObservable.addObserver(resource, pending);
             resource.incrementUnresolvedDependencyCount();
         }
     }
@@ -1205,16 +1205,16 @@ public final class Interpreter extends StackVisitor<Object> {
 
     /**
      * Adds a dependency to the resource based on the evaluation result.
-     * Handles three types: Deferred (unresolved), Dependency (resolved), and ResourceValue (from @dependsOn).
+     * Handles three types: Pending (unresolved), Resolved (resolved), and ResourceValue (from @dependsOn).
      */
-    private void addDependency(ResourceStatement resource, ResourceValue instance, Object result, List<Deferred> deferredList) {
+    private void addDependency(ResourceStatement resource, ResourceValue instance, Object result, List<ResourceRef.Pending> deferredList) {
         switch (result) {
-            case Deferred deferred -> {
-                instance.addDependency(deferred.resource());
+            case ResourceRef.Pending pending -> {
+                instance.addDependency(pending.resourceName());
                 resource.setEvaluated(false);
-                deferredList.add(deferred);
+                deferredList.add(pending);
             }
-            case Dependency dependency -> instance.addDependency(dependency.resource().getPath().toSegmentName());
+            case ResourceRef.Resolved resolved -> instance.addDependency(resolved.resource().getPath().toSegmentName());
             case ResourceValue resourceValue -> instance.addDependency(resourceValue.getName());
             case null, default -> {
             }
@@ -1454,8 +1454,8 @@ public final class Interpreter extends StackVisitor<Object> {
             value = executeBlock(expression.getInit(), env);
         }
         expect(expression, value);
-        if (value instanceof Dependency dependency) { // a dependency access on another resource
-            return env.init(symbol, dependency.value());
+        if (value instanceof ResourceRef.Resolved resolved) { // a resolved reference to another resource
+            return env.init(symbol, resolved.value());
         }
         return env.init(symbol, value);
     }
@@ -1505,8 +1505,8 @@ public final class Interpreter extends StackVisitor<Object> {
             throw new MissingOutputException("Output type without an init value: " + printer.visit(expression));
         }
         var res = visit(expression.getInit());
-        if (res instanceof Dependency value && value.value() == null) {
-            return value;
+        if (res instanceof ResourceRef.Resolved resolved && resolved.value() == null) {
+            return resolved;
         } else {
             return res;
         }
@@ -1526,8 +1526,8 @@ public final class Interpreter extends StackVisitor<Object> {
 
     private Object resolveResource(Map<String, Map<String, Object>> resources, OutputDeclaration output) {
         if (output.getInit() instanceof MemberExpression memberExpression) {
-            if (visit(output.getInit()) instanceof Dependency dependency) {
-                var resource = dependency.resource();
+            if (visit(output.getInit()) instanceof ResourceRef.Resolved resolved) {
+                var resource = resolved.resource();
                 var propertyName = getPropertyName(memberExpression.getProperty());
                 return resources.get(resource.getName()).get(propertyName);
             }
@@ -1547,8 +1547,8 @@ public final class Interpreter extends StackVisitor<Object> {
         if (expression.hasInit()) {// resource/schema can both have init but is only mandatory in the resource
             value = executeBlock(expression.getInit(), env);
         }
-        if (value instanceof Dependency dependency) { // a dependency access on another resource
-            return env.init(symbol, dependency.value());
+        if (value instanceof ResourceRef.Resolved resolved) { // a resolved reference to another resource
+            return env.init(symbol, resolved.value());
         }
         return env.init(symbol, value);
     }

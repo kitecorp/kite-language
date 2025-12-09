@@ -1,7 +1,7 @@
 package cloud.kitelang.execution;
 
-import cloud.kitelang.execution.values.Deferred;
 import cloud.kitelang.execution.values.DeferredObserverValue;
+import cloud.kitelang.execution.values.ResourceRef;
 import cloud.kitelang.execution.values.ResourceValue;
 
 import java.util.HashMap;
@@ -67,8 +67,14 @@ public class DeferredObservable {
         }
     }
 
-    public void addObserver(DeferredObserverValue resource, Deferred deferred) {
-        var observers = deferredResources.computeIfAbsent(deferred.resource(), k -> new HashSet<>());
+    /**
+     * Registers a resource as an observer waiting for a pending dependency to be resolved.
+     *
+     * @param resource the observer (resource with unresolved dependency)
+     * @param pending  the pending reference being waited on
+     */
+    public void addObserver(DeferredObserverValue resource, ResourceRef.Pending pending) {
+        var observers = deferredResources.computeIfAbsent(pending.resourceName(), k -> new HashSet<>());
         observers.add(resource);
     }
 }

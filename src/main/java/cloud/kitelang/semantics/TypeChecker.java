@@ -8,7 +8,7 @@ import cloud.kitelang.execution.exceptions.DeclarationExistsException;
 import cloud.kitelang.execution.exceptions.InvalidInitException;
 import cloud.kitelang.execution.exceptions.NotFoundException;
 import cloud.kitelang.execution.exceptions.OperationNotImplementedException;
-import cloud.kitelang.execution.values.Deferred;
+import cloud.kitelang.execution.values.ResourceRef;
 import cloud.kitelang.semantics.decorators.*;
 import cloud.kitelang.semantics.types.*;
 import cloud.kitelang.syntax.annotations.Annotatable;
@@ -559,7 +559,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             objectType = executeBlock(expression.getObject(), env);
         } catch (NotFoundException e) {
             // Forward reference to resource not yet declared - defer validation to interpreter
-            return new AnyType(new Deferred(resourceName.string()));
+            return new AnyType(ResourceRef.pending(resourceName.string()));
         }
 
         return switch (objectType) {
@@ -619,7 +619,7 @@ public final class TypeChecker extends StackVisitor<Type> {
                 resourceName.string()
         );
 
-        return result instanceof Deferred deferred ? new AnyType(deferred) : (Type) result;
+        return result instanceof ResourceRef.Pending pending ? new AnyType(pending) : (Type) result;
     }
 
     private TypeEnvironment getInstances() {
@@ -1332,7 +1332,7 @@ public final class TypeChecker extends StackVisitor<Type> {
           resource vm main { a = second.a }  // references a resource not evaluated yet so we must deferr evaluation
           resource vm main { a = "second" }
         */
-        if (valueType instanceof AnyType any && any.getAny() instanceof Deferred deferred) {
+        if (valueType instanceof AnyType any && any.getAny() instanceof ResourceRef.Pending pending) {
             return any;
         }
         var expected = expect(valueType, varType, expression);
