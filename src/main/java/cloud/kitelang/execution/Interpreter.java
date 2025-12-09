@@ -47,6 +47,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cloud.kitelang.execution.CycleDetection.topologySort;
+import static cloud.kitelang.execution.CycleDetectionSupport.lookupOrPending;
 import static cloud.kitelang.execution.CycleDetectionSupport.propertyOrDeferred;
 import static cloud.kitelang.execution.interpreter.OperatorComparator.compare;
 import static cloud.kitelang.syntax.ast.statements.FunctionDeclaration.fun;
@@ -873,7 +874,7 @@ public final class Interpreter extends StackVisitor<Object> {
                     // try direct lookup of the full indexed name 'main[0]'
                     var propertyName = getPropertyName(expression.getObject());
                     var fullName = format("{0}[{1}]", propertyName, index);
-                    yield propertyOrDeferred(getInstances(), fullName);
+                    yield lookupOrPending(getInstances(), fullName);
                 }
                 case null, default ->
                         throw new RuntimeError("Cannot index into type: " + (object != null ? object.getClass().getSimpleName() : "null"));
@@ -931,13 +932,13 @@ public final class Interpreter extends StackVisitor<Object> {
         var resources = getInstances();
 
         if (!ExecutionContextIn(ForStatement.class)) {
-            return propertyOrDeferred(resources, propertyName);
+            return lookupOrPending(resources, propertyName);
         }
 
         // Access computed property in for loop expression without the syntax
         // See: ForResourceTest#dependsOnEarlyResource()
         if (!(ExecutionContext(ResourceStatement.class) instanceof ResourceStatement resourceStatement)) {
-            return propertyOrDeferred(resources, propertyName);
+            return lookupOrPending(resources, propertyName);
         }
 
         // In a loop (or @count) we try to access an equivalent resource without using the index
@@ -990,14 +991,25 @@ public final class Interpreter extends StackVisitor<Object> {
         return componentValue.lookup(propertyName);
     }
 
+    /**
+     * Handles property access on a pending (not yet resolved) resource reference.
+     * For example: main[0].name where main[0] hasn't been evaluated yet.
+     *
+     * @param expression the member expression being accessed
+     * @param pending the pending resource reference
+     * @return a new pending reference that includes the property path
+     */
     private Object visitPendingMember(MemberExpression expression, ResourceRef.Pending pending) {
-        if (expression.getObject() instanceof MemberExpression memberExpression) {
-            var key = executeBlock(expression.getProperty(), env);
-            var computedProperty = pending.resourceName() + "[" + key + "]";
-            memberExpression.setProperty(SymbolIdentifier.id(computedProperty));
-            return visit(memberExpression);
-        }
-        return pending;
+        // Get the property name being accessed (e.g., "name" for main[0].name)
+        var propertyName = getPropertyName(expression.getProperty());
+
+        // Return a pending reference that includes the property path.
+        // When the resource is resolved, the property will be accessed during re-evaluation.
+        return ResourceRef.pending(
+                pending.resourceName(),
+                propertyName,
+                ResourceRef.RefSource.PROPERTY_ACCESS
+        );
     }
 
     private @NotNull String getPropertyName(Expression expression) {
