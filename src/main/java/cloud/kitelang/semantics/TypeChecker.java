@@ -623,7 +623,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     private TypeEnvironment getInstances() {
-        return env;
+        return env.getTypeRoot();
     }
 
     private Type lookupResourceProperty(MemberExpression expression, ResourceType resourceType, SymbolIdentifier resourceName) {
@@ -916,10 +916,13 @@ public final class TypeChecker extends StackVisitor<Type> {
         validateResourceProperties(resourceEnv, installedSchema, resource);
 
         var resourceType = new ResourceType(resourceName, installedSchema, resourceEnv);
+        // Check for global uniqueness, but store location depends on context
         if (ExecutionContextIn(ComponentStatement.class)) {
-            env.init(resourceName, resourceType);
+            // Component resources: store in component's scope for proper type lookups
+            env.initResourceType(resourceName, resourceType);
         } else {
-            env.init(resourceName, resourceType);
+            // Top-level resources: store at root to catch conflicts across sibling scopes (e.g., two for-loops)
+            env.initResourceTypeAtRoot(resourceName, resourceType);
         }
 
         return resourceType;

@@ -1,6 +1,7 @@
 package cloud.kitelang.semantics.typechecker;
 
 import cloud.kitelang.base.CheckerTest;
+import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.TypeEnvironment;
 import cloud.kitelang.semantics.types.ArrayType;
 import cloud.kitelang.semantics.types.ObjectType;
@@ -181,6 +182,29 @@ public class ForLoopTest extends CheckerTest {
         var resourceType = (ResourceType) arrayType.getType();
         var res = new ResourceType("photos", resourceType.getSchema(), arrayType.getEnvironment());
         assertEquals(res, arrayType.getType());
+    }
+
+    @Test
+    void arrayResourcesOverStringsOverlappingName() {
+        // Two for-loops creating resources with the same name should fail
+        Assertions.assertThrows(TypeError.class, () -> eval("""
+                schema Bucket {
+                   string name
+                }
+                schema Ec2 {
+                   string name
+                }
+                var envs = ['hello', 'world']
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index}'
+                }
+                
+                [for index in envs]
+                resource Bucket photos {
+                  name     = 'name-${index}'
+                }
+                """), "Duplicate resource name 'photos' should cause TypeError");
     }
 
 }
