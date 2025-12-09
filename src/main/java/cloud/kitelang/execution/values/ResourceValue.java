@@ -176,4 +176,7 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
         this.properties = properties;
     }
 
+    public Object getProperty(String x) {
+        return getProperties().get(x);
+    }
 }

@@ -868,7 +868,13 @@ public final class Interpreter extends StackVisitor<Object> {
                         yield dependency.value();
                     }
                 }
-                case Deferred deferred -> visitDeferredMember(expression, deferred);
+                case Deferred deferred -> {
+                    // When base name doesn't exist (e.g., 'main' for @count resources),
+                    // try direct lookup of the full indexed name 'main[0]'
+                    var propertyName = getPropertyName(expression.getObject());
+                    var fullName = format("{0}[{1}]", propertyName, index);
+                    yield propertyOrDeferred(getInstances(), fullName);
+                }
                 case null, default ->
                         throw new RuntimeError("Cannot index into type: " + (object != null ? object.getClass().getSimpleName() : "null"));
             };

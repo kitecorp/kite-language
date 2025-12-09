@@ -15,7 +15,7 @@ public class ResourceStringInterpolationTest extends BaseIntegrationTest {
                             name = "main-property"
                             size = 1
                         }
-
+                
                         fun main() {
                             var x = "Hello ${server.name}! Your number is ${server.size}"
                             println(x)
@@ -25,7 +25,7 @@ public class ResourceStringInterpolationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void interpolationInterpolationCount() {
+    void interpolationAfterCount() {
         eval("""
                     schema vm { string name; number size; }
                 
@@ -38,7 +38,27 @@ public class ResourceStringInterpolationTest extends BaseIntegrationTest {
                     var x = main[0].name
                     var y = main[1].name
                 """);
-        Assertions.assertEquals("property-0", interpreter.getEnv().get("x"));
-        Assertions.assertEquals("property-1", interpreter.getEnv().get("y"));
+        Assertions.assertEquals("property-0", interpreter.getInstance("main[0]").getProperty("name"));
+        Assertions.assertEquals("property-1", interpreter.getInstance("main[1]").getProperty("name"));
+    }
+
+    @Test
+    void interpolationBeforeCount() {
+        eval("""
+                    schema vm { string name; number size; }
+                
+                    var x = main[0].name
+                    var y = main[1].name
+                
+                    @count(2)
+                    resource vm main {
+                        name = "property-${count}"
+                        size = 1
+                    }
+                
+                
+                """);
+        Assertions.assertEquals("property-0", interpreter.getInstance("main[0]").getProperty("name"));
+        Assertions.assertEquals("property-1", interpreter.getInstance("main[1]").getProperty("name"));
     }
 }
