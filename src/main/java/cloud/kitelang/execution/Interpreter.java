@@ -65,10 +65,6 @@ public final class Interpreter extends StackVisitor<Object> {
     @Getter
     @Setter
     private SyntaxPrinter printer;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Setter
-    private Map<String, ResourceValue> instances; // holds the full resource path name
     @Getter
     private Environment<Object> env;
     // Track currently importing files to detect circular imports
@@ -98,7 +94,6 @@ public final class Interpreter extends StackVisitor<Object> {
         this.outputs = new ArrayList<>();
         this.printer = printer;
         this.deferredObservable = new DeferredObservable();
-        this.instances = new LinkedHashMap<>();
         this.importChain = importChain; // Share the import chain
         this.componentDeclarations = new HashMap<>();
 
@@ -253,16 +248,17 @@ public final class Interpreter extends StackVisitor<Object> {
         }
     }
 
+    /**
+     * Registers a resource instance at the root environment level.
+     * Ensures global uniqueness of resource names across all scopes.
+     */
     public ResourceValue initInstance(ResourceValue instance) {
-        String segmentName = instance.getPath().toSegmentName();
-        var contains = this.instances.containsKey(segmentName); // todo performance tip: replace contains with put only
-        if (contains) {
-            throw new DeclarationExistsException(">" + segmentName + "< already exists in schema");
-        }
-        this.env.init(segmentName, instance);
-        this.instances.put(segmentName, instance);
+        var segmentName = instance.getPath().toSegmentName();
+        // Register at root level for global uniqueness
+        env.initResource(segmentName, instance);
         if (ExecutionContextIn(ForStatement.class)) {
             // make resource name {..} accessible through .name instead of .name[count]
+            // This is a convenience alias in the current scope, not a separate resource
             env.initOrAssign(instance.getPath().getName(), instance);
         }
         return instance;
@@ -270,7 +266,7 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Nullable
     public ResourceValue getInstance(String name) {
-        return instances.get(name);
+        return env.getResource(name);
     }
 
     @Override
@@ -926,28 +922,29 @@ public final class Interpreter extends StackVisitor<Object> {
 
     private Object visitSchemaMember(MemberExpression expression) {
         var propertyName = getPropertyName(expression.getObject());
+        var resources = getInstances();
 
         if (!ExecutionContextIn(ForStatement.class)) {
-            return propertyOrDeferred(instances, propertyName);
+            return propertyOrDeferred(resources, propertyName);
         }
 
         // Access computed property in for loop expression without the syntax
         // See: ForResourceTest#dependsOnEarlyResource()
         if (!(ExecutionContext(ResourceStatement.class) instanceof ResourceStatement resourceStatement)) {
-            return propertyOrDeferred(instances, propertyName);
+            return propertyOrDeferred(resources, propertyName);
         }
 
         // In a loop (or @count) we try to access an equivalent resource without using the index
         // If nothing is found we might access the resource that is not an array
         // See: CountTests#countResourceDependencyIndex()
         var indexedProperty = "%s[%s]".formatted(propertyName, resourceStatement.getIndex());
-        var indexedResource = propertyOrDeferred(instances, indexedProperty);
+        var indexedResource = propertyOrDeferred(resources, indexedProperty);
 
         if (indexedResource == null) {
-            return propertyOrDeferred(instances, propertyName);
+            return propertyOrDeferred(resources, propertyName);
         }
 
-        if (indexedResource instanceof Deferred && propertyOrDeferred(instances, propertyName) instanceof ResourceValue resourceValue) {
+        if (indexedResource instanceof Deferred && propertyOrDeferred(resources, propertyName) instanceof ResourceValue resourceValue) {
             return resourceValue;
         }
 
@@ -1614,7 +1611,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private void topologySortResources() {
-        topologySort(instances);
+        topologySort(getInstances());
     }
 
     @Override
@@ -1702,6 +1699,6 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     public Map<String, ResourceValue> getInstances() {
-        return instances;
+        return env.getRoot().getResources();
     }
 }

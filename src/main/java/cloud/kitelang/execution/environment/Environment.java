@@ -12,7 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents a lexical scope for variable storage and lookup.
@@ -234,5 +236,68 @@ public class Environment<T> implements IEnvironment<T> {
 
     public int size() {
         return variables.size();
+    }
+
+    /**
+     * Returns the root (top-most) environment in the hierarchy.
+     * Resources are stored at the root level to ensure global uniqueness.
+     */
+    public Environment<T> getRoot() {
+        return parent == null ? this : parent.getRoot();
+    }
+
+    /**
+     * Returns all ResourceValue instances stored in this environment.
+     * Preserves insertion order using LinkedHashMap for deterministic dependency resolution.
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, ResourceValue> getResources() {
+        return variables.entrySet().stream()
+                .filter(e -> e.getValue() instanceof ResourceValue)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> (ResourceValue) e.getValue(),
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+    }
+
+    /**
+     * Checks if a resource with the given name exists anywhere in the environment hierarchy.
+     * Used to ensure global uniqueness of resource names.
+     */
+    public boolean hasResourceGlobally(String name) {
+        var value = get(name);
+        if (value instanceof ResourceValue) {
+            return true;
+        }
+        return parent != null && parent.hasResourceGlobally(name);
+    }
+
+    /**
+     * Initializes a resource at the root environment level to ensure global uniqueness.
+     * Throws DeclarationExistsException if a resource with the same name already exists.
+     *
+     * @param name     the resource name (segment name including index if applicable)
+     * @param resource the ResourceValue to register
+     * @return the registered resource
+     */
+    @SuppressWarnings("unchecked")
+    public ResourceValue initResource(String name, ResourceValue resource) {
+        var root = getRoot();
+        if (root.hasResourceGlobally(name)) {
+            throw new DeclarationExistsException(">" + name + "< already exists");
+        }
+        root.variables.put(name, (T) resource);
+        return resource;
+    }
+
+    /**
+     * Retrieves a resource by name from the root environment.
+     */
+    @Nullable
+    public ResourceValue getResource(String name) {
+        var value = getRoot().get(name);
+        return value instanceof ResourceValue rv ? rv : null;
     }
 }
