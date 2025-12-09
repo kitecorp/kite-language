@@ -42,6 +42,7 @@ public class CountTests extends DecoratorTests {
                 resource vm main {
                     name = "main-$count"
                 }
+//                var x = main[0].name
                 """);
         var main0 = interpreter.getInstance("main[0]");
         var main1 = interpreter.getInstance("main[1]");

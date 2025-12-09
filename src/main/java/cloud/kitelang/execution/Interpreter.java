@@ -1321,7 +1321,7 @@ public final class Interpreter extends StackVisitor<Object> {
         if (statement.isBodyBlock()) { // Block-style: execute body each iteration, return last result
             return ExecuteForBodyBlock(statement, min, max, forEnv);
         } else if (statement.getBody() != null) { // Expr-style: build a list from body results (with If support)
-            return ExecuteForBody(statement, max, min, forEnv);
+            return ExecuteForBody(statement, max, min, env);
         } else {
             throw new OperationNotImplementedException("For statement operation not implemented");
         }

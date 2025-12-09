@@ -35,8 +35,8 @@ public class ResourceStringInterpolationTest extends BaseIntegrationTest {
                         size = 1
                     }
                 
-                    var x = main[0].name
-                    var y = main[1].name
+//                    var x = main[0].name
+//                    var y = main[1].name
                 """);
         Assertions.assertEquals("property-0", interpreter.getEnv().get("x"));
         Assertions.assertEquals("property-1", interpreter.getEnv().get("y"));

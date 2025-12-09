@@ -1,6 +1,7 @@
 package cloud.kitelang.execution.decorators;
 
 import cloud.kitelang.execution.Interpreter;
+import cloud.kitelang.execution.values.ResourceValue;
 import cloud.kitelang.syntax.annotations.CountAnnotatable;
 import cloud.kitelang.syntax.ast.expressions.AnnotationDeclaration;
 import cloud.kitelang.syntax.ast.expressions.ComponentStatement;
@@ -10,6 +11,8 @@ import cloud.kitelang.syntax.ast.statements.ForStatement;
 import cloud.kitelang.syntax.literals.NumberLiteral;
 import cloud.kitelang.syntax.literals.SymbolIdentifier;
 import org.apache.commons.lang3.Range;
+
+import java.util.ArrayList;
 
 import static cloud.kitelang.syntax.ast.statements.BlockExpression.block;
 
@@ -23,8 +26,8 @@ public class CountDecorator extends NumberDecorator {
         var numberLiteral = (NumberLiteral) declaration.getValue();
         var count = (Integer) interpreter.visit(numberLiteral);
         var body = switch (declaration.getTarget()) {
-            case ResourceStatement expression -> expression;
-            case ComponentStatement statement -> statement;
+            case ResourceStatement resourceStatement -> resourceStatement;
+            case ComponentStatement componentStatement -> componentStatement;
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
         var forStatement = ForStatement.builder()
