@@ -96,7 +96,10 @@ var endpoint = main.hostname  // Access property on instance
 - Component instantiation (`component Type name { ... }`) - creates instance with overrides
 - Instances inherit default values from type declaration
 - Instance properties override declaration defaults
-- Properties accessed via `instanceName.propertyName`
+- **Member access rules:**
+  - Inputs and outputs are accessible via `instanceName.propertyName`
+  - Resources are private (cannot be accessed from outside the component)
+  - Component types (not instances) do not allow property access
 - Input/output/resource names must be unique within a component (enforced by Environment)
 - Components cannot be modified outside their block (throws RuntimeError)
 - Supports string interpolation, computed values, and cross-instance references

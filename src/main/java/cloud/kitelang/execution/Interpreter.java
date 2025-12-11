@@ -608,7 +608,17 @@ public final class Interpreter extends StackVisitor<Object> {
                 .build();
 
         // Execute the declaration block to initialize inputs/outputs with defaults
+        // Skip resources - they should only be created during instantiation
         for (var stmt : expression.getArguments()) {
+            if (stmt instanceof ResourceStatement) {
+                continue; // Resources are created per-instance, not during type declaration
+            }
+            // Register inputs and outputs as public properties
+            if (stmt instanceof InputDeclaration input) {
+                componentValue.addPublicProperty(input.name());
+            } else if (stmt instanceof OutputDeclaration output) {
+                componentValue.addPublicProperty(output.name());
+            }
             executeBlock(stmt, componentEnv);
         }
 
@@ -648,7 +658,13 @@ public final class Interpreter extends StackVisitor<Object> {
                 .build();
 
         // First, execute declaration block to initialize defaults
+        // Register inputs and outputs as public properties
         for (var stmt : declaration.getArguments()) {
+            if (stmt instanceof InputDeclaration input) {
+                componentValue.addPublicProperty(input.name());
+            } else if (stmt instanceof OutputDeclaration output) {
+                componentValue.addPublicProperty(output.name());
+            }
             executeBlock(stmt, instanceEnv);
         }
 
@@ -982,12 +998,26 @@ public final class Interpreter extends StackVisitor<Object> {
 
     /**
      * Handles property access on component instances.
-     * Only inputs/outputs can be accessed via instanceName.outputName.
+     * Only inputs and outputs can be accessed via instanceName.propertyName.
+     * Resources are private and cannot be accessed from outside the component.
+     * Component types (not instances) do not allow external property access.
      */
     private Object visitComponentMember(MemberExpression expression, ComponentValue componentValue) {
         var propertyName = getPropertyName(expression.getProperty());
-        // Look up the property in the component's properties environment
-        // TODO: Restrict to inputs/outputs
+
+        // Component types (name == null) do not allow external property access
+        // Only instances (name != null) support public property access
+        if (componentValue.getName() == null) {
+            throw new RuntimeError("Cannot access property '%s' on component type. Create an instance first."
+                    .formatted(propertyName));
+        }
+
+        // Check if property is publicly accessible (input or output)
+        if (!componentValue.isPublicProperty(propertyName)) {
+            throw new RuntimeError("Cannot access private property '%s' on component '%s'. Only inputs and outputs are accessible."
+                    .formatted(propertyName, componentValue.getName()));
+        }
+
         return componentValue.lookup(propertyName);
     }
 
@@ -1512,11 +1542,16 @@ public final class Interpreter extends StackVisitor<Object> {
     @Override
     public Object visit(OutputDeclaration expression) {
         visitAnnotations(expression.getAnnotations());
-        outputs.add(expression); // just collect the outputs since they need to be evaluated after the program is run
+        outputs.add(expression); // collect outputs for printing after apply
         if (!expression.hasInit()) {
             throw new MissingOutputException("Output type without an init value: " + printer.visit(expression));
         }
         var res = visit(expression.getInit());
+
+        // Store output in current environment for component member access
+        var name = expression.name();
+        env.initOrAssign(name, res);
+
         if (res instanceof ResourceRef.Resolved resolved && resolved.value() == null) {
             return resolved;
         } else {

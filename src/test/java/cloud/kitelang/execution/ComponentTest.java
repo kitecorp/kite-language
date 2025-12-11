@@ -536,4 +536,131 @@ public class ComponentTest extends RuntimeTest {
         assertEquals(2, ((List<?>) instance.argVal("arr")).size());
     }
 
+    // ==================== Component Member Access Restriction Tests ====================
+
+    @Test
+    @DisplayName("Accessing an output on a component instance should work")
+    void componentInstanceCanAccessOutput() {
+        var res = eval("""
+                component server {
+                    output string endpoint = "http://localhost:8080"
+                }
+
+                component server main {
+                }
+
+                var url = main.endpoint
+                """);
+
+        assertEquals("http://localhost:8080", res);
+    }
+
+    @Test
+    @DisplayName("Accessing an input on a component instance should work")
+    void componentInstanceCanAccessInput() {
+        var res = eval("""
+                component server {
+                    input string hostname = "default"
+                }
+
+                component server main {
+                    hostname = "localhost"
+                }
+
+                var host = main.hostname
+                """);
+
+        assertEquals("localhost", res);
+    }
+
+    @Test
+    @DisplayName("Accessing a non-existent property on a component instance should throw error")
+    void componentInstanceCannotAccessNonExistentProperty() {
+        assertThrows(RuntimeException.class, () -> eval("""
+                component server {
+                    input string hostname = "localhost"
+                }
+
+                component server main {
+                }
+
+                var x = main.nonExistent
+                """));
+    }
+
+    @Test
+    @DisplayName("Both inputs and outputs should be accessible on component instances")
+    void componentInstanceCanAccessInputsAndOutputs() {
+        eval("""
+                component server {
+                    input string hostname = "localhost"
+                    input number port = 8080
+                    output string info = "server-info"
+                }
+
+                component server main {
+                    hostname = "myhost"
+                }
+
+                var h = main.hostname
+                var p = main.port
+                var i = main.info
+                """);
+
+        assertEquals("myhost", interpreter.getVar("h"));
+        assertEquals(8080, interpreter.getVar("p"));
+        assertEquals("server-info", interpreter.getVar("i"));
+    }
+
+    @Test
+    @DisplayName("Component with resource should create resource during instantiation")
+    void componentWithResourceCreatesResourceDuringInstantiation() {
+        eval("""
+                schema vm {
+                    string name
+                }
+
+                component server {
+                    input string hostname = "default"
+                    resource vm instance {
+                        name = hostname
+                    }
+                }
+
+                component server main {
+                    hostname = "my-server"
+                }
+                """);
+
+        var instance = interpreter.getComponent("main");
+        assertNotNull(instance);
+        assertEquals("my-server", instance.argVal("hostname"));
+
+    }
+
+    @Test
+    @DisplayName("Accessing a resource on component instance should throw error - resources are private")
+    void componentInstanceCannotAccessResource() {
+        var err = assertThrows(RuntimeError.class, () -> eval("""
+                schema vm {
+                    string name
+                }
+
+                component server {
+                    input string hostname = "default"
+                    resource vm instance {
+                        name = hostname
+                    }
+                }
+
+                component server main {
+                    hostname = "my-server"
+                }
+
+                var r = main.instance
+                """));
+
+        assertTrue(err.getMessage().contains("instance") || err.getMessage().contains("private"));
+    }
+
 }

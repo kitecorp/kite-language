@@ -29,6 +29,12 @@ public class ComponentValue implements ProviderSupport, TagsSupport {
     private ResourcePath path;
 
     /**
+     * Set of property names that are publicly accessible on component instances.
+     * Only inputs and outputs are public; resources are private.
+     */
+    private Set<String> publicProperties;
+
+    /**
      * indicate if the cloud resource
      */
     @Setter
@@ -151,5 +157,32 @@ public class ComponentValue implements ProviderSupport, TagsSupport {
     @Override
     public void setTags(Tags tags) {
         this.tags = tags;
+    }
+
+    /**
+     * Returns the set of public property names (inputs and outputs).
+     * Resources are not included as they are private to the component.
+     */
+    public Set<String> getPublicProperties() {
+        if (publicProperties == null) {
+            publicProperties = new HashSet<>();
+        }
+        return publicProperties;
+    }
+
+    /**
+     * Registers a property name as publicly accessible.
+     * Called for inputs and outputs during component declaration/instantiation.
+     */
+    public void addPublicProperty(String name) {
+        getPublicProperties().add(name);
+    }
+
+    /**
+     * Checks if a property is publicly accessible on this component.
+     * Returns true for inputs and outputs, false for resources.
+     */
+    public boolean isPublicProperty(String name) {
+        return getPublicProperties().contains(name);
     }
 }
