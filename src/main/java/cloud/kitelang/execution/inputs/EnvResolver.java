@@ -61,4 +61,12 @@ public class EnvResolver extends InputResolver {
 
         return o.toString();
     }
+
+    @Override
+    @Nullable String resolve(String qualifiedName, InputDeclaration key, Object previousValue) {
+        Object o = envVariables.get(qualifiedName);
+        if (o == null) return null;
+
+        return o.toString();
+    }
 }

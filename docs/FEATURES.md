@@ -105,6 +105,11 @@ var endpoint = main.hostname  // Access property on instance
   - Multiple component instances can have same-named resources without conflicts
   - Resources are created after input overrides are applied (see final input values)
   - Full hierarchy preserved via `ResourcePath.parentPath` for database storage (supports nested components)
+- **Component input resolution:** Inputs in components can be resolved from env/file/CLI when not provided
+  - Uses dot notation for qualified names (e.g., `api.hostname`, `prod.region`)
+  - Env variables use `KITE_INPUT_API__HOSTNAME=localhost` (double underscore for dots)
+  - File-based: `api.hostname = "localhost"` in `inputs.default.kite`
+  - Explicit overrides in component instances take precedence over resolved values
 - Input/output/resource names must be unique within a component (enforced by Environment)
 - Components cannot be modified outside their block (throws RuntimeError)
 - Supports string interpolation, computed values, and cross-instance references
@@ -115,6 +120,7 @@ var endpoint = main.hostname  // Access property on instance
 
 **Tests:**
 - `src/test/java/cloud/kitelang/execution/ComponentTest.java`
+- `src/test/java/cloud/kitelang/execution/ComponentInputResolverTest.java`
 
 ## @cloud Decorator
 

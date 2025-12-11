@@ -65,6 +65,9 @@ public final class Interpreter extends StackVisitor<Object> {
     private final Set<String> importChain;
     // Track component declarations for later instantiation (similar to TypeChecker's ComponentRegistry)
     private final Map<String, ComponentStatement> componentDeclarations;
+    // Resolved component inputs from InputChainResolver (qualified name -> Expression)
+    @Setter
+    private Map<String, Expression> resolvedComponentInputs = new HashMap<>();
     @Getter
     @Setter
     private SyntaxPrinter printer;
@@ -661,7 +664,14 @@ public final class Interpreter extends StackVisitor<Object> {
         for (var stmt : declaration.getArguments()) {
             if (stmt instanceof InputDeclaration input) {
                 componentValue.addPublicProperty(input.name());
-                executeBlock(stmt, instanceEnv);
+                // Check if input was resolved via InputChainResolver (env/file/cli)
+                String qualifiedName = instanceName + "." + input.name();
+                if (resolvedComponentInputs.containsKey(qualifiedName)) {
+                    var value = visit(resolvedComponentInputs.get(qualifiedName));
+                    instanceEnv.init(input.name(), value);
+                } else {
+                    executeBlock(stmt, instanceEnv);
+                }
             } else if (stmt instanceof OutputDeclaration output) {
                 componentValue.addPublicProperty(output.name());
                 executeBlock(stmt, instanceEnv);

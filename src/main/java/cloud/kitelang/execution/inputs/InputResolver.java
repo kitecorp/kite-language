@@ -16,4 +16,13 @@ public abstract class InputResolver {
     @Nullable
     abstract String resolve(InputDeclaration key, Object previousValue);
 
+    /**
+     * Resolve an input using a qualified name (e.g., "componentName.inputName").
+     * Default implementation delegates to resolve() using the qualified name for lookup.
+     */
+    @Nullable
+    String resolve(String qualifiedName, InputDeclaration key, Object previousValue) {
+        return resolve(key, previousValue);
+    }
+
 }

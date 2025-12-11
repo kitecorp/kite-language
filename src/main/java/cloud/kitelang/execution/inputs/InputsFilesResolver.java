@@ -218,7 +218,17 @@ public class InputsFilesResolver extends InputResolver {
 
     @Override
     String resolve(InputDeclaration input, Object previousValue) {
-        // read default file
+        ensureFilesRead();
+        return inputs.get(input.name());
+    }
+
+    @Override
+    String resolve(String qualifiedName, InputDeclaration input, Object previousValue) {
+        ensureFilesRead();
+        return inputs.get(qualifiedName);
+    }
+
+    private void ensureFilesRead() {
         if (!wasRead) {
             readFileProperty(Paths.get(INPUTS_DEFAULTS_KITE));
 
@@ -227,7 +237,6 @@ public class InputsFilesResolver extends InputResolver {
                     .ifPresent(env -> readFileProperty(Paths.get(INPUTS_ENV_DEFAULTS_KITE.formatted(env))));
             wasRead = true;
         }
-        return inputs.get(input.name());
     }
 
     private void readFileProperty(Path file) {

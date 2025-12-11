@@ -13,8 +13,13 @@ public class CliResolver extends InputResolver {
 
     @Override
     @Nullable String resolve(InputDeclaration inputDeclaration, Object previousValue) {
+        return resolve(inputDeclaration.name(), inputDeclaration, previousValue);
+    }
+
+    @Override
+    @Nullable String resolve(String qualifiedName, InputDeclaration inputDeclaration, Object previousValue) {
         if (previousValue != null) {
-            // if previous value is not null we don't need to as the user for input.
+            // if previous value is not null we don't need to ask the user for input.
             // in other words if the input was resolved, skip asking for input.
             return null;
         }
@@ -27,7 +32,7 @@ public class CliResolver extends InputResolver {
                     .a(inputDeclaration.getType().getType().getValue().toLowerCase())
                     .a(' ')
                     .reset()
-                    .a(inputDeclaration.name())
+                    .a(qualifiedName)
                     .a(" = ")
                     .reset();
             System.out.println(ansi.toString());

@@ -15,11 +15,14 @@
   - Enables traversing the complete scope chain via `getParentPath()`
   - Supports deeply nested components (e.g., `parent.main.child.instance.vm.server`)
 
-## Future Work
-
-### Component InputResolver integration
-- Inputs in components should use InputResolver chain (files, env vars, CLI) when not provided explicitly
+### Component InputResolver integration (Done)
+- Inputs in components use InputResolver chain (files, env vars, CLI) when not provided explicitly
+- Uses dot notation for qualified names (e.g., `api.hostname`, `prod.region`)
+- Env variables support double underscore for dots (e.g., `KITE_INPUT_API__HOSTNAME=localhost`)
+- Explicit overrides in component instances take precedence over resolved values
 - Same behavior as top-level inputs
+
+## Future Work
 
 ### Add struct support
 - Currently only object literals are supported but are not ideal because they are not nominal types

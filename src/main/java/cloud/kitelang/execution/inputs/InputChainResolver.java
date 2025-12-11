@@ -11,11 +11,14 @@ import cloud.kitelang.syntax.ast.expressions.*;
 import cloud.kitelang.syntax.ast.statements.*;
 import cloud.kitelang.syntax.literals.*;
 import cloud.kitelang.tool.theme.PlainTheme;
+import lombok.Getter;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,6 +27,11 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     private final KiteCompiler parser;
     private final List<InputResolver> resolvers;
     private final SyntaxPrinter printer = new SyntaxPrinter(new PlainTheme());
+    // Track component declarations for resolving inputs in instances
+    private final Map<String, ComponentStatement> componentDeclarations = new HashMap<>();
+    // Store resolved component inputs by qualified name (e.g., "api.hostname" -> resolved Expression)
+    @Getter
+    private final Map<String, Expression> resolvedComponentInputs = new HashMap<>();
 
     public InputChainResolver() {
         this.resolvers = List.of(
@@ -80,6 +88,21 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
         return previousValue.toString();
     }
 
+    /**
+     * Resolve an input using a qualified name (e.g., "componentName.inputName").
+     * Used for component inputs where the name needs to include the component prefix.
+     */
+    @Nullable String resolve(String qualifiedName, InputDeclaration key, Object previousValue) {
+        for (InputResolver resolver : resolvers) {
+            var temp = normalizeArrays(resolver.resolve(qualifiedName, key, previousValue));
+            if (temp != null) {
+                previousValue = temp;
+            }
+        }
+        if (previousValue == null) return null;
+        return previousValue.toString();
+    }
+
     @Override
     public Object visit(InputDeclaration inputDeclaration) {
         if (inputDeclaration.hasInit()) {
@@ -90,13 +113,34 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     }
 
     private Object parseInput(InputDeclaration inputDeclaration, Object init) {
+        return parseInput(inputDeclaration, init, null);
+    }
+
+    /**
+     * Parse and resolve an input, optionally with a component prefix for qualified name lookup.
+     */
+    private Object parseInput(InputDeclaration inputDeclaration, Object init, @Nullable String componentName) {
         try {
-            var input = resolve(inputDeclaration, init);
-            var srcCode = normalizeStringInputs(input, inputDeclaration);
+            String qualifiedName = componentName != null
+                    ? componentName + "." + inputDeclaration.name()
+                    : inputDeclaration.name();
+
+            var input = componentName != null
+                    ? resolve(qualifiedName, inputDeclaration, init)
+                    : resolve(inputDeclaration, init);
+
+            var srcCode = normalizeStringInputs(input, inputDeclaration, qualifiedName);
 
             var ast = parser.parse(srcCode);
             var statement = (ExpressionStatement) ast.getBody().get(0);
-            inputDeclaration.setInit(statement.getStatement());
+
+            if (componentName != null) {
+                // Store resolved value for component inputs - don't modify the shared declaration
+                resolvedComponentInputs.put(qualifiedName, statement.getStatement());
+            } else {
+                // For top-level inputs, set the init directly on the InputDeclaration
+                inputDeclaration.setInit(statement.getStatement());
+            }
 
             return visit(statement.getStatement());
         } catch (NoSuchElementException exception) {
@@ -104,9 +148,9 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
         }
     }
 
-    private @Nullable String normalizeStringInputs(String input, InputDeclaration inputDeclaration) {
+    private @Nullable String normalizeStringInputs(String input, InputDeclaration inputDeclaration, String displayName) {
         if (!(input instanceof String string) || StringUtils.isBlank(string.trim())) {
-            throw new MissingInputException("Missing `%s`".formatted(printer.visit(inputDeclaration)));
+            throw new MissingInputException("Missing input `%s`".formatted(displayName));
         }
         string = string.trim();
         boolean keepOriginal = NumberUtils.isCreatable(string) ||
@@ -219,7 +263,35 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     }
 
     @Override
-    public Object visit(ComponentStatement expression) {
+    public Object visit(ComponentStatement component) {
+        var typeName = component.getType().string();
+
+        if (component.isDefinition()) {
+            // Store component definition for later instance resolution
+            componentDeclarations.put(typeName, component);
+        } else if (component.name() != null) {
+            // Component instance - resolve inputs from the declaration
+            var declaration = componentDeclarations.get(typeName);
+            if (declaration != null) {
+                // Collect input names that are explicitly overridden in the instance
+                var overriddenInputs = new HashSet<String>();
+                for (Statement stmt : component.getArguments()) {
+                    if (stmt instanceof ExpressionStatement exprStmt &&
+                        exprStmt.getStatement() instanceof AssignmentExpression assignment &&
+                        assignment.getLeft() instanceof Identifier id) {
+                        overriddenInputs.add(id.string());
+                    }
+                }
+
+                // Only resolve inputs that are NOT explicitly overridden in the instance
+                for (Statement stmt : declaration.getArguments()) {
+                    if (stmt instanceof InputDeclaration input && !overriddenInputs.contains(input.name())) {
+                        Object init = input.hasInit() ? visit(input.getInit()) : null;
+                        parseInput(input, init, component.name());
+                    }
+                }
+            }
+        }
         return null;
     }
 
