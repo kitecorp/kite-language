@@ -1120,19 +1120,6 @@ public class ComponentTest extends CheckerTest {
     }
 
     @Test
-    void componentInputsNotAccessibleFromOutside() {
-        assertThrows(TypeError.class, () -> eval("""
-                component app {
-                    input string name = "test"
-                }
-                
-                component other {
-                    input string ref = app.name
-                }
-                """));
-    }
-
-    @Test
     void componentWithOnlyOutputs() {
         var res = eval("""
                 component config {

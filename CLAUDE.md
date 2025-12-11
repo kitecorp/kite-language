@@ -102,6 +102,29 @@ type MathOp = (number, number) -> number
 4. **Decorators are data-like** - use arrays for multiple values
 5. **Union types deduplicate by kind** - `1 | 2 | 3` becomes `number`
 
+## Interpreter Patterns
+
+### ExecutionContext for Nested Context Detection
+
+Use `ExecutionContext(Class)` to check if currently executing inside a specific statement type. This is preferred over adding new tracking fields.
+
+```java
+// Check if inside a component and get its name
+if (ExecutionContext(ComponentStatement.class) instanceof ComponentStatement comp) {
+    path.setParentPath(comp.name());
+}
+
+// Check if inside a for loop
+if (ExecutionContext(ForStatement.class) instanceof ForStatement forStmt) {
+    // handle loop context
+}
+```
+
+**Prefer this pattern over:**
+- Adding new fields to track context (e.g., `currentComponentInstanceName`)
+- Overriding methods to inject context
+- Using try/finally blocks to set/clear context
+
 ## Naming Conventions
 
 - PascalCase: types, resources, components

@@ -44,6 +44,10 @@ public final class TypeChecker extends StackVisitor<Type> {
     private final ComponentRegistry componentRegistry;
     private final Set<String> importedFiles;
     private final KiteCompiler parser = new KiteCompiler();
+    // Track resources declared in current component scope for forward reference validation
+    // null = not in component, empty set = in component with no resources
+    @Nullable
+    private Set<String> declaredComponentResources = null;
     @Getter
     private TypeEnvironment env;
 
@@ -558,7 +562,15 @@ public final class TypeChecker extends StackVisitor<Type> {
         try {
             objectType = executeBlock(expression.getObject(), env);
         } catch (NotFoundException e) {
-            // Forward reference to resource not yet declared - defer validation to interpreter
+            // Check if this is a valid forward reference to a resource declared in the component
+            var objectName = getObjectName(expression.getObject());
+            // Only validate against declared resources when inside a component (declaredComponentResources != null)
+            if (declaredComponentResources != null && objectName != null
+                    && !declaredComponentResources.contains(objectName)) {
+                // Not a forward reference - resource doesn't exist in component
+                throw e;
+            }
+            // Forward reference to resource declared later - defer validation to interpreter
             return new AnyType(ResourceRef.pending(resourceName.string()));
         }
 
@@ -574,27 +586,24 @@ public final class TypeChecker extends StackVisitor<Type> {
     private Type lookupComponentMember(ComponentType componentType, SymbolIdentifier memberName) {
         String name = memberName.string();
 
-        // Check if this is a component definition (no instance name)
-        if (componentType.getName() == null) {
-            var context = ExecutionContext(ComponentStatement.class);
-            if (context instanceof ComponentStatement statement && statement.hasName()) {
-                throw new TypeError(
-                        "Cannot access component definition '%s.%s'. Only component instances can be referenced."
-                                .formatted(componentType.getType(), memberName.string())
-                );
-            }
-        }
-
         Type member = componentType.lookup(name);
 
         if (member == null) {
             throw new TypeError(format("Component '{0}' does not have member '{1}'", componentType.getType(), name));
         }
 
-        // If accessing a component INSTANCE, only allow inputs and outputs (not resources)
+        // Resources are private - cannot be accessed from outside the component
         if (member instanceof ResourceType) {
-            throw new TypeError(
-                    format("Cannot access resource `{0}` from component instance `{1}`. Only inputs and outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
+            if (componentType.getName() == null) {
+                // Accessing resource on component definition
+                throw new TypeError(
+                        "Cannot access component definition '%s.%s'. Only component instances can be referenced."
+                                .formatted(componentType.getType(), name));
+            } else {
+                // Accessing resource on component instance
+                throw new TypeError(
+                        format("Cannot access resource `{0}` from component instance `{1}`. Only inputs and outputs are accessible. Consider exposing `{0}` as an output.", name, componentType.getName()));
+            }
         }
 
 //        // Block direct input access - inputs are private
@@ -632,6 +641,18 @@ public final class TypeChecker extends StackVisitor<Type> {
         } catch (NotFoundException e) {
             throw new TypeError(propertyNotFoundOnObject(expression, resourceName));
         }
+    }
+
+    /**
+     * Extracts the name from an object expression for forward reference validation.
+     */
+    @Nullable
+    private String getObjectName(Expression object) {
+        return switch (object) {
+            case SymbolIdentifier id -> id.string();
+            case Identifier id -> id.string();
+            default -> null;
+        };
     }
 
     private Type visitStringMember(MemberExpression expression, StringLiteral stringLiteral) {
@@ -1058,11 +1079,38 @@ public final class TypeChecker extends StackVisitor<Type> {
         // Create component type with its own environment
         var componentType = new ComponentType(typeName, new TypeEnvironment(typeName, env));
 
-        // Execute declaration block to validate and initialize inputs, outputs, and resources
-        executeBlock(expression.getArguments(), componentType.getEnvironment());
+        // Pre-scan to collect all resource names declared in this component
+        // This enables forward reference validation - only declared resources can be referenced
+        var previousDeclaredResources = declaredComponentResources;
+        declaredComponentResources = collectDeclaredResourceNames(expression.getArguments());
+
+        try {
+            // Execute declaration block to validate and initialize inputs, outputs, and resources
+            executeBlock(expression.getArguments(), componentType.getEnvironment());
+        } finally {
+            declaredComponentResources = previousDeclaredResources;
+        }
 
         // Register in type environment
         return env.init(typeName, componentType);
+    }
+
+    /**
+     * Collects all resource names from a list of statements.
+     * Used for forward reference validation in components.
+     */
+    private Set<String> collectDeclaredResourceNames(List<Statement> statements) {
+        var names = new HashSet<String>();
+        for (var stmt : statements) {
+            if (stmt instanceof ResourceStatement resource && resource.getName() != null) {
+                switch (resource.getName()) {
+                    case SymbolIdentifier id -> names.add(id.string());
+                    case Identifier id -> names.add(id.string());
+                    default -> { } // Dynamic names handled at runtime
+                }
+            }
+        }
+        return names;
     }
 
     /**
