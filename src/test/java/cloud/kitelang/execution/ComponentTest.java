@@ -663,4 +663,49 @@ public class ComponentTest extends RuntimeTest {
         assertTrue(err.getMessage().contains("instance") || err.getMessage().contains("private"));
     }
 
+    @Test
+    @DisplayName("Multiple component instances with same resource name should not conflict")
+    void multipleComponentInstancesWithSameResourceName() {
+        eval("""
+                schema vm {
+                    string name
+                }
+
+                component server {
+                    input string hostname = "default"
+                    resource vm instance {
+                        name = hostname
+                    }
+                }
+
+                component server main {
+                    hostname = "main-server"
+                }
+
+                component server api {
+                    hostname = "api-server"
+                }
+                """);
+
+        // Both instances should exist
+        var main = interpreter.getComponent("main");
+        var api = interpreter.getComponent("api");
+        assertNotNull(main);
+        assertNotNull(api);
+        assertEquals("main-server", main.argVal("hostname"));
+        assertEquals("api-server", api.argVal("hostname"));
+
+        // Resources should be namespaced by component instance
+        var resources = interpreter.getEnv().getResources();
+        assertTrue(resources.containsKey("main.instance"), "Resource should be namespaced as 'main.instance'");
+        assertTrue(resources.containsKey("api.instance"), "Resource should be namespaced as 'api.instance'");
+        assertFalse(resources.containsKey("instance"), "Resource should not be stored without namespace");
+
+        // Each resource should have correct value
+        var mainResource = resources.get("main.instance");
+        var apiResource = resources.get("api.instance");
+        assertEquals("main-server", mainResource.get("name"));
+        assertEquals("api-server", apiResource.get("name"));
+    }
+
 }

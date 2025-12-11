@@ -32,10 +32,8 @@ import cloud.kitelang.syntax.ast.expressions.*;
 import cloud.kitelang.syntax.ast.statements.*;
 import cloud.kitelang.syntax.literals.*;
 import cloud.kitelang.syntax.literals.ObjectLiteral.ObjectLiteralPair;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
@@ -63,15 +61,15 @@ public final class Interpreter extends StackVisitor<Object> {
     @Getter
     private final List<RuntimeException> errors;
     private final KiteCompiler parser = new KiteCompiler();
+    // Track currently importing files to detect circular imports
+    private final Set<String> importChain;
+    // Track component declarations for later instantiation (similar to TypeChecker's ComponentRegistry)
+    private final Map<String, ComponentStatement> componentDeclarations;
     @Getter
     @Setter
     private SyntaxPrinter printer;
     @Getter
     private Environment<Object> env;
-    // Track currently importing files to detect circular imports
-    private final Set<String> importChain;
-    // Track component declarations for later instantiation (similar to TypeChecker's ComponentRegistry)
-    private final Map<String, ComponentStatement> componentDeclarations;
 
     public Interpreter() {
         this(new Environment<>());
@@ -346,7 +344,8 @@ public final class Interpreter extends StackVisitor<Object> {
         var res = switch (expression.getKey()) {
             case SymbolIdentifier id -> new ObjectLiteralPair(id.string(), visit(expression.getValue()));
             case StringLiteral literal -> new ObjectLiteralPair((String) visit(literal), visit(expression.getValue()));
-            case StringInterpolation interpolation -> new ObjectLiteralPair((String) visit(interpolation), visit(expression.getValue()));
+            case StringInterpolation interpolation ->
+                    new ObjectLiteralPair((String) visit(interpolation), visit(expression.getValue()));
             default -> throw new IllegalArgumentException("Invalid object literal key: " + expression.getKey());
         };
         return res;
@@ -657,19 +656,21 @@ public final class Interpreter extends StackVisitor<Object> {
                 .properties(instanceEnv)
                 .build();
 
-        // First, execute declaration block to initialize defaults
-        // Register inputs and outputs as public properties
+        // Phase 1: Execute inputs and outputs from declaration block (skip resources)
+        // This sets up default values for all inputs/outputs
         for (var stmt : declaration.getArguments()) {
             if (stmt instanceof InputDeclaration input) {
                 componentValue.addPublicProperty(input.name());
+                executeBlock(stmt, instanceEnv);
             } else if (stmt instanceof OutputDeclaration output) {
                 componentValue.addPublicProperty(output.name());
+                executeBlock(stmt, instanceEnv);
             }
-            executeBlock(stmt, instanceEnv);
+            // Skip resources in this phase - they'll be executed after input overrides
         }
 
-        // Then, execute instance block to override values
-        // Use instanceEnv so component properties can be referenced in expressions
+        // Phase 2: Apply instance overrides for inputs
+        // This allows resources to use the overridden values
         for (var stmt : expression.getArguments()) {
             if (stmt instanceof ExpressionStatement exprStmt) {
                 handleAssignment(typeName, stmt, exprStmt, instanceEnv, inputDeclarations);
@@ -678,6 +679,14 @@ public final class Interpreter extends StackVisitor<Object> {
             }
         }
 
+        // Phase 3: Execute resources from declaration block with overridden input values
+        for (var stmt : declaration.getArguments()) {
+            if (stmt instanceof ResourceStatement) {
+                executeBlock(stmt, instanceEnv);
+            }
+        }
+
+
         // Register instance by name only (new pattern)
         env.init(instanceName, componentValue);
 
@@ -685,7 +694,7 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private void handleAssignment(String typeName, Statement stmt, ExpressionStatement exprStmt,
-                                    Environment<Object> instanceEnv, Map<String, InputDeclaration> inputDeclarations) {
+                                  Environment<Object> instanceEnv, Map<String, InputDeclaration> inputDeclarations) {
         if (exprStmt.getStatement() instanceof AssignmentExpression assignment) {
             // Handle assignment: property = value
             var propertyName = getPropertyName(assignment.getLeft());
@@ -1026,7 +1035,7 @@ public final class Interpreter extends StackVisitor<Object> {
      * For example: main[0].name where main[0] hasn't been evaluated yet.
      *
      * @param expression the member expression being accessed
-     * @param pending the pending resource reference
+     * @param pending    the pending resource reference
      * @return a new pending reference that includes the property path
      */
     private Object visitPendingMember(MemberExpression expression, ResourceRef.Pending pending) {
@@ -1113,6 +1122,9 @@ public final class Interpreter extends StackVisitor<Object> {
     private ResourceValue initResource(ResourceStatement statement, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
         var path = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
+        if (ExecutionContext(ComponentStatement.class) instanceof ComponentStatement componentStatement) {
+            path.setParentPath(componentStatement.name());
+        }
         var resourceEnv = new Environment<>(path.getName(), env, typeEnvironment.getVariables());
         var instance = ResourceValue.resourceValue(path.getName(), resourceEnv, installedSchema, statement.getExisting());
         instance.setPath(path);
