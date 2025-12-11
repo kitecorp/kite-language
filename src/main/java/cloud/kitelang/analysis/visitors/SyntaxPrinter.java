@@ -420,6 +420,32 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     }
 
     @Override
+    public String visit(StructDeclaration statement) {
+        var builder = new StringBuilder();
+
+        builder.append(theme.kw("struct "))
+                .append(visit(statement.getName()))
+                .append(theme.punctuation(" {"))
+                .append("\n");
+
+        for (StructProperty property : statement.getProperties()) {
+            builder.append("\t")
+                    .append(visit(property.type()))
+                    .append(" ")
+                    .append(theme.identifier(property.name()));
+            if (property.hasInit()) {
+                builder.append(" = ").append(visit(property.init()));
+            }
+            builder.append("\n");
+        }
+
+        builder.append(theme.punctuation("}"))
+                .append("\n");
+
+        return builder.toString();
+    }
+
+    @Override
     public String visit(ReturnStatement statement) {
         return theme.kw("return ") + visit(statement.getArgument());
     }

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public sealed class ReferenceType
         extends Type
-        permits AnyType, ArrayType, ComponentType, ObjectType, ResourceType, SchemaType, UnionType {
+        permits AnyType, ArrayType, ComponentType, ObjectType, ResourceType, SchemaType, StructType, UnionType {
 
     @Getter
     @Setter

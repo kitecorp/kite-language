@@ -423,6 +423,12 @@ public final class ScopeResolver implements Visitor<Void> {
     }
 
     @Override
+    public Void visit(StructDeclaration statement) {
+        // Struct declarations don't need scope resolution
+        return null;
+    }
+
+    @Override
     public Void visit(ReturnStatement statement) {
         if (currentFunction == FunctionType.NONE) {
             throw new ValidationException("Can't return from top level code");

@@ -36,7 +36,7 @@ public final class DecoratorType extends Type {
     }
 
     public enum Target {
-        OUTPUT, INPUT, VAR, RESOURCE, COMPONENT, SCHEMA, SCHEMA_PROPERTY, FUN;
+        OUTPUT, INPUT, VAR, RESOURCE, COMPONENT, SCHEMA, SCHEMA_PROPERTY, STRUCT, STRUCT_PROPERTY, FUN;
 
         String lowercase() {
             return toString().toLowerCase();

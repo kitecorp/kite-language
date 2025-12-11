@@ -95,6 +95,8 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
             result = visitComponentDeclaration(ctx.componentDeclaration());
         } else if (ctx.schemaDeclaration() != null) {
             result = visitSchemaDeclaration(ctx.schemaDeclaration());
+        } else if (ctx.structDeclaration() != null) {
+            result = visitStructDeclaration(ctx.structDeclaration());
         } else if (ctx.functionDeclaration() != null) {
             result = visitFunctionDeclaration(ctx.functionDeclaration());
         } else if (ctx.typeDeclaration() != null) {
@@ -169,6 +171,35 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
                 (Expression) visit(ctx.propertyInitializer()) : null;
 
         var property = SchemaProperty.schemaProperty(type, name, init, annotations);
+        // Link annotations to their target for decorator validation
+        setAnnotations(property, annotations);
+        return property;
+    }
+
+    @Override
+    public StructDeclaration visitStructDeclaration(StructDeclarationContext ctx) {
+        Identifier name = (Identifier) visit(ctx.identifier());
+
+        List<StructProperty> properties = Collections.emptyList();
+        if (ctx.structPropertyList() != null) {
+            properties = ctx.structPropertyList().structProperty()
+                    .stream()
+                    .map(prop -> (StructProperty) visit(prop))
+                    .collect(Collectors.toList());
+        }
+
+        return StructDeclaration.struct(name, properties, Set.of());
+    }
+
+    @Override
+    public StructProperty visitStructProperty(StructPropertyContext ctx) {
+        Set<AnnotationDeclaration> annotations = extractDecorators(ctx.decoratorList());
+        TypeIdentifier type = (TypeIdentifier) visit(ctx.typeIdentifier());
+        Identifier name = (Identifier) visit(ctx.identifier());
+        Expression init = ctx.propertyInitializer() != null ?
+                (Expression) visit(ctx.propertyInitializer()) : null;
+
+        var property = StructProperty.structProperty(type, name, init, annotations);
         // Link annotations to their target for decorator validation
         setAnnotations(property, annotations);
         return property;

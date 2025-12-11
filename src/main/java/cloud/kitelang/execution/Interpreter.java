@@ -846,6 +846,11 @@ public final class Interpreter extends StackVisitor<Object> {
                 throw new RuntimeError("Resources can only be updated inside their block: " + resourceValue.getName());
             } else if (instanceEnv instanceof ComponentValue componentValue) {
                 throw new RuntimeError("Components can only be updated inside their block: " + componentValue.getName());
+            } else if (instanceEnv instanceof StructValue structValue) {
+                // Structs are mutable - allow property assignment
+                var propertyName = getPropertyName(memberExpression.getProperty());
+                var value = executeBlock(expression.getRight(), env);
+                return structValue.assign(propertyName, value);
             }
         } else if (expression.getLeft() instanceof SymbolIdentifier identifier) {
             return assignmentSymbol(expression, identifier);
@@ -918,6 +923,7 @@ public final class Interpreter extends StackVisitor<Object> {
             // Dot notation: obj.property
             return switch (object) {
                 case SchemaValue schemaValue -> visitSchemaMember(expression);
+                case StructValue structValue -> visitStructMember(expression, structValue);
                 case ResourceValue resourceValue -> visitResourceMember(expression, resourceValue);
                 case ComponentValue componentValue -> visitComponentMember(expression, componentValue);
                 case Map<?, ?> map -> visitMapMember(expression, map);
@@ -1013,6 +1019,14 @@ public final class Interpreter extends StackVisitor<Object> {
     private Object visitMapMember(MemberExpression expression, Map<?, ?> map) {
         var propertyName = getPropertyName(expression.getProperty());
         return map.get(propertyName);
+    }
+
+    /**
+     * Handles property access on struct instances.
+     */
+    private Object visitStructMember(MemberExpression expression, StructValue structValue) {
+        var propertyName = getPropertyName(expression.getProperty());
+        return structValue.get(propertyName);
     }
 
     /**
@@ -1463,6 +1477,40 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     @Override
+    public Object visit(StructDeclaration expression) {
+        visitAnnotations(expression.getAnnotations());
+        var environment = new Environment<>(env);
+        var structValue = StructValue.of(expression.getName(), environment);
+        push(ContextStack.Struct);
+
+        for (var property : expression.getProperties()) {
+            // Register property name for constructor argument mapping
+            structValue.addPropertyName(property.name());
+
+            // Track @cloud properties and validate no initialization
+            if (property.isCloudGenerated()) {
+                structValue.addCloudProperty(property.name());
+                if (property.hasInit()) {
+                    throw new InvalidInitException(
+                            "@cloud property '%s' cannot have an initialization value in struct '%s'"
+                                    .formatted(property.name(), expression.getName().string())
+                    );
+                }
+                // Initialize cloud properties with null - they'll be set by the cloud provider
+                environment.init(property.name(), null);
+                continue;
+            }
+
+            switch (property.init()) {
+                case BlockExpression blockExpression -> executeBlock(blockExpression.getExpression(), environment);
+                case null, default -> environment.init(property.name(), visit(property.init()));
+            }
+        }
+        pop(ContextStack.Struct);
+        return env.init(expression.getName().string(), structValue);
+    }
+
+    @Override
     public Object visit(UnaryExpression expression) {
         if (!(expression.getOperator() instanceof String op)) {
             throw new RuntimeException("Operator could not be evaluated");
@@ -1521,10 +1569,58 @@ public final class Interpreter extends StackVisitor<Object> {
             value = executeBlock(expression.getInit(), env);
         }
         expect(expression, value);
+
+        // Auto-coerce object literals to struct when type is specified
+        value = coerceToStructIfNeeded(expression, value);
+
         if (value instanceof ResourceRef.Resolved resolved) { // a resolved reference to another resource
             return env.init(symbol, resolved.value());
         }
         return env.init(symbol, value);
+    }
+
+    /**
+     * Coerces an object literal (Map) to a StructValue if the declared type is a struct.
+     * Example: var Point p = { x: 10, y: 20 } will create a Point instance.
+     */
+    private Object coerceToStructIfNeeded(DependencyHolder expression, Object value) {
+        if (!expression.hasType() || !(value instanceof Map<?, ?> map)) {
+            return value;
+        }
+
+        var typeName = expression.getType().string();
+        var structDef = env.get(typeName);
+
+        if (!(structDef instanceof StructValue structType) || !structType.isDefinition()) {
+            return value;
+        }
+
+        return coerceMapToStruct(structType, map);
+    }
+
+    /**
+     * Creates a struct instance from a map, using the struct definition as template.
+     */
+    @SuppressWarnings("unchecked")
+    private StructValue coerceMapToStruct(StructValue structDef, Map<?, ?> map) {
+        var propertyNames = structDef.getPropertyNames();
+        var args = new ArrayList<>(propertyNames.size());
+
+        for (var propName : propertyNames) {
+            if (map.containsKey(propName)) {
+                args.add(map.get(propName));
+            } else {
+                // Use default or null
+                var defaultValue = structDef.get(propName);
+                if (defaultValue == null && !structDef.isCloudProperty(propName)) {
+                    throw new RuntimeError("Missing required property '%s' for struct '%s'"
+                            .formatted(propName, structDef.getType()));
+                }
+                args.add(defaultValue);
+            }
+        }
+
+        return (StructValue) structDef.call(this, args);
     }
 
     private void expect(DependencyHolder expression, Object value) {

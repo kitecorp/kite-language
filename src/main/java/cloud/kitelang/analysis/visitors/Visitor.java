@@ -65,6 +65,7 @@ public sealed interface Visitor<R>
             case InitStatement initStatement -> visit(initStatement);
             case ReturnStatement returnStatement -> visit(returnStatement);
             case SchemaDeclaration schemaDeclaration -> visit(schemaDeclaration);
+            case StructDeclaration structDeclaration -> visit(structDeclaration);
             case ComponentStatement component -> visit(component);
             case InputDeclaration expression -> visit(expression);
             case OutputDeclaration expression -> visit(expression);
@@ -167,6 +168,8 @@ public sealed interface Visitor<R>
     R visit(ForStatement statement);
 
     R visit(SchemaDeclaration statement);
+
+    R visit(StructDeclaration statement);
 
     R visit(ReturnStatement statement);
 

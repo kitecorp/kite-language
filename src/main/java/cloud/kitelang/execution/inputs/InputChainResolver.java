@@ -432,6 +432,11 @@ public non-sealed class InputChainResolver extends InputResolver implements Visi
     }
 
     @Override
+    public Object visit(StructDeclaration statement) {
+        return null;
+    }
+
+    @Override
     public Object visit(ReturnStatement statement) {
         return null;
     }

@@ -122,6 +122,93 @@ var endpoint = main.hostname  // Access property on instance
 - `src/test/java/cloud/kitelang/execution/ComponentTest.java`
 - `src/test/java/cloud/kitelang/execution/ComponentInputResolverTest.java`
 
+## Struct Declaration
+
+Defines nominal typed data containers for passing structured data with type safety.
+
+### Block Style Declaration
+
+```kite
+struct Point {
+    number x
+    number y = 0
+}
+```
+
+### Inline Style Declaration
+
+```kite
+struct Point { number x, number y = 0 }
+```
+
+### Constructor Instantiation
+
+Create struct instances by calling the struct name as a function:
+
+```kite
+struct Point { number x, number y }
+
+var p1 = Point(10, 20)    // positional arguments
+var p2 = Point(5)         // uses default for y (if defined)
+```
+
+### Auto-Coercion from Object Literals
+
+When a variable has an explicit struct type, object literals are automatically coerced:
+
+```kite
+struct Config {
+    number port = 8080
+    string host = "localhost"
+}
+
+var Config c = { port: 3000 }  // auto-coerced to Config instance
+// c.host == "localhost" (default)
+// c.port == 3000 (overridden)
+```
+
+### Mutability
+
+Struct instances are mutable - properties can be reassigned after creation:
+
+```kite
+struct Point { number x, number y }
+
+var p = Point(10, 20)
+p.x = 100  // valid - mutates the property
+```
+
+### @cloud Annotation on Struct Properties
+
+Struct properties can be marked with `@cloud` for cloud-generated values:
+
+```kite
+struct AWSResource {
+    string name
+    @cloud string arn   // set by cloud provider, cannot be initialized
+}
+```
+
+**Features:**
+- Block style: multi-line with newlines between properties
+- Inline style: single-line with commas between properties
+- Type annotation required for all properties
+- Default values optional (properties without defaults are required)
+- Constructor instantiation with positional arguments
+- Auto-coercion from object literals when type is specified
+- Mutable instances - properties can be reassigned
+- All decorators supported on struct properties (including `@cloud`)
+- Structs are registered in the environment and can be reused
+
+**Reference:**
+- `src/main/java/cloud/kitelang/syntax/ast/statements/StructDeclaration.java`
+- `src/main/java/cloud/kitelang/syntax/ast/statements/StructProperty.java`
+- `src/main/java/cloud/kitelang/execution/values/StructValue.java`
+- `src/main/java/cloud/kitelang/execution/Interpreter.java` (visit(StructDeclaration), coerceToStructIfNeeded)
+
+**Tests:**
+- `src/test/java/cloud/kitelang/execution/StructTest.java`
+
 ## @cloud Decorator
 
 Marks schema properties as cloud-generated values that cannot be set by users. These properties are populated by the cloud provider after resource creation (e.g., ARNs, IDs, endpoints).

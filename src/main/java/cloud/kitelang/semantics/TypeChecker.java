@@ -922,6 +922,23 @@ public final class TypeChecker extends StackVisitor<Type> {
     }
 
     @Override
+    public Type visit(StructDeclaration struct) {
+        visitAnnotations(struct.getAnnotations());
+        var name = struct.getName();
+        var body = struct.getProperties();
+
+        var structType = new StructType(name.string(), new TypeEnvironment(name.string(), env));
+        env.init(name, structType);
+        for (StructProperty property : body) {
+            visitAnnotations(property.getAnnotations());
+            var vardeclaration = VarDeclaration.var(property.name(), property.type(), property.init());
+            executeBlock(vardeclaration, structType.getEnvironment());
+        }
+
+        return structType;
+    }
+
+    @Override
     public Type visit(ResourceStatement resource) {
         visitAnnotations(resource.getAnnotations());
         validateResourceName(resource);
