@@ -708,4 +708,31 @@ public class ComponentTest extends RuntimeTest {
         assertEquals("api-server", apiResource.get("name"));
     }
 
+    @Test
+    @DisplayName("Assignment to component input from outside is not allowed")
+    void assignmentToComponentInputFromOutsideNotAllowed() {
+        var err = assertThrows(RuntimeException.class, () -> eval("""
+                component server {
+                    input string hostname = "localhost"
+                }
+                component server api {}
+                api.hostname = "changed"
+                """));
+        assertEquals("Components can only be updated inside their block: api", err.getMessage());
+    }
+
+    @Test
+    @DisplayName("Assignment to component output from outside is not allowed")
+    void assignmentToComponentOutputFromOutsideNotAllowed() {
+        var err = assertThrows(RuntimeException.class, () -> eval("""
+                component server {
+                    input string hostname = "localhost"
+                    output string endpoint = "http://" + hostname
+                }
+                component server api {}
+                api.endpoint = "changed"
+                """));
+        assertEquals("Components can only be updated inside their block: api", err.getMessage());
+    }
+
 }
