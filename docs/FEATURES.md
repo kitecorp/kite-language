@@ -104,6 +104,7 @@ var endpoint = main.hostname  // Access property on instance
   - e.g., resource `instance` in component `main` is stored as `main.instance`
   - Multiple component instances can have same-named resources without conflicts
   - Resources are created after input overrides are applied (see final input values)
+  - Full hierarchy preserved via `ResourcePath.parentPath` for database storage (supports nested components)
 - Input/output/resource names must be unique within a component (enforced by Environment)
 - Components cannot be modified outside their block (throws RuntimeError)
 - Supports string interpolation, computed values, and cross-instance references
