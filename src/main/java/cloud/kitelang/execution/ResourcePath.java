@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 @Log4j2
 public class ResourcePath {
     private String filePath;        // e.g., "modules/network.kite"
-    private String parentPath;   // e.g., "myapp"
+    private ResourcePath parentPath;   // e.g., ResourcePath(type=webapp, name=myapp)
     private String type;    // e.g., "vm"
     private String name;    // e.g., "servers"
 
@@ -98,16 +98,20 @@ public class ResourcePath {
             builder.type(parts[0]);
             builder.name(parts[1]);
         } else if (parts.length == 3) {
-            // With parent: parent.type.name
-            builder.parentPath(parts[0]);
+            // With parent: parent.type.name (e.g., "myapp.vm.servers")
+            // The parent is a single component instance name - create ResourcePath with just name
+            builder.parentPath(ResourcePath.builder()
+                    .name(parts[0])
+                    .segments(new ArrayList<>())
+                    .build());
             builder.type(parts[1]);
             builder.name(parts[2]);
         } else if (parts.length > 3) {
-            // Nested: parent.path.goes.here.type.name
-            // Join all but last two parts as parent path
+            // Nested: parent.path.goes.here.type.name (e.g., "parent.main.child.instance.vm.server")
+            // Recursively parse the parent parts
             String[] parentParts = new String[parts.length - 2];
             System.arraycopy(parts, 0, parentParts, 0, parts.length - 2);
-            builder.parentPath(String.join(".", parentParts));
+            builder.parentPath(parse(String.join(".", parentParts)));
             builder.type(parts[parts.length - 2]);
             builder.name(parts[parts.length - 1]);
         }
@@ -150,6 +154,17 @@ public class ResourcePath {
     }
 
     /**
+     * Get the parent path as a string for building full paths.
+     * Recursively traverses the parent hierarchy.
+     */
+    private String getParentPathString() {
+        if (parentPath == null) {
+            return null;
+        }
+        return parentPath.toDisplayName();
+    }
+
+    /**
      * Build the full database key for this entity (resource or component)
      * Format: [filePath:]parentPath.type.name[segments...]
      */
@@ -160,11 +175,16 @@ public class ResourcePath {
             sb.append(filePath).append(":");
         }
 
-        if (parentPath != null && !parentPath.isEmpty()) {
-            sb.append(parentPath).append(".");
+        String parentStr = getParentPathString();
+        if (parentStr != null && !parentStr.isEmpty()) {
+            sb.append(parentStr).append(".");
         }
 
-        sb.append(type).append(".").append(name);
+        // Handle the case where this ResourcePath only has a name (e.g., component instance)
+        if (type != null) {
+            sb.append(type).append(".");
+        }
+        sb.append(name);
 
         for (PathSegment segment : segments) {
             sb.append(segment.toString());
@@ -179,11 +199,16 @@ public class ResourcePath {
     public String toDisplayName() {
         StringBuilder sb = new StringBuilder();
 
-        if (parentPath != null && !parentPath.isEmpty()) {
-            sb.append(parentPath).append(".");
+        String parentStr = getParentPathString();
+        if (parentStr != null && !parentStr.isEmpty()) {
+            sb.append(parentStr).append(".");
         }
 
-        sb.append(type).append(".").append(name);
+        // Handle the case where this ResourcePath only has a name (e.g., component instance)
+        if (type != null) {
+            sb.append(type).append(".");
+        }
+        sb.append(name);
 
         for (PathSegment segment : segments) {
             sb.append(segment.toString());
@@ -198,8 +223,9 @@ public class ResourcePath {
     public String toSegmentName() {
         StringBuilder sb = new StringBuilder();
 
-        if (parentPath != null && !parentPath.isEmpty()) {
-            sb.append(parentPath).append(".");
+        String parentStr = getParentPathString();
+        if (parentStr != null && !parentStr.isEmpty()) {
+            sb.append(parentStr).append(".");
         }
 
         sb.append(name);
@@ -264,11 +290,16 @@ public class ResourcePath {
     public String getBasePath() {
         StringBuilder sb = new StringBuilder();
 
-        if (parentPath != null && !parentPath.isEmpty()) {
-            sb.append(parentPath).append(".");
+        String parentStr = getParentPathString();
+        if (parentStr != null && !parentStr.isEmpty()) {
+            sb.append(parentStr).append(".");
         }
 
-        sb.append(type).append(".").append(name);
+        // Handle the case where this ResourcePath only has a name (e.g., component instance)
+        if (type != null) {
+            sb.append(type).append(".");
+        }
+        sb.append(name);
 
         return sb.toString();
     }

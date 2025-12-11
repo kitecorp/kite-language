@@ -1123,7 +1123,10 @@ public final class Interpreter extends StackVisitor<Object> {
         // clone all properties from schema properties to the new resource
         var path = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
         if (ExecutionContext(ComponentStatement.class) instanceof ComponentStatement componentStatement) {
-            path.setParentPath(componentStatement.name());
+            path.setParentPath(ResourcePath.builder()
+                    .name(componentStatement.name())
+                    .segments(new ArrayList<>())
+                    .build());
         }
         var resourceEnv = new Environment<>(path.getName(), env, typeEnvironment.getVariables());
         var instance = ResourceValue.resourceValue(path.getName(), resourceEnv, installedSchema, statement.getExisting());

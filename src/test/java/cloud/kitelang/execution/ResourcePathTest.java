@@ -59,7 +59,9 @@ public class ResourcePathTest {
         ResourcePath path = ResourcePath.parse("myapp.vm.servers");
 
         assertNull(path.getFilePath());
-        assertEquals("myapp", path.getParentPath());
+        assertNotNull(path.getParentPath());
+        assertEquals("myapp", path.getParentPath().getName());
+        assertNull(path.getParentPath().getType());
         assertEquals("vm", path.getType());
         assertEquals("servers", path.getName());
         assertEquals("myapp.vm.servers", path.toDatabaseKey());
@@ -71,7 +73,8 @@ public class ResourcePathTest {
     void parseWithComponentAndIndex() {
         ResourcePath path = ResourcePath.parse("myapp.vm.servers[0]");
 
-        assertEquals("myapp", path.getParentPath());
+        assertNotNull(path.getParentPath());
+        assertEquals("myapp", path.getParentPath().getName());
         assertEquals("vm", path.getType());
         assertEquals("servers", path.getName());
         assertEquals(1, path.getSegments().size());
@@ -98,7 +101,8 @@ public class ResourcePathTest {
         ResourcePath path = ResourcePath.parse("modules/network.kite:myapp.vm.servers[\"web\"]");
 
         assertEquals("modules/network.kite", path.getFilePath());
-        assertEquals("myapp", path.getParentPath());
+        assertNotNull(path.getParentPath());
+        assertEquals("myapp", path.getParentPath().getName());
         assertEquals("vm", path.getType());
         assertEquals("servers", path.getName());
         assertEquals(1, path.getSegments().size());
@@ -138,7 +142,7 @@ public class ResourcePathTest {
     @DisplayName("Build path programmatically")
     void buildPath() {
         ResourcePath path = ResourcePath.builder()
-                .parentPath("myapp")
+                .parentPath(ResourcePath.builder().name("myapp").build())
                 .type("vm")
                 .name("servers")
                 .build();
@@ -229,7 +233,16 @@ public class ResourcePathTest {
     void parseDeepNesting() {
         ResourcePath path = ResourcePath.parse("parent.main.child.instance.vm.server");
 
-        assertEquals("parent.main.child.instance", path.getParentPath());
+        // Verify the recursive parent structure
+        assertNotNull(path.getParentPath());
+        assertEquals("child", path.getParentPath().getType());
+        assertEquals("instance", path.getParentPath().getName());
+        // And the grandparent
+        assertNotNull(path.getParentPath().getParentPath());
+        assertEquals("parent", path.getParentPath().getParentPath().getType());
+        assertEquals("main", path.getParentPath().getParentPath().getName());
+        assertNull(path.getParentPath().getParentPath().getParentPath());
+
         assertEquals("vm", path.getType());
         assertEquals("server", path.getName());
         assertEquals("parent.main.child.instance.vm.server", path.toDatabaseKey());
@@ -260,7 +273,7 @@ public class ResourcePathTest {
         // Scenario 3: Nested within component with file path
         ResourcePath fullPath = ResourcePath.builder()
                 .filePath("infrastructure/main.kite")
-                .parentPath("webapp")
+                .parentPath(ResourcePath.builder().name("webapp").build())
                 .type("vm")
                 .name("servers")
                 .build()
