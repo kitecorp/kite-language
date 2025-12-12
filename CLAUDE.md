@@ -91,8 +91,18 @@ type MathOp = (number, number) -> number
 
 ## Grammar Files
 
-- `lang/src/main/antlr/KiteLexer.g4` - Lexer with string interpolation modes
-- `lang/src/main/antlr/KiteParser.g4` - Parser grammar
+- `kite-language/grammar/KiteLexer.g4` - Lexer with string interpolation modes
+- `kite-language/grammar/KiteParser.g4` - Parser grammar
+
+**IMPORTANT:** When writing Kite code, always check the grammar files for correct syntax. Kite has its own syntax - do NOT assume Terraform or HCL conventions. Key differences:
+
+| Construct | Kite Syntax | NOT like Terraform |
+|-----------|-------------|-------------------|
+| Resource properties | `name = "value"` | Same |
+| Object literals | `{ key: "value", other: 123 }` | Uses `:` and `,` |
+| Blocks | `resource Type name { }` | Similar but different rules |
+
+Always reference `KiteParser.g4` for authoritative syntax rules.
 
 ## Design Decisions
 
