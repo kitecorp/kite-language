@@ -73,6 +73,13 @@ public final class Interpreter extends StackVisitor<Object> {
     private SyntaxPrinter printer;
     @Getter
     private Environment<Object> env;
+    /**
+     * Current source file path being interpreted.
+     * Used to track which file each resource comes from.
+     */
+    @Getter
+    @Setter
+    private String sourceFilePath;
 
     public Interpreter() {
         this(new Environment<>());
@@ -556,6 +563,8 @@ public final class Interpreter extends StackVisitor<Object> {
 
             // Create a new interpreter with shared import chain
             var importInterpreter = new Interpreter(new Environment<>("import", env), printer, importChain);
+            // Track the source file path for resources created in the imported file
+            importInterpreter.setSourceFilePath(statement.getFilePath());
             importInterpreter.visit(program);
             return importInterpreter.getEnv();
         });
@@ -1146,6 +1155,10 @@ public final class Interpreter extends StackVisitor<Object> {
     private ResourceValue initResource(ResourceStatement statement, SchemaValue installedSchema, Environment<Object> typeEnvironment) {
         // clone all properties from schema properties to the new resource
         var path = resourceName(statement); // install indexed resource name in environment ex: resName["prod"] or resName[0]
+        // Set source file path if available
+        if (sourceFilePath != null) {
+            path.setFilePath(sourceFilePath);
+        }
         if (ExecutionContext(ComponentStatement.class) instanceof ComponentStatement componentStatement) {
             path.setParentPath(ResourcePath.builder()
                     .name(componentStatement.name())
