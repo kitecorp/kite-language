@@ -2,7 +2,7 @@ package cloud.kitelang.execution;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  */
 @Data
 @Builder
-@Log4j2
+@Slf4j
 public class ResourcePath {
     private String filePath;        // e.g., "modules/network.kite"
     private ResourcePath parentPath;   // e.g., ResourcePath(type=webapp, name=myapp)

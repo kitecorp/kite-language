@@ -1,7 +1,7 @@
 package cloud.kitelang.syntax.parser;
 
 import cloud.kitelang.syntax.ast.ValidationException;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * - Schema
  * - SchemaProperty
  */
-@Log4j2
+@Slf4j
 @DisplayName("Parser decorator")
 public class DecoratorTest extends ParserTest {
 

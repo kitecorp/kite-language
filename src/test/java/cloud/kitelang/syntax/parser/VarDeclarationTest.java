@@ -4,7 +4,7 @@ import cloud.kitelang.syntax.ast.Program;
 import cloud.kitelang.syntax.ast.expressions.AssignmentExpression;
 import cloud.kitelang.syntax.ast.statements.VarStatement;
 import cloud.kitelang.syntax.literals.StringLiteral;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static cloud.kitelang.syntax.literals.BooleanLiteral.bool;
 import static cloud.kitelang.syntax.literals.NullLiteral.nullLiteral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parser Var")
 public class VarDeclarationTest extends ParserTest {
 
@@ -26,7 +26,7 @@ public class VarDeclarationTest extends ParserTest {
         var res = parse("var x");
         var expected = program(statement(var("x")));
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("y")
                 ));
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("x", 2)
                 ));
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("y", 2)
                 ));
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class VarDeclarationTest extends ParserTest {
                         var("y", 2)
                 ));
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("y", 2))
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("y", bool(false)))
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("x", nullLiteral()))
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class VarDeclarationTest extends ParserTest {
                 statement(var("y", 2))
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     /**
@@ -144,7 +144,7 @@ public class VarDeclarationTest extends ParserTest {
                 expressionStatement(AssignmentExpression.assign("x", "hello"))
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class VarDeclarationTest extends ParserTest {
         var identifier = (cloud.kitelang.syntax.literals.SymbolIdentifier) exprPart.expression();
         Assertions.assertEquals("x", identifier.string());
 
-        log.info(res);
+        log.info("{}", res);
     }
 
 

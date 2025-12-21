@@ -6,7 +6,7 @@ import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.ObjectType;
 import cloud.kitelang.semantics.types.SchemaType;
 import cloud.kitelang.semantics.types.ValueType;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 @DisplayName("TypeChecker Schema")
 public class SchemaTest extends CheckerTest {
 

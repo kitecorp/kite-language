@@ -5,7 +5,7 @@ import cloud.kitelang.execution.exceptions.MissingInputException;
 import cloud.kitelang.execution.inputs.InputChainResolver;
 import cloud.kitelang.semantics.TypeChecker;
 import cloud.kitelang.semantics.TypeError;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * 3. Environment variable
  * All tests will be run on the input type provided by the subclass.
  */
-@Log4j2
+@Slf4j
 public abstract class InputTests extends RuntimeTest {
     private InputChainResolver inputChainResolver;
     private TypeChecker typeChecker;

@@ -2,7 +2,7 @@ package cloud.kitelang.syntax.parser;
 
 import cloud.kitelang.syntax.ast.ValidationException;
 import cloud.kitelang.syntax.ast.expressions.AnnotationDeclaration;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static cloud.kitelang.syntax.ast.expressions.ResourceStatement.resource;
 import static cloud.kitelang.syntax.ast.statements.BlockExpression.block;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parser Resource")
 public class ResourceTest extends ParserTest {
 

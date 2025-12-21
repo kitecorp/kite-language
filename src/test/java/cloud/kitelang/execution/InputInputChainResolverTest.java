@@ -8,7 +8,7 @@ import cloud.kitelang.execution.inputs.InputChainResolver;
 import cloud.kitelang.execution.inputs.InputsFilesResolver;
 import cloud.kitelang.syntax.ast.expressions.InputDeclaration;
 import cloud.kitelang.syntax.literals.TypeIdentifier;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Log4j2
+@Slf4j
 public class InputInputChainResolverTest extends RuntimeTest {
     private InputChainResolver inputChainResolver;
     private Map<String, Object> envVariables;

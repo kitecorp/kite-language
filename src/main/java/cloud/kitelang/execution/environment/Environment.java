@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * <p>
  * When comparing Environments in tests, ensure both 'variables' AND 'name' match!
  */
-@Log4j2
+@Slf4j
 @Data
 public class Environment<T> implements IEnvironment<T> {
     @Nullable

@@ -11,7 +11,7 @@ import cloud.kitelang.semantics.types.ValueType;
 import cloud.kitelang.syntax.ast.KiteCompiler;
 import cloud.kitelang.syntax.literals.ArrayTypeIdentifier;
 import cloud.kitelang.syntax.literals.TypeIdentifier;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * 3. Environment variable
  * All tests will be run on the output type provided by the subclass.
  */
-@Log4j2
+@Slf4j
 public class OutputTests extends RuntimeTest {
     private TypeChecker typeChecker;
 

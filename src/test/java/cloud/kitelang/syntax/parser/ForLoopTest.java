@@ -5,7 +5,7 @@ import cloud.kitelang.syntax.ast.statements.ForStatement;
 import cloud.kitelang.syntax.ast.statements.IfStatement;
 import cloud.kitelang.syntax.ast.statements.WhileStatement;
 import cloud.kitelang.syntax.literals.NumberLiteral;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Range;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ import static cloud.kitelang.syntax.literals.ObjectLiteral.object;
 import static cloud.kitelang.syntax.literals.StringLiteral.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 public class ForLoopTest extends ParserTest {
 
     @Test

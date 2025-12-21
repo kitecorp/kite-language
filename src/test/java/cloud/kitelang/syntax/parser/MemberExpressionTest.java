@@ -1,6 +1,6 @@
 package cloud.kitelang.syntax.parser;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ import static cloud.kitelang.syntax.ast.expressions.MemberExpression.member;
 import static cloud.kitelang.syntax.literals.StringLiteral.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parser Member Expression")
 public class MemberExpressionTest extends ParserTest {
 

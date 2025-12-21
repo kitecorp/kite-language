@@ -1,13 +1,13 @@
 package cloud.kitelang.execution.decorators;
 
 import cloud.kitelang.execution.values.ResourceValue;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 /**
  * Maybe print the description of the fields
  */
-@Log4j2
+@Slf4j
 public class DescriptionTests extends DecoratorTests {
 
     @Test
@@ -22,7 +22,7 @@ public class DescriptionTests extends DecoratorTests {
                 
                 }
                 """);
-        log.warn(res);
+        log.warn("{}", res);
     }
 
 

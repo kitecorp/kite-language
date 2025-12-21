@@ -1,13 +1,13 @@
 package cloud.kitelang.stdlib.functions.cast;
 
 import cloud.kitelang.base.RuntimeTest;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 class StringCastFunctionTest extends RuntimeTest {
     private final StringCastFunction function = new StringCastFunction();
 

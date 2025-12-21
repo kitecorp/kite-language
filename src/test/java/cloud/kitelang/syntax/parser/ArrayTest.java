@@ -1,6 +1,6 @@
 package cloud.kitelang.syntax.parser;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import static cloud.kitelang.syntax.ast.Program.program;
@@ -13,7 +13,7 @@ import static cloud.kitelang.syntax.literals.NumberLiteral.number;
 import static cloud.kitelang.syntax.literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 public class ArrayTest extends ParserTest {
 
 
@@ -30,7 +30,7 @@ public class ArrayTest extends ParserTest {
                 statement(var("z", array(id("x"), id("y"))))
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     /**
@@ -54,7 +54,7 @@ public class ArrayTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 
     /**
@@ -78,6 +78,6 @@ public class ArrayTest extends ParserTest {
                 )
         );
         assertEquals(expected, res);
-        log.info(res);
+        log.info("{}", res);
     }
 }

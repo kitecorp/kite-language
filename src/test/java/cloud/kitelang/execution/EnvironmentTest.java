@@ -4,12 +4,12 @@ import cloud.kitelang.execution.environment.Environment;
 import cloud.kitelang.execution.exceptions.NotFoundException;
 import cloud.kitelang.syntax.ast.statements.ExpressionStatement;
 import cloud.kitelang.syntax.literals.Identifier;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Log4j2
+@Slf4j
 public class EnvironmentTest {
     private Environment environment;
 

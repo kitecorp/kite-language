@@ -3,12 +3,12 @@ package cloud.kitelang.execution.decorators;
 import cloud.kitelang.execution.InputEnvVariableTests;
 import cloud.kitelang.execution.exceptions.MissingInputException;
 import cloud.kitelang.semantics.TypeError;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 public class ValidateInputsTests extends InputEnvVariableTests {
 
     @Test

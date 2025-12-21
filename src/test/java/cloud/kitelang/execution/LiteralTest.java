@@ -3,7 +3,7 @@ package cloud.kitelang.execution;
 import cloud.kitelang.base.RuntimeTest;
 import cloud.kitelang.execution.values.NullValue;
 import cloud.kitelang.syntax.literals.SymbolIdentifier;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ import static cloud.kitelang.syntax.literals.NumberLiteral.number;
 import static cloud.kitelang.syntax.literals.ObjectLiteral.ObjectLiteralPair;
 import static cloud.kitelang.syntax.literals.ObjectLiteral.object;
 
-@Log4j2
+@Slf4j
 public class LiteralTest extends RuntimeTest {
     @Test
     void literal() {

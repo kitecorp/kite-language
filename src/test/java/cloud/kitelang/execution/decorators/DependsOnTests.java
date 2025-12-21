@@ -3,14 +3,14 @@ package cloud.kitelang.execution.decorators;
 import cloud.kitelang.execution.CycleException;
 import cloud.kitelang.execution.exceptions.NotFoundException;
 import cloud.kitelang.execution.values.ResourceValue;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
  * All the tests from print but with added sensitive values.
  */
-@Log4j2
+@Slf4j
 public class DependsOnTests extends DecoratorTests {
 
     @Test

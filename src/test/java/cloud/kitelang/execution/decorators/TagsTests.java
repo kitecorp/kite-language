@@ -1,7 +1,7 @@
 package cloud.kitelang.execution.decorators;
 
 import cloud.kitelang.execution.values.ResourceValue;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static cloud.kitelang.execution.decorators.Tags.tags;
 
-@Log4j2
+@Slf4j
 @DisplayName("@tags")
 public class TagsTests extends DecoratorTests {
 

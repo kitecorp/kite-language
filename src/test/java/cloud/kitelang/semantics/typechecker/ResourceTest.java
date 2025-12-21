@@ -8,14 +8,14 @@ import cloud.kitelang.semantics.types.SchemaType;
 import cloud.kitelang.semantics.types.ValueType;
 import cloud.kitelang.syntax.ast.ValidationException;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 public class ResourceTest extends CheckerTest {
     @Test
     void newResourceThrowsIfNoNameIsSpecified() {

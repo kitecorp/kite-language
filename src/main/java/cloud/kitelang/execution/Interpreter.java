@@ -34,7 +34,7 @@ import cloud.kitelang.syntax.literals.*;
 import cloud.kitelang.syntax.literals.ObjectLiteral.ObjectLiteralPair;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +51,7 @@ import static cloud.kitelang.execution.interpreter.OperatorComparator.compare;
 import static cloud.kitelang.syntax.ast.statements.FunctionDeclaration.fun;
 import static java.text.MessageFormat.format;
 
-@Log4j2
+@Slf4j
 public final class Interpreter extends StackVisitor<Object> {
     private final DeferredObservable deferredObservable;
     @Getter

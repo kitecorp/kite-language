@@ -1,17 +1,17 @@
 package cloud.kitelang.syntax.parser;
 
 import cloud.kitelang.base.RuntimeTest;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.BeforeAll;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class ParserTest extends RuntimeTest {
 
     @BeforeAll
-    static void setLog4j() {
-        Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.INFO);
+    static void setLogLevel() {
+        Logger.getLogger("").setLevel(Level.INFO);
     }
 
 

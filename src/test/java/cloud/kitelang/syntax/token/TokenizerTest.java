@@ -1,11 +1,11 @@
 package cloud.kitelang.frontend.Token;
 
 import cloud.kitelang.syntax.ast.KiteCompiler;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 
-@Log4j2
+@Slf4j
 @DisplayName("Tokenizer")
 public class TokenizerTest {
     private KiteCompiler compiler;

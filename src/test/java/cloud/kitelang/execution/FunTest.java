@@ -9,7 +9,7 @@ import cloud.kitelang.syntax.ast.statements.ExpressionStatement;
 import cloud.kitelang.syntax.ast.statements.VarStatement;
 import cloud.kitelang.syntax.literals.Identifier;
 import cloud.kitelang.syntax.literals.NumberLiteral;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 public class FunTest extends RuntimeTest {
 
     @Test

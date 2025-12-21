@@ -5,7 +5,7 @@ import cloud.kitelang.syntax.ast.expressions.StringInterpolation;
 import cloud.kitelang.syntax.ast.statements.ExpressionStatement;
 import cloud.kitelang.syntax.literals.NumberLiteral;
 import cloud.kitelang.syntax.literals.SymbolIdentifier;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static cloud.kitelang.syntax.literals.NumberLiteral.number;
 import static cloud.kitelang.syntax.literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parser Literal")
 public class LiteralTest extends ParserTest {
 

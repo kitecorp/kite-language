@@ -4,7 +4,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public final class FunType extends Type {
         return new FunType(List.of(params), returnType);
     }
 
-    public static FunType fun(@NotBlank String symbol) {
+    public static FunType fun(@NotNull String symbol) {
         var funSplit = StringUtils.split(symbol, "->");
         Type returnType = null;
         Collection<Type> paramsType = new ArrayList<>();

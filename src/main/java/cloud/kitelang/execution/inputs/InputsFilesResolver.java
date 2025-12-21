@@ -1,7 +1,7 @@
 package cloud.kitelang.execution.inputs;
 
 import cloud.kitelang.syntax.ast.expressions.InputDeclaration;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Log4j2
+@Slf4j
 public class InputsFilesResolver extends InputResolver {
     static final String INPUTS_DEFAULTS_KITE = "inputs.default.kite";
     static final String INPUTS_ENV_DEFAULTS_KITE = "inputs.%s.default.kite";

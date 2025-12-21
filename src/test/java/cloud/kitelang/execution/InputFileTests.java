@@ -2,14 +2,14 @@ package cloud.kitelang.execution;
 
 import cloud.kitelang.execution.inputs.InputChainResolver;
 import cloud.kitelang.execution.inputs.InputsFilesResolver;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 
 import java.util.List;
 import java.util.Map;
 
-@Log4j2
+@Slf4j
 public class InputFileTests extends InputTests {
 
     @AfterEach

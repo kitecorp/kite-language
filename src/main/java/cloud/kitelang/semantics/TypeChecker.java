@@ -19,7 +19,7 @@ import cloud.kitelang.syntax.ast.expressions.*;
 import cloud.kitelang.syntax.ast.statements.*;
 import cloud.kitelang.syntax.literals.*;
 import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
 
-@Log4j2
+@Slf4j
 public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> NUMERIC_OPS = List.of(SystemType.NUMBER);
     private static final List<SystemType> ADDITIVE_OPS = List.of(SystemType.NUMBER, SystemType.STRING);

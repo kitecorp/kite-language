@@ -2,7 +2,7 @@ package cloud.kitelang.syntax.literals;
 
 import cloud.kitelang.syntax.ast.ValidationException;
 import cloud.kitelang.syntax.parser.ParserTest;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ import static cloud.kitelang.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parse object var")
 public class ObjectVarExpressionTest extends ParserTest {
 

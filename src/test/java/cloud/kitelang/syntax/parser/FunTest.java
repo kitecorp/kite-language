@@ -3,7 +3,7 @@ package cloud.kitelang.syntax.parser;
 import cloud.kitelang.semantics.types.ValueType;
 import cloud.kitelang.syntax.ast.statements.ExpressionStatement;
 import cloud.kitelang.syntax.literals.TypeIdentifier;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ import static cloud.kitelang.syntax.ast.statements.ReturnStatement.funReturn;
 import static cloud.kitelang.syntax.literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parser Function")
 public class FunTest extends ParserTest {
 

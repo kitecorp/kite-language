@@ -2,12 +2,12 @@ package cloud.kitelang.execution;
 
 import cloud.kitelang.base.RuntimeTest;
 import cloud.kitelang.execution.values.NullValue;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 public class AssignmentTest extends RuntimeTest {
 
     private void setGlobalVar(Object of) {

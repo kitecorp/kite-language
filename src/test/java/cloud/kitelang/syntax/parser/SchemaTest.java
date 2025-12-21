@@ -1,6 +1,6 @@
 package cloud.kitelang.syntax.parser;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ import static cloud.kitelang.syntax.literals.TypeIdentifier.type;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Log4j2
+@Slf4j
 @DisplayName("Parser Schema")
 public class SchemaTest extends ParserTest {
 

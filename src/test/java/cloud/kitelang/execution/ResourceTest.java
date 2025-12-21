@@ -6,7 +6,7 @@ import cloud.kitelang.execution.exceptions.RuntimeError;
 import cloud.kitelang.execution.values.ResourceValue;
 import cloud.kitelang.syntax.ast.ValidationException;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 public class ResourceTest extends RuntimeTest {
     @Test
     void newResourceThrowsIfNoNameIsSpecified() {
@@ -106,7 +106,7 @@ public class ResourceTest extends RuntimeTest {
                 
                 }
                 """);
-        log.warn(res);
+        log.warn("{}", res);
         var resource = interpreter.getInstance("main");
 
         assertEquals(2, resource.getProperties().lookup("x"));

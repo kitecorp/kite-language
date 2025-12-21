@@ -1,7 +1,7 @@
 package cloud.kitelang.execution;
 
 import cloud.kitelang.base.RuntimeTest;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Log4j2
+@Slf4j
 public class VarArrayTest extends RuntimeTest {
 
     @Test

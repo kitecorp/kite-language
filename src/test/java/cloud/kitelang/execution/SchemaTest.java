@@ -2,7 +2,7 @@ package cloud.kitelang.execution;
 
 import cloud.kitelang.base.RuntimeTest;
 import cloud.kitelang.execution.values.FunValue;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import java.util.List;
 import static cloud.kitelang.syntax.literals.ParameterIdentifier.param;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 public class SchemaTest extends RuntimeTest {
 
     @Test

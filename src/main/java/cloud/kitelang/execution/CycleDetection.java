@@ -2,14 +2,14 @@ package cloud.kitelang.execution;
 
 import cloud.kitelang.execution.exceptions.NotFoundException;
 import cloud.kitelang.execution.values.ResourceValue;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Log4j2
+@Slf4j
 public class CycleDetection {
     /**
      * given 2 resources:

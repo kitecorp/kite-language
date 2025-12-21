@@ -7,12 +7,12 @@ import cloud.kitelang.semantics.TypeChecker;
 import cloud.kitelang.semantics.scope.ScopeResolver;
 import cloud.kitelang.syntax.ast.KiteCompiler;
 import cloud.kitelang.tool.theme.PlainTheme;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Maybe print the description of the fields
  */
-@Log4j2
+@Slf4j
 public class DecoratorTests extends RuntimeTest {
     private TypeChecker typeChecker;
 

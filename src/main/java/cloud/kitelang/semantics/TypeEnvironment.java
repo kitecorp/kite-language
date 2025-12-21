@@ -4,7 +4,7 @@ import cloud.kitelang.execution.environment.Environment;
 import cloud.kitelang.execution.values.ResourceValue;
 import cloud.kitelang.semantics.types.ResourceType;
 import cloud.kitelang.semantics.types.Type;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * In type theory is called Gamma
  *
  * */
-@Log4j2
+@Slf4j
 public class TypeEnvironment extends Environment<Type> {
     public TypeEnvironment(@Nullable Environment<Type> parent) {
         super(parent);

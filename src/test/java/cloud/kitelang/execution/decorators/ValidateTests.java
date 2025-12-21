@@ -2,12 +2,12 @@ package cloud.kitelang.execution.decorators;
 
 import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.syntax.ast.ValidationException;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Log4j2
+@Slf4j
 public class ValidateTests extends DecoratorTests {
 
     @Test
