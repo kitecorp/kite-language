@@ -77,6 +77,11 @@ sourceSets {
     }
 }
 configurations {
+    // Prevent ANTLR tool (with icu4j) from leaking into runtime
+    // Only antlr4-runtime is needed at runtime
+    implementation {
+        exclude group: 'com.ibm.icu', module: 'icu4j'
+    }
     testClasses {
         canBeResolved = true  // ✅ this is key
         canBeConsumed = true
