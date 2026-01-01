@@ -116,8 +116,8 @@ Whitelist of allowed values.
 | Property | Value |
 |----------|-------|
 | **Argument** | `array` of literals (1 to 256 elements) |
-| **Targets** | `input` |
-| **Applies to** | `string`, `number`, `object`, `array` |
+| **Targets** | `input`, `schema property` |
+| **Applies to** | `string`, `number`, `array` |
 
 ```kite
 @allowed(["dev", "staging", "prod"])
@@ -126,6 +126,38 @@ input string environment = "dev"
 @allowed([80, 443, 8080])
 input number port = 80
 ```
+
+**On schema properties:**
+
+```kite
+schema ServerConfig {
+    @allowed(["default", "dedicated", "host"])
+    string tenancy = "default"
+
+    @allowed(["gp2", "gp3", "io1", "io2"])
+    string volumeType = "gp3"
+}
+```
+
+**Provider Integration:**
+
+When building cloud providers with the Kite Provider SDK, the `@Property(validValues=...)` annotation on Java resource classes automatically generates `@allowed` decorators in the Kite schema documentation:
+
+```java
+// Java resource class (provider)
+@Property(description = "Instance tenancy",
+          validValues = {"default", "dedicated", "host"})
+private String tenancy = "default";
+```
+
+Generates:
+```kite
+// Generated .kite schema
+@allowed(["default", "dedicated", "host"])
+string tenancy = "default"  // Instance tenancy
+```
+
+This ensures validation constraints defined in providers are reflected in the generated schemas.
 
 ### @unique
 
@@ -405,7 +437,7 @@ input string name
 | `@maxLength(n)` | number | input, output |
 | `@nonEmpty` | none | input |
 | `@validate(regex:, preset:)` | named strings | input, output |
-| `@allowed([...])` | array | input |
+| `@allowed([...])` | array | input, schema property |
 | `@unique` | none | input |
 | `@cloud` | optional: `importable` | schema property |
 | `@existing("ref")` | string | resource |
