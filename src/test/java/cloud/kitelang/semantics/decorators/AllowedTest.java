@@ -336,9 +336,102 @@ public class AllowedTest extends CheckerTest {
                     @allowed(["hello", "world"])
                     input string something
                 }
-                
+
                 component app prodApp {
                     something = 123
+                }
+                """));
+    }
+
+    // ==================== Schema Property Tests ====================
+
+    @Test
+    @DisplayName("@allowed on schema string property with valid values")
+    void schemaPropertyAllowedStrings() {
+        eval("""
+                schema Config {
+                    @allowed(["dev", "staging", "prod"])
+                    string environment = "dev"
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@allowed on schema number property with valid values")
+    void schemaPropertyAllowedNumbers() {
+        eval("""
+                schema ServerConfig {
+                    @allowed([80, 443, 8080])
+                    number port = 8080
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@allowed on schema property without default value")
+    void schemaPropertyAllowedNoDefault() {
+        eval("""
+                schema Config {
+                    @allowed(["small", "medium", "large"])
+                    string size
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@allowed on schema string array property")
+    void schemaPropertyAllowedStringArray() {
+        eval("""
+                schema Config {
+                    @allowed(["read", "write", "admin"])
+                    string[] permissions
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@allowed with @cloud decorator on schema property")
+    void schemaPropertyAllowedWithCloud() {
+        eval("""
+                schema VpcConfig {
+                    @allowed(["default", "dedicated"])
+                    string instanceTenancy = "default"
+
+                    @cloud
+                    string vpcId
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@allowed on schema property with invalid type (boolean) should fail")
+    void schemaPropertyAllowedInvalidType() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema Config {
+                    @allowed([true, false])
+                    boolean enabled
+                }
+                """));
+    }
+
+    @Test
+    @DisplayName("@allowed on schema property with mismatched value types should fail")
+    void schemaPropertyAllowedTypeMismatch() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema Config {
+                    @allowed([1, 2, 3])
+                    string size
+                }
+                """));
+    }
+
+    @Test
+    @DisplayName("@allowed on schema property with empty array should fail")
+    void schemaPropertyAllowedEmptyArray() {
+        assertThrows(TypeError.class, () -> eval("""
+                schema Config {
+                    @allowed([])
+                    string environment
                 }
                 """));
     }

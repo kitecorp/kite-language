@@ -5,6 +5,7 @@ import cloud.kitelang.execution.Interpreter;
 import cloud.kitelang.syntax.ast.expressions.AnnotationDeclaration;
 import cloud.kitelang.syntax.ast.expressions.Expression;
 import cloud.kitelang.syntax.ast.expressions.InputDeclaration;
+import cloud.kitelang.syntax.ast.statements.SchemaProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -20,18 +21,23 @@ public class AllowedDecorator extends DecoratorInterpreter {
         this.interpreter = interpreter;
     }
 
-    private Object throwValueNotAllowed(AnnotationDeclaration declaration) {
-        var value = declaration.getTarget();
-        return switch (value) {
+    private Object getTargetValue(AnnotationDeclaration declaration) {
+        var target = declaration.getTarget();
+        return switch (target) {
             case InputDeclaration input -> interpreter.visit(input.getInit());
-            default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
+            case SchemaProperty property -> property.init() != null ? interpreter.visit(property.init()) : null;
+            default -> throw new IllegalStateException("Unexpected target: " + target);
         };
     }
 
     @Override
     public Object execute(AnnotationDeclaration declaration) {
         if (declaration.getArgs() != null) {
-            var value = throwValueNotAllowed(declaration);
+            var value = getTargetValue(declaration);
+            // Skip validation if no default value (will be validated when instantiated)
+            if (value == null) {
+                return null;
+            }
             var allowedValues = getAllowedValues(declaration);
             if (value instanceof List<?> list) {
                 validateArrayValue(list, allowedValues);

@@ -6,6 +6,7 @@ import cloud.kitelang.semantics.TypeError;
 import cloud.kitelang.semantics.types.*;
 import cloud.kitelang.syntax.annotations.Annotatable;
 import cloud.kitelang.syntax.ast.expressions.*;
+import cloud.kitelang.syntax.ast.statements.SchemaProperty;
 import cloud.kitelang.syntax.literals.BooleanLiteral;
 import cloud.kitelang.syntax.literals.NumberLiteral;
 import cloud.kitelang.syntax.literals.StringLiteral;
@@ -30,7 +31,7 @@ public class AllowedDecorator extends DecoratorChecker {
                                 ValueType.Number,
                                 ValueType.String
                         ),
-                        Set.of(DecoratorType.Target.INPUT)),
+                        Set.of(DecoratorType.Target.INPUT, DecoratorType.Target.SCHEMA_PROPERTY)),
                 Set.of(SystemType.STRING,
                         SystemType.OBJECT,
                         SystemType.NUMBER,
@@ -55,6 +56,8 @@ public class AllowedDecorator extends DecoratorChecker {
 
         if (declaration.getTarget() instanceof InputDeclaration input) {
             throwTypeErrorForInvalidArgument(input);
+        } else if (declaration.getTarget() instanceof SchemaProperty property) {
+            throwTypeErrorForInvalidArgument(property);
         } else {
             throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         }
@@ -109,6 +112,7 @@ public class AllowedDecorator extends DecoratorChecker {
         Annotatable target = declaration.getTarget();
         var string = switch (target) {
             case InputDeclaration input -> syntaxPrinter.visit(input);
+            case SchemaProperty property -> property.type().getType().getValue() + " " + property.name();
             default -> throw new IllegalStateException("Unexpected value: " + declaration.getTarget());
         };
         String message = Ansi.ansi()
@@ -140,6 +144,26 @@ public class AllowedDecorator extends DecoratorChecker {
                         .fgDefault()
                         .a(" in expression: ")
                         .a(syntaxPrinter.visit(input))
+                        .fgDefault()
+                        .toString();
+                throw new TypeError(message);
+            }
+        }
+    }
+
+    private void throwTypeErrorForInvalidArgument(SchemaProperty property) {
+        if (property.type() instanceof TypeIdentifier literal) {
+            if (!isAllowedOn(literal)) {
+                String message = Ansi.ansi()
+                        .fgYellow()
+                        .a("@").a(getName())
+                        .reset()
+                        .a(" is only valid for `strings`, `numbers`, and `arrays`. Applied to ")
+                        .fgBlue()
+                        .a(literal.getType().getValue())
+                        .fgDefault()
+                        .a(" in property: ")
+                        .a(property.name())
                         .fgDefault()
                         .toString();
                 throw new TypeError(message);
