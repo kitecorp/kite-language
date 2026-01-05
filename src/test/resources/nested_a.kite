@@ -1,4 +1,4 @@
 // nested_a.kite - imports stdlib
-import * from "src/test/resources/stdlib.kite"
+import * from "stdlib.kite"
 
 var valueA = double(3)  // 3 * 2 = 6

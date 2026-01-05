@@ -1,0 +1,15 @@
+// Subnet module for directory import testing
+// Exports: Subnet object
+
+fun createSubnet(string name, string cidr) object {
+    return {
+        resourceType: "subnet",
+        name: name,
+        cidr: cidr
+    }
+}
+
+var Subnet = {
+    resourceType: "subnet",
+    create: createSubnet
+}

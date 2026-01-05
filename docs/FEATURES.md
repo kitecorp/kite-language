@@ -2,9 +2,9 @@
 
 ## Import Statement
 
-Supports importing symbols from external Kite files with wildcard and named imports.
+Supports importing symbols from external Kite files with wildcard and named imports. Supports both file and directory imports.
 
-### Wildcard Import
+### File Import (Wildcard)
 
 Imports all exported symbols from a file.
 
@@ -16,7 +16,7 @@ var result = double(5)  // 'double' function is imported
 var msg = greeting      // 'greeting' variable is imported
 ```
 
-### Named Import
+### File Import (Named)
 
 Imports specific symbols from a file, keeping other symbols out of scope.
 
@@ -29,16 +29,55 @@ var area = PI * r * r   // PI constant is available
 // multiply is NOT available (not imported)
 ```
 
+### Directory Import (Named)
+
+Imports specific symbols from a directory. All `.kite` files in the directory are scanned, and only the requested symbols are imported.
+
+**Example:**
+```kite
+import NatGateway from "providers/networking"
+// Scans all .kite files in providers/networking/
+// Imports only the symbol named 'NatGateway'
+
+var nat = NatGateway.create("my-nat")
+```
+
+Multiple symbols can be imported:
+```kite
+import NatGateway, VPC from "providers/networking"
+// Scans all .kite files in providers/networking/
+// Imports symbols named 'NatGateway' and 'VPC'
+// Other symbols (like helper functions) are NOT imported
+```
+
+### Directory Import (Wildcard)
+
+Imports all symbols from all `.kite` files in a directory.
+
+**Example:**
+```kite
+import * from "providers/networking"
+// Loads all .kite files and imports all symbols
+```
+
+### Path Detection
+
+- Paths ending with `.kite` are treated as files
+- Paths without `.kite` extension are treated as directories
+
 **Features:**
-- Wildcard import (`import * from "file.kite"`) - imports all symbols
-- Named import (`import symbol1, symbol2 from "file.kite"`) - imports only specified symbols
+- Wildcard import (`import * from "file.kite"`) - imports all symbols from file
+- Named import (`import symbol1, symbol2 from "file.kite"`) - imports only specified symbols from file
+- Directory wildcard import (`import * from "dir"`) - imports all symbols from all `.kite` files in directory
+- Directory named import (`import Symbol from "dir"`) - scans all `.kite` files in directory and imports only the named symbol
 - Parses and type-checks imported files at compile time
 - Merges exported types (functions, variables, schemas) into current environment
 - Detects circular imports at type-check time
-- Validates import file paths exist
+- Validates import file/directory paths exist
 - Type-checks function calls from imported modules
 - Caches parsed programs to avoid re-parsing
-- Errors when importing non-existent symbols
+- Errors when importing non-existent symbols or files
+- Supports configurable base path for relative import resolution (useful for testing)
 
 **Reference:**
 - `src/main/java/cloud/kitelang/syntax/ast/statements/ImportStatement.java`

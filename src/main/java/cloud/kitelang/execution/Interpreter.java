@@ -1877,6 +1877,21 @@ public final class Interpreter extends StackVisitor<Object> {
         return env.hasVar(x);
     }
 
+    /**
+     * Gets a variable value or null if not found (doesn't throw).
+     * Use getVar() if you expect the variable to exist.
+     */
+    public Object getVarOrNull(String name) {
+        return env.get(name);
+    }
+
+    /**
+     * Initializes a variable in the current environment.
+     */
+    public Object initVar(String name, Object value) {
+        return env.init(name, value);
+    }
+
     public Object getFun(String myFun) {
         return env.lookup(myFun);
     }

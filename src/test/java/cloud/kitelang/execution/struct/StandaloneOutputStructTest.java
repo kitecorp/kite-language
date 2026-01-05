@@ -125,9 +125,9 @@ public class StandaloneOutputStructTest extends RuntimeTest {
         assertEquals(3, outputs.size());
 
         // Outputs are stored as declarations, values are in env
-        var origin = (StructValue) interpreter.getEnv().lookup("origin");
-        var center = (StructValue) interpreter.getEnv().lookup("center");
-        var corner = (StructValue) interpreter.getEnv().lookup("corner");
+        var origin = (StructValue) interpreter.getVar("origin");
+        var center = (StructValue) interpreter.getVar("center");
+        var corner = (StructValue) interpreter.getVar("corner");
 
         assertEquals(0, origin.get("x"));
         assertEquals(50, center.get("x"));

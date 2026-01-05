@@ -1,0 +1,7 @@
+// WebServer component for compute resources
+component WebServer {
+    input string hostname = "localhost"
+    input number port = 8080
+
+    output string serverHost = hostname
+}

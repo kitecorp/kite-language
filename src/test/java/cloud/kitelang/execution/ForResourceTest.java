@@ -702,7 +702,7 @@ public class ForResourceTest extends RuntimeTest {
                 """);
 
         var map = new HashMap<String, ResourceValue>();
-        var schemaValue = (SchemaValue) this.interpreter.getEnv().get("Bucket");
+        var schemaValue = (SchemaValue) this.interpreter.getVarOrNull("Bucket");
         map.put("main-amazon", resourceValue("main-amazon", new Environment<>(Map.of("name", "name-amazon")), schemaValue));
         map.put("main-bmw", resourceValue("main-bmw", new Environment<>(Map.of("name", "name-bmw")), schemaValue));
         assertEquals(map, interpreter.getInstances());

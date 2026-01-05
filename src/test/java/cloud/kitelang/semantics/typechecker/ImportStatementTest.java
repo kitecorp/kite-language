@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -31,21 +28,14 @@ class ImportStatementTest extends CheckerTest {
         ImportResolver.clearCache();
     }
 
-    private String getTestResourcePath(String filename) {
-        Path resourcePath = Paths.get("src/test/resources", filename).toAbsolutePath();
-        return resourcePath.toString();
-    }
-
     @Test
     @DisplayName("should cache parsed programs to avoid re-parsing")
     void shouldCacheParsedPrograms() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
         assertEquals(0, ImportResolver.getCacheSize(), "Cache should be empty initially");
 
         eval("""
-                import * from "%s"
-                """.formatted(stdlibPath));
+                import * from "stdlib.kite"
+                """);
 
         // Cache should have entries after import
         assertTrue(ImportResolver.getCacheSize() > 0, "Cache should have entries after import");
@@ -53,8 +43,8 @@ class ImportStatementTest extends CheckerTest {
 
         // Import the same file again - cache size should not change
         eval("""
-                import * from "%s"
-                """.formatted(stdlibPath));
+                import * from "stdlib.kite"
+                """);
 
         assertEquals(cacheSize, ImportResolver.getCacheSize(), "Cache size should not increase for same file");
     }
@@ -62,13 +52,11 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should import function types from external file")
     void importFunctionTypes() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
         eval("""
-                import * from "%s"
+                import * from "stdlib.kite"
 
                 var result = double(5)
-                """.formatted(stdlibPath));
+                """);
 
         // The 'double' function should be available in the type environment
         var doubleType = checker.getEnv().lookup("double");
@@ -83,13 +71,11 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should import variable types from external file")
     void importVariableTypes() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
         eval("""
-                import * from "%s"
+                import * from "stdlib.kite"
 
                 var msg = greeting
-                """.formatted(stdlibPath));
+                """);
 
         // The 'greeting' variable should be available as string type
         var greetingType = checker.getEnv().lookup("greeting");
@@ -103,14 +89,12 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should type-check function calls from imported file")
     void typeCheckImportedFunctionCalls() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
         // Calling double with wrong argument type should fail
         assertThrows(TypeError.class, () -> eval("""
-                import * from "%s"
+                import * from "stdlib.kite"
 
                 var result = double("not a number")
-                """.formatted(stdlibPath)));
+                """));
     }
 
     @Test
@@ -124,11 +108,9 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should detect circular imports")
     void detectCircularImports() {
-        String circularPath = getTestResourcePath("circular_a.kite");
-
         var exception = assertThrows(TypeError.class, () -> eval("""
-                import * from "%s"
-                """.formatted(circularPath)));
+                import * from "circular_a.kite"
+                """));
 
         assertTrue(exception.getMessage().contains("Circular import"),
                 "Error message should mention circular import: " + exception.getMessage());
@@ -137,13 +119,11 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should handle nested imports")
     void handleNestedImports() {
-        String nestedPath = getTestResourcePath("nested_b.kite");
-
         eval("""
-                import * from "%s"
+                import * from "nested_b.kite"
 
                 var result = valueB
-                """.formatted(nestedPath));
+                """);
 
         // valueB should be accessible and typed
         var valueBType = checker.getEnv().lookup("valueB");
@@ -155,15 +135,13 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should import schema types")
     void importSchemaTypes() {
-        String schemaPath = getTestResourcePath("schema_import.kite");
-
         eval("""
-                import * from "%s"
+                import * from "schema_import.kite"
 
                 resource vm myVm {
                     name = "test"
                 }
-                """.formatted(schemaPath));
+                """);
 
         // The 'vm' schema should be available
         var vmSchema = checker.getEnv().lookup("vm");
@@ -174,15 +152,13 @@ class ImportStatementTest extends CheckerTest {
     @DisplayName("should import component types")
     @Disabled("Component import not yet implemented - requires shared ComponentRegistry")
     void importComponentTypes() {
-        String componentPath = getTestResourcePath("component_import.kite");
-
         eval("""
-                import * from "%s"
+                import * from "component_import.kite"
 
                 component MyComponent myInstance {
                     inputValue = "test"
                 }
-                """.formatted(componentPath));
+                """);
 
         // The component type should be available
         var componentType = checker.getEnv().lookup("MyComponent");
@@ -192,11 +168,9 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should not pollute environment with stdlib functions from imported file")
     void shouldNotPollutedWithStdlib() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
         eval("""
-                import * from "%s"
-                """.formatted(stdlibPath));
+                import * from "stdlib.kite"
+                """);
 
         // Only user-defined items should be imported, not built-in functions
         // that were auto-initialized in the imported TypeChecker
@@ -212,18 +186,15 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should handle multiple imports in same file")
     void multipleImportsInSameFile() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var sum = add(1, 2)
                 var message = greet("World")
                 var pi = PI
                 var greeting = DEFAULT_GREETING
-                """.formatted(mathPath, stringPath));
+                """);
 
         // Math functions should be available
         var addType = checker.getEnv().lookup("add");
@@ -245,14 +216,12 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should handle diamond dependency pattern")
     void diamondDependencyPattern() {
-        String topPath = getTestResourcePath("imports/diamond_top.kite");
-
         eval("""
-                import * from "%s"
+                import * from "imports/diamond_top.kite"
 
                 var combined = COMBINED
                 var result = process(5)
-                """.formatted(topPath));
+                """);
 
         // All symbols from the diamond should be available
         assertNotNull(checker.getEnv().lookup("SHARED_VALUE"), "SHARED_VALUE from common should be available");
@@ -274,13 +243,11 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should cache shared imports in diamond pattern")
     void diamondPatternUsesCache() {
-        String topPath = getTestResourcePath("imports/diamond_top.kite");
-
         assertEquals(0, ImportResolver.getCacheSize(), "Cache should be empty initially");
 
         eval("""
-                import * from "%s"
-                """.formatted(topPath));
+                import * from "imports/diamond_top.kite"
+                """);
 
         // Cache should contain: diamond_top, diamond_left, diamond_right, common
         // common.kite is imported by both left and right but should only be parsed once
@@ -291,11 +258,9 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should propagate type errors from imported files")
     void propagateTypeErrorsFromImports() {
-        String errorPath = getTestResourcePath("imports/type_error.kite");
-
         var exception = assertThrows(TypeError.class, () -> eval("""
-                import * from "%s"
-                """.formatted(errorPath)));
+                import * from "imports/type_error.kite"
+                """));
 
         assertNotNull(exception, "TypeError should be thrown for type errors in imported file");
     }
@@ -303,15 +268,13 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should allow importing same file multiple times explicitly")
     void importSameFileMultipleTimes() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         // Importing the same file twice should work (idempotent)
         eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/math_utils.kite"
 
                 var result = add(1, multiply(2, 3))
-                """.formatted(mathPath, mathPath));
+                """);
 
         assertEquals(ValueType.Number, checker.getEnv().lookup("result"));
     }
@@ -319,31 +282,25 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should type check function calls across multiple imports")
     void typeCheckAcrossMultipleImports() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         // Using math function with string should fail
         assertThrows(TypeError.class, () -> eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var bad = add("hello", "world")
-                """.formatted(mathPath, stringPath)));
+                """));
     }
 
     @Test
     @DisplayName("should type check imported function return types used in expressions")
     void typeCheckImportedReturnTypesInExpressions() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         // Using number function result where string expected should fail
         assertThrows(TypeError.class, () -> eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var result = greet(add(1, 2))
-                """.formatted(mathPath, stringPath)));
+                """));
     }
 
     // ========== Named Import Tests ==========
@@ -351,13 +308,11 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should import only specified symbol with named import")
     void namedImportSingleSymbol() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import add from "%s"
+                import add from "imports/math_utils.kite"
 
                 var result = add(1, 2)
-                """.formatted(mathPath));
+                """);
 
         // add should be available
         var addType = checker.getEnv().lookup("add");
@@ -373,14 +328,12 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should import multiple specified symbols with named import")
     void namedImportMultipleSymbols() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import add, PI from "%s"
+                import add, PI from "imports/math_utils.kite"
 
                 var result = add(1, 2)
                 var myPi = PI
-                """.formatted(mathPath));
+                """);
 
         // add and PI should be available
         assertNotNull(checker.getEnv().lookup("add"), "Function 'add' should be imported");
@@ -393,11 +346,9 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should error when importing non-existent symbol")
     void namedImportNonExistentSymbol() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         var exception = assertThrows(TypeError.class, () -> eval("""
-                import nonExistent from "%s"
-                """.formatted(mathPath)));
+                import nonExistent from "imports/math_utils.kite"
+                """));
 
         assertTrue(exception.getMessage().contains("nonExistent") ||
                    exception.getMessage().contains("not found"),
@@ -407,16 +358,13 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should mix named import with wildcard import")
     void mixNamedAndWildcardImports() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         eval("""
-                import add from "%s"
-                import * from "%s"
+                import add from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var sum = add(1, 2)
                 var msg = greet("World")
-                """.formatted(mathPath, stringPath));
+                """);
 
         // add from named import should work
         assertNotNull(checker.getEnv().lookup("add"));
@@ -434,27 +382,269 @@ class ImportStatementTest extends CheckerTest {
     @Test
     @DisplayName("should type check function calls from named import")
     void typeCheckNamedImportFunctionCalls() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         // Calling add with wrong argument type should fail
         assertThrows(TypeError.class, () -> eval("""
-                import add from "%s"
+                import add from "imports/math_utils.kite"
 
                 var result = add("not", "numbers")
-                """.formatted(mathPath)));
+                """));
     }
 
     @Test
     @DisplayName("should import variable with named import")
     void namedImportVariable() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import PI from "%s"
+                import PI from "imports/math_utils.kite"
 
                 var myPi = PI
-                """.formatted(mathPath));
+                """);
 
         assertEquals(ValueType.Number, checker.getEnv().lookup("myPi"));
+    }
+
+    // ========== Directory Import Tests ==========
+
+    @Test
+    @DisplayName("should import single symbol from directory")
+    void directoryImportNamedSymbol() {
+        eval("""
+                import NatGateway from "providers/networking"
+
+                var natType = NatGateway.resourceType
+                var nat = NatGateway.create("my-nat")
+                """);
+
+        // NatGateway object should be available
+        assertNotNull(checker.getEnv().lookup("NatGateway"), "NatGateway should be imported");
+        assertEquals(ValueType.String, checker.getEnv().lookup("natType"));
+
+        // VPC and Subnet should NOT be available
+        assertFalse(checker.getEnv().lookupKey("VPC"), "VPC should NOT be imported");
+        assertFalse(checker.getEnv().lookupKey("Subnet"), "Subnet should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should import multiple symbols from directory")
+    void directoryImportMultipleSymbols() {
+        eval("""
+                import NatGateway, VPC from "providers/networking"
+
+                var natType = NatGateway.resourceType
+                var vpcType = VPC.resourceType
+                """);
+
+        // Both NatGateway and VPC symbols should be available
+        assertEquals(ValueType.String, checker.getEnv().lookup("natType"));
+        assertEquals(ValueType.String, checker.getEnv().lookup("vpcType"));
+
+        // Subnet should NOT be available
+        assertFalse(checker.getEnv().lookupKey("Subnet"), "Subnet should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should import all .kite files from directory with wildcard")
+    void directoryImportWildcard() {
+        eval("""
+                import * from "providers/networking"
+
+                var natType = NatGateway.resourceType
+                var vpcType = VPC.resourceType
+                var subnetType = Subnet.resourceType
+                """);
+
+        // All symbols should be available
+        assertEquals(ValueType.String, checker.getEnv().lookup("natType"));
+        assertEquals(ValueType.String, checker.getEnv().lookup("vpcType"));
+        assertEquals(ValueType.String, checker.getEnv().lookup("subnetType"));
+    }
+
+    @Test
+    @DisplayName("should error when importing non-existent symbol from directory")
+    void directoryImportNonExistentSymbol() {
+        var exception = assertThrows(TypeError.class, () -> eval("""
+                import NonExistent from "providers/networking"
+                """));
+
+        assertTrue(exception.getMessage().contains("not found") ||
+                   exception.getMessage().contains("NonExistent"),
+                "Error should mention missing symbol: " + exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should error when importing from non-existent directory")
+    void directoryImportNonExistentDirectory() {
+        var exception = assertThrows(TypeError.class, () -> eval("""
+                import Something from "non/existent/directory"
+                """));
+
+        assertTrue(exception.getMessage().contains("not found") ||
+                   exception.getMessage().contains("directory"),
+                "Error should mention missing directory: " + exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should type check object properties from directory imports")
+    void directoryImportTypeCheckProperties() {
+        eval("""
+                import VPC from "providers/networking"
+
+                var vpcType = VPC.resourceType
+                var myVpc = VPC.create("main-vpc", "10.0.0.0/16")
+                """);
+
+        // VPC object should be available
+        assertNotNull(checker.getEnv().lookup("VPC"), "VPC should be imported");
+        assertEquals(ValueType.String, checker.getEnv().lookup("vpcType"));
+    }
+
+    @Test
+    @DisplayName("should only expose named symbol, not internal file symbols")
+    void directoryImportOnlyExposesNamedSymbol() {
+        eval("""
+                import VPC from "providers/networking"
+
+                var vpcType = VPC.resourceType
+                """);
+
+        // VPC object should be available
+        assertTrue(checker.getEnv().lookupKey("VPC"), "VPC should be imported");
+
+        // Internal symbols from VPC.kite file should NOT be exposed at top level
+        // createVPC function is internal to VPC.kite and should not be available
+        assertFalse(checker.getEnv().lookupKey("createVPC"), "createVPC should NOT be at top level");
+        assertFalse(checker.getEnv().lookupKey("defaultCidr"), "defaultCidr should NOT be at top level");
+    }
+
+    // ========== Directory Import Tests - Schemas, Components, Resources ==========
+
+    @Test
+    @DisplayName("should import schema from directory")
+    void directoryImportSchema() {
+        eval("""
+                import Instance from "providers/compute"
+
+                resource Instance myServer {
+                    name = "web-server"
+                    instanceType = "t2.large"
+                }
+                """);
+
+        // Instance schema should be available
+        assertTrue(checker.getEnv().lookupKey("Instance"), "Instance schema should be imported");
+    }
+
+    @Test
+    @DisplayName("should import schema with wildcard from directory")
+    void directoryImportSchemaWildcard() {
+        eval("""
+                import * from "providers/compute"
+
+                resource Instance myInstance {
+                    name = "test-instance"
+                }
+
+                resource Database myDb {
+                    name = "app-db"
+                    engine = "mysql"
+                }
+                """);
+
+        // Both schemas should be available
+        assertTrue(checker.getEnv().lookupKey("Instance"), "Instance schema should be imported");
+        assertTrue(checker.getEnv().lookupKey("Database"), "Database schema should be imported");
+    }
+
+    @Test
+    @DisplayName("should import multiple schemas and variables from directory with wildcard")
+    void directoryImportMultipleTypesWildcard() {
+        eval("""
+                import * from "providers/compute"
+
+                resource Instance server {
+                    name = "app-server"
+                }
+
+                resource Database myDb {
+                    name = "app-db"
+                }
+
+                var dbDefaults = DatabaseDefaults
+                """);
+
+        // All schemas should be available
+        assertTrue(checker.getEnv().lookupKey("Instance"), "Instance schema should be imported");
+        assertTrue(checker.getEnv().lookupKey("Database"), "Database schema should be imported");
+        assertTrue(checker.getEnv().lookupKey("DatabaseDefaults"), "DatabaseDefaults variable should be imported");
+    }
+
+    @Test
+    @DisplayName("should import named schema and helper function from directory")
+    void directoryImportSchemaWithHelperFunction() {
+        eval("""
+                import Instance, createInstanceConfig from "providers/compute"
+
+                var config = createInstanceConfig("my-server", "t3.xlarge")
+                """);
+
+        // Both schema and helper function should be available
+        assertTrue(checker.getEnv().lookupKey("Instance"), "Instance schema should be imported");
+        assertTrue(checker.getEnv().lookupKey("createInstanceConfig"), "createInstanceConfig function should be imported");
+
+        // Config type should be object
+        assertNotNull(checker.getEnv().lookup("config"));
+    }
+
+    @Test
+    @DisplayName("should type check resource properties against imported schema")
+    void directoryImportSchemaTypeCheck() {
+        // Using wrong type for property should fail
+        assertThrows(TypeError.class, () -> eval("""
+                import Instance from "providers/compute"
+
+                resource Instance myServer {
+                    name = 123
+                }
+                """));
+    }
+
+    // ========== Directory Import Tests - Creating Resources with Imported Schemas ==========
+
+    @Test
+    @DisplayName("should import schema from directory and create resource")
+    void directoryImportSchemaAndCreateResource() {
+        eval("""
+                import ServerConfig from "providers/compute"
+
+                resource ServerConfig webServer {
+                    name = "web-server"
+                    size = "large"
+                }
+
+                resource ServerConfig apiServer {
+                    name = "api-server"
+                }
+                """);
+
+        // Schema should be imported
+        assertTrue(checker.getEnv().lookupKey("ServerConfig"), "ServerConfig schema should be imported");
+    }
+
+    @Test
+    @DisplayName("should import schema and variable from directory")
+    void directoryImportSchemaAndVariable() {
+        eval("""
+                import ServerConfig, serverCount from "providers/compute"
+
+                resource ServerConfig myServer {
+                    name = "my-server"
+                }
+
+                var count = serverCount
+                """);
+
+        // Schema and variable should be imported
+        assertTrue(checker.getEnv().lookupKey("ServerConfig"), "ServerConfig schema should be imported");
+        assertTrue(checker.getEnv().lookupKey("serverCount"), "serverCount should be imported");
+        assertEquals(ValueType.Number, checker.getEnv().lookup("count"));
     }
 }

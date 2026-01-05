@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AssignmentTest extends RuntimeTest {
 
     private void setGlobalVar(Object of) {
-        interpreter.getEnv().init("VERSION", of);
+        interpreter.initVar("VERSION", of);
     }
 
     @Test

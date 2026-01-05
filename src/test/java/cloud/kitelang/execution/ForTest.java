@@ -72,7 +72,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of("dev", "prod"), res);
-        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of("dev", "prod"), interpreter.getVar("res"));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of("dev", 1), res);
-        assertEquals(List.of("dev", 1), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of("dev", 1), interpreter.getVar("res"));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of("dev", "prod"), res);
-        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of("dev", "prod"), interpreter.getVar("res"));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of(1, 2, 3, 4, 5), res);
-        assertEquals(List.of(1, 2, 3, 4, 5), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of(1, 2, 3, 4, 5), interpreter.getVar("res"));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of(Map.of("client", "dev"), Map.of("client", "prod")), res);
-        assertEquals(List.of(Map.of("client", "dev"), Map.of("client", "prod")), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of(Map.of("client", "dev"), Map.of("client", "prod")), interpreter.getVar("res"));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of("dev", "prod"), res);
-        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of("dev", "prod"), interpreter.getVar("res"));
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
         assertEquals(List.of("0 dev", "1 prod"), res);
-        assertEquals(List.of("0 dev", "1 prod"), interpreter.getEnv().lookup("res"));
+        assertEquals(List.of("0 dev", "1 prod"), interpreter.getVar("res"));
     }
 
     @Test
@@ -166,8 +166,8 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
 
-        assertEquals(List.of(0, 1, 2), interpreter.getEnv().lookup("indices"));
-        assertEquals(List.of(1, 2, 3), interpreter.getEnv().lookup("values"));
+        assertEquals(List.of(0, 1, 2), interpreter.getVar("indices"));
+        assertEquals(List.of(1, 2, 3), interpreter.getVar("values"));
     }
 
     @Test
@@ -182,8 +182,8 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
 
-        assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
-        assertEquals(List.of("env1", "env2"), interpreter.getEnv().lookup("values"));
+        assertEquals(List.of(0, 1), interpreter.getVar("indices"));
+        assertEquals(List.of("env1", "env2"), interpreter.getVar("values"));
     }
 
     @Test
@@ -198,8 +198,8 @@ public class ForTest extends RuntimeTest {
                 }
                 """);
 
-        assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
-        assertEquals(List.of("env1", 1), interpreter.getEnv().lookup("values"));
+        assertEquals(List.of(0, 1), interpreter.getVar("indices"));
+        assertEquals(List.of("env1", 1), interpreter.getVar("values"));
     }
 
     @Test
@@ -217,7 +217,7 @@ public class ForTest extends RuntimeTest {
                     }
                 }
                 """);
-        assertEquals(List.of("env1", "client1", "client2", "env2", "client1", "client2"), interpreter.getEnv().lookup("values"));
+        assertEquals(List.of("env1", "client1", "client2", "env2", "client1", "client2"), interpreter.getVar("values"));
     }
 
     @Test
@@ -231,8 +231,8 @@ public class ForTest extends RuntimeTest {
                     values += value.client
                 }
                 """);
-        assertEquals(List.of(0, 1), interpreter.getEnv().lookup("indices"));
-        assertEquals(List.of("dev", "prod"), interpreter.getEnv().lookup("values"));
+        assertEquals(List.of(0, 1), interpreter.getVar("indices"));
+        assertEquals(List.of("dev", "prod"), interpreter.getVar("values"));
     }
 
 

@@ -1,0 +1,18 @@
+// Pre-defined resources for directory import testing
+
+schema ServerConfig {
+    string name
+    string size = "small"
+}
+
+resource ServerConfig prodServer {
+    name = "production-server"
+    size = "large"
+}
+
+resource ServerConfig devServer {
+    name = "dev-server"
+    size = "small"
+}
+
+var serverCount = 2

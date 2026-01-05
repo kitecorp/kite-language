@@ -116,7 +116,7 @@ public class StructDeclarationTest extends RuntimeTest {
                 }
                 """);
 
-        var point = interpreter.getEnv().lookup("Point");
+        var point = interpreter.getVar("Point");
         assertNotNull(point);
         assertInstanceOf(StructValue.class, point);
     }

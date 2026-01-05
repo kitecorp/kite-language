@@ -1,0 +1,17 @@
+// Instance schema for compute resources
+schema Instance {
+    string name
+    string instanceType = "t2.micro"
+    number vcpus = 1
+    number memoryGb = 1
+}
+
+// Helper function to create instance config
+fun createInstanceConfig(string name, string size) object {
+    return {
+        name: name,
+        instanceType: size,
+        vcpus: 2,
+        memoryGb: 4
+    }
+}

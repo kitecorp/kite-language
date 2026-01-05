@@ -1,4 +1,4 @@
 // nested_b.kite - imports nested_a.kite (which imports stdlib)
-import * from "src/test/resources/nested_a.kite"
+import * from "nested_a.kite"
 
 var valueB = valueA + 4  // 6 + 4 = 10

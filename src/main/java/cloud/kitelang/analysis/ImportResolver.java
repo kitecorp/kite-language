@@ -10,10 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Shared utility for handling import statements in both TypeChecker and Interpreter.
@@ -28,12 +30,42 @@ public class ImportResolver {
      */
     private static final Map<String, Program> PARSE_CACHE = new ConcurrentHashMap<>();
 
+    /**
+     * Thread-local base path for resolving relative import paths.
+     * When set, relative paths in import statements are resolved against this base.
+     */
+    private static final ThreadLocal<Path> BASE_PATH = new ThreadLocal<>();
+
     private final KiteCompiler parser;
     private final Set<String> importChain;
 
     public ImportResolver(KiteCompiler parser, Set<String> importChain) {
         this.parser = parser;
         this.importChain = importChain;
+    }
+
+    /**
+     * Sets the base path for resolving relative import paths.
+     * When set, relative paths like "providers/networking" are resolved against this base.
+     * Useful for tests where the working directory differs from the resource location.
+     *
+     * @param basePath The base path for import resolution, or null to use current working directory
+     */
+    public static void setBasePath(Path basePath) {
+        if (basePath == null) {
+            BASE_PATH.remove();
+        } else {
+            BASE_PATH.set(basePath);
+        }
+    }
+
+    /**
+     * Gets the current base path for import resolution.
+     *
+     * @return The base path, or null if not set
+     */
+    public static Path getBasePath() {
+        return BASE_PATH.get();
     }
 
     /**
@@ -51,7 +83,8 @@ public class ImportResolver {
     }
 
     /**
-     * Resolves an import statement by parsing the file and delegating to the visitor.
+     * Resolves an import statement by parsing the file(s) and delegating to the visitor.
+     * Supports both file imports (path ends with .kite) and directory imports (path without .kite).
      *
      * @param <T>            The type of values in the environment
      * @param statement      The import statement to resolve
@@ -64,20 +97,135 @@ public class ImportResolver {
             Environment<T> currentEnv,
             Function<Program, Environment<T>> visitorFactory
     ) {
-        var filePath = normalizeFilePath(statement.getFilePath());
+        var importPath = statement.getFilePath();
 
-        checkCircularImport(filePath);
-        validateFileExists(statement.getFilePath());
+        if (isDirectoryImport(importPath)) {
+            resolveDirectoryImport(statement, currentEnv, visitorFactory);
+        } else {
+            resolveFileImport(statement, currentEnv, visitorFactory);
+        }
+    }
 
-        importChain.add(filePath);
+    /**
+     * Checks if the import path refers to a directory (no .kite extension).
+     */
+    private boolean isDirectoryImport(String path) {
+        return !path.endsWith(".kite");
+    }
+
+    /**
+     * Resolves a single file import.
+     */
+    private <T> void resolveFileImport(
+            ImportStatement statement,
+            Environment<T> currentEnv,
+            Function<Program, Environment<T>> visitorFactory
+    ) {
+        var resolvedPath = resolvePath(statement.getFilePath());
+        var normalizedPath = normalizeFilePath(resolvedPath.toString());
+
+        checkCircularImport(normalizedPath);
+        validateFileExists(resolvedPath);
+
+        importChain.add(normalizedPath);
         try {
-            var program = readAndParse(statement.getFilePath());
+            var program = readAndParse(resolvedPath.toString());
             var importedEnv = visitorFactory.apply(program);
 
             mergeEnvironment(statement, importedEnv, currentEnv);
         } finally {
-            importChain.remove(filePath);
+            importChain.remove(normalizedPath);
         }
+    }
+
+    /**
+     * Resolves a directory import by loading all .kite files and importing the relevant symbols.
+     * For named imports (import X, Y from "dir"), loads all files and imports only symbols X, Y.
+     * For wildcard imports (import * from "dir"), imports all symbols from all .kite files in the directory.
+     */
+    private <T> void resolveDirectoryImport(
+            ImportStatement statement,
+            Environment<T> currentEnv,
+            Function<Program, Environment<T>> visitorFactory
+    ) {
+        var dirPath = resolvePath(statement.getFilePath());
+        validateDirectoryExists(dirPath);
+
+        // Get all .kite files in the directory
+        var allFiles = getAllKiteFilesInDirectory(dirPath);
+
+        // Build combined environment from all files
+        var combinedEnv = new java.util.HashMap<String, T>();
+        for (var filePath : allFiles) {
+            var normalizedPath = normalizeFilePath(filePath.toString());
+            checkCircularImport(normalizedPath);
+
+            importChain.add(normalizedPath);
+            try {
+                var program = readAndParse(filePath.toString());
+                var importedEnv = visitorFactory.apply(program);
+
+                // Collect all symbols from this file
+                combinedEnv.putAll(importedEnv.getVariables());
+            } finally {
+                importChain.remove(normalizedPath);
+            }
+        }
+
+        // Import symbols based on whether it's wildcard or named import
+        if (statement.isImportAll()) {
+            // Import all symbols from combined environment
+            for (var entry : combinedEnv.entrySet()) {
+                currentEnv.initOrAssign(entry.getKey(), entry.getValue());
+            }
+        } else {
+            // Import only the specified symbols
+            for (var symbol : statement.getSymbols()) {
+                if (!combinedEnv.containsKey(symbol)) {
+                    throw new ImportException(
+                            "Symbol '" + symbol + "' not found in directory '" + dirPath + "'. " +
+                            "Available symbols: " + combinedEnv.keySet());
+                }
+                currentEnv.initOrAssign(symbol, combinedEnv.get(symbol));
+            }
+        }
+    }
+
+    /**
+     * Gets all .kite files in a directory (non-recursive, sorted).
+     */
+    private List<Path> getAllKiteFilesInDirectory(Path dirPath) {
+        try (Stream<Path> paths = Files.list(dirPath)) {
+            return paths
+                    .filter(p -> p.toString().endsWith(".kite"))
+                    .sorted()
+                    .toList();
+        } catch (IOException e) {
+            throw new ImportException("Failed to list directory: " + dirPath, e);
+        }
+    }
+
+    /**
+     * Validates that the directory exists.
+     */
+    private void validateDirectoryExists(Path dirPath) {
+        if (!Files.isDirectory(dirPath)) {
+            throw new ImportException("Import directory not found: " + dirPath);
+        }
+    }
+
+    /**
+     * Resolves a path against the base path if set, otherwise uses as-is.
+     * This allows relative paths like "providers/networking" to work when a base path is configured.
+     */
+    private Path resolvePath(String importPath) {
+        var path = Path.of(importPath);
+        var basePath = BASE_PATH.get();
+
+        if (basePath != null && !path.isAbsolute()) {
+            return basePath.resolve(path);
+        }
+        return path;
     }
 
     /**
@@ -102,8 +250,8 @@ public class ImportResolver {
     /**
      * Validates that the import file exists.
      */
-    public void validateFileExists(String filePath) {
-        if (!Files.exists(Path.of(filePath))) {
+    public void validateFileExists(Path filePath) {
+        if (!Files.exists(filePath)) {
             throw new ImportException("Import file not found: " + filePath);
         }
     }

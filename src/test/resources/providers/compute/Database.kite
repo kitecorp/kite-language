@@ -1,0 +1,14 @@
+// Database schema for compute resources
+schema Database {
+    string name
+    string engine = "postgres"
+    number port = 5432
+    string version = "15.0"
+}
+
+// Database helper variable
+var DatabaseDefaults = {
+    engine: "postgres",
+    port: 5432,
+    version: "15.0"
+}

@@ -6,9 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Interpreter Import Statement")
@@ -19,22 +16,13 @@ class ImportStatementTest extends RuntimeTest {
         ImportResolver.clearCache();
     }
 
-    private String getTestResourcePath(String filename) {
-        // Get the absolute path to the test resources directory
-        Path resourcePath = Paths.get("src/test/resources", filename).toAbsolutePath();
-        return resourcePath.toString();
-    }
-
     @Test
     void importStatementBasic() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
-        // Now try the full eval
         var res = eval("""
-                import * from "%s"
-                
+                import * from "stdlib.kite"
+
                 var result = double(5)
-                """.formatted(stdlibPath));
+                """);
 
         assertNotNull(res);
         // Verify the imported function was called successfully (5 * 2 = 10 as integer)
@@ -43,26 +31,24 @@ class ImportStatementTest extends RuntimeTest {
 
     @Test
     void importStatementAccessVariable() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
         eval("""
-                import * from "%s"
-                
+                import * from "stdlib.kite"
+
                 var msg = greeting
-                """.formatted(stdlibPath));
+                """);
         assertEquals("Hello from stdlib!", interpreter.getVar("msg"));
     }
 
     @Test
     void importStatementCallFunction() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
         eval("""
-                import * from "%s"
-                
+                import * from "stdlib.kite"
+
                 var doubled = double(10)
                 var tripled = triple(5)
-                """.formatted(stdlibPath));
-        assertEquals(20, interpreter.getEnv().lookup("doubled"));  // 10 * 2 = 20 (integer)
-        assertEquals(15, interpreter.getEnv().lookup("tripled"));  // 5 * 3 = 15 (integer)
+                """);
+        assertEquals(20, interpreter.getVar("doubled"));  // 10 * 2 = 20 (integer)
+        assertEquals(15, interpreter.getVar("tripled"));  // 5 * 3 = 15 (integer)
     }
 
     @Test
@@ -76,12 +62,11 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     void importStatementNested() {
         // Test nested imports: main -> nested_b -> nested_a -> stdlib
-        String nestedPath = getTestResourcePath("nested_b.kite");
         var code = """
-                import * from "%s"
-                
+                import * from "nested_b.kite"
+
                 var result = valueB
-                """.formatted(nestedPath);
+                """;
         eval(code);
 
         // valueB should be 10 (from nested_b.kite)
@@ -92,10 +77,9 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     void importStatementCircular() {
         // Test circular import detection: circular_a imports circular_b, which imports circular_a
-        String circularPath = getTestResourcePath("circular_a.kite");
         var code = """
-                import * from "%s"
-                """.formatted(circularPath);
+                import * from "circular_a.kite"
+                """;
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> eval(code));
         assertTrue(exception.getMessage().contains("Circular import detected"),
@@ -111,21 +95,19 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should cache parsed programs to avoid re-parsing")
     void shouldCacheParsedPrograms() {
-        String stdlibPath = getTestResourcePath("stdlib.kite");
-
         assertEquals(0, ImportResolver.getCacheSize(), "Cache should be empty initially");
 
         eval("""
-                import * from "%s"
-                """.formatted(stdlibPath));
+                import * from "stdlib.kite"
+                """);
 
         assertTrue(ImportResolver.getCacheSize() > 0, "Cache should have entries after import");
         int cacheSize = ImportResolver.getCacheSize();
 
         // Import the same file again - cache size should not change
         eval("""
-                import * from "%s"
-                """.formatted(stdlibPath));
+                import * from "stdlib.kite"
+                """);
 
         assertEquals(cacheSize, ImportResolver.getCacheSize(), "Cache size should not increase for same file");
     }
@@ -133,19 +115,16 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should handle multiple imports in same file")
     void multipleImportsInSameFile() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var mySum = add(1, 2)
                 var myProduct = multiply(3, 4)
                 var myMessage = greet("World")
                 var myPi = PI
                 var myGreeting = DEFAULT_GREETING
-                """.formatted(mathPath, stringPath));
+                """);
 
         // Math functions should work
         assertEquals(3, interpreter.getVar("mySum"));
@@ -162,14 +141,12 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should handle diamond dependency pattern")
     void diamondDependencyPattern() {
-        String topPath = getTestResourcePath("imports/diamond_top.kite");
-
         eval("""
-                import * from "%s"
+                import * from "imports/diamond_top.kite"
 
                 var combined = COMBINED
                 var result = process(5)
-                """.formatted(topPath));
+                """);
 
         // SHARED_VALUE = 42, LEFT_VALUE = 42 + 10 = 52, RIGHT_VALUE = 42 + 20 = 62
         // COMBINED = 52 + 62 = 114
@@ -185,13 +162,11 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should cache shared imports in diamond pattern")
     void diamondPatternUsesCache() {
-        String topPath = getTestResourcePath("imports/diamond_top.kite");
-
         assertEquals(0, ImportResolver.getCacheSize(), "Cache should be empty initially");
 
         eval("""
-                import * from "%s"
-                """.formatted(topPath));
+                import * from "imports/diamond_top.kite"
+                """);
 
         // Cache should contain: diamond_top, diamond_left, diamond_right, common
         // common.kite is imported by both left and right but should only be parsed once
@@ -202,15 +177,13 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should allow importing same file multiple times explicitly")
     void importSameFileMultipleTimes() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         // Importing the same file twice should work (idempotent)
         eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/math_utils.kite"
 
                 var result = add(1, multiply(2, 3))
-                """.formatted(mathPath, mathPath));
+                """);
 
         // 1 + (2 * 3) = 1 + 6 = 7
         assertEquals(7, interpreter.getVar("result"));
@@ -219,17 +192,14 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should execute functions from multiple imports together")
     void executeFunctionsFromMultipleImports() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         eval("""
-                import * from "%s"
-                import * from "%s"
+                import * from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var myNum = add(10, 20)
                 var myMsg = greet("Kite")
                 var myCombined = myMsg + " - result"
-                """.formatted(mathPath, stringPath));
+                """);
 
         assertEquals(30, interpreter.getVar("myNum"));
         assertEquals("Hello, Kite", interpreter.getVar("myMsg"));
@@ -239,13 +209,11 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should handle deeply nested function calls across imports")
     void deeplyNestedFunctionCalls() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import * from "%s"
+                import * from "imports/math_utils.kite"
 
                 var result = add(multiply(2, 3), multiply(4, 5))
-                """.formatted(mathPath));
+                """);
 
         // (2 * 3) + (4 * 5) = 6 + 20 = 26
         assertEquals(26, interpreter.getVar("result"));
@@ -254,13 +222,11 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should use imported variables in expressions")
     void useImportedVariablesInExpressions() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import * from "%s"
+                import * from "imports/math_utils.kite"
 
                 var circumference = 2 * PI * 10
-                """.formatted(mathPath));
+                """);
 
         // 2 * 3.14159 * 10 = 62.8318
         var result = (Number) interpreter.getVar("circumference");
@@ -272,14 +238,12 @@ class ImportStatementTest extends RuntimeTest {
     void importChainWithValuePropagation() {
         // nested_b imports nested_a which imports stdlib
         // This tests that values computed in nested imports are correctly propagated
-        String nestedPath = getTestResourcePath("nested_b.kite");
-
         eval("""
-                import * from "%s"
+                import * from "nested_b.kite"
 
                 var a = valueA
                 var b = valueB
-                """.formatted(nestedPath));
+                """);
 
         // valueA = double(3) = 6 (from nested_a)
         // valueB = valueA + 4 = 10 (from nested_b)
@@ -292,50 +256,44 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should import only specified symbol with named import")
     void namedImportSingleSymbol() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import add from "%s"
+                import add from "imports/math_utils.kite"
 
                 var result = add(1, 2)
-                """.formatted(mathPath));
+                """);
 
         // add should work
         assertEquals(3, interpreter.getVar("result"));
 
         // multiply and PI should NOT be available
-        assertFalse(interpreter.getEnv().hasVar("multiply"), "multiply should NOT be imported");
-        assertFalse(interpreter.getEnv().hasVar("PI"), "PI should NOT be imported");
+        assertFalse(interpreter.hasVar("multiply"), "multiply should NOT be imported");
+        assertFalse(interpreter.hasVar("PI"), "PI should NOT be imported");
     }
 
     @Test
     @DisplayName("should import multiple specified symbols with named import")
     void namedImportMultipleSymbols() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import add, PI from "%s"
+                import add, PI from "imports/math_utils.kite"
 
                 var result = add(1, 2)
                 var myPi = PI
-                """.formatted(mathPath));
+                """);
 
         // add and PI should work
         assertEquals(3, interpreter.getVar("result"));
         assertEquals(3.14159, interpreter.getVar("myPi"));
 
         // multiply should NOT be available
-        assertFalse(interpreter.getEnv().hasVar("multiply"), "multiply should NOT be imported");
+        assertFalse(interpreter.hasVar("multiply"), "multiply should NOT be imported");
     }
 
     @Test
     @DisplayName("should error when importing non-existent symbol")
     void namedImportNonExistentSymbol() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         var exception = assertThrows(RuntimeException.class, () -> eval("""
-                import nonExistent from "%s"
-                """.formatted(mathPath)));
+                import nonExistent from "imports/math_utils.kite"
+                """));
 
         assertTrue(exception.getMessage().contains("nonExistent") ||
                    exception.getMessage().contains("not found"),
@@ -345,17 +303,14 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should mix named import with wildcard import")
     void mixNamedAndWildcardImports() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-        String stringPath = getTestResourcePath("imports/string_utils.kite");
-
         eval("""
-                import add from "%s"
-                import * from "%s"
+                import add from "imports/math_utils.kite"
+                import * from "imports/string_utils.kite"
 
                 var mySum = add(1, 2)
                 var msg = greet("World")
                 var greeting = DEFAULT_GREETING
-                """.formatted(mathPath, stringPath));
+                """);
 
         // add from named import should work
         assertEquals(3, interpreter.getVar("mySum"));
@@ -365,19 +320,17 @@ class ImportStatementTest extends RuntimeTest {
         assertEquals("Welcome", interpreter.getVar("greeting"));
 
         // multiply from math should NOT be available (only add was imported)
-        assertFalse(interpreter.getEnv().hasVar("multiply"));
+        assertFalse(interpreter.hasVar("multiply"));
     }
 
     @Test
     @DisplayName("should import variable with named import")
     void namedImportVariable() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import PI from "%s"
+                import PI from "imports/math_utils.kite"
 
                 var myPi = PI
-                """.formatted(mathPath));
+                """);
 
         assertEquals(3.14159, interpreter.getVar("myPi"));
     }
@@ -385,15 +338,272 @@ class ImportStatementTest extends RuntimeTest {
     @Test
     @DisplayName("should import function and use with computed values")
     void namedImportFunctionWithComputedValues() {
-        String mathPath = getTestResourcePath("imports/math_utils.kite");
-
         eval("""
-                import add, multiply from "%s"
+                import add, multiply from "imports/math_utils.kite"
 
                 var result = add(multiply(2, 3), multiply(4, 5))
-                """.formatted(mathPath));
+                """);
 
         // (2 * 3) + (4 * 5) = 6 + 20 = 26
         assertEquals(26, interpreter.getVar("result"));
+    }
+
+    // ========== Directory Import Tests ==========
+
+    @Test
+    @DisplayName("should import single symbol from directory")
+    void directoryImportNamedSymbol() {
+        eval("""
+                import NatGateway from "providers/networking"
+
+                var natType = NatGateway.resourceType
+                var nat = NatGateway.create("my-nat")
+                """);
+
+        assertEquals("nat-gateway", interpreter.getVar("natType"));
+
+        // VPC and Subnet symbols should NOT be available (only NatGateway was imported)
+        assertFalse(interpreter.hasVar("VPC"), "VPC should NOT be imported");
+        assertFalse(interpreter.hasVar("Subnet"), "Subnet should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should import multiple symbols from directory")
+    void directoryImportMultipleSymbols() {
+        eval("""
+                import NatGateway, VPC from "providers/networking"
+
+                var natType = NatGateway.resourceType
+                var vpcType = VPC.resourceType
+                """);
+
+        assertEquals("nat-gateway", interpreter.getVar("natType"));
+        assertEquals("vpc", interpreter.getVar("vpcType"));
+
+        // Subnet should NOT be available
+        assertFalse(interpreter.hasVar("Subnet"), "Subnet should NOT be imported");
+    }
+
+    @Test
+    @DisplayName("should import all .kite files from directory with wildcard")
+    void directoryImportWildcard() {
+        eval("""
+                import * from "providers/networking"
+
+                var natType = NatGateway.resourceType
+                var vpcType = VPC.resourceType
+                var subnetType = Subnet.resourceType
+                """);
+
+        assertEquals("nat-gateway", interpreter.getVar("natType"));
+        assertEquals("vpc", interpreter.getVar("vpcType"));
+        assertEquals("subnet", interpreter.getVar("subnetType"));
+    }
+
+    @Test
+    @DisplayName("should error when importing non-existent symbol from directory")
+    void directoryImportNonExistentSymbol() {
+        var exception = assertThrows(RuntimeException.class, () -> eval("""
+                import NonExistent from "providers/networking"
+                """));
+
+        assertTrue(exception.getMessage().contains("not found") ||
+                   exception.getMessage().contains("NonExistent"),
+                "Error should mention missing symbol: " + exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should error when importing from non-existent directory")
+    void directoryImportNonExistentDirectory() {
+        var exception = assertThrows(RuntimeException.class, () -> eval("""
+                import Something from "non/existent/directory"
+                """));
+
+        assertTrue(exception.getMessage().contains("not found") ||
+                   exception.getMessage().contains("directory"),
+                "Error should mention missing directory: " + exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should use functions from directory imports")
+    void directoryImportUseFunctions() {
+        eval("""
+                import VPC from "providers/networking"
+
+                var myVpc = VPC.create("main-vpc", "10.0.0.0/16")
+                """);
+
+        var vpc = interpreter.getVar("myVpc");
+        assertNotNull(vpc);
+        assertInstanceOf(java.util.Map.class, vpc);
+        @SuppressWarnings("unchecked")
+        var vpcMap = (java.util.Map<String, Object>) vpc;
+        assertEquals("vpc", vpcMap.get("resourceType"));
+        assertEquals("main-vpc", vpcMap.get("name"));
+    }
+
+    @Test
+    @DisplayName("should only expose named symbol, not internal file symbols")
+    void directoryImportOnlyExposesNamedSymbol() {
+        eval("""
+                import VPC from "providers/networking"
+
+                var vpcType = VPC.resourceType
+                """);
+
+        // VPC object should be available
+        assertTrue(interpreter.hasVar("VPC"), "VPC should be imported");
+        assertEquals("vpc", interpreter.getVar("vpcType"));
+
+        // Internal symbols from VPC.kite file should NOT be exposed at top level
+        // createVPC function is internal to VPC.kite and should not be available
+        assertFalse(interpreter.hasVar("createVPC"), "createVPC should NOT be at top level");
+        assertFalse(interpreter.hasVar("defaultCidr"), "defaultCidr should NOT be at top level");
+    }
+
+    // ========== Directory Import Tests - Schemas, Components, Resources ==========
+
+    @Test
+    @DisplayName("should import schema from directory")
+    void directoryImportSchema() {
+        eval("""
+                import Instance from "providers/compute"
+
+                resource Instance myServer {
+                    name = "web-server"
+                    instanceType = "t2.large"
+                }
+                """);
+
+        // Instance schema should be available
+        assertTrue(interpreter.hasVar("Instance"), "Instance schema should be imported");
+
+        // Check that the resource was created
+        assertTrue(interpreter.hasVar("myServer"), "Resource myServer should be created");
+    }
+
+    @Test
+    @DisplayName("should import schema with wildcard from directory")
+    void directoryImportSchemaWildcard() {
+        eval("""
+                import * from "providers/compute"
+
+                resource Instance myInstance {
+                    name = "test-instance"
+                }
+
+                resource Database myDb {
+                    name = "app-db"
+                    engine = "mysql"
+                }
+                """);
+
+        // Both schemas should be available
+        assertTrue(interpreter.hasVar("Instance"), "Instance schema should be imported");
+        assertTrue(interpreter.hasVar("Database"), "Database schema should be imported");
+        assertTrue(interpreter.hasVar("myInstance"), "Resource myInstance should be created");
+        assertTrue(interpreter.hasVar("myDb"), "Resource myDb should be created");
+    }
+
+    @Test
+    @DisplayName("should import multiple schemas and variables from directory with wildcard")
+    void directoryImportMultipleTypesWildcard() {
+        eval("""
+                import * from "providers/compute"
+
+                resource Instance server {
+                    name = "app-server"
+                }
+
+                resource Database myDb {
+                    name = "app-db"
+                }
+
+                var dbDefaults = DatabaseDefaults
+                """);
+
+        // All schemas should be available
+        assertTrue(interpreter.hasVar("Instance"), "Instance schema should be imported");
+        assertTrue(interpreter.hasVar("Database"), "Database schema should be imported");
+        assertTrue(interpreter.hasVar("DatabaseDefaults"), "DatabaseDefaults variable should be imported");
+
+        // Resources should be created
+        assertTrue(interpreter.hasVar("server"), "Resource server should be created");
+        assertTrue(interpreter.hasVar("myDb"), "Resource myDb should be created");
+
+        // Variable from imported module should be accessible
+        var dbDefaults = interpreter.getVar("dbDefaults");
+        assertNotNull(dbDefaults);
+        assertInstanceOf(java.util.Map.class, dbDefaults);
+    }
+
+    @Test
+    @DisplayName("should import named schema and use helper function from directory")
+    void directoryImportSchemaWithHelperFunction() {
+        eval("""
+                import Instance, createInstanceConfig from "providers/compute"
+
+                var config = createInstanceConfig("my-server", "t3.xlarge")
+                """);
+
+        // Both schema and helper function should be available
+        assertTrue(interpreter.hasVar("Instance"), "Instance schema should be imported");
+        assertTrue(interpreter.hasVar("createInstanceConfig"), "createInstanceConfig function should be imported");
+
+        var config = interpreter.getVar("config");
+        assertNotNull(config);
+        assertInstanceOf(java.util.Map.class, config);
+
+        @SuppressWarnings("unchecked")
+        var configMap = (java.util.Map<String, Object>) config;
+        assertEquals("my-server", configMap.get("name"));
+        assertEquals("t3.xlarge", configMap.get("instanceType"));
+    }
+
+    // ========== Directory Import Tests - Creating Resources with Imported Schemas ==========
+
+    @Test
+    @DisplayName("should import schema from directory and create resource")
+    void directoryImportSchemaAndCreateResource() {
+        eval("""
+                import ServerConfig from "providers/compute"
+
+                resource ServerConfig webServer {
+                    name = "web-server"
+                    size = "large"
+                }
+
+                resource ServerConfig apiServer {
+                    name = "api-server"
+                }
+                """);
+
+        // Schema should be imported
+        assertTrue(interpreter.hasVar("ServerConfig"), "ServerConfig schema should be imported");
+
+        // Resources should be created
+        assertTrue(interpreter.hasVar("webServer"), "webServer should be created");
+        assertTrue(interpreter.hasVar("apiServer"), "apiServer should be created");
+    }
+
+    @Test
+    @DisplayName("should import schema and variable from directory")
+    void directoryImportSchemaAndVariable() {
+        eval("""
+                import ServerConfig, serverCount from "providers/compute"
+
+                resource ServerConfig myServer {
+                    name = "my-server"
+                }
+
+                var count = serverCount
+                """);
+
+        // Schema and variable should be imported
+        assertTrue(interpreter.hasVar("ServerConfig"), "ServerConfig schema should be imported");
+        assertTrue(interpreter.hasVar("serverCount"), "serverCount should be imported");
+        assertTrue(interpreter.hasVar("myServer"), "myServer should be created");
+
+        assertEquals(2, interpreter.getVar("count"));
     }
 }

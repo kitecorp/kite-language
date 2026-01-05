@@ -1,6 +1,6 @@
 // Top of diamond - imports both left and right, which both import common
-import * from "src/test/resources/imports/diamond_left.kite"
-import * from "src/test/resources/imports/diamond_right.kite"
+import * from "imports/diamond_left.kite"
+import * from "imports/diamond_right.kite"
 
 var COMBINED = LEFT_VALUE + RIGHT_VALUE
 

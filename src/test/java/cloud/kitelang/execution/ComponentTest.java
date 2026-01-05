@@ -21,7 +21,7 @@ public class ComponentTest extends RuntimeTest {
         var x = eval("""
                 component server { }
                 """);
-        var fromEnv = interpreter.getEnv().lookup("server");
+        var fromEnv = interpreter.getVar("server");
         assertSame(x, fromEnv);
     }
 
@@ -696,7 +696,7 @@ public class ComponentTest extends RuntimeTest {
         assertEquals("api-server", api.argVal("hostname"));
 
         // Resources should be namespaced by component instance
-        var resources = interpreter.getEnv().getResources();
+        var resources = interpreter.getInstances();
         assertTrue(resources.containsKey("main.instance"), "Resource should be namespaced as 'main.instance'");
         assertTrue(resources.containsKey("api.instance"), "Resource should be namespaced as 'api.instance'");
         assertFalse(resources.containsKey("instance"), "Resource should not be stored without namespace");

@@ -1,5 +1,5 @@
 // Left side of diamond dependency
-import * from "src/test/resources/imports/common.kite"
+import * from "imports/common.kite"
 
 var LEFT_VALUE = SHARED_VALUE + 10
 

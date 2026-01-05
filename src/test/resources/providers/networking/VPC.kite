@@ -1,0 +1,16 @@
+// VPC module for directory import testing
+// Exports: VPC object
+
+fun createVPC(string name, string cidr) object {
+    return {
+        resourceType: "vpc",
+        name: name,
+        cidr: cidr
+    }
+}
+
+var VPC = {
+    resourceType: "vpc",
+    defaultCidr: "10.0.0.0/16",
+    create: createVPC
+}

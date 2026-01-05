@@ -1,0 +1,14 @@
+// NatGateway module for directory import testing
+// Exports: NatGateway object
+
+fun createNatGateway(string name) object {
+    return {
+        resourceType: "nat-gateway",
+        name: name
+    }
+}
+
+var NatGateway = {
+    resourceType: "nat-gateway",
+    create: createNatGateway
+}
