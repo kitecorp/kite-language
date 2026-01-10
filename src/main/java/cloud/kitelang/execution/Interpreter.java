@@ -776,8 +776,8 @@ public final class Interpreter extends StackVisitor<Object> {
             case Boolean b -> BooleanLiteral.bool(b);
             case List<?> list -> {
                 var items = list.stream()
-                        .map(item -> (Literal) createValueExpression(item))
-                        .toList();
+                        .map(this::createValueExpression)
+                        .toArray(Expression[]::new);
                 yield ArrayExpression.array(items);
             }
             case Map<?, ?> map -> {
@@ -788,6 +788,14 @@ public final class Interpreter extends StackVisitor<Object> {
                     properties.add(ObjectLiteral.object(key, val));
                 }
                 yield ObjectExpression.object(properties);
+            }
+            case StructValue struct -> {
+                // Convert struct instance back to a constructor call expression
+                var callee = Identifier.id(struct.getType());
+                var args = struct.getPropertyNames().stream()
+                        .map(propName -> (Expression) createValueExpression(struct.get(propName)))
+                        .toList();
+                yield CallExpression.call(callee, args);
             }
             case null -> NullLiteral.nullLiteral();
             default -> throw new RuntimeException("Cannot create expression for value: " + value);

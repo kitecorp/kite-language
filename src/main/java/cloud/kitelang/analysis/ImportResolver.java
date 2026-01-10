@@ -1,5 +1,6 @@
 package cloud.kitelang.analysis;
 
+import cloud.kitelang.api.ProviderSchemaLookup;
 import cloud.kitelang.execution.environment.Environment;
 import cloud.kitelang.syntax.ast.KiteCompiler;
 import cloud.kitelang.syntax.ast.Program;
@@ -21,6 +22,13 @@ import java.util.stream.Stream;
  * Shared utility for handling import statements in both TypeChecker and Interpreter.
  * Handles file resolution, circular import detection, parsing, and environment merging.
  * Includes a static cache to avoid re-parsing the same file multiple times.
+ *
+ * <p>Supports three types of imports:
+ * <ul>
+ *   <li>File imports: {@code import Foo from "path/to/file.kite"}</li>
+ *   <li>Directory imports: {@code import * from "path/to/dir"}</li>
+ *   <li>Provider imports: {@code import Vpc from "aws/networking"}</li>
+ * </ul>
  */
 public class ImportResolver {
     /**
@@ -35,6 +43,12 @@ public class ImportResolver {
      * When set, relative paths in import statements are resolved against this base.
      */
     private static final ThreadLocal<Path> BASE_PATH = new ThreadLocal<>();
+
+    /**
+     * Thread-local provider schema lookup for resolving provider imports.
+     * When set, imports like "aws/networking" are resolved against provider schemas.
+     */
+    private static final ThreadLocal<ProviderSchemaLookup> SCHEMA_LOOKUP = new ThreadLocal<>();
 
     private final KiteCompiler parser;
     private final Set<String> importChain;
@@ -69,6 +83,29 @@ public class ImportResolver {
     }
 
     /**
+     * Sets the provider schema lookup for resolving provider imports.
+     * When set, imports like "aws/networking" are resolved against provider schemas.
+     *
+     * @param lookup The schema lookup implementation, or null to disable provider imports
+     */
+    public static void setSchemaLookup(ProviderSchemaLookup lookup) {
+        if (lookup == null) {
+            SCHEMA_LOOKUP.remove();
+        } else {
+            SCHEMA_LOOKUP.set(lookup);
+        }
+    }
+
+    /**
+     * Gets the current provider schema lookup.
+     *
+     * @return The schema lookup, or null if not set
+     */
+    public static ProviderSchemaLookup getSchemaLookup() {
+        return SCHEMA_LOOKUP.get();
+    }
+
+    /**
      * Clears the parse cache. Useful for testing or when files have changed.
      */
     public static void clearCache() {
@@ -84,7 +121,7 @@ public class ImportResolver {
 
     /**
      * Resolves an import statement by parsing the file(s) and delegating to the visitor.
-     * Supports both file imports (path ends with .kite) and directory imports (path without .kite).
+     * Supports file imports, directory imports, and provider imports.
      *
      * @param <T>            The type of values in the environment
      * @param statement      The import statement to resolve
@@ -99,7 +136,9 @@ public class ImportResolver {
     ) {
         var importPath = statement.getFilePath();
 
-        if (isDirectoryImport(importPath)) {
+        if (isProviderImport(importPath)) {
+            resolveProviderImport(statement, currentEnv, visitorFactory);
+        } else if (isDirectoryImport(importPath)) {
             resolveDirectoryImport(statement, currentEnv, visitorFactory);
         } else {
             resolveFileImport(statement, currentEnv, visitorFactory);
@@ -107,10 +146,130 @@ public class ImportResolver {
     }
 
     /**
+     * Checks if the import path refers to a provider import.
+     * Provider imports use format "provider" or "provider/domain" (e.g., "aws", "aws/networking").
+     */
+    private boolean isProviderImport(String path) {
+        // Not a provider import if it ends with .kite
+        if (path.endsWith(".kite")) {
+            return false;
+        }
+
+        // Check if the schema lookup is configured
+        var schemaLookup = SCHEMA_LOOKUP.get();
+        if (schemaLookup == null) {
+            return false;
+        }
+
+        // Extract provider name (first part before /)
+        String providerName = path.contains("/") ? path.substring(0, path.indexOf('/')) : path;
+
+        // Check if this is a known provider
+        return schemaLookup.isKnownProvider(providerName);
+    }
+
+    /**
      * Checks if the import path refers to a directory (no .kite extension).
      */
     private boolean isDirectoryImport(String path) {
         return !path.endsWith(".kite");
+    }
+
+    /**
+     * Resolves a provider import by looking up schemas from the registry.
+     * Handles both "provider/domain" format (e.g., "aws/networking") and
+     * "provider" format (e.g., "aws" - imports from all domains).
+     */
+    private <T> void resolveProviderImport(
+            ImportStatement statement,
+            Environment<T> currentEnv,
+            Function<Program, Environment<T>> visitorFactory
+    ) {
+        var schemaLookup = SCHEMA_LOOKUP.get();
+        if (schemaLookup == null) {
+            throw new ImportException("Provider schema lookup not configured for import: " + statement.getFilePath());
+        }
+
+        var importPath = statement.getFilePath();
+        String[] parts = importPath.split("/");
+        String providerName = parts[0];
+        String domain = parts.length > 1 ? parts[1] : null;
+
+        // Get schemas from registry
+        List<ProviderSchemaLookup.SchemaInfo> schemas;
+        if (domain != null) {
+            schemas = schemaLookup.getSchemas(providerName, domain);
+            if (schemas.isEmpty()) {
+                throw new ImportException(
+                        "No schemas found for provider '" + providerName + "' domain '" + domain + "'. " +
+                        "Check that the provider is installed and the domain exists.");
+            }
+        } else {
+            schemas = schemaLookup.getAllSchemas(providerName);
+            if (schemas.isEmpty()) {
+                throw new ImportException(
+                        "No schemas found for provider '" + providerName + "'. " +
+                        "Check that the provider is installed.");
+            }
+        }
+
+        // Build a combined environment from all matching schemas
+        var combinedEnv = new java.util.HashMap<String, T>();
+        for (var schema : schemas) {
+            // Only process if wildcard or explicitly requested
+            if (statement.isImportAll() || statement.getSymbols().contains(schema.typeName())) {
+                // Parse the schema string into a program
+                var program = parseSchemaString(schema.schemaString(), schema.typeName());
+
+                // Create environment from the parsed schema
+                var schemaEnv = visitorFactory.apply(program);
+
+                // Collect all symbols from this schema
+                combinedEnv.putAll(schemaEnv.getVariables());
+            }
+        }
+
+        // Import symbols based on whether it's wildcard or named import
+        if (statement.isImportAll()) {
+            // Import all symbols from combined environment
+            for (var entry : combinedEnv.entrySet()) {
+                currentEnv.initOrAssign(entry.getKey(), entry.getValue());
+            }
+        } else {
+            // Import only the specified symbols
+            for (var symbol : statement.getSymbols()) {
+                if (!combinedEnv.containsKey(symbol)) {
+                    // Check if the symbol exists in any schema
+                    var found = schemas.stream()
+                            .anyMatch(s -> s.typeName().equals(symbol));
+                    if (!found) {
+                        var availableTypes = schemas.stream()
+                                .map(ProviderSchemaLookup.SchemaInfo::typeName)
+                                .toList();
+                        throw new ImportException(
+                                "Symbol '" + symbol + "' not found in '" + importPath + "'. " +
+                                "Available types: " + availableTypes);
+                    }
+                }
+                currentEnv.initOrAssign(symbol, combinedEnv.get(symbol));
+            }
+        }
+    }
+
+    /**
+     * Parses a schema string into a Program AST.
+     * Uses caching to avoid re-parsing the same schema multiple times.
+     */
+    private Program parseSchemaString(String schemaString, String typeName) {
+        var cacheKey = "provider:" + typeName;
+
+        return PARSE_CACHE.computeIfAbsent(cacheKey, _ -> {
+            try {
+                return parser.parse(schemaString);
+            } catch (Exception e) {
+                throw new ImportException("Failed to parse schema for " + typeName + ": " + e.getMessage(), e);
+            }
+        });
     }
 
     /**
