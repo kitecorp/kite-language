@@ -220,18 +220,19 @@ public class ImportResolver {
         List<ProviderSchemaLookup.SchemaInfo> schemas;
         if (domain != null) {
             schemas = schemaLookup.getSchemas(providerName, domain);
+            // If domain-specific lookup is empty, fall back to all schemas
+            // This handles providers that don't categorize by domain
             if (schemas.isEmpty()) {
-                throw new ImportException(
-                        "No schemas found for provider '" + providerName + "' domain '" + domain + "'. " +
-                        "Check that the provider is installed and the domain exists.");
+                schemas = schemaLookup.getAllSchemas(providerName);
             }
         } else {
             schemas = schemaLookup.getAllSchemas(providerName);
-            if (schemas.isEmpty()) {
-                throw new ImportException(
-                        "No schemas found for provider '" + providerName + "'. " +
-                        "Check that the provider is installed.");
-            }
+        }
+
+        if (schemas.isEmpty()) {
+            throw new ImportException(
+                    "No schemas found for provider '" + providerName + "'. " +
+                    "Check that the provider is installed.");
         }
 
         // Build a combined environment from all matching schemas
