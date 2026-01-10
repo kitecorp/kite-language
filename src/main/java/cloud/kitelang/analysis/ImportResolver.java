@@ -138,6 +138,12 @@ public class ImportResolver {
 
         if (isProviderImport(importPath)) {
             resolveProviderImport(statement, currentEnv, visitorFactory);
+        } else if (looksLikeProviderImport(importPath)) {
+            // Path looks like a provider import but provider is not loaded
+            String providerName = importPath.contains("/") ? importPath.substring(0, importPath.indexOf('/')) : importPath;
+            throw new ImportException(
+                    "Provider '" + providerName + "' is not installed or failed to load. " +
+                    "Add it to your kitefile.yml dependencies and ensure it installs successfully.");
         } else if (isDirectoryImport(importPath)) {
             resolveDirectoryImport(statement, currentEnv, visitorFactory);
         } else {
@@ -166,6 +172,21 @@ public class ImportResolver {
 
         // Check if this is a known provider
         return schemaLookup.isKnownProvider(providerName);
+    }
+
+    /**
+     * Checks if the import path looks like a provider import format (provider/domain)
+     * but the provider is not loaded. Used to give better error messages.
+     */
+    private boolean looksLikeProviderImport(String path) {
+        // Provider imports typically have format "provider/domain" without .kite extension
+        if (path.endsWith(".kite")) {
+            return false;
+        }
+        // Check if it looks like a provider path (single segment or provider/domain format)
+        // Common provider names that users might try to import
+        String firstSegment = path.contains("/") ? path.substring(0, path.indexOf('/')) : path;
+        return Set.of("aws", "azure", "gcp", "google", "kubernetes", "k8s", "docker", "files").contains(firstSegment.toLowerCase());
     }
 
     /**
