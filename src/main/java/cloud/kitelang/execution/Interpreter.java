@@ -882,6 +882,10 @@ public final class Interpreter extends StackVisitor<Object> {
         } else if (right instanceof ResourceRef.Resolved resolved) {
             var res = env.assign(identifier.string(), resolved.value());
             return resolved;
+        } else if (right instanceof DeferredValue deferred) {
+            // Cloud property reference - assign null now, will be resolved during apply
+            env.assign(identifier.string(), null);
+            return deferred;
         } else {
             return env.assign(identifier.string(), right);
         }
@@ -1028,6 +1032,21 @@ public final class Interpreter extends StackVisitor<Object> {
             return resourceValue.lookup(propertyName);
         } else {
             var propertyValue = resourceValue.lookup(propertyName);
+
+            // Check if accessing a @cloud property - these are null during interpretation
+            // and need to be resolved during apply after the dependency is created.
+            // EXCEPTION: Output declarations should NOT defer - they're meant to display
+            // cloud values and are resolved later via printOutputs().
+            var schema = resourceValue.getSchema();
+            if (schema != null && schema.isCloudProperty(propertyName)
+                    && !ExecutionContextIn(OutputDeclaration.class)) {
+                // Return DeferredValue for cloud properties - will be resolved during apply
+                var resourceName = resourceValue.getPath() != null
+                        ? resourceValue.getPath().toSegmentName()
+                        : resourceValue.getName();
+                return new DeferredValue(resourceName, propertyName);
+            }
+
             // When retrieving the type of a resource through member expression, return a Resolved reference
             return ResourceRef.resolved(resourceValue, propertyValue);
         }
@@ -1225,6 +1244,10 @@ public final class Interpreter extends StackVisitor<Object> {
         for (Statement it : resource.getArguments()) {
             validateNotCloudProperty(it, instance, resource);
             var result = executeBlock(it, instance.getProperties());
+
+            // Track deferred cloud property references for resolution during apply
+            trackDeferredCloudProperty(it, instance, result);
+
             addDependency(resource, instance, result, deferredList);
         }
 
@@ -1242,6 +1265,26 @@ public final class Interpreter extends StackVisitor<Object> {
         }
 
         return deferredList;
+    }
+
+    /**
+     * Tracks deferred cloud property references for resolution during apply.
+     * When a resource property references a @cloud property of another resource,
+     * the reference is stored for resolution after the dependency is created.
+     */
+    private void trackDeferredCloudProperty(Statement statement, ResourceValue instance, Object result) {
+        if (!(result instanceof DeferredValue deferred)) {
+            return;
+        }
+        if (!(statement instanceof ExpressionStatement exprStmt)) {
+            return;
+        }
+        if (!(exprStmt.getStatement() instanceof AssignmentExpression assignment)) {
+            return;
+        }
+
+        var propertyName = getPropertyName(assignment.getLeft());
+        instance.setDeferredProperty(propertyName, deferred);
     }
 
     /**
@@ -1307,7 +1350,8 @@ public final class Interpreter extends StackVisitor<Object> {
 
     /**
      * Adds a dependency to the resource based on the evaluation result.
-     * Handles three types: Pending (unresolved), Resolved (resolved), and ResourceValue (from @dependsOn).
+     * Handles four types: Pending (unresolved), Resolved (resolved), ResourceValue (from @dependsOn),
+     * and DeferredValue (cloud property reference).
      */
     private void addDependency(ResourceStatement resource, ResourceValue instance, Object result, List<ResourceRef.Pending> deferredList) {
         switch (result) {
@@ -1318,6 +1362,10 @@ public final class Interpreter extends StackVisitor<Object> {
             }
             case ResourceRef.Resolved resolved -> instance.addDependency(resolved.resource().getPath().toSegmentName());
             case ResourceValue resourceValue -> instance.addDependency(resourceValue.getName());
+            case DeferredValue deferred -> {
+                // DeferredValue is already tracked in trackDeferredCloudProperty
+                // and setDeferredProperty adds the dependency automatically
+            }
             case null, default -> {
             }
         }
@@ -1683,21 +1731,26 @@ public final class Interpreter extends StackVisitor<Object> {
 
     @Override
     public Object visit(OutputDeclaration expression) {
-        visitAnnotations(expression.getAnnotations());
-        outputs.add(expression); // collect outputs for printing after apply
-        if (!expression.hasInit()) {
-            throw new MissingOutputException("Output type without an init value: " + printer.visit(expression));
-        }
-        var res = visit(expression.getInit());
+        push(expression); // Push to callstack so ExecutionContextIn(OutputDeclaration.class) works
+        try {
+            visitAnnotations(expression.getAnnotations());
+            outputs.add(expression); // collect outputs for printing after apply
+            if (!expression.hasInit()) {
+                throw new MissingOutputException("Output type without an init value: " + printer.visit(expression));
+            }
+            var res = visit(expression.getInit());
 
-        // Store output in current environment for component member access
-        var name = expression.name();
-        env.initOrAssign(name, res);
+            // Store output in current environment for component member access
+            var name = expression.name();
+            env.initOrAssign(name, res);
 
-        if (res instanceof ResourceRef.Resolved resolved && resolved.value() == null) {
-            return resolved;
-        } else {
-            return res;
+            if (res instanceof ResourceRef.Resolved resolved && resolved.value() == null) {
+                return resolved;
+            } else {
+                return res;
+            }
+        } finally {
+            pop(expression);
         }
     }
 
@@ -1714,14 +1767,21 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private Object resolveResource(Map<String, Map<String, Object>> resources, OutputDeclaration output) {
-        if (output.getInit() instanceof MemberExpression memberExpression) {
-            if (visit(output.getInit()) instanceof ResourceRef.Resolved resolved) {
-                var resource = resolved.resource();
-                var propertyName = getPropertyName(memberExpression.getProperty());
-                return resources.get(resource.getName()).get(propertyName);
+        // Push output to callstack so ExecutionContextIn(OutputDeclaration.class) returns true
+        // This prevents @cloud properties from being returned as DeferredValue
+        push(output);
+        try {
+            if (output.getInit() instanceof MemberExpression memberExpression) {
+                if (visit(output.getInit()) instanceof ResourceRef.Resolved resolved) {
+                    var resource = resolved.resource();
+                    var propertyName = getPropertyName(memberExpression.getProperty());
+                    return resources.get(resource.getName()).get(propertyName);
+                }
             }
+            return visit(output.getInit());
+        } finally {
+            pop(output);
         }
-        return visit(output.getInit());
     }
 
     @Override

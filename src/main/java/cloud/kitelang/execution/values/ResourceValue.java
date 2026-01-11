@@ -8,7 +8,9 @@ import cloud.kitelang.execution.environment.Environment;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @EqualsAndHashCode
@@ -41,6 +43,13 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
     @Getter
     @Setter
     private ResourcePath path;
+
+    /**
+     * Properties that reference @cloud properties of other resources.
+     * These will be resolved during apply, after the dependent resources are created.
+     * Key: property name on this resource, Value: the deferred reference to resolve.
+     */
+    private Map<String, DeferredValue> deferredProperties;
 
     /**
      * Most complete factory method - all other variants chain to this one.
@@ -148,6 +157,39 @@ public class ResourceValue implements ProviderSupport, TagsSupport {
 
     public void addDependency(Set<String> dependencies) {
         getDependencies().addAll(dependencies);
+    }
+
+    /**
+     * Adds a deferred property reference that will be resolved during apply.
+     * Also adds the dependency for topological sorting.
+     *
+     * @param propertyName the property on this resource that has the deferred value
+     * @param deferred     the deferred reference to resolve
+     */
+    public void setDeferredProperty(String propertyName, DeferredValue deferred) {
+        getDeferredProperties().put(propertyName, deferred);
+        addDependency(deferred.dependencyName());
+    }
+
+    /**
+     * Gets the map of properties with deferred cloud references.
+     *
+     * @return map of property name to deferred reference
+     */
+    public Map<String, DeferredValue> getDeferredProperties() {
+        if (deferredProperties == null) {
+            deferredProperties = new HashMap<>();
+        }
+        return deferredProperties;
+    }
+
+    /**
+     * Checks if this resource has any deferred properties.
+     *
+     * @return true if there are deferred properties to resolve during apply
+     */
+    public boolean hasDeferredProperties() {
+        return deferredProperties != null && !deferredProperties.isEmpty();
     }
 
     @Override

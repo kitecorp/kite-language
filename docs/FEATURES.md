@@ -293,3 +293,66 @@ The optional `importable` argument indicates properties that can identify existi
 **Tests:**
 - `src/test/java/cloud/kitelang/semantics/typechecker/SchemaTest.java` (type-check tests)
 - `src/test/java/cloud/kitelang/integration/CloudDecoratorTest.java` (integration tests)
+
+## Deferred Cloud Property Resolution
+
+Enables referencing `@cloud` properties from other resources. These references are resolved during apply, after the dependent resource is created and its cloud-managed properties are populated.
+
+### Basic Usage
+
+```kite
+schema Vpc {
+    string cidrBlock
+    @cloud string vpcId  // Assigned by cloud provider after creation
+}
+schema Subnet {
+    string vpcId
+    string cidrBlock
+}
+
+resource Vpc example {
+    cidrBlock = "10.0.0.0/24"
+}
+
+resource Subnet subnet {
+    vpcId = example.vpcId  // References @cloud property - resolved during apply
+    cidrBlock = "10.0.0.0/25"
+}
+```
+
+### How It Works
+
+1. During interpretation, references to `@cloud` properties return `DeferredValue` instead of null
+2. The resource stores deferred property references for resolution during apply
+3. Dependencies are automatically tracked for topological sorting (VPC created before Subnet)
+4. During apply, after VPC is created with real `vpcId`, the Subnet's `vpcId` is resolved
+5. Subnet is then created with the actual `vpcId` value
+
+### Multiple References
+
+A resource can reference `@cloud` properties from multiple resources:
+
+```kite
+resource Instance server {
+    vpcId = vpc.vpcId               // Resolved from vpc
+    securityGroupId = sg.groupId    // Resolved from sg
+}
+```
+
+**Features:**
+- Automatic detection of `@cloud` property references during interpretation
+- Deferred values stored as `DeferredValue(resourceName, propertyPath)`
+- Dependencies automatically added for topological sort (ensures correct creation order)
+- Resolution happens in `ResourceManager.apply()` before provider.create() is called
+- Supports references to multiple `@cloud` properties from different resources
+- Clear error messages if dependency is not resolved (indicates cycle or missing resource)
+
+**Reference:**
+- `src/main/java/cloud/kitelang/execution/values/DeferredValue.java` (deferred value record)
+- `src/main/java/cloud/kitelang/execution/values/ResourceValue.java` (deferredProperties tracking)
+- `src/main/java/cloud/kitelang/execution/Interpreter.java` (visitResourceMember, trackDeferredCloudProperty)
+- `engine/src/main/java/cloud/kitelang/engine/domain/Resource.java` (DeferredReference record)
+- `engine/src/main/java/cloud/kitelang/engine/ResourceManager.java` (resolveDeferredProperties)
+
+**Tests:**
+- `src/test/java/cloud/kitelang/integration/DeferredCloudPropertyTest.java`
