@@ -388,22 +388,66 @@ public class CountTest extends CheckerTest {
                 schema vm {
                     string name
                 }
-                
+
                 component app {
                     input string appName
-                
+
                     @count(2)
                     resource vm server {
                         name = appName + "-server-$count"
                     }
                 }
-                
+
                 @count(3)
                 component app prodApp {
                     appName = "prod-$count"
                 }
                 """);
         // Creates 3 app instances, each with 2 servers
+    }
+
+    @Test
+    @DisplayName("@count with string property should throw TypeError")
+    void decoratorCountWithStringPropertyThrows() {
+        // @count(resource.stringProp) should fail because string is not a number
+        assertThrows(TypeError.class, () -> eval("""
+                schema network {
+                    @cloud string arn
+                }
+                schema vm {
+                    string name
+                }
+
+                resource network subnet {
+                }
+
+                @count(subnet.arn)
+                resource vm server {
+                    name = "server-$count"
+                }
+                """));
+    }
+
+    @Test
+    @DisplayName("@count with cloud number property is valid")
+    void decoratorCountWithCloudNumberProperty() {
+        // @count(resource.cloudNumber) is valid
+        eval("""
+                schema network {
+                    @cloud number availabilityZoneCount
+                }
+                schema vm {
+                    string cidrBlock
+                }
+
+                resource network vpc {
+                }
+
+                @count(vpc.availabilityZoneCount)
+                resource vm subnet {
+                    cidrBlock = "10.0.$count.0/24"
+                }
+                """);
     }
 
 }

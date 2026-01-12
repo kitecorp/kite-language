@@ -6,6 +6,7 @@ import cloud.kitelang.semantics.types.DecoratorType;
 import cloud.kitelang.semantics.types.ValueType;
 import cloud.kitelang.syntax.ast.expressions.AnnotationDeclaration;
 import cloud.kitelang.syntax.ast.expressions.ComponentStatement;
+import cloud.kitelang.syntax.ast.expressions.Expression;
 import cloud.kitelang.syntax.ast.expressions.ResourceStatement;
 import cloud.kitelang.syntax.literals.Identifier;
 import cloud.kitelang.syntax.literals.NumberLiteral;
@@ -74,6 +75,21 @@ public class CountDecorator extends DecoratorChecker {
                 throw new TypeError(message);
             }
             default -> {
+                // For any other expression (MemberExpression, CallExpression, etc.)
+                // validate that the result type is a number
+                if (declaration.getValue() instanceof Expression expr) {
+                    var type = checker.visit(expr);
+                    if (type != ValueType.Number) {
+                        String message = Ansi.ansi()
+                                .fgYellow()
+                                .a("@").a(getName())
+                                .reset()
+                                .a(" requires a number, got ")
+                                .a(type != null ? type.getValue() : "unknown")
+                                .toString();
+                        throw new TypeError(message);
+                    }
+                }
             }
         }
         var body = switch (declaration.getTarget()) {
