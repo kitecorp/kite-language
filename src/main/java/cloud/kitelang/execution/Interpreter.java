@@ -65,6 +65,9 @@ public final class Interpreter extends StackVisitor<Object> {
     private final Set<String> importChain;
     // Track component declarations for later instantiation (similar to TypeChecker's ComponentRegistry)
     private final Map<String, ComponentStatement> componentDeclarations;
+    // Track deferred resource templates for apply-time creation (when @count depends on @cloud properties)
+    @Getter
+    private final List<DeferredResourceTemplate> deferredTemplates;
     // Resolved component inputs from InputChainResolver (qualified name -> Expression)
     @Setter
     private Map<String, Expression> resolvedComponentInputs = new HashMap<>();
@@ -105,6 +108,7 @@ public final class Interpreter extends StackVisitor<Object> {
         this.deferredObservable = new DeferredObservable();
         this.importChain = importChain; // Share the import chain
         this.componentDeclarations = new HashMap<>();
+        this.deferredTemplates = new ArrayList<>();
 
         this.errors = new ArrayList<>();
         this.decorators = new HashMap<>();
@@ -276,6 +280,25 @@ public final class Interpreter extends StackVisitor<Object> {
     @Nullable
     public ResourceValue getInstance(String name) {
         return env.getResource(name);
+    }
+
+    /**
+     * Add a deferred resource template for apply-time creation.
+     * Called when @count depends on a @cloud property.
+     *
+     * @param template the deferred resource template
+     */
+    public void addDeferredTemplate(DeferredResourceTemplate template) {
+        deferredTemplates.add(template);
+    }
+
+    /**
+     * Check if there are any deferred resource templates.
+     *
+     * @return true if there are templates to process during apply
+     */
+    public boolean hasDeferredTemplates() {
+        return !deferredTemplates.isEmpty();
     }
 
     @Override
