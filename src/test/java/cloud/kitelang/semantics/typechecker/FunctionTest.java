@@ -139,6 +139,41 @@ public class FunctionTest extends CheckerTest {
     }
 
     @Test
+    @DisplayName("substring(string, number) returns string")
+    void testSubstringTwoArgs() {
+        var actual = eval("substring(\"hello\", 2)");
+        assertEquals(ValueType.String, actual);
+    }
+
+    @Test
+    @DisplayName("substring(string, number, number) returns string")
+    void testSubstringThreeArgs() {
+        var actual = eval("substring(\"hello\", 0, 3)");
+        assertEquals(ValueType.String, actual);
+    }
+
+    @Test
+    @DisplayName("substring rejects number as first argument")
+    void testSubstringRejectsNumberFirstArg() {
+        var ex = assertThrows(TypeError.class, () -> eval("substring(123, 0)"));
+        assertTrue(ex.getMessage().contains("string"));
+    }
+
+    @Test
+    @DisplayName("substring rejects string as second argument")
+    void testSubstringRejectsStringSecondArg() {
+        var ex = assertThrows(TypeError.class, () -> eval("substring(\"hello\", \"0\")"));
+        assertTrue(ex.getMessage().contains("number"));
+    }
+
+    @Test
+    @DisplayName("substring rejects too few arguments")
+    void testSubstringTooFewArgs() {
+        var ex = assertThrows(TypeError.class, () -> eval("substring(\"hello\")"));
+        assertTrue(ex.getMessage().contains("at least"));
+    }
+
+    @Test
     void testWrongArgType() {
         Assertions.assertThrows(TypeError.class, () -> eval("""
                 fun multiply(number x  ,number y )  number {

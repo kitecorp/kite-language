@@ -37,6 +37,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
     private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
     private static final Set<String> MAGIC_VARIABLES = Set.of("count");
+    private static final Set<String> FUNCTIONS_WITH_OPTIONAL_PARAMS = Set.of("substring");
     @Getter
     private final SyntaxPrinter printer;
     private final Set<String> vals = new HashSet<>();
@@ -74,6 +75,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         env.init("print", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
         env.init("println", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
         env.init("length", TypeFactory.add(FunType.fun(ValueType.Number, UnionType.unionType("string|array", ValueType.String, ArrayType.arrayType(AnyType.INSTANCE)))));
+        env.init("substring", TypeFactory.add(FunType.fun(ValueType.String, ValueType.String, ValueType.Number)));
 
         this.componentRegistry = new ComponentRegistry();
 
@@ -816,9 +818,20 @@ public final class TypeChecker extends StackVisitor<Type> {
                 .stream()
                 .map(this::visit)
                 .toList();
-        if (fun.getParams().size() != passedArgumentsTypes.size()) {
-            String string = "Function '" + printer.visit(expression.getCallee()) + "' expects " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
-            throw new TypeError(string);
+        var calleeName = printer.visit(expression.getCallee());
+        var allowsExtraArgs = FUNCTIONS_WITH_OPTIONAL_PARAMS.contains(calleeName);
+        if (allowsExtraArgs) {
+            // Functions with optional params: actual args >= declared params (minimum required)
+            if (passedArgumentsTypes.size() < fun.getParams().size()) {
+                String string = "Function '" + calleeName + "' expects at least " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
+                throw new TypeError(string);
+            }
+        } else {
+            // Standard functions: exact argument count required
+            if (fun.getParams().size() != passedArgumentsTypes.size()) {
+                String string = "Function '" + calleeName + "' expects " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
+                throw new TypeError(string);
+            }
         }
         checkArgs(fun.getParams(), passedArgumentsTypes, expression);
         return fun.getReturnType();
