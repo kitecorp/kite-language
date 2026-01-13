@@ -73,6 +73,7 @@ public final class TypeChecker extends StackVisitor<Type> {
         env.init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
         env.init("print", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
         env.init("println", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
+        env.init("length", TypeFactory.add(FunType.fun(ValueType.Number, UnionType.unionType("string|array", ValueType.String, ArrayType.arrayType(AnyType.INSTANCE)))));
 
         this.componentRegistry = new ComponentRegistry();
 
@@ -385,7 +386,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             return declaredType;
         }
 
-        if (!declaredType.getTypes().contains(actualType)) {
+        if (!unionTypeContains(declaredType, actualType)) {
             throw new TypeError(format(
                     "Expected type `{0}` with valid values: `{1}` but got `{2}` in expression: `{3}`",
                     printer.visit(declaredType),
@@ -400,6 +401,22 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         return declaredType;
+    }
+
+    /**
+     * Check if a union type contains the actual type.
+     * For arrays, any[] matches any array type (number[], string[], etc.)
+     */
+    private boolean unionTypeContains(UnionType unionType, Type actualType) {
+        if (unionType.getTypes().contains(actualType)) {
+            return true;
+        }
+        // Special handling for arrays: any[] matches any array type
+        if (actualType instanceof ArrayType) {
+            return unionType.getTypes().stream()
+                    .anyMatch(t -> t instanceof ArrayType);
+        }
+        return false;
     }
 
     private void validateObjectProperties(ObjectType actualObject, UnionType declaredType) {

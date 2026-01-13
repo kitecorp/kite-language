@@ -23,7 +23,8 @@ public class FunStore {
     }
 
     public FunType setFun(FunType funType) {
-        return store.put(funType.name(), funType);
+        store.put(funType.name(), funType);
+        return funType;
     }
 
     public void addFun(String funName, FunType funType) {

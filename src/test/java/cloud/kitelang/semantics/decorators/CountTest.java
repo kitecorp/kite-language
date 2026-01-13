@@ -2,12 +2,14 @@ package cloud.kitelang.semantics.decorators;
 
 import cloud.kitelang.base.CheckerTest;
 import cloud.kitelang.semantics.TypeError;
+import cloud.kitelang.semantics.types.ValueType;
 import cloud.kitelang.syntax.ast.ValidationException;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static cloud.kitelang.semantics.typechecker.ComponentTest.assertIsComponentType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -448,6 +450,111 @@ public class CountTest extends CheckerTest {
                     cidrBlock = "10.0.$count.0/24"
                 }
                 """);
+    }
+
+    @Test
+    @DisplayName("@count with length() of string property is valid")
+    void decoratorCountWithLengthOfStringProperty() {
+        // @count(length(resource.stringProp)) is valid because length returns number
+        eval("""
+                schema network {
+                    string name
+                }
+                schema vm {
+                    string id
+                }
+
+                resource network subnet {
+                    name = "test"
+                }
+
+                @count(length(subnet.name))
+                resource vm server {
+                    id = "server-$count"
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@count with length() of cloud string property is valid")
+    void decoratorCountWithLengthOfCloudStringProperty() {
+        // @count(length(resource.cloudString)) is valid - length() returns number
+        eval("""
+                schema network {
+                    @cloud string arn
+                }
+                schema vm {
+                    string id
+                }
+
+                resource network subnet {
+                }
+
+                @count(length(subnet.arn))
+                resource vm server {
+                    id = "server-$count"
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("@count with length() of array is valid")
+    void decoratorCountWithLengthOfArray() {
+        // @count(length(array)) is valid
+        eval("""
+                schema vm {
+                    string id
+                }
+
+                var zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+                @count(length(zones))
+                resource vm server {
+                    id = "server-$count"
+                }
+                """);
+    }
+
+    @Test
+    @DisplayName("length() accepts string argument and returns number")
+    void lengthAcceptsString() {
+        eval("""
+                var str = "hello"
+                var len = length(str)
+                """);
+        var lenType = checker.getEnv().lookup("len");
+        assertEquals(ValueType.Number, lenType, "length() should return number type");
+    }
+
+    @Test
+    @DisplayName("length() accepts array argument and returns number")
+    void lengthAcceptsArray() {
+        eval("""
+                var arr = [1, 2, 3]
+                var len = length(arr)
+                """);
+        var lenType = checker.getEnv().lookup("len");
+        assertEquals(ValueType.Number, lenType, "length() should return number type");
+    }
+
+    @Test
+    @DisplayName("length() rejects number argument")
+    void lengthRejectsNumber() {
+        var ex = assertThrows(TypeError.class, () -> eval("""
+                var num = 123
+                var len = length(num)
+                """));
+        assertEquals("Expected type `any[] | string` with valid values: `any[] | string` but got `number` in expression: `length(num)`", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("length() rejects boolean argument")
+    void lengthRejectsBoolean() {
+        var ex = assertThrows(TypeError.class, () -> eval("""
+                var flag = true
+                var len = length(flag)
+                """));
+        assertEquals("Expected type `any[] | string` with valid values: `any[] | string` but got `boolean` in expression: `length(flag)`", ex.getMessage());
     }
 
 }
