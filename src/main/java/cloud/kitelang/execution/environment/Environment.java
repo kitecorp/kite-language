@@ -41,12 +41,12 @@ public class Environment<T> implements IEnvironment<T> {
 
     public Environment(@Nullable Environment<T> parent) {
         this.parent = parent;
-        this.variables = new HashMap<>(8);
+        this.variables = new LinkedHashMap<>(8);
     }
 
     public Environment(String name, @Nullable Environment<T> parent) {
         this.parent = parent;
-        this.variables = new HashMap<>(8);
+        this.variables = new LinkedHashMap<>(8);
         this.name = name;
     }
 
@@ -74,11 +74,11 @@ public class Environment<T> implements IEnvironment<T> {
     }
 
     public Environment() {
-        this(new HashMap<>());
+        this(new LinkedHashMap<>());
     }
 
     public Environment(String name) {
-        this(new HashMap<>(1));
+        this(new LinkedHashMap<>(1));
         this.name = name;
     }
 
@@ -244,6 +244,19 @@ public class Environment<T> implements IEnvironment<T> {
      */
     public Environment<T> getRoot() {
         return parent == null ? this : parent.getRoot();
+    }
+
+    /**
+     * Reorders resource entries in the variables map to match the given sorted order.
+     * Non-resource entries are preserved in their original positions.
+     * Requires variables to be a LinkedHashMap for insertion-order iteration.
+     *
+     * @param sorted resources in dependency order (from topological sort)
+     */
+    @SuppressWarnings("unchecked")
+    public void reorderResources(Map<String, ResourceValue> sorted) {
+        sorted.keySet().forEach(variables::remove);
+        sorted.forEach((name, value) -> variables.put(name, (T) value));
     }
 
     /**

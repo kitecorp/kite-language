@@ -1899,7 +1899,8 @@ public final class Interpreter extends StackVisitor<Object> {
     }
 
     private void topologySortResources() {
-        topologySort(getInstances());
+        var sorted = topologySort(getInstances());
+        env.getRoot().reorderResources(sorted);
     }
 
     @Override
