@@ -68,6 +68,9 @@ public final class Interpreter extends StackVisitor<Object> {
     // Track deferred resource templates for apply-time creation (when @count depends on @cloud properties)
     @Getter
     private final List<DeferredResourceTemplate> deferredTemplates;
+    // Track cloud property observers for reactive re-evaluation after apply
+    @Getter
+    private final CloudObservable cloudObservable;
     // Resolved component inputs from InputChainResolver (qualified name -> Expression)
     @Setter
     private Map<String, Expression> resolvedComponentInputs = new HashMap<>();
@@ -106,6 +109,7 @@ public final class Interpreter extends StackVisitor<Object> {
         this.outputs = new ArrayList<>();
         this.printer = printer;
         this.deferredObservable = new DeferredObservable();
+        this.cloudObservable = new CloudObservable();
         this.importChain = importChain; // Share the import chain
         this.componentDeclarations = new HashMap<>();
         this.deferredTemplates = new ArrayList<>();
@@ -1196,6 +1200,12 @@ public final class Interpreter extends StackVisitor<Object> {
                     } else {
                         resource.setIndex(map);
                     }
+                }
+                case ResourceValue rv -> {
+                    // When iterating over resources, use the resource name as index
+                    // e.g., [for subnet in subnets] resource Ec2Instance server {...}
+                    // creates server["subnetA"], server["subnetB"]
+                    resource.setIndex("\"%s\"".formatted(rv.getName()));
                 }
                 default -> throw new TypeError("Invalid index type: %s".formatted(visit.getClass()));
             }

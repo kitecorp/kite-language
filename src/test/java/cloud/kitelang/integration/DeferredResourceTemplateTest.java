@@ -8,15 +8,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for deferred resource template creation when @count depends on @cloud properties.
+ * Tests for deferred resource handling when @count depends on @cloud properties.
  * When @count evaluates to a DeferredValue (because it references a cloud property),
- * a DeferredResourceTemplate is created instead of actual resources.
+ * a CloudPropertyObserver is registered for reactive re-evaluation during apply.
+ *
+ * <p>The reactive pattern:
+ * <ol>
+ *   <li>During plan: @count(vpc.subnetCount) encounters DeferredValue</li>
+ *   <li>CloudPropertyObserver is registered with CloudObservable</li>
+ *   <li>Resource is marked as cloudPending</li>
+ *   <li>During apply: after vpc is created, observers are notified</li>
+ *   <li>@count re-evaluates with actual value, creates resources</li>
+ * </ol>
  */
 @DisplayName("Deferred resource template tests (@count with @cloud)")
 public class DeferredResourceTemplateTest extends BaseIntegrationTest {
 
     @Test
-    @DisplayName("@count with cloud property creates deferred template")
+    @DisplayName("@count with cloud property registers cloud observer")
     void countWithCloudPropertyCreatesDeferredTemplate() {
         eval("""
                 schema Vpc {
@@ -41,17 +50,48 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
         var subnet = interpreter.getInstance("subnet");
         assertNull(subnet);
 
-        // Verify a deferred template was created
-        assertTrue(interpreter.hasDeferredTemplates());
-        assertEquals(1, interpreter.getDeferredTemplates().size());
-
-        var template = interpreter.getDeferredTemplates().get(0);
-        assertEquals("subnet", template.templateName());
-        assertTrue(template.dependencies().contains("vpc"));
+        // Verify a cloud observer was registered (new reactive pattern)
+        assertTrue(interpreter.getCloudObservable().hasObservers(),
+                "CloudObservable should have observers for deferred @count");
+        assertTrue(interpreter.getCloudObservable().getPendingResources().contains("vpc"),
+                "CloudObservable should be waiting on 'vpc'");
     }
 
     @Test
-    @DisplayName("@count with literal number does not create deferred template")
+    @DisplayName("@count with length(cloudProperty) registers cloud observer")
+    void countWithLengthOfCloudPropertyCreatesDeferredTemplateWithWrapperFunction() {
+        eval("""
+                schema Subnet {
+                    string cidrBlock
+                    @cloud string arn
+                }
+                schema Bucket {
+                    string name
+                }
+
+                resource Subnet subnet {
+                    cidrBlock = "10.0.0.0/24"
+                }
+
+                @count(length(subnet.arn))
+                resource Bucket bucket {
+                    name = "bucket-$count"
+                }
+                """);
+
+        // The bucket should not be created yet (deferred)
+        var bucket = interpreter.getInstance("bucket");
+        assertNull(bucket);
+
+        // Verify a cloud observer was registered (new reactive pattern)
+        assertTrue(interpreter.getCloudObservable().hasObservers(),
+                "CloudObservable should have observers for deferred @count");
+        assertTrue(interpreter.getCloudObservable().getPendingResources().contains("subnet"),
+                "CloudObservable should be waiting on 'subnet'");
+    }
+
+    @Test
+    @DisplayName("@count with literal number does not register cloud observer")
     void countWithLiteralNumberDoesNotCreateDeferredTemplate() {
         eval("""
                 schema Subnet {
@@ -72,12 +112,13 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
         assertNotNull(subnet1);
         assertNotNull(subnet2);
 
-        // No deferred templates
-        assertFalse(interpreter.hasDeferredTemplates());
+        // No cloud observers registered
+        assertFalse(interpreter.getCloudObservable().hasObservers(),
+                "No cloud observers should be registered for literal count");
     }
 
     @Test
-    @DisplayName("@count with variable containing number does not create deferred template")
+    @DisplayName("@count with variable containing number does not register cloud observer")
     void countWithVariableContainingNumberDoesNotCreateDeferredTemplate() {
         eval("""
                 schema Subnet {
@@ -98,12 +139,13 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
         assertNotNull(subnet0);
         assertNotNull(subnet1);
 
-        // No deferred templates
-        assertFalse(interpreter.hasDeferredTemplates());
+        // No cloud observers registered
+        assertFalse(interpreter.getCloudObservable().hasObservers(),
+                "No cloud observers should be registered for variable count");
     }
 
     @Test
-    @DisplayName("DeferredResourceTemplate captures correct dependency information")
+    @DisplayName("CloudObservable captures correct dependency information")
     void deferredResourceTemplateCapturesCorrectDependencyInfo() {
         eval("""
                 schema Vpc {
@@ -126,22 +168,19 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
                 }
                 """);
 
-        assertTrue(interpreter.hasDeferredTemplates());
-        var template = interpreter.getDeferredTemplates().get(0);
+        // Verify cloud observer is registered with correct dependency
+        assertTrue(interpreter.getCloudObservable().hasObservers(),
+                "CloudObservable should have observers");
+        assertTrue(interpreter.getCloudObservable().getPendingResources().contains("myVpc"),
+                "CloudObservable should be waiting on 'myVpc'");
 
-        assertEquals("mySubnet", template.templateName());
-        assertEquals("Subnet", template.resourceType().string());
-        assertTrue(template.dependencies().contains("myVpc"));
-
-        // Verify the deferred value captured
-        var deferredValue = template.deferredValue();
-        assertNotNull(deferredValue);
-        assertEquals("myVpc", deferredValue.dependencyName());
-        assertEquals("availabilityZoneCount", deferredValue.propertyPath());
+        // The subnet should not be created yet
+        var subnet = interpreter.getInstance("mySubnet");
+        assertNull(subnet, "mySubnet should not be created - it's deferred");
     }
 
     @Test
-    @DisplayName("DeferredResourceTemplate provides meaningful reason")
+    @DisplayName("Cloud observer registered for resource waiting on cloud property")
     void deferredResourceTemplateProvidesReason() {
         eval("""
                 schema Cloud {
@@ -160,16 +199,15 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
                 }
                 """);
 
-        assertTrue(interpreter.hasDeferredTemplates());
-        var template = interpreter.getDeferredTemplates().get(0);
-
-        String reason = template.getDeferredReason();
-        assertTrue(reason.contains("config"));
-        assertTrue(reason.contains("instanceCount"));
+        // Verify cloud observer is registered
+        assertTrue(interpreter.getCloudObservable().hasObservers(),
+                "CloudObservable should have observers");
+        assertTrue(interpreter.getCloudObservable().getPendingResources().contains("config"),
+                "CloudObservable should be waiting on 'config'");
     }
 
     @Test
-    @DisplayName("Multiple deferred templates can be created")
+    @DisplayName("Multiple cloud observers can be registered")
     void multipleDeferredTemplatesCanBeCreated() {
         eval("""
                 schema Vpc {
@@ -197,20 +235,15 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
                 }
                 """);
 
-        assertTrue(interpreter.hasDeferredTemplates());
-        assertEquals(2, interpreter.getDeferredTemplates().size());
+        // Both decorators depend on vpc, so both should register observers
+        assertTrue(interpreter.getCloudObservable().hasObservers(),
+                "CloudObservable should have observers");
+        assertTrue(interpreter.getCloudObservable().getPendingResources().contains("vpc"),
+                "CloudObservable should be waiting on 'vpc'");
 
-        var subnetTemplate = interpreter.getDeferredTemplates().stream()
-                .filter(t -> t.templateName().equals("subnet"))
-                .findFirst()
-                .orElse(null);
-        var sgTemplate = interpreter.getDeferredTemplates().stream()
-                .filter(t -> t.templateName().equals("sg"))
-                .findFirst()
-                .orElse(null);
-
-        assertNotNull(subnetTemplate);
-        assertNotNull(sgTemplate);
+        // Neither resource should be created yet
+        assertNull(interpreter.getInstance("subnet"), "subnet should not be created");
+        assertNull(interpreter.getInstance("sg"), "sg should not be created");
     }
 
     @Test
@@ -223,7 +256,8 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
                 null,
                 java.util.Set.of("vpc"),
                 null,
-                deferred
+                deferred,
+                null
         );
 
         assertFalse(template.allDependenciesResolved(java.util.Set.of()));
@@ -242,7 +276,8 @@ public class DeferredResourceTemplateTest extends BaseIntegrationTest {
                 null,
                 java.util.Set.of("vpc"),
                 null,
-                deferred
+                deferred,
+                null
         );
 
         String str = template.toString();

@@ -43,6 +43,11 @@ public final class ResourceStatement
     @Singular
     private Set<AnnotationDeclaration> annotations = new HashSet<>();
     private boolean counted;
+    /**
+     * True if this resource depends on cloud properties that will be resolved during apply.
+     * The resource will be created via CloudObservable after dependencies are applied.
+     */
+    private boolean cloudPending;
     @Singular
     private Set<Expression> dependencies; // we use expression because we can have a deferred resource
     private Set<String> providers;

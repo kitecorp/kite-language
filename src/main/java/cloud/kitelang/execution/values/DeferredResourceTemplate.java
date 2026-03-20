@@ -3,6 +3,7 @@ package cloud.kitelang.execution.values;
 import cloud.kitelang.syntax.ast.expressions.Expression;
 import cloud.kitelang.syntax.ast.expressions.ResourceStatement;
 import cloud.kitelang.syntax.literals.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -18,7 +19,7 @@ import java.util.Set;
  *     cidrBlock = "10.0.0.0/24"
  * }
  *
- * @count(length([subnet]))  // If subnet references @cloud properties
+ * @count(length(subnet.arn))  // subnet.arn is @cloud string
  * resource S3Bucket bucket {
  *     bucket = "my-bucket-$count"
  * }
@@ -35,6 +36,7 @@ import java.util.Set;
  * @param dependencies      resource names this template depends on
  * @param resourceType      the type identifier for the resource (e.g., "S3Bucket")
  * @param deferredValue     the deferred value that caused this template to be created
+ * @param wrapperFunction   optional function to apply to the resolved value (e.g., "length")
  */
 public record DeferredResourceTemplate(
         String templateName,
@@ -42,7 +44,8 @@ public record DeferredResourceTemplate(
         ResourceStatement resourceStatement,
         Set<String> dependencies,
         Identifier resourceType,
-        DeferredValue deferredValue
+        DeferredValue deferredValue,
+        @Nullable String wrapperFunction
 ) {
     /**
      * Check if all dependencies have been resolved (created in cloud).
