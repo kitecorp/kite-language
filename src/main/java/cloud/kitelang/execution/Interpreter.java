@@ -399,11 +399,11 @@ public final class Interpreter extends StackVisitor<Object> {
                 if (StringUtils.containsAny(".", "[")) { // complex interpolation ${vm.resourceName.property}
                     var list = parser.parse(interpolationVar).getBody();
                     for (Statement statement : list) {
-                        values.add(visit(statement).toString());
+                        values.add(stringifyForInterpolation(visit(statement)));
                     }
                 } else { // normal variables ${variable}
                     var value = env.lookup(interpolationVar, hops);
-                    values.add(value.toString());
+                    values.add(stringifyForInterpolation(value));
                 }
 
             }
@@ -420,11 +420,27 @@ public final class Interpreter extends StackVisitor<Object> {
                 case StringInterpolation.Text text -> result.append(text.value());
                 case StringInterpolation.Expr expr -> {
                     var value = visit(expr.expression());
-                    result.append(value != null ? value.toString() : "null");
+                    result.append(stringifyForInterpolation(value));
                 }
             }
         }
         return result.toString();
+    }
+
+    /**
+     * Converts a value to its string representation for use in string interpolation.
+     * Unwraps ResourceRef.Resolved to extract the actual value instead of using
+     * the record's default toString().
+     */
+    private String stringifyForInterpolation(Object value) {
+        return switch (value) {
+            case null -> "null";
+            case ResourceRef.Resolved resolved -> {
+                var inner = resolved.value();
+                yield stringifyForInterpolation(inner);
+            }
+            default -> value.toString();
+        };
     }
 
     @Override

@@ -205,4 +205,44 @@ public class DeferredCloudPropertyTest extends BaseIntegrationTest {
         var deferred = new DeferredValue("myVpc", "vpcId");
         assertEquals("${myVpc.vpcId}", deferred.toString());
     }
+
+    @Test
+    @DisplayName("Cloud property reference inside object literal stores DeferredValue in the map")
+    void cloudPropertyInsideObjectLiteralCreatesDeferredValue() {
+        eval("""
+                schema S3Bucket {
+                    string bucket
+                    @cloud string arn
+                    object tags
+                }
+
+                resource S3Bucket main {
+                    bucket = "kite-dev-bucket"
+                }
+
+                resource S3Bucket second {
+                    bucket = "other-bucket"
+                    tags = {
+                        Name: main.arn
+                    }
+                }
+                """);
+
+        var second = interpreter.getInstance("second");
+        assertNotNull(second);
+
+        // The tags map value should be a DeferredValue (not yet resolved)
+        var tags = second.lookup("tags");
+        assertNotNull(tags);
+        assertInstanceOf(java.util.Map.class, tags);
+
+        @SuppressWarnings("unchecked")
+        var tagsMap = (java.util.Map<String, Object>) tags;
+        var nameValue = tagsMap.get("Name");
+        assertInstanceOf(DeferredValue.class, nameValue);
+
+        var deferred = (DeferredValue) nameValue;
+        assertEquals("main", deferred.dependencyName());
+        assertEquals("arn", deferred.propertyPath());
+    }
 }
