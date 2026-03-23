@@ -1795,15 +1795,16 @@ public final class Interpreter extends StackVisitor<Object> {
             }
             var res = visit(expression.getInit());
 
+            // Unwrap resolved resource refs so outputs expose the actual value
+            if (res instanceof ResourceRef.Resolved resolved) {
+                res = resolved.value();
+            }
+
             // Store output in current environment for component member access
             var name = expression.name();
             env.initOrAssign(name, res);
 
-            if (res instanceof ResourceRef.Resolved resolved && resolved.value() == null) {
-                return resolved;
-            } else {
-                return res;
-            }
+            return res;
         } finally {
             pop(expression);
         }
