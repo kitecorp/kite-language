@@ -38,7 +38,7 @@ public class StandaloneInputStructTest extends RuntimeTest {
                     number y
                 }
                 input Point origin = Point(10, 20)
-                var sum = origin.x + origin.y 
+                var result = origin.x + origin.y
                 """);
 
         assertEquals(30, result);
