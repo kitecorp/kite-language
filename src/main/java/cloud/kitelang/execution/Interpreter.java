@@ -661,19 +661,18 @@ public final class Interpreter extends StackVisitor<Object> {
                 .properties(componentEnv)
                 .build();
 
-        // Execute the declaration block to initialize inputs/outputs with defaults
-        // Skip resources - they should only be created during instantiation
+        // Execute inputs from declaration block to register defaults
+        // Skip resources and outputs - they are evaluated per-instance after input overrides
         for (var stmt : expression.getArguments()) {
             if (stmt instanceof ResourceStatement) {
-                continue; // Resources are created per-instance, not during type declaration
+                continue;
             }
-            // Register inputs and outputs as public properties
             if (stmt instanceof InputDeclaration input) {
                 componentValue.addPublicProperty(input.name());
+                executeBlock(stmt, componentEnv);
             } else if (stmt instanceof OutputDeclaration output) {
                 componentValue.addPublicProperty(output.name());
             }
-            executeBlock(stmt, componentEnv);
         }
 
         // Register in global environment
@@ -711,8 +710,8 @@ public final class Interpreter extends StackVisitor<Object> {
                 .properties(instanceEnv)
                 .build();
 
-        // Phase 1: Execute inputs and outputs from declaration block (skip resources)
-        // This sets up default values for all inputs/outputs
+        // Phase 1: Execute inputs from declaration block (skip outputs and resources)
+        // This sets up default values for all inputs
         for (var stmt : declaration.getArguments()) {
             if (stmt instanceof InputDeclaration input) {
                 componentValue.addPublicProperty(input.name());
@@ -725,14 +724,14 @@ public final class Interpreter extends StackVisitor<Object> {
                     executeBlock(stmt, instanceEnv);
                 }
             } else if (stmt instanceof OutputDeclaration output) {
+                // Register output as public property but defer evaluation
                 componentValue.addPublicProperty(output.name());
-                executeBlock(stmt, instanceEnv);
             }
-            // Skip resources in this phase - they'll be executed after input overrides
+            // Skip resources - they'll be executed after input overrides
         }
 
         // Phase 2: Apply instance overrides for inputs
-        // This allows resources to use the overridden values
+        // This allows outputs and resources to use the overridden values
         for (var stmt : expression.getArguments()) {
             if (stmt instanceof ExpressionStatement exprStmt) {
                 handleAssignment(typeName, stmt, exprStmt, instanceEnv, inputDeclarations);
@@ -741,7 +740,14 @@ public final class Interpreter extends StackVisitor<Object> {
             }
         }
 
-        // Phase 3: Execute resources from declaration block with overridden input values
+        // Phase 3: Evaluate outputs with final input values
+        for (var stmt : declaration.getArguments()) {
+            if (stmt instanceof OutputDeclaration) {
+                executeBlock(stmt, instanceEnv);
+            }
+        }
+
+        // Phase 4: Execute resources from declaration block with overridden input values
         for (var stmt : declaration.getArguments()) {
             if (stmt instanceof ResourceStatement) {
                 executeBlock(stmt, instanceEnv);
