@@ -1697,10 +1697,15 @@ public final class Interpreter extends StackVisitor<Object> {
         // Auto-coerce object literals to struct when type is specified
         value = coerceToStructIfNeeded(expression, value);
 
+        return initShadowingBuiltin(value, symbol);
+    }
+
+    private Object initShadowingBuiltin(Object value, String symbol) {
+        // Allow user variables to shadow stdlib builtin functions (e.g., var sum = 1 + 2)
         if (value instanceof ResourceRef.Resolved resolved) { // a resolved reference to another resource
-            return env.init(symbol, resolved.value());
+            return env.initShadowingBuiltin(symbol, resolved.value());
         }
-        return env.init(symbol, value);
+        return env.initShadowingBuiltin(symbol, value);
     }
 
     /**
@@ -1852,10 +1857,8 @@ public final class Interpreter extends StackVisitor<Object> {
         if (expression.hasInit()) {// resource/schema can both have init but is only mandatory in the resource
             value = executeBlock(expression.getInit(), env);
         }
-        if (value instanceof ResourceRef.Resolved resolved) { // a resolved reference to another resource
-            return env.init(symbol, resolved.value());
-        }
-        return env.init(symbol, value);
+        // Allow user values to shadow stdlib builtin functions
+        return initShadowingBuiltin(value, symbol);
     }
 
     @Override

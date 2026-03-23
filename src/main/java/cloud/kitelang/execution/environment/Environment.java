@@ -152,6 +152,35 @@ public class Environment<T> implements IEnvironment<T> {
         return value;
     }
 
+    /**
+     * Declare a new variable, allowing it to shadow a stdlib builtin function.
+     * Stdlib builtins are {@link cloud.kitelang.execution.Callable} instances that are NOT
+     * user-defined {@link cloud.kitelang.execution.values.FunValue} or
+     * {@link cloud.kitelang.execution.values.StructValue} callables.
+     * This enables user code like {@code var sum = 1 + 2} even though {@code sum}
+     * is a built-in collection function.
+     *
+     * @throws DeclarationExistsException if the name is already declared as a user variable
+     */
+    @SuppressWarnings("unchecked")
+    public T initShadowingBuiltin(String name, Object value) {
+        var existing = variables.get(name);
+        if (existing != null && isStdlibBuiltin(existing)) {
+            this.put(name, (T) value);
+            return (T) value;
+        }
+        return init(name, value);
+    }
+
+    /**
+     * Checks if a value is a stdlib builtin (a Callable that is not a user-defined FunValue or StructValue).
+     */
+    private boolean isStdlibBuiltin(Object value) {
+        return value instanceof cloud.kitelang.execution.Callable
+                && !(value instanceof cloud.kitelang.execution.values.FunValue)
+                && !(value instanceof cloud.kitelang.execution.values.StructValue);
+    }
+
     public T initOrAssign(String varName, T value) {
         if (hasVar(varName)) {
             return assign(varName, value);
