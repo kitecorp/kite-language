@@ -818,20 +818,22 @@ public final class TypeChecker extends StackVisitor<Type> {
                 .stream()
                 .map(this::visit)
                 .toList();
-        var calleeName = printer.visit(expression.getCallee());
-        var allowsExtraArgs = FUNCTIONS_WITH_OPTIONAL_PARAMS.contains(calleeName);
-        if (allowsExtraArgs) {
-            // Functions with optional params: actual args >= declared params (minimum required)
-            if (passedArgumentsTypes.size() < fun.getParams().size()) {
-                String string = "Function '" + calleeName + "' expects at least " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
-                throw new TypeError(string);
+        if (printer.visit(expression.getCallee()) instanceof String calleeName) {
+            var allowsExtraArgs = FUNCTIONS_WITH_OPTIONAL_PARAMS.contains(calleeName);
+            if (allowsExtraArgs) {
+                // Functions with optional params: actual args >= declared params (minimum required)
+                if (passedArgumentsTypes.size() < fun.getParams().size()) {
+                    String string = "Function '" + calleeName + "' expects at least " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
+                    throw new TypeError(string);
+                }
+            } else {
+                // Standard functions: exact argument count required
+                if (fun.getParams().size() != passedArgumentsTypes.size()) {
+                    String string = "Function '" + calleeName + "' expects " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
+                    throw new TypeError(string);
+                }
             }
-        } else {
-            // Standard functions: exact argument count required
-            if (fun.getParams().size() != passedArgumentsTypes.size()) {
-                String string = "Function '" + calleeName + "' expects " + fun.getParams().size() + " arguments but got " + passedArgumentsTypes.size() + " in " + printer.visit(expression);
-                throw new TypeError(string);
-            }
+
         }
         checkArgs(fun.getParams(), passedArgumentsTypes, expression);
         return fun.getReturnType();
