@@ -11,6 +11,7 @@ import cloud.kitelang.execution.exceptions.OperationNotImplementedException;
 import cloud.kitelang.execution.values.ResourceRef;
 import cloud.kitelang.semantics.decorators.*;
 import cloud.kitelang.semantics.types.*;
+import cloud.kitelang.stdlib.StdlibRegistry;
 import cloud.kitelang.syntax.annotations.Annotatable;
 import cloud.kitelang.syntax.annotations.CountAnnotatable;
 import cloud.kitelang.syntax.ast.KiteCompiler;
@@ -37,7 +38,7 @@ public final class TypeChecker extends StackVisitor<Type> {
     private static final List<SystemType> EQUALITY_OPS = List.of(SystemType.STRING, SystemType.NUMBER, SystemType.BOOLEAN, SystemType.OBJECT);
     private static final List<SystemType> COMPARISON_OPS = List.of(SystemType.NUMBER, SystemType.BOOLEAN);
     private static final Set<String> MAGIC_VARIABLES = Set.of("count");
-    private static final Set<String> FUNCTIONS_WITH_OPTIONAL_PARAMS = Set.of("substring");
+    private static final Set<String> FUNCTIONS_WITH_OPTIONAL_PARAMS = StdlibRegistry.FUNCTIONS_WITH_OPTIONAL_PARAMS;
     @Getter
     private final SyntaxPrinter printer;
     private final Set<String> vals = new HashSet<>();
@@ -70,12 +71,9 @@ public final class TypeChecker extends StackVisitor<Type> {
             env.init(value.getValue(), value);
         }
         this.importedFiles = importedFiles;
-        env.init("pow", TypeFactory.fromString("(%s,%s)->%s".formatted(ValueType.Number.getValue(), ValueType.Number.getValue(), ValueType.Number.getValue())));
-        env.init("toString", TypeFactory.fromString("(%s)->%s".formatted(ValueType.Number.getValue(), ValueType.String.getValue())));
-        env.init("print", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
-        env.init("println", TypeFactory.add(FunType.fun(ValueType.Void, AnyType.INSTANCE)));
-        env.init("length", TypeFactory.add(FunType.fun(ValueType.Number, UnionType.unionType("string|array", ValueType.String, ArrayType.arrayType(AnyType.INSTANCE)))));
-        env.init("substring", TypeFactory.add(FunType.fun(ValueType.String, ValueType.String, ValueType.Number)));
+
+        // Register all stdlib function type signatures from the central registry
+        StdlibRegistry.registerTypes(env);
 
         this.componentRegistry = new ComponentRegistry();
 
@@ -641,13 +639,22 @@ public final class TypeChecker extends StackVisitor<Type> {
 
     public Type lookupInstance(Identifier resourceName) {
         // When retrieving the type of a resource, we first check the "instances" field for existing resources
-        // Since that environment points to the parent (type env), it will also find the properties
+        // Since that environment points to the parent (type env), it will also find the properties.
+        // We must filter out stdlib function types because they share the type root namespace
+        // but are not resource/component instances (e.g., "second", "first", "keys" are stdlib functions).
         var result = CycleDetectionSupport.propertyOrDeferred(
                 getInstances().getVariables(),
                 resourceName.string()
         );
 
-        return result instanceof ResourceRef.Pending pending ? new AnyType(pending) : (Type) result;
+        if (result instanceof ResourceRef.Pending pending) {
+            return new AnyType(pending);
+        }
+        // Stdlib function types are not valid resource/component instances — treat as pending
+        if (result instanceof FunType) {
+            return new AnyType(ResourceRef.pending(resourceName.string()));
+        }
+        return (Type) result;
     }
 
     private TypeEnvironment getInstances() {
@@ -1183,7 +1190,9 @@ public final class TypeChecker extends StackVisitor<Type> {
         handleCountAnnotation(expression, environment);
 
         try {
-            var result = env.init(instanceName, instance);
+            // Allow component instances to shadow stdlib function names (e.g., "first", "second")
+            // The Interpreter will still catch truly invalid shadowing at runtime
+            var result = env.initShadowingStdlib(instanceName, instance);
 
             // First execute declaration block to set up base structure (resources, etc.)
             executeBlock(declaration.getArguments(), instance.getEnvironment());
@@ -1236,7 +1245,7 @@ public final class TypeChecker extends StackVisitor<Type> {
             return initType(expression, expression.getInit(), expression.getType(), var);
         } else if (expression.hasType()) {
             var explicitType = visit(expression.getType());
-            return env.init(var, explicitType);
+            return env.initShadowingStdlib(var, explicitType);
         } else {
             throw new IllegalArgumentException("Missing explicit and implicit type for variable " + var);
         }
@@ -1252,7 +1261,7 @@ public final class TypeChecker extends StackVisitor<Type> {
                 returnType = initType(expression, expression.getInit(), expression.getType(), var);
             } else if (expression.hasType()) {
                 var explicitType = visit(expression.getType());
-                returnType = env.init(var, explicitType);
+                returnType = env.initShadowingStdlib(var, explicitType);
             } else {
                 throw new TypeError("Missing explicit and implicit type for expression: " + printer.visit(expression));
             }
@@ -1281,10 +1290,10 @@ public final class TypeChecker extends StackVisitor<Type> {
         }
 
         if (Objects.equals(implicitType, ValueType.String) && init instanceof StringLiteral stringLiteral) {
-            return env.init(var, new StringType(stringLiteral.getValue()));
+            return env.initShadowingStdlib(var, new StringType(stringLiteral.getValue()));
         }
 
-        return env.init(var, implicitType);
+        return env.initShadowingStdlib(var, implicitType);
     }
 
     private Type initWithExplicitType(Expression expression, TypeIdentifier typeIdentifier, String var, Type implicitType) {
@@ -1292,7 +1301,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         if (explicitType instanceof UnionType unionType) {
             var resolvedType = expect(implicitType, unionType, expression);
-            return env.init(var, resolvedType);
+            return env.initShadowingStdlib(var, resolvedType);
         }
 
         expect(implicitType, explicitType, expression);
@@ -1302,7 +1311,7 @@ public final class TypeChecker extends StackVisitor<Type> {
                 ? implicitType
                 : explicitType;
 
-        return env.init(var, typeToInit);
+        return env.initShadowingStdlib(var, typeToInit);
     }
 
     @Override

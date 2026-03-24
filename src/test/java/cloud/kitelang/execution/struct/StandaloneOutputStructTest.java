@@ -133,4 +133,68 @@ public class StandaloneOutputStructTest extends RuntimeTest {
         assertEquals(50, center.get("x"));
         assertEquals(100, corner.get("x"));
     }
+
+    @Test
+    @DisplayName("Standalone output struct with computed fields")
+    void standaloneOutputStructWithComputedFields() {
+        var result = eval("""
+                struct Point {
+                    number x
+                    number y
+                }
+                var offset = 25
+                output Point shifted = Point(offset * 2, offset + 10)
+                """);
+
+        assertInstanceOf(StructValue.class, result);
+        assertEquals(50, ((StructValue) result).get("x"));
+        assertEquals(35, ((StructValue) result).get("y"));
+    }
+
+    @Test
+    @DisplayName("Standalone output struct from var")
+    void standaloneOutputStructFromVar() {
+        var result = eval("""
+                struct Point {
+                    number x
+                    number y
+                }
+                var p = Point(77, 88)
+                output Point myPoint = p
+                """);
+
+        assertInstanceOf(StructValue.class, result);
+        assertEquals(77, ((StructValue) result).get("x"));
+        assertEquals(88, ((StructValue) result).get("y"));
+    }
+
+    @Test
+    @DisplayName("Standalone output string interpolation with struct field")
+    void standaloneOutputStringInterpolation() {
+        var result = eval("""
+                struct Point {
+                    number x
+                    number y
+                }
+                var p = Point(10, 20)
+                output string coords = "x=${p.x}, y=${p.y}"
+                """);
+
+        assertEquals("x=10, y=20", result);
+    }
+
+    @Test
+    @DisplayName("Standalone output number from struct field access")
+    void standaloneOutputNumberFromStructField() {
+        var result = eval("""
+                struct Point {
+                    number x
+                    number y
+                }
+                var p = Point(42, 99)
+                output number xCoord = p.x
+                """);
+
+        assertEquals(42, result);
+    }
 }

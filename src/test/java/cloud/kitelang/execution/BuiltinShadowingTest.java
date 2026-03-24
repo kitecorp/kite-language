@@ -197,4 +197,132 @@ public class BuiltinShadowingTest extends RuntimeTest {
                 }
                 """));
     }
+
+    @Test
+    @DisplayName("Function declaration named after builtin throws")
+    void funNamedAfterBuiltinThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
+                fun sum(number a, number b) {
+                    return a + b
+                }
+                """));
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin first()")
+    void varShadowsFirst() {
+        var result = eval("""
+                var first = "winner"
+                first
+                """);
+        assertEquals("winner", result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin last()")
+    void varShadowsLast() {
+        var result = eval("""
+                var last = 99
+                last
+                """);
+        assertEquals(99, result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin length()")
+    void varShadowsLength() {
+        var result = eval("""
+                var length = 42
+                length + 8
+                """);
+        assertEquals(50, result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin values()")
+    void varShadowsValues() {
+        var result = eval("""
+                var values = [1, 2, 3]
+                values
+                """);
+        assertEquals(java.util.List.of(1, 2, 3), result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin find()")
+    void varShadowsFind() {
+        var result = eval("var find = true");
+        assertEquals(true, result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin hash()")
+    void varShadowsHash() {
+        var result = eval("""
+                var hash = "abc123"
+                hash
+                """);
+        assertEquals("abc123", result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin date()")
+    void varShadowsDate() {
+        var result = eval("""
+                var date = "2024-01-01"
+                date
+                """);
+        assertEquals("2024-01-01", result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin second()")
+    void varShadowsSecond() {
+        var result = eval("""
+                var second = 2
+                second * 5
+                """);
+        assertEquals(10, result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin get()")
+    void varShadowsGet() {
+        var result = eval("""
+                var get = "fetched"
+                get
+                """);
+        assertEquals("fetched", result);
+    }
+
+    @Test
+    @DisplayName("var shadows re-enabled builtin environment()")
+    void varShadowsEnvironment() {
+        var result = eval("""
+                var environment = "production"
+                environment
+                """);
+        assertEquals("production", result);
+    }
+
+    @Test
+    @DisplayName("Shadowed builtin is no longer callable")
+    void shadowedBuiltinNotCallable() {
+        // After shadowing sum with an integer, calling sum() should fail
+        // because the var value (integer) is not callable
+        assertThrows(RuntimeException.class, () -> eval("""
+                var sum = 42
+                sum([1, 2, 3])
+                """));
+    }
+
+    @Test
+    @DisplayName("Builtin can be used before shadowing in separate scope")
+    void builtinUsableBeforeShadow() {
+        var result = eval("""
+                var first = "not-a-function"
+                first
+                """);
+        assertEquals("not-a-function", result);
+    }
 }

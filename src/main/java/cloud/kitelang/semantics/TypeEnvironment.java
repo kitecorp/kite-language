@@ -4,6 +4,8 @@ import cloud.kitelang.execution.environment.Environment;
 import cloud.kitelang.execution.values.ResourceValue;
 import cloud.kitelang.semantics.types.ResourceType;
 import cloud.kitelang.semantics.types.Type;
+import cloud.kitelang.stdlib.StdlibRegistry;
+import cloud.kitelang.syntax.literals.Identifier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +55,32 @@ public class TypeEnvironment extends Environment<Type> {
 
     public boolean hasName() {
         return StringUtils.isNotBlank(getName());
+    }
+
+    /**
+     * Declares a new type, allowing it to shadow a stdlib builtin function type.
+     * Stdlib builtins are identified by their name being in {@link StdlibRegistry#STDLIB_FUNCTION_NAMES}.
+     * This enables user code like {@code var sum = 1 + 2} even though {@code sum}
+     * is a built-in collection function.
+     *
+     * @throws cloud.kitelang.execution.exceptions.DeclarationExistsException if the name is already
+     *         declared as a user variable (not a stdlib builtin)
+     */
+    /**
+     * Overload accepting {@link Identifier} for convenience, delegates to the String version.
+     */
+    public Type initShadowingStdlib(Identifier name, Type value) {
+        return initShadowingStdlib(name.string(), value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Type initShadowingStdlib(String name, Type value) {
+        var existing = getVariables().get(name);
+        if (existing != null && StdlibRegistry.STDLIB_FUNCTION_NAMES.contains(name)) {
+            getVariables().put(name, value);
+            return value;
+        }
+        return (Type) init(name, value);
     }
 
     /**
