@@ -1,12 +1,10 @@
 package cloud.kitelang.stdlib.functions.utility;
 
 import cloud.kitelang.base.RuntimeTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled("Function 'hash' removed due to namespace conflict with common resource names")
 class HashFunctionTest extends RuntimeTest {
 
     private final HashFunction function = new HashFunction();

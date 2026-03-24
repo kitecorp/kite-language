@@ -32,9 +32,9 @@ public class DependsOnTests extends DecoratorTests {
     void dependsOnSingleResourceInexistantResource() {
         Assertions.assertThrows(NotFoundException.class, () -> eval("""
                 schema vm { string name }
-                
-                @dependsOn(second)
-                resource vm first { }
+
+                @dependsOn(nonexistent)
+                resource vm primary { }
                 """));
     }
 

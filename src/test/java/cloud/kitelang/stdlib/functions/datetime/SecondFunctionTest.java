@@ -1,7 +1,6 @@
 package cloud.kitelang.stdlib.functions.datetime;
 
 import cloud.kitelang.base.RuntimeTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
@@ -9,7 +8,6 @@ import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Disabled("Function 'second' removed due to namespace conflict with common resource names")
 class SecondFunctionTest extends RuntimeTest {
 
     private final SecondFunction function = new SecondFunction();

@@ -20,9 +20,11 @@ import cloud.kitelang.stdlib.functions.collections.*;
 import cloud.kitelang.stdlib.functions.datetime.*;
 import cloud.kitelang.stdlib.functions.numeric.*;
 import cloud.kitelang.stdlib.functions.objects.EntriesFunction;
+import cloud.kitelang.stdlib.functions.objects.GetFunction;
 import cloud.kitelang.stdlib.functions.objects.HasKeyFunction;
 import cloud.kitelang.stdlib.functions.objects.KeysFunction;
 import cloud.kitelang.stdlib.functions.objects.MergeFunction;
+import cloud.kitelang.stdlib.functions.objects.ValuesFunction;
 import cloud.kitelang.stdlib.functions.string.*;
 import cloud.kitelang.stdlib.functions.types.*;
 import cloud.kitelang.stdlib.functions.utility.*;
@@ -149,15 +151,15 @@ public final class Interpreter extends StackVisitor<Object> {
         // collection functions
         this.env.init("isEmpty", new IsEmptyFunction());
         this.env.init("contains", new ContainsFunction());
-        // this.env.init("first", new FirstFunction()); // Removed: conflicts with common resource names
-        // this.env.init("last", new LastFunction()); // Removed: conflicts with common resource names
+        this.env.init("first", new FirstFunction());
+        this.env.init("last", new LastFunction());
         this.env.init("join", new JoinFunction());
         this.env.init("sort", new SortFunction());
         this.env.init("push", new PushFunction());
         this.env.init("pop", new PopFunction());
         this.env.init("reverse", new ReverseFunction());
         this.env.init("slice", new SliceFunction());
-        // this.env.init("find", new FindFunction()); // Removed: conflicts with common resource names
+        this.env.init("find", new FindFunction());
         this.env.init("distinct", new DistinctFunction());
         this.env.init("flatten", new FlattenFunction());
         this.env.init("take", new TakeFunction());
@@ -193,10 +195,10 @@ public final class Interpreter extends StackVisitor<Object> {
         this.env.init("day", new DayFunction());
         this.env.init("hour", new HourFunction());
         this.env.init("minute", new MinuteFunction());
-        // this.env.init("second", new SecondFunction()); // Removed: conflicts with common resource names
+        this.env.init("second", new SecondFunction());
         this.env.init("formatDate", new FormatDateFunction());
         this.env.init("timestamp", new TimestampFunction());
-        // this.env.init("date", new DateFunction()); // Removed: conflicts with common resource names
+        this.env.init("date", new DateFunction());
         this.env.init("addDays", new AddDaysFunction());
         this.env.init("diffDays", new DiffDaysFunction());
         this.env.init("isLeapYear", new IsLeapYearFunction());
@@ -215,18 +217,18 @@ public final class Interpreter extends StackVisitor<Object> {
 
         // object manipulation functions
         this.env.init("keys", new KeysFunction());
-        // this.env.init("values", new ValuesFunction()); // Removed: conflicts with common variable names
+        this.env.init("values", new ValuesFunction());
         this.env.init("entries", new EntriesFunction());
         this.env.init("merge", new MergeFunction());
         this.env.init("hasKey", new HasKeyFunction());
-        // this.env.init("get", new GetFunction()); // Removed: conflicts with common resource names
+        this.env.init("get", new GetFunction());
 
         // utility functions
         this.env.init("uuid", new UuidFunction());
         this.env.init("base64Encode", new Base64EncodeFunction());
         this.env.init("base64Decode", new Base64DecodeFunction());
-        // this.env.init("hash", new HashFunction()); // Removed: conflicts with common resource names
-        // this.env.init("env", new EnvFunction()); // Removed: conflicts with common variable names (e.g., for env in environments)
+        this.env.init("hash", new HashFunction());
+        this.env.init("environment", new EnvironmentFunction());
         this.env.init("fileExists", new FileExistsFunction());
         this.env.init("readFile", new ReadFileFunction());
         this.env.init("fromJson", new FromJsonFunction());

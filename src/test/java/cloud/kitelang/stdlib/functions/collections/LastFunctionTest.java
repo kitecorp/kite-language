@@ -1,7 +1,6 @@
 package cloud.kitelang.stdlib.functions.collections;
 
 import cloud.kitelang.base.RuntimeTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Disabled("Function 'last' removed due to namespace conflict with common resource names")
 class LastFunctionTest extends RuntimeTest {
 
     private final LastFunction function = new LastFunction();

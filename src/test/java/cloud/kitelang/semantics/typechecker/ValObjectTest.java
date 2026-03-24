@@ -14,7 +14,7 @@ import static cloud.kitelang.syntax.literals.NumberLiteral.number;
 import static cloud.kitelang.syntax.literals.ObjectLiteral.object;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("TypeChecker Object")
+@DisplayName("TypeChecker Val Object")
 @Disabled
 public class ValObjectTest extends CheckerTest {
 
