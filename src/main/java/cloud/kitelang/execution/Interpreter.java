@@ -675,8 +675,8 @@ public final class Interpreter extends StackVisitor<Object> {
             }
         }
 
-        // Register in global environment (may shadow stdlib builtins like sum, min, max)
-        env.initShadowingBuiltin(typeName, componentValue);
+        // Register in global environment
+        env.init(typeName, componentValue);
 
         return componentValue;
     }
@@ -755,8 +755,8 @@ public final class Interpreter extends StackVisitor<Object> {
         }
 
 
-        // Register instance by name only (may shadow stdlib builtins)
-        env.initShadowingBuiltin(instanceName, componentValue);
+        // Register instance by name only
+        env.init(instanceName, componentValue);
 
         return componentValue;
     }
@@ -1631,7 +1631,7 @@ public final class Interpreter extends StackVisitor<Object> {
             }
         }
         pop(ContextStack.Struct);
-        return env.initShadowingBuiltin(expression.getName().string(), structValue);
+        return env.init(expression.getName().string(), structValue);
     }
 
     @Override

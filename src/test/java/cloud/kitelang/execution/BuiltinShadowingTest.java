@@ -2,11 +2,11 @@ package cloud.kitelang.execution;
 
 import cloud.kitelang.base.RuntimeTest;
 import cloud.kitelang.execution.exceptions.DeclarationExistsException;
-import cloud.kitelang.execution.values.StructValue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests that user-declared variables can shadow stdlib builtin function names,
@@ -131,54 +131,70 @@ public class BuiltinShadowingTest extends RuntimeTest {
     }
 
     @Test
-    @DisplayName("Struct named after builtin can be declared and instantiated")
-    void structNamedAfterBuiltin() {
-        var result = eval("""
+    @DisplayName("Shadowing same builtin twice throws")
+    void doubleShadowThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
+                var sum = 1
+                var sum = 2
+                """));
+    }
+
+    @Test
+    @DisplayName("Shadowing user-defined function throws")
+    void shadowUserFunctionThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
+                fun add(number a, number b) {
+                    return a + b
+                }
+                var add = 5
+                """));
+    }
+
+    @Test
+    @DisplayName("Shadowing user-defined struct throws")
+    void shadowUserStructThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
+                struct Point {
+                    number x
+                    number y
+                }
+                var Point = 5
+                """));
+    }
+
+    @Test
+    @DisplayName("Struct named after builtin throws")
+    void structNamedAfterBuiltinThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
                 struct sum {
                     number a
                     number b
                 }
-                var s = sum(3, 7)
-                s.a + s.b
-                """);
-        assertEquals(10, result);
+                """));
     }
 
     @Test
-    @DisplayName("Component type named after builtin")
-    void componentTypeNamedAfterBuiltin() {
-        eval("""
+    @DisplayName("Component type named after builtin throws")
+    void componentTypeNamedAfterBuiltinThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
                 component sum {
                     input number a = 1
-                    input number b = 2
-                    output number total = a + b
+                    output number total = a * 2
                 }
-                component sum mySum {
-                    a = 10
-                    b = 20
-                }
-                """);
-
-        var instance = interpreter.getComponent("mySum");
-        assertEquals(30, instance.argVal("total"));
+                """));
     }
 
     @Test
-    @DisplayName("Component instance named after builtin")
-    void componentInstanceNamedAfterBuiltin() {
-        eval("""
+    @DisplayName("Component instance named after builtin throws")
+    void componentInstanceNamedAfterBuiltinThrows() {
+        assertThrows(DeclarationExistsException.class, () -> eval("""
                 component Adder {
                     input number a = 1
-                    input number b = 2
-                    output number total = a + b
+                    output number total = a * 2
                 }
                 component Adder sum {
                     a = 5
-                    b = 15
                 }
-                """);
-
-        var instance = interpreter.getComponent("sum");
-        assertEquals(20, instance.argVal("total"));
+                """));
     }
 }
