@@ -154,7 +154,7 @@ if (ExecutionContext(ForStatement.class) instanceof ForStatement forStmt) {
 
 **Core:** ANTLR4 4.13.1, Hibernate 7.1, Spring Context 6.2, Jackson 2.20, Lombok, Log4j 2.24
 **Test:** JUnit 5, Mockito, H2
-**Build:** Gradle 9.1, Java 25
+**Build:** Gradle 9.4, Java 25
 
 ## Test Coverage
 

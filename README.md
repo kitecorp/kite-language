@@ -12,17 +12,28 @@ This module contains the **parser**, **type checker**, **interpreter**, and **st
 ## Overview
 
 ```kite
-// Define a schema
-schema Config { string host; number port = 5432 }
+// import statements
+import Bucket from "aws/s3"
+import Instance from "aws/ec2"
 
 // Declare a resource
-resource S3.Bucket photos { name = "my-photos-bucket" }
+resource Bucket photos { 
+   name = "my-photos-bucket" 
+}
 
 // Define a reusable component
-component WebServer api {
+component WebServer {
   input number port = 8080
-  resource VM.Instance server { size = "t2.micro" }
+  
+  resource Instance server { 
+      size = "t2.micro" 
+  }
+  
   output string endpoint = server.publicIp
+}
+// instantiate the component
+component WebServer server {
+  port = 8080
 }
 
 // Use types and string interpolation
@@ -52,7 +63,7 @@ kite-language/
 ## Prerequisites
 
 - **Java 25** or later
-- **Gradle 9.1** (wrapper included)
+- **Gradle 9.4** (wrapper included)
 
 ## Building
 
