@@ -5,20 +5,11 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-green)](LICENSE)
 [![Gradle](https://img.shields.io/badge/Build-Gradle%209.1-02303A)](https://gradle.org/)
 
-The language module for [Kite](https://github.com/kitecorp/kite) — an Infrastructure as Code (IaC) language designed as an alternative to Terraform.
+The language module for [Kite](https://github.com/kitecorp/kite) - an Infrastructure as Code (IaC) language designed as a modern alternative to Terraform.
 
 This module contains the **parser**, **type checker**, **interpreter**, and **standard library** that power the Kite language.
 
 ## Overview
-
-Kite uses a two-phase execution model that catches all errors before any cloud provisioning happens:
-
-```
-Phase 1: Source → Lexer → Parser → AST → TypeChecker → Interpreter → ResourceValue[]
-Phase 2: ResourceValue[] → Engine → Cloud APIs → Database State
-```
-
-### Quick Syntax Example
 
 ```kite
 // Define a schema
@@ -193,6 +184,15 @@ If you modify the ANTLR grammar files (`grammar/KiteLexer.g4` or `grammar/KitePa
 3. Update documentation in `docs/` if your change affects language behavior
 4. Update `docs/FEATURES.md` when completing a new feature
 5. Keep commits focused and descriptive
+
+## Architecture
+
+Kite uses a two-phase execution model that catches all errors before any cloud provisioning happens:
+
+```
+Phase 1: Source → Lexer → Parser → AST → TypeChecker → Interpreter → ResourceValue[]
+Phase 2: ResourceValue[] → Engine → Cloud APIs → Database State
+```
 
 ## License
 
