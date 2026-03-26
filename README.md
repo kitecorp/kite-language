@@ -69,19 +69,19 @@ kite-language/
 
 ```bash
 # Build the module
-./gradlew :kite-language:build
+./gradlew build
 
 # Run tests
-./gradlew :kite-language:test
+./gradlew test
 
 # Run a specific test
-./gradlew :kite-language:test --tests "*.StructTest"
+./gradlew test --tests "*.StructTest"
 
 # Regenerate ANTLR grammar sources
-./gradlew clean :kite-language:generateGrammarSource
+./gradlew clean generateGrammarSource
 ```
 
-> **Note:** This module depends on [`kite-api`](https://github.com/kitecorp/kite-api), which is included as a composite build. Make sure both submodules are initialized (see [Getting Started](#getting-started) below).
+> **Note:** This module depends on [`kite-api`](https://github.com/kitecorp/kite-api), which must be cloned as a sibling directory. See [Getting Started](#getting-started) for setup instructions.
 
 ## Key Features
 
@@ -111,42 +111,35 @@ kite-language/
 
 ### Getting Started
 
-This repository is a **Git submodule** of the main [kite](https://github.com/kitecorp/kite) project. To set up your development environment:
-
-1. **Clone the parent repository with submodules:**
-
-   ```bash
-   git clone --recurse-submodules git@github.com:kitecorp/kite.git
-   cd kite
-   ```
-
-   If you already cloned without `--recurse-submodules`, initialize them manually:
-
-   ```bash
-   git submodule update --init --recursive
-   ```
-
-2. **Verify the setup** — both `kite-language` and `kite-api` (a build dependency) must be present:
-
-   ```bash
-   ls kite-language/   # This module
-   ls kite-api/        # Required dependency
-   ```
-
-3. **Build and run tests:**
-
-   ```bash
-   ./gradlew :kite-language:test
-   ```
-
-### Working on the Submodule
-
-When contributing to `kite-language`, keep in mind that submodules track a specific commit. After making changes:
+`kite-language` is a standalone module. The only build dependency is [`kite-api`](https://github.com/kitecorp/kite-api) (shared interfaces and annotations). Clone both repos side by side:
 
 ```bash
-# Work inside the submodule directory
-cd kite-language
+# Clone both repos into the same parent directory
+git clone git@github.com:kitecorp/kite-language.git
+git clone git@github.com:kitecorp/kite-api.git
+```
 
+Your directory structure should look like:
+
+```
+parent-dir/
+├── kite-language/   # This repo
+└── kite-api/        # Build dependency (interfaces only)
+```
+
+> `kite-api` must be in a sibling directory (`../kite-api`) — this is configured in [`settings.gradle`](settings.gradle) as a [Gradle composite build](https://docs.gradle.org/current/userguide/composite_builds.html).
+
+Build and verify:
+
+```bash
+cd kite-language
+./gradlew build
+./gradlew test
+```
+
+### Making Changes
+
+```bash
 # Create a feature branch
 git checkout -b feature/my-change
 
@@ -157,8 +150,6 @@ git push origin feature/my-change
 ```
 
 Then open a pull request against the [`kite-language`](https://github.com/kitecorp/kite-language) repository.
-
-> **Important:** After your changes are merged, the parent `kite` repository also needs to be updated to point to the new submodule commit.
 
 ### Development Practices
 
@@ -171,13 +162,13 @@ Then open a pull request against the [`kite-language`](https://github.com/kiteco
 
 ```bash
 # All tests
-./gradlew :kite-language:test
+./gradlew test
 
 # Specific test class
-./gradlew :kite-language:test --tests "*.StructTest"
+./gradlew test --tests "*.StructTest"
 
 # Tests matching a pattern
-./gradlew :kite-language:test --tests "*typechecker*"
+./gradlew test --tests "*typechecker*"
 ```
 
 ### Grammar Changes
@@ -185,12 +176,12 @@ Then open a pull request against the [`kite-language`](https://github.com/kiteco
 If you modify the ANTLR grammar files (`grammar/KiteLexer.g4` or `grammar/KiteParser.g4`), regenerate sources before building:
 
 ```bash
-./gradlew clean :kite-language:generateGrammarSource
+./gradlew clean generateGrammarSource
 ```
 
 ### Pull Request Guidelines
 
-1. Ensure all tests pass (`./gradlew :kite-language:test`)
+1. Ensure all tests pass (`./gradlew test`)
 2. Add tests for new features or bug fixes
 3. Update documentation in `docs/` if your change affects language behavior
 4. Update `docs/FEATURES.md` when completing a new feature
