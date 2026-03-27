@@ -186,7 +186,7 @@ public class ImportResolver {
         // Check if it looks like a provider path (single segment or provider/domain format)
         // Common provider names that users might try to import
         String firstSegment = path.contains("/") ? path.substring(0, path.indexOf('/')) : path;
-        return Set.of("aws", "azure", "gcp", "google", "kubernetes", "k8s", "docker", "files").contains(firstSegment.toLowerCase());
+        return Set.of("aws", "azure", "gcp", "google", "kubernetes", "k8s", "docker", "files", "std").contains(firstSegment.toLowerCase());
     }
 
     /**
