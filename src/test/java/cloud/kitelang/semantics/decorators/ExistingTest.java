@@ -45,20 +45,27 @@ public class ExistingTest extends CheckerTest {
                 resource vm something {}"""));
     }
 
+    /**
+     * No-argument form: marks the resource as a query-based data source.
+     * Equivalent to a Terraform data source lookup.
+     */
     @Test
-    void existing() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+    void existingNoArgQueryBased() {
+        eval("""
                 schema vm {}
                 @existing
-                resource vm something {}"""));
+                resource vm something {}""");
     }
 
+    /**
+     * Empty parens form: semantically identical to the no-argument form.
+     */
     @Test
-    void existingEmpty() {
-        Assertions.assertThrows(TypeError.class, () -> eval("""
+    void existingEmptyParensQueryBased() {
+        eval("""
                 schema vm {}
                 @existing()
-                resource vm something {}"""));
+                resource vm something {}""");
     }
 
     @Test

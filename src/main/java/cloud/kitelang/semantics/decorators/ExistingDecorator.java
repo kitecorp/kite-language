@@ -17,6 +17,12 @@ import static cloud.kitelang.semantics.types.DecoratorType.decorator;
 public class ExistingDecorator extends DecoratorChecker {
     public static final String NAME = "existing";
 
+    /**
+     * Sentinel value used when {@code @existing} is declared without arguments,
+     * indicating a query-based data source lookup (Terraform data source style).
+     */
+    public static final String QUERY_SENTINEL = "__query__";
+
     public ExistingDecorator(TypeChecker checker) {
         super(checker, NAME, decorator(
                         List.of(ValueType.String),
@@ -28,6 +34,14 @@ public class ExistingDecorator extends DecoratorChecker {
     @Override
     public Object validate(AnnotationDeclaration declaration, List<Object> args) {
         var value = declaration.getValue();
+
+        // No-argument form: @existing (query-based data source).
+        // Accept only when no value, no array args, and no object args are present.
+        // Note: getArgs() != null catches @existing([]) which hasArgs() would miss.
+        if (value == null && declaration.getArgs() == null && declaration.getObject() == null) {
+            return null;
+        }
+
         if (value == null) {
             throwIfInvalidArgs(declaration);
         }
@@ -156,7 +170,7 @@ public class ExistingDecorator extends DecoratorChecker {
         }
     }
 
-    public enum ImportKind {ARN, SERVICE_ID, NAME, URL, TAGS }
+    public enum ImportKind {ARN, SERVICE_ID, NAME, URL, TAGS, QUERY }
 
     public record ImportRef(ImportKind kind, String service, String value,
                             String region, String account) {}

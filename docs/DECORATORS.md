@@ -219,16 +219,19 @@ When `importable=true`, the property can be used to identify existing resources 
 
 ## Resource Decorators
 
-### @existing("reference")
+### @existing / @existing("reference")
 
-Reference existing cloud resources by ARN, URL, or ID.
+Reference existing cloud resources. Supports two forms:
+
+1. **ID-based (import by reference):** `@existing("reference")` -- looks up a specific resource by ARN, URL, or ID.
+2. **Query-based (data source):** `@existing` (no argument) -- marks the resource as a query-based data source lookup, where filters and properties on the resource body drive the lookup (similar to Terraform data sources).
 
 | Property | Value |
 |----------|-------|
-| **Argument** | `string` (ARN, URL, EC2 instance ID, KMS alias, log group) |
+| **Argument** | `string` (ARN, URL, EC2 instance ID, KMS alias, log group) or none |
 | **Targets** | `resource` |
 
-**Supported formats:**
+**Supported formats (ID-based form):**
 - ARN: `arn:aws:s3:::bucket-name`
 - URL: `https://example.com` or `s3://bucket/key`
 - EC2 Instance ID: `i-0123456789abcdef0`
@@ -237,11 +240,19 @@ Reference existing cloud resources by ARN, URL, or ID.
 - Tags: `Environment=prod,Team=platform`
 
 ```kite
+// ID-based: import by specific reference
 @existing("arn:aws:s3:::my-bucket")
 resource S3.Bucket existing_bucket {}
 
 @existing("i-0123456789abcdef0")
 resource EC2.Instance existing_instance {}
+
+// Query-based: data source lookup driven by resource body
+@existing
+resource Ami latest {
+  filter = { name: "name", values: ["amzn2-*"] }
+  mostRecent = true
+}
 ```
 
 ### @sensitive
@@ -440,7 +451,7 @@ input string name
 | `@allowed([...])` | array | input, schema property |
 | `@unique` | none | input |
 | `@cloud` | optional: `importable` | schema property |
-| `@existing("ref")` | string | resource |
+| `@existing` / `@existing("ref")` | none or string | resource |
 | `@sensitive` | none | input, output |
 | `@dependsOn(res)` | reference(s) | resource, component |
 | `@tags({...})` | object/array/string | resource, component |

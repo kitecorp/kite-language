@@ -294,6 +294,32 @@ The optional `importable` argument indicates properties that can identify existi
 - `src/test/java/cloud/kitelang/semantics/typechecker/SchemaTest.java` (type-check tests)
 - `src/test/java/cloud/kitelang/integration/CloudDecoratorTest.java` (integration tests)
 
+## @existing No-Argument Form (Query-Based Data Source)
+
+The `@existing` decorator now supports a no-argument form for query-based data source lookups, in addition to the existing ID-based form. Without an argument, `@existing` marks the resource as a query-based data source where filters and properties in the resource body drive the lookup (similar to Terraform data sources).
+
+**Example:**
+```kite
+// Query-based: lookup via resource body filters
+@existing
+resource Ami latest {
+  filter = { name: "name", values: ["amzn2-*"] }
+  mostRecent = true
+}
+
+// ID-based: import by specific reference (unchanged)
+@existing("arn:aws:s3:::my-bucket")
+resource S3.Bucket myBucket {}
+```
+
+**Reference:**
+- `src/main/java/cloud/kitelang/semantics/decorators/ExistingDecorator.java` (type checker validation)
+- `src/main/java/cloud/kitelang/execution/decorators/ExistingDecorator.java` (interpreter execution)
+
+**Tests:**
+- `src/test/java/cloud/kitelang/semantics/decorators/ExistingTest.java`
+- `src/test/java/cloud/kitelang/execution/decorators/ExistingTests.java`
+
 ## Deferred Cloud Property Resolution
 
 Enables referencing `@cloud` properties from other resources. These references are resolved during apply, after the dependent resource is created and its cloud-managed properties are populated.

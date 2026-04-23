@@ -5,6 +5,8 @@ import cloud.kitelang.syntax.ast.expressions.AnnotationDeclaration;
 import cloud.kitelang.syntax.ast.expressions.ResourceStatement;
 import cloud.kitelang.syntax.literals.StringLiteral;
 
+import static cloud.kitelang.semantics.decorators.ExistingDecorator.QUERY_SENTINEL;
+
 public class ExistingDecorator extends DecoratorInterpreter {
     private final SyntaxPrinter printer;
 
@@ -16,10 +18,14 @@ public class ExistingDecorator extends DecoratorInterpreter {
     @Override
     public Object execute(AnnotationDeclaration declaration) {
         if (declaration.getTarget() instanceof ResourceStatement resource) {
-            Object value = declaration.getValue();
+            var value = declaration.getValue();
+
+            // No-argument form: @existing (query-based data source)
             if (value == null) {
-                throw new IllegalStateException("%s Value cannot be null".formatted(printer.visit(declaration)));
+                resource.setExisting(QUERY_SENTINEL);
+                return resource.getExisting();
             }
+
             if (value instanceof StringLiteral string) {
                 resource.setExisting(string.getValue());
                 return resource.getExisting();
