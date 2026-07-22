@@ -1,6 +1,7 @@
 package cloud.kitelang.analysis.visitors;
 
 import cloud.kitelang.semantics.types.ArrayType;
+import cloud.kitelang.semantics.types.MapType;
 import cloud.kitelang.semantics.types.Type;
 import cloud.kitelang.semantics.types.UnionType;
 import cloud.kitelang.syntax.ast.Program;
@@ -304,6 +305,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
     public String visit(Type type) {
         return switch (type) {
             case ArrayType at -> theme.type(at.getType().getValue() + "[]");
+            case MapType mt -> theme.type("map<" + visit(mt.getKeyType()) + ", " + visit(mt.getValueType()) + ">");
             case UnionType ut -> theme.type(ut.getTypes()
                     .stream()
                     .map(this::visit)
@@ -479,6 +481,7 @@ public non-sealed class SyntaxPrinter implements Visitor<String> {
         return switch (expression) {
             case ParameterIdentifier p -> theme.type(formatParameter(p));
             case ArrayTypeIdentifier a -> theme.type(a.getType().getValue() + "[]");
+            case MapTypeIdentifier m -> theme.type(m.string());
             case TypeIdentifier t -> theme.type(t.string());
             case PluginIdentifier p -> theme.type(p.string());
             case null -> null;

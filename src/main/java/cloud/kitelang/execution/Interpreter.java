@@ -241,6 +241,13 @@ public final class Interpreter extends StackVisitor<Object> {
         if (expression instanceof ArrayTypeIdentifier arrayTypeIdentifier) {
             return env.lookup(arrayTypeIdentifier.getType().getValue(), expression.getHops());
         }
+        if (expression instanceof MapTypeIdentifier) {
+            // Unlike array element types, a map's key/value types are never themselves a
+            // registered union-type-alias Set (e.g. `type Status = "a" | "b"`) looked up by name
+            // here - "map" isn't a declared identifier at runtime. Nothing to resolve; the
+            // expect(DependencyHolder, Object) caller only acts when this returns a Set.
+            return null;
+        }
         try {
             return env.lookup(expression.string(), expression.getHops());
         } catch (NotFoundException e) {

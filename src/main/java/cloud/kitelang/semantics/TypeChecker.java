@@ -123,6 +123,14 @@ public final class TypeChecker extends StackVisitor<Type> {
                 var res = Optional.ofNullable(type).orElseGet(() -> TypeFactory.fromString(identifier.getType().getValue()));
                 return new ArrayType(env, res);
             }
+            case MapTypeIdentifier identifier -> {
+                // Recurse through this same dispatcher for both nested types so key/value types
+                // compose freely (map<string, map<string, number>>, map<string, number[]>, ...)
+                // exactly like array element types already do.
+                Type keyType = visit((Identifier) identifier.getKeyType());
+                Type valueType = visit((Identifier) identifier.getValueType());
+                return new MapType(env, keyType, valueType);
+            }
             case TypeIdentifier identifier -> {
                 Type type = env.lookup(identifier.getType().getValue());
                 return Optional.ofNullable(type).orElseGet(() -> TypeFactory.fromString(identifier.getType().getValue()));
@@ -313,6 +321,7 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         return switch (expectedType.getKind()) {
             case ARRAY -> expectArray(actualType, expectedType, expectedVal);
+            case MAP -> expectMap(actualType, expectedType, expectedVal);
             case UNION_TYPE -> expect(actualType, (UnionType) expectedType, expectedVal);
             case ANY -> actualType; // Accept any actual type without validation
             case null, default -> throw new TypeError(format(
@@ -320,6 +329,30 @@ public final class TypeChecker extends StackVisitor<Type> {
                     printer.visit(expectedType), actualType, printer.visit(expectedVal)
             ));
         };
+    }
+
+    /**
+     * Map values are written as object literals (Kite has no dedicated map-literal syntax), so
+     * an ObjectType satisfies a declared MapType as long as every property's inferred type is
+     * compatible with the map's declared value type. Keys are always strings at the AST level
+     * (enforced in {@code visit(ObjectExpression)}), so there is nothing to validate there.
+     */
+    private Type expectMap(Type actualType, Type expectedType, Expression expectedVal) {
+        var expectedMapType = (MapType) expectedType;
+
+        // Bare `object`/empty map: nothing declared to check element-by-element against.
+        if (!(actualType instanceof ObjectType actualObject)) {
+            throw new TypeError(format(
+                    "Expected map type `{0}` but got `{1}` in expression: {2}",
+                    expectedType, actualType, printer.visit(expectedVal)
+            ));
+        }
+        if (actualObject.getEnvironment() != null) {
+            for (Type propertyType : actualObject.getEnvironment().getVariables().values()) {
+                expect(propertyType, expectedMapType.getValueType(), expectedVal);
+            }
+        }
+        return expectedType;
     }
 
     private Type expectArray(Type actualType, Type expectedType, Expression expectedVal) {
@@ -1306,8 +1339,11 @@ public final class TypeChecker extends StackVisitor<Type> {
 
         expect(implicitType, explicitType, expression);
 
-        // Use implicit type for objects to preserve environment variable types
-        var typeToInit = implicitType.getKind() == ObjectType.INSTANCE.getKind()
+        // Use implicit type for objects to preserve environment variable types.
+        // Map-declared vars are excluded: their initializer is ALSO an object literal
+        // (Kite has no dedicated map-literal syntax), but the declared key/value types are
+        // exactly what makes it a map rather than a plain object - keep the explicit MapType.
+        var typeToInit = implicitType.getKind() == ObjectType.INSTANCE.getKind() && !(explicitType instanceof MapType)
                 ? implicitType
                 : explicitType;
 

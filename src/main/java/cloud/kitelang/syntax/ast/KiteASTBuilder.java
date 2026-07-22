@@ -884,6 +884,8 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
         // Handle function type: (number) -> string
         if (ctx.functionType() != null) {
             base = (TypeIdentifier) visit(ctx.functionType());
+        } else if (ctx.mapType() != null) {
+            base = (TypeIdentifier) visit(ctx.mapType());
         } else if (ctx.complexTypeIdentifier() != null) {
             base = (TypeIdentifier) visit(ctx.complexTypeIdentifier());
         } else if (ctx.OBJECT() != null) {
@@ -911,6 +913,13 @@ public class KiteASTBuilder extends cloud.kitelang.syntax.ast.generated.KitePars
                 .collect(Collectors.joining("."));
 
         return TypeIdentifier.type(typeName);
+    }
+
+    @Override
+    public TypeIdentifier visitMapType(MapTypeContext ctx) {
+        var keyType = (TypeIdentifier) visit(ctx.typeIdentifier(0));
+        var valueType = (TypeIdentifier) visit(ctx.typeIdentifier(1));
+        return MapTypeIdentifier.mapType(keyType, valueType);
     }
 
     @Override
