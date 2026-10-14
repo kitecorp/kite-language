@@ -14,7 +14,10 @@ repositories {
 def lombok = '1.18.44'
 
 dependencies {
-    implementation project(':kite-api')
+    // Standalone, settings.gradle includes ../kite-api as a composite build that substitutes this
+    // coordinate. Inside the kite superproject, kite-api is a project of the same build instead.
+    // Either form alone breaks the other build, which is why this line kept flipping between them.
+    implementation(findProject(':kite-api') != null ? project(':kite-api') : 'cloud.kitelang:kite-api')
     antlr "org.antlr:antlr4:4.13.1"
     implementation "org.antlr:antlr4-runtime:4.13.1"
 
@@ -62,9 +65,19 @@ generateGrammarSource {
     }
 }
 
+// grammar/ is the kite-grammar git submodule. When it is not checked out, generateGrammarSource
+// has no input and is skipped, and javac then fails on every missing generated class. Fail first
+// with the command that fixes it.
+def parserGrammar = file('grammar/KiteParser.g4')
+
 // Ensure compileJava depends on grammar generation
 compileJava {
     dependsOn generateGrammarSource
+    doFirst {
+        if (!parserGrammar.exists()) {
+            throw new GradleException("${parserGrammar} not found: the grammar/ submodule is not checked out. Run: git submodule update --init")
+        }
+    }
 }
 sourceSets {
     main {
