@@ -9,22 +9,6 @@ import java.util.regex.Pattern;
 public class StringLiteralUtils {
     private static final Pattern INTERPOLATION = Pattern.compile("\\$\\{([^}]+)\\}|\\$([A-Za-z_][A-Za-z0-9_]*)");
 
-    /**
-     * The text inside one pair of quotes around the whole value, or the value itself
-     * when it is not quoted. Only a pair that opens and closes the value is removed: a
-     * value holding quotes, like the JSON of an IAM policy, used to be cut down to the
-     * text between its first two double quotes (kitecorp/kite#109).
-     */
-    public static String quote(String value) {
-        if (value != null && value.length() >= 2) {
-            var first = value.charAt(0);
-            if ((first == '"' || first == '\'') && value.charAt(value.length() - 1) == first) {
-                return value.substring(1, value.length() - 1);
-            }
-        }
-        return value;
-    }
-
     public static List<String> extractNames(String input) {
         List<String> vars = new ArrayList<>();
         Matcher m = INTERPOLATION.matcher(input);

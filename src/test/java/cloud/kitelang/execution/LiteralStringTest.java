@@ -132,4 +132,14 @@ public class LiteralStringTest extends RuntimeTest {
                 """);
         Assertions.assertEquals("\"hi\"", interpreter.getVar("quotation"));
     }
+
+    @Test
+    void doubleQuotedText_thatIsAQuotation_keepsItsQuotes() {
+        eval("""
+                var quotation = "\\"hi\\""
+                var single = "'abc'"
+                """);
+        Assertions.assertEquals(java.util.List.of("\"hi\"", "'abc'"),
+                java.util.List.of(interpreter.getVar("quotation"), interpreter.getVar("single")));
+    }
 }

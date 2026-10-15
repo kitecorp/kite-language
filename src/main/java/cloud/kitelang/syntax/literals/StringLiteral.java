@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * A string literal has the form of: "hello" or empty string ""
@@ -57,7 +56,6 @@ public class StringLiteral extends Literal {
      */
     public static StringLiteral literal(String value) {
         var literal = new StringLiteral();
-        // The parser passes the text without its quotes: '"hi"' is the text "hi"
         literal.value = value;
         // Don't extract interpolation vars - this is a literal string
         return literal;
@@ -70,12 +68,13 @@ public class StringLiteral extends Literal {
         return new StringLiteral(value.toString());
     }
 
+    /**
+     * The value is the string's text: callers pass it without the quotes it was written
+     * in. It used to go through a helper that cut quotes off again, so "\"hi\"" and
+     * '{"a":1}' lost characters of their own (kitecorp/kite#109).
+     */
     private void setValue(@Nullable String value) {
-        if (isBlank(value)) {
-            this.value = value;
-        } else {
-            this.value = StringLiteralUtils.quote(value);
-        }
+        this.value = value;
         if (contains(this.value, '$')) {
             this.interpolationVars = StringLiteralUtils.extractNames(this.value);
         }
