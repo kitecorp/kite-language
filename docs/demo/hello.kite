@@ -1,0 +1,14 @@
+import File from "files/general"
+
+var greeting = "Hello from Kite"
+
+resource File hello {
+  path    = "hello.txt"
+  content = "${greeting}!"
+}
+
+// Depends on hello: Kite orders it after hello
+resource File notes {
+  path    = "notes.txt"
+  content = "Created after ${hello.path}"
+}

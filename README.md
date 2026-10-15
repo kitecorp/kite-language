@@ -7,6 +7,12 @@
 
 Kite is a declarative infrastructure-as-code language: an alternative to Terraform, with its own syntax. You describe the cloud resources you want, group them into reusable components, and Kite works out the order in which to create them. This repository is the language itself: the grammar, parser, type checker and interpreter that turn a `.kite` file into a list of resources, sorted so that each resource comes after the resources it depends on.
 
+<p align="center">
+  <img src="docs/demo/kite.gif" alt="A terminal session: kite new creates a project, kite providers install downloads the aws and azure providers in parallel with one progress bar each, then kite plan and kite apply create two local files from a small Kite file, and a second kite plan reports nothing to change." width="900">
+</p>
+
+<sub>Recorded from [`docs/demo/kite.tape`](docs/demo/kite.tape) with [VHS](https://github.com/charmbracelet/vhs); re-record it with `vhs docs/demo/kite.tape`.</sub>
+
 ## A quick look
 
 > [!NOTE]
