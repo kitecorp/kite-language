@@ -57,7 +57,8 @@ public class StringLiteral extends Literal {
      */
     public static StringLiteral literal(String value) {
         var literal = new StringLiteral();
-        literal.value = StringLiteralUtils.quote(value);
+        // The parser passes the text without its quotes: '"hi"' is the text "hi"
+        literal.value = value;
         // Don't extract interpolation vars - this is a literal string
         return literal;
     }

@@ -104,5 +104,32 @@ public class LiteralStringTest extends RuntimeTest {
         Assertions.assertEquals("production", res.value());
     }
 
+    /**
+     * A string holding double quotes, like the JSON an IAM policy is written in, keeps
+     * every character: it used to be cut down to the text between its first two double
+     * quotes, so '{"Version":"2012-10-17"}' became Version (kitecorp/kite#109).
+     */
+    @Test
+    void singleQuotedJson_keepsItsQuotes() {
+        eval("""
+                var policy = '{"Version":"2012-10-17","Statement":[]}'
+                """);
+        Assertions.assertEquals("{\"Version\":\"2012-10-17\",\"Statement\":[]}", interpreter.getVar("policy"));
+    }
 
+    @Test
+    void doubleQuotedTextWithEscapedQuotes_keepsThem() {
+        eval("""
+                var greeting = "say \\"hi\\" now"
+                """);
+        Assertions.assertEquals("say \"hi\" now", interpreter.getVar("greeting"));
+    }
+
+    @Test
+    void singleQuotedText_thatIsAQuotation_keepsItsQuotes() {
+        eval("""
+                var quotation = '"hi"'
+                """);
+        Assertions.assertEquals("\"hi\"", interpreter.getVar("quotation"));
+    }
 }
