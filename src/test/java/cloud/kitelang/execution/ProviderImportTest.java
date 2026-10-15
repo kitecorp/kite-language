@@ -3,6 +3,7 @@ package cloud.kitelang.execution;
 import cloud.kitelang.analysis.ImportResolver;
 import cloud.kitelang.api.ProviderSchemaLookup;
 import cloud.kitelang.base.RuntimeTest;
+import cloud.kitelang.execution.values.ResourceValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -246,6 +247,54 @@ class ProviderImportTest extends RuntimeTest {
         assertEquals(3, interpreter.getVar("myMixedSum"));
         assertTrue(interpreter.hasVar("Vpc"));
         assertTrue(interpreter.hasVar("myMixedVpc"));
+    }
+
+    /**
+     * A Terraform provider loaded through the bridge is registered under its dependency
+     * name, which has a slash itself ({@code tf/random}), so its import path must not be
+     * cut at the first slash (kitecorp/kite#85).
+     */
+    @Test
+    @DisplayName("should import a type from a bridged Terraform provider")
+    void importTypeFromBridgedTerraformProvider() {
+        mockLookup.registerSchema("tf/random", "general", "Pet", """
+                schema Pet {
+                    number length
+                    @cloud string id
+                }
+                """);
+
+        eval("""
+                import Pet from "tf/random"
+
+                resource Pet name {
+                    length = 2
+                }
+                """);
+
+        var resource = (ResourceValue) interpreter.getVar("name");
+        assertEquals(2, resource.getProperty("length"));
+    }
+
+    @Test
+    @DisplayName("should import a type from a bridged Terraform provider's domain")
+    void importTypeFromBridgedTerraformProviderDomain() {
+        mockLookup.registerSchema("tf/aws", "storage", "S3Bucket", """
+                schema S3Bucket {
+                    string bucket
+                }
+                """);
+
+        eval("""
+                import S3Bucket from "tf/aws/storage"
+
+                resource S3Bucket logs {
+                    bucket = "kite-logs"
+                }
+                """);
+
+        var resource = (ResourceValue) interpreter.getVar("logs");
+        assertEquals("kite-logs", resource.getProperty("bucket"));
     }
 
     /**

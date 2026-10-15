@@ -167,11 +167,27 @@ public class ImportResolver {
             return false;
         }
 
-        // Extract provider name (first part before /)
-        String providerName = path.contains("/") ? path.substring(0, path.indexOf('/')) : path;
+        return knownProvider(path, schemaLookup) != null;
+    }
 
-        // Check if this is a known provider
-        return schemaLookup.isKnownProvider(providerName);
+    /**
+     * The provider an import path starts with, or null when it starts with no known
+     * provider. A provider's name can contain a slash itself: a Terraform provider loaded
+     * through the bridge is registered as {@code tf/random}. So the longest run of leading
+     * path segments that names a known provider wins, and in {@code tf/aws/storage} the
+     * provider is {@code tf/aws} and the domain {@code storage}.
+     */
+    private static String knownProvider(String path, ProviderSchemaLookup schemaLookup) {
+        String provider = null;
+        for (var slash = path.indexOf('/'); ; slash = path.indexOf('/', slash + 1)) {
+            var candidate = slash < 0 ? path : path.substring(0, slash);
+            if (schemaLookup.isKnownProvider(candidate)) {
+                provider = candidate;
+            }
+            if (slash < 0) {
+                return provider;
+            }
+        }
     }
 
     /**
@@ -212,9 +228,10 @@ public class ImportResolver {
         }
 
         var importPath = statement.getFilePath();
-        String[] parts = importPath.split("/");
-        String providerName = parts[0];
-        String domain = parts.length > 1 ? parts[1] : null;
+        String providerName = knownProvider(importPath, schemaLookup);
+        String domain = importPath.length() > providerName.length()
+                ? importPath.substring(providerName.length() + 1).split("/")[0]
+                : null;
 
         // Get schemas from registry
         List<ProviderSchemaLookup.SchemaInfo> schemas;
