@@ -158,7 +158,7 @@ public class ValidateDecorator extends DecoratorInterpreter {
     private void validateValueOrArray(AnnotationDeclaration decl, Pattern p, String msg, Object value) {
         switch (value) {
             case null -> {
-                return; // allow null; other decorators (e.g. @required) can enforce presence
+                return; // @validate checks the form of a value that is set, not whether one is set
             }
             case String s -> {
                 if (!p.matcher(s).matches()) throw fail(decl, msg, s, -1);
